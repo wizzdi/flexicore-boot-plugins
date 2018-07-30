@@ -16,6 +16,10 @@ public class UiFieldToClazz extends Baselink {
         return s_Singleton;
     }
 
+    private int priority;
+    private boolean visible;
+    private String context;
+
 
 
 
@@ -47,5 +51,33 @@ public class UiFieldToClazz extends Baselink {
     @Override
     public void setRightside(Baseclass rightside) {
         super.setRightside(rightside);
+    }
+
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public UiFieldToClazz setPriority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public UiFieldToClazz setVisible(boolean visible) {
+        this.visible = visible;
+        return this;
+    }
+
+    public String getContext() {
+        return context;
+    }
+
+    public UiFieldToClazz setContext(String context) {
+        this.context = context;
+        return this;
     }
 }
