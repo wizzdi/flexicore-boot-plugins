@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.flexicore</groupId>
+    <artifactId>scheduling-model</artifactId>
+    <version>1.0.0</version>
+    <properties>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <version.eclipselink>2.7.1</version.eclipselink>
+
+    </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>flexicore-local</id>
+            <name>flexicore-local</name>
+            <url>http://138.201.191.203:8083/artifactory/flexicore-local</url>
+        </repository>
+
+    </distributionManagement>
+
+
+    <repositories>
+        <repository>
+            <id>flexicore-local</id>
+            <name>flexicore-local</name>
+            <url>http://138.201.191.203:8083/artifactory/flexicore-local</url>
+        </repository>
+
+    </repositories>
+
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>flexicore-local</id>
+            <name>flexicore-local</name>
+            <url>http://138.201.191.203:8083/artifactory/flexicore-local</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.flexicore</groupId>
+            <artifactId>FlexiCore</artifactId>
+            <version>1.9.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>${version.eclipselink}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.5.12</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <compilerArgument>-proc:none</compilerArgument>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+
+                            <minimizeJar>false</minimizeJar>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <dependencyReducedPomLocation>
+                                ${java.io.tmpdir}/dependency-reduced-pom.xml
+                            </dependencyReducedPomLocation>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.acme.coyote</pattern>
+                                    <shadedPattern>hidden.coyote</shadedPattern>
+                                </relocation>
+                            </relocations>
+
+
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/*.EC</exclude>
+
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.flexicore</groupId>
+                <artifactId>flexicore-plugin</artifactId>
+                <version>1</version>
+                <executions>
+                    <execution>
+                        <id>flexicore</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <version>3.1.0-beta1</version>
+                <executions>
+                    <execution>
+                        <id>eclipselink-jpa-metamodel</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+
+                        <configuration>
+                            <compilerArguments>
+                                -Aeclipselink.persistencexml=${project.basedir}/src/main/resources/persistence.xml
+                            </compilerArguments>
+
+                            <processors>
+                                <processor>
+                                    org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor
+                                </processor>
+                            </processors>
+                            <outputDirectory>${project.build.directory}/generated-sources/meta-model
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+                        <version>${version.eclipselink}</version>
+                    </dependency>
+
+
+                </dependencies>
+            </plugin>
+
+
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+
+            </resource>
+        </resources>
+    </build>
+
+
+
+
+
+</project>
