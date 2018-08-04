@@ -20,6 +20,7 @@ public class UiFieldToClazz extends Baselink {
     private boolean visible;
     private String context;
     private String categoryName;
+    private String displayName;
 
 
 
@@ -88,6 +89,15 @@ public class UiFieldToClazz extends Baselink {
 
     public UiFieldToClazz setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+        return this;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public UiFieldToClazz setDisplayName(String displayName) {
+        this.displayName = displayName;
         return this;
     }
 }
