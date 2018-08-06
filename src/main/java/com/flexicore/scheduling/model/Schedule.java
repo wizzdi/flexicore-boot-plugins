@@ -19,7 +19,7 @@ public class Schedule extends Baseclass {
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = Schedule.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
 
     private LocalDateTime timeFrameStart;
@@ -145,7 +145,7 @@ public class Schedule extends Baseclass {
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = Schedule.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     public List<ScheduleToAction> getScheduleToActions() {
         return scheduleToActions;
     }

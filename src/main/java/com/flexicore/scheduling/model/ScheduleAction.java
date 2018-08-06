@@ -15,7 +15,7 @@ public class ScheduleAction extends Baseclass {
 
 
     @JsonIgnore
-    @OneToMany(targetEntity = Schedule.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
     private String serviceCanonicalName;
     private String methodName;
@@ -27,7 +27,7 @@ public class ScheduleAction extends Baseclass {
     private String parameter3;
 
     @JsonIgnore
-    @OneToMany(targetEntity = Schedule.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     public List<ScheduleToAction> getScheduleToActions() {
         return scheduleToActions;
     }
