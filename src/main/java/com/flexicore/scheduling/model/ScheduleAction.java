@@ -1,11 +1,12 @@
 package com.flexicore.scheduling.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ScheduleAction extends Baseclass {
@@ -13,8 +14,9 @@ public class ScheduleAction extends Baseclass {
     public  static ScheduleAction s() {return s_Singleton;}
 
 
-    @ManyToOne(targetEntity = Schedule.class)
-    private Schedule schedule;
+    @JsonIgnore
+    @OneToMany(targetEntity = Schedule.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
     private String serviceCanonicalName;
     private String methodName;
     @Lob
@@ -24,16 +26,16 @@ public class ScheduleAction extends Baseclass {
     @Lob
     private String parameter3;
 
-    @ManyToOne(targetEntity = Schedule.class)
-    public Schedule getSchedule() {
-        return schedule;
+    @JsonIgnore
+    @OneToMany(targetEntity = Schedule.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    public List<ScheduleToAction> getScheduleToActions() {
+        return scheduleToActions;
     }
 
-    public ScheduleAction setSchedule(Schedule schedule) {
-        this.schedule = schedule;
+    public ScheduleAction setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
+        this.scheduleToActions = scheduleToActions;
         return this;
     }
-
 
     public String getServiceCanonicalName() {
         return serviceCanonicalName;

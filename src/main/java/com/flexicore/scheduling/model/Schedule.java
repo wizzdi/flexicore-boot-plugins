@@ -3,6 +3,7 @@ package com.flexicore.scheduling.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
@@ -17,9 +18,9 @@ public class Schedule extends Baseclass {
         return s_Singleton;
     }
 
-    @OneToMany(targetEntity = ScheduleAction.class,mappedBy = "schedule")
     @JsonIgnore
-    private List<ScheduleAction> scheduleActionList= new ArrayList<>();
+    @OneToMany(targetEntity = Schedule.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
 
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
@@ -143,14 +144,14 @@ public class Schedule extends Baseclass {
         return this;
     }
 
-    @OneToMany(targetEntity = ScheduleAction.class,mappedBy = "schedule")
     @JsonIgnore
-    public List<ScheduleAction> getScheduleActionList() {
-        return scheduleActionList;
+    @OneToMany(targetEntity = Schedule.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    public List<ScheduleToAction> getScheduleToActions() {
+        return scheduleToActions;
     }
 
-    public Schedule setScheduleActionList(List<ScheduleAction> scheduleActionList) {
-        this.scheduleActionList = scheduleActionList;
+    public Schedule setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
+        this.scheduleToActions = scheduleToActions;
         return this;
     }
 }
