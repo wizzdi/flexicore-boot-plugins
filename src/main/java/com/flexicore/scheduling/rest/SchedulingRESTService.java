@@ -6,11 +6,11 @@ import com.flexicore.annotations.rest.Read;
 import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.scheduling.containers.request.CreateScheduling;
-import com.flexicore.scheduling.containers.request.SchedulingFiltering;
-import com.flexicore.scheduling.containers.request.SchedulingOperatorsFiltering;
+import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.model.Schedule;
+import com.flexicore.scheduling.model.ScheduleAction;
+import com.flexicore.scheduling.model.ScheduleToAction;
 import com.flexicore.scheduling.service.SchedulingService;
 import com.flexicore.security.SecurityContext;
 import io.swagger.annotations.Api;
@@ -20,10 +20,7 @@ import io.swagger.annotations.Tag;
 
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import java.util.List;
 
@@ -64,6 +61,24 @@ public class SchedulingRESTService implements RestServicePlugin {
 		return service.getAllSchedules(securityContext, filtering);
 	}
 
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "getAllScheduleActions", notes = "Gets All Schedule Actions")
+	@Path("getAllScheduleActions")
+	public List<ScheduleAction> getAllScheduleActions(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			SchedulingActionFiltering filtering,
+			@Context SecurityContext securityContext) {
+
+		Schedule schedule=filtering.getScheduleId()!=null?service.getByIdOrNull(filtering.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null&&filtering.getScheduleId()!=null){
+			throw new BadRequestException("No Schedule with id "+filtering.getScheduleId());
+		}
+
+		return service.getAllScheduleActions(securityContext, filtering);
+	}
+
 
 	@POST
 	@Produces("application/json")
@@ -92,6 +107,34 @@ public class SchedulingRESTService implements RestServicePlugin {
 			@Context SecurityContext securityContext) {
 
 		return service.createSchedule(securityContext, createScheduling);
+	}
+
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "createScheduleAction", notes = "Create Schedule Action")
+	@Path("createScheduleAction")
+	public ScheduleAction createScheduleAction(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			CreateSchedulingAction createScheduling,
+			@Context SecurityContext securityContext) {
+
+		return service.createScheduleAction(securityContext, createScheduling);
+	}
+
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "linkScheduleToAction", notes = "Link Schedule To Action")
+	@Path("linkScheduleToAction")
+	public ScheduleToAction linkScheduleToAction(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			LinkScheduleToAction createScheduling,
+			@Context SecurityContext securityContext) {
+
+		return service.linkScheduleToAction(securityContext, createScheduling);
 	}
 
 

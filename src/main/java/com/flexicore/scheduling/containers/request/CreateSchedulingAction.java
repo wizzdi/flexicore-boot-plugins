@@ -1,27 +1,14 @@
 package com.flexicore.scheduling.containers.request;
 
-import com.flexicore.scheduling.model.Schedule;
-
-
-
 public class CreateSchedulingAction {
 
-    private Schedule schedule;
+
     private String serviceCanonicalName;
     private String methodName;
     private String parameter1;
     private String parameter2;
     private String parameter3;
 
-
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public CreateSchedulingAction setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-        return this;
-    }
 
     public String getServiceCanonicalName() {
         return serviceCanonicalName;

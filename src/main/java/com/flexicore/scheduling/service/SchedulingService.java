@@ -7,16 +7,14 @@ import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.User;
-import com.flexicore.scheduling.containers.request.CreateScheduling;
-import com.flexicore.scheduling.containers.request.CreateSchedulingAction;
-import com.flexicore.scheduling.containers.request.SchedulingFiltering;
-import com.flexicore.scheduling.containers.request.SchedulingOperatorsFiltering;
+import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.SchedulingMethod;
 import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.data.SchedulingRepository;
 import com.flexicore.scheduling.interfaces.SchedulingOperator;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
+import com.flexicore.scheduling.model.ScheduleToAction;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.service.PluginService;
@@ -108,19 +106,26 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         scheduling.setTimeFrameEnd(createScheduling.getTimeFrameEnd());
         scheduling.setTimeOfTheDay(createScheduling.getTimeOfTheDay());
         scheduling.setTimeOfTheDayName(createScheduling.getTimeOfTheDayName());
-        for (CreateSchedulingAction createSchedulingAction : createScheduling.getActions()) {
-            ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getMethodName(), securityContext.getUser());
-            scheduleAction.Init();
-            scheduleAction.setMethodName(createSchedulingAction.getMethodName());
-            scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
-            scheduleAction.setParameter1(createSchedulingAction.getParameter1());
-            scheduleAction.setParameter2(createSchedulingAction.getParameter2());
-            scheduleAction.setParameter3(createSchedulingAction.getParameter3());
-            scheduleAction.setSchedule(scheduling);
 
-        }
         return scheduling;
 
+    }
+
+    public ScheduleAction createScheduleAction(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
+        ScheduleAction scheduleAction=createScheduleActionNoMerge(securityContext,createSchedulingAction);
+        schedulingRepository.merge(scheduleAction);
+        return scheduleAction;
+    }
+
+    public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
+        ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getMethodName(), securityContext.getUser());
+        scheduleAction.Init();
+        scheduleAction.setMethodName(createSchedulingAction.getMethodName());
+        scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
+        scheduleAction.setParameter1(createSchedulingAction.getParameter1());
+        scheduleAction.setParameter2(createSchedulingAction.getParameter2());
+        scheduleAction.setParameter3(createSchedulingAction.getParameter3());
+        return scheduleAction;
     }
 
     public List<Schedule> getAllSchedules(SecurityContext securityContext, SchedulingFiltering filtering) {
@@ -128,18 +133,21 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return schedulingRepository.getAllFiltered(queryInformationHolder);
     }
 
+    public List<ScheduleToAction> getAllScheduleLinks() {
+       return schedulingRepository.getAll(ScheduleToAction.class);
+    }
+
     public LocalDateTime getTimeFromName(String timeOfTheDayName) {
         return null;
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void runSchedule(Schedule schedule, SecurityContext securityContext) {
-        if (schedule.getScheduleActionList().isEmpty()) {
-            return;
-        }
+    public void runSchedule(List<ScheduleToAction> schedule, SecurityContext securityContext) {
+
         List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
         Map<String, SchedulingOperator> schedulingOperatorMap = list.parallelStream().collect(Collectors.toMap(f -> f.getClass().getCanonicalName(), f -> f));
-        for (ScheduleAction scheduleAction : schedule.getScheduleActionList()) {
+        for (ScheduleToAction link : schedule) {
+            ScheduleAction scheduleAction=link.getRightside();
             SchedulingOperator schedulingOperator = schedulingOperatorMap.get(scheduleAction.getServiceCanonicalName());
             if (schedulingOperator != null) {
                 executeAction(schedulingOperator, scheduleAction, securityContext);
@@ -182,5 +190,22 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     private boolean matchParameters(Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         return method.getParameterCount()==2 && ScheduleAction.class.isAssignableFrom(parameterTypes[0]) && parameterTypes[1]==SecurityContext.class;
+    }
+
+
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, List<String> batchString, SecurityContext securityContext) {
+        return schedulingRepository.getByIdOrNull(id, c, batchString, securityContext);
+    }
+
+
+    public ScheduleToAction linkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction createScheduling) {
+        ScheduleToAction scheduleToAction=ScheduleToAction.s().CreateUnchecked("link",securityContext.getUser());
+        scheduleToAction.Init(createScheduling.getSchedule(),createScheduling.getScheduleAction());
+        schedulingRepository.merge(scheduleToAction);
+        return scheduleToAction;
+    }
+
+    public List<ScheduleAction> getAllScheduleActions(SecurityContext securityContext, SchedulingActionFiltering filtering) {
+        return schedulingRepository.getAllScheduleActions(filtering,securityContext);
     }
 }

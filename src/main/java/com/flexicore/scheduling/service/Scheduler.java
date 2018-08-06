@@ -2,15 +2,19 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.scheduling.containers.request.SchedulingFiltering;
 import com.flexicore.scheduling.model.Schedule;
+import com.flexicore.scheduling.model.ScheduleToAction;
 import com.flexicore.security.SecurityContext;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Scheduler implements Runnable {
     private static final long FETCH_INTERVAL = 60 * 1000;
@@ -31,21 +35,22 @@ public class Scheduler implements Runnable {
     @Override
     public void run() {
         SchedulingFiltering schedulingFiltering = new SchedulingFiltering();
-        List<Schedule> list = new ArrayList<>();
+        Map<String,List<ScheduleToAction> > list = new HashMap<>();
         while (!stop) {
             try {
                 LocalDateTime now = LocalDateTime.now();
 
                 if (lastFetch == null || now.isAfter(lastFetch.plus(FETCH_INTERVAL, ChronoUnit.MILLIS))) {
-                    list = schedulingService.getAllSchedules(null, schedulingFiltering);
+                    list = schedulingService.getAllScheduleLinks().parallelStream().collect(Collectors.groupingBy(f->f.getLeftside().getId(),Collectors.toList()));
                     lastFetch = now;
 
                 }
-                for (Schedule schedule : list) {
+                for (Map.Entry<String, List<ScheduleToAction>> entry : list.entrySet()) {
+                    Schedule schedule=entry.getValue().get(0).getLeftside();
                     try {
                         if (shouldRun(schedule, now)) {
                             logger.info("schedule time " + schedule.getName() + " has arrived");
-                            schedulingService.runSchedule(schedule, securityContext);
+                            schedulingService.runSchedule(entry.getValue(), securityContext);
                             logger.info("done running schedule " + schedule.getName());
 
                         }
@@ -54,6 +59,7 @@ public class Scheduler implements Runnable {
                     }
 
                 }
+
                 Thread.sleep(CHECK_INTERVAL);
 
             } catch (InterruptedException e) {

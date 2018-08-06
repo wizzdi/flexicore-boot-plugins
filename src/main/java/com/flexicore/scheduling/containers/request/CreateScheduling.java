@@ -20,7 +20,6 @@ public class CreateScheduling {
     private boolean thursday;
     private boolean friday;
     private boolean saturday;
-    private List<CreateSchedulingAction> actions=new ArrayList<>();
 
 
     public String getName() {
@@ -140,14 +139,6 @@ public class CreateScheduling {
         return this;
     }
 
-    public List<CreateSchedulingAction> getActions() {
-        return actions;
-    }
-
-    public CreateScheduling setActions(List<CreateSchedulingAction> actions) {
-        this.actions = actions;
-        return this;
-    }
 
     public String getDescription() {
         return description;
