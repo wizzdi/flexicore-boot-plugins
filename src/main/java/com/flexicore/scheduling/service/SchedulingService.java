@@ -153,6 +153,9 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
                 executeAction(schedulingOperator, scheduleAction, securityContext);
             }
         }
+        for (SchedulingOperator schedulingOperator : list) {
+            pluginService.cleanUpInstance(schedulingOperator);
+        }
     }
 
     private void executeAction(SchedulingOperator schedulingOperator, ScheduleAction scheduleAction, SecurityContext securityContext) {
@@ -173,7 +176,11 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     public List<SchedulingOperatorContainer> getAvailableSchedulingOperators(SecurityContext securityContext, SchedulingOperatorsFiltering filtering) {
         List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
-        return list.parallelStream().map(f->getSchedulingOperatorContainer(f)).collect(Collectors.toList());
+        List<SchedulingOperatorContainer> toRet = list.parallelStream().map(f -> getSchedulingOperatorContainer(f)).collect(Collectors.toList());
+        for (SchedulingOperator schedulingOperator : list) {
+            pluginService.cleanUpInstance(schedulingOperator);
+        }
+        return toRet;
     }
 
     private SchedulingOperatorContainer getSchedulingOperatorContainer(SchedulingOperator f) {
@@ -181,7 +188,9 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         Class<? extends SchedulingOperator> clazz = f.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
             if(matchParameters(method)){
-                list.add(new SchedulingMethod(method.getName(),null));
+                com.flexicore.scheduling.interfaces.SchedulingMethod schedulingMethod=method.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.SchedulingMethod.class);
+
+                list.add(new SchedulingMethod(method.getName(),schedulingMethod));
             }
         }
         return new SchedulingOperatorContainer(clazz.getCanonicalName(),list);

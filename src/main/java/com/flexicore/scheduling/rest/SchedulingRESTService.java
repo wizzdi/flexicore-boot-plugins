@@ -75,6 +75,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 		if(schedule==null&&filtering.getScheduleId()!=null){
 			throw new BadRequestException("No Schedule with id "+filtering.getScheduleId());
 		}
+		filtering.setSchedule(schedule);
 
 		return service.getAllScheduleActions(securityContext, filtering);
 	}
@@ -131,10 +132,23 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@Path("linkScheduleToAction")
 	public ScheduleToAction linkScheduleToAction(
 			@HeaderParam("authenticationKey") String authenticationKey,
-			LinkScheduleToAction createScheduling,
+			LinkScheduleToAction linkScheduleToAction,
 			@Context SecurityContext securityContext) {
 
-		return service.linkScheduleToAction(securityContext, createScheduling);
+		Schedule schedule=linkScheduleToAction.getScheduleId()!=null?service.getByIdOrNull(linkScheduleToAction.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null&&linkScheduleToAction.getScheduleId()!=null){
+			throw new BadRequestException("No Schedule with id "+linkScheduleToAction.getScheduleId());
+		}
+		linkScheduleToAction.setSchedule(schedule);
+
+		ScheduleAction action=linkScheduleToAction.getActionId()!=null?service.getByIdOrNull(linkScheduleToAction.getActionId(),ScheduleAction.class,null,securityContext):null;
+		if(action==null&&linkScheduleToAction.getActionId()!=null){
+			throw new BadRequestException("No action with id "+linkScheduleToAction.getActionId());
+		}
+		linkScheduleToAction.setScheduleAction(action);
+
+
+		return service.linkScheduleToAction(securityContext, linkScheduleToAction);
 	}
 
 

@@ -36,28 +36,35 @@ public class Scheduler implements Runnable {
     public void run() {
         SchedulingFiltering schedulingFiltering = new SchedulingFiltering();
         Map<String,List<ScheduleToAction> > list = new HashMap<>();
+        logger.info("Scheduler Started");
         while (!stop) {
             try {
                 LocalDateTime now = LocalDateTime.now();
 
                 if (lastFetch == null || now.isAfter(lastFetch.plus(FETCH_INTERVAL, ChronoUnit.MILLIS))) {
-                    list = schedulingService.getAllScheduleLinks().parallelStream().collect(Collectors.groupingBy(f->f.getLeftside().getId(),Collectors.toList()));
+                    list = schedulingService.getAllScheduleLinks().parallelStream().filter(f->f.getLeftside()!=null).collect(Collectors.groupingBy(f->f.getLeftside().getId(),Collectors.toList()));
                     lastFetch = now;
 
                 }
-                for (Map.Entry<String, List<ScheduleToAction>> entry : list.entrySet()) {
-                    Schedule schedule=entry.getValue().get(0).getLeftside();
-                    try {
-                        if (shouldRun(schedule, now)) {
-                            logger.info("schedule time " + schedule.getName() + " has arrived");
-                            schedulingService.runSchedule(entry.getValue(), securityContext);
-                            logger.info("done running schedule " + schedule.getName());
+                try {
+                    for (Map.Entry<String, List<ScheduleToAction>> entry : list.entrySet()) {
+                        Schedule schedule = entry.getValue().get(0).getLeftside();
+                        try {
+                            boolean shouldRun = shouldRun(schedule, now);
+                            if (shouldRun) {
+                                logger.info("schedule time " + schedule.getName() + " has arrived");
+                                schedulingService.runSchedule(entry.getValue(), securityContext);
+                                logger.info("done running schedule " + schedule.getName());
 
+                            }
+                        } catch (Exception e) {
+                            logger.log(Level.SEVERE, "failed running schedule " + schedule.getName());
                         }
-                    } catch (Exception e) {
-                        logger.log(Level.SEVERE, "failed running schedule " + schedule.getName());
-                    }
 
+                    }
+                }
+                catch (Exception e){
+                    logger.log(Level.SEVERE,"exception while running schedule",e);
                 }
 
                 Thread.sleep(CHECK_INTERVAL);
@@ -67,6 +74,8 @@ public class Scheduler implements Runnable {
                 stop = true;
             }
         }
+        logger.info("Scheduler Stopped");
+
     }
 
     private boolean shouldRun(Schedule schedule, LocalDateTime now) {
