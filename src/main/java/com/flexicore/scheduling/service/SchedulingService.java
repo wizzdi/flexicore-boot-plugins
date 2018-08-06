@@ -10,6 +10,9 @@ import com.flexicore.model.User;
 import com.flexicore.scheduling.containers.request.CreateScheduling;
 import com.flexicore.scheduling.containers.request.CreateSchedulingAction;
 import com.flexicore.scheduling.containers.request.SchedulingFiltering;
+import com.flexicore.scheduling.containers.request.SchedulingOperatorsFiltering;
+import com.flexicore.scheduling.containers.response.SchedulingMethod;
+import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.data.SchedulingRepository;
 import com.flexicore.scheduling.interfaces.SchedulingOperator;
 import com.flexicore.scheduling.model.Schedule;
@@ -27,6 +30,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +69,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         if (init.compareAndSet(false, true)) {
             SecurityContext securityContext = getAdminSecurityContext();
             scheduler = new Scheduler(logger, this, securityContext);
-            scheduler.run();
+            new Thread(scheduler).start();
         }
     }
 
@@ -157,5 +161,26 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     private Method getMethod(SchedulingOperator schedulingOperator, ScheduleAction scheduleAction) throws NoSuchMethodException {
         return schedulingOperator.getClass().getDeclaredMethod(scheduleAction.getMethodName(), ScheduleAction.class, SecurityContext.class);
+    }
+
+    public List<SchedulingOperatorContainer> getAvailableSchedulingOperators(SecurityContext securityContext, SchedulingOperatorsFiltering filtering) {
+        List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
+        return list.parallelStream().map(f->getSchedulingOperatorContainer(f)).collect(Collectors.toList());
+    }
+
+    private SchedulingOperatorContainer getSchedulingOperatorContainer(SchedulingOperator f) {
+        List<SchedulingMethod> list=new ArrayList<>();
+        Class<? extends SchedulingOperator> clazz = f.getClass();
+        for (Method method : clazz.getDeclaredMethods()) {
+            if(matchParameters(method)){
+                list.add(new SchedulingMethod(method.getName(),null));
+            }
+        }
+        return new SchedulingOperatorContainer(clazz.getCanonicalName(),list);
+    }
+
+    private boolean matchParameters(Method method) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        return method.getParameterCount()==2 && ScheduleAction.class.isAssignableFrom(parameterTypes[0]) && parameterTypes[1]==SecurityContext.class;
     }
 }

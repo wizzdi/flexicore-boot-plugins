@@ -8,6 +8,8 @@ import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.scheduling.containers.request.CreateScheduling;
 import com.flexicore.scheduling.containers.request.SchedulingFiltering;
+import com.flexicore.scheduling.containers.request.SchedulingOperatorsFiltering;
+import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.service.SchedulingService;
 import com.flexicore.security.SecurityContext;
@@ -60,6 +62,20 @@ public class SchedulingRESTService implements RestServicePlugin {
 			@Context SecurityContext securityContext) {
 
 		return service.getAllSchedules(securityContext, filtering);
+	}
+
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "getAvailableSchedulingOperators", notes = "Gets All Scheduling operator containers")
+	@Path("getAvailableSchedulingOperators")
+	public List<SchedulingOperatorContainer> getAvailableSchedulingOperators(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			SchedulingOperatorsFiltering filtering,
+			@Context SecurityContext securityContext) {
+
+		return service.getAvailableSchedulingOperators(securityContext, filtering);
 	}
 
 
