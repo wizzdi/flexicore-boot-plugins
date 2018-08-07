@@ -26,7 +26,7 @@ public class Schedule extends Baseclass {
     private LocalDateTime timeFrameEnd;
     private LocalDateTime lastExecution;
     private long coolDownIntervalBeforeRepeat;
-    private String timeOfTheDayName;
+    private TimeOfTheDayName timeOfTheDayName;
     private double timeOfTheDayNameLat;
     private double timeOfTheDayNameLon;
     private LocalDateTime timeOfTheDayStart;
@@ -40,6 +40,7 @@ public class Schedule extends Baseclass {
     private boolean thursday;
     private boolean friday;
     private boolean saturday;
+    private boolean holiday;
 
 
     public LocalDateTime getTimeFrameStart() {
@@ -60,11 +61,11 @@ public class Schedule extends Baseclass {
         return this;
     }
 
-    public String getTimeOfTheDayName() {
+    public TimeOfTheDayName getTimeOfTheDayName() {
         return timeOfTheDayName;
     }
 
-    public Schedule setTimeOfTheDayName(String timeOfTheDayName) {
+    public Schedule setTimeOfTheDayName(TimeOfTheDayName timeOfTheDayName) {
         this.timeOfTheDayName = timeOfTheDayName;
         return this;
     }
@@ -205,6 +206,15 @@ public class Schedule extends Baseclass {
 
     public Schedule setTimeOfTheDayNameLon(double timeOfTheDayNameLon) {
         this.timeOfTheDayNameLon = timeOfTheDayNameLon;
+        return this;
+    }
+
+    public boolean isHoliday() {
+        return holiday;
+    }
+
+    public Schedule setHoliday(boolean holiday) {
+        this.holiday = holiday;
         return this;
     }
 }
