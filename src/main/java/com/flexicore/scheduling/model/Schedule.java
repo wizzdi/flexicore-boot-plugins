@@ -24,8 +24,14 @@ public class Schedule extends Baseclass {
 
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
+    private LocalDateTime lastExecution;
+    private long coolDownIntervalBeforeRepeat;
     private String timeOfTheDayName;
-    private LocalDateTime timeOfTheDay;
+    private double timeOfTheDayNameLat;
+    private double timeOfTheDayNameLon;
+    private LocalDateTime timeOfTheDayStart;
+    private LocalDateTime timeOfTheDayEnd;
+
     private long millisOffset;
     private boolean sunday;
     private boolean monday;
@@ -63,12 +69,12 @@ public class Schedule extends Baseclass {
         return this;
     }
 
-    public LocalDateTime getTimeOfTheDay() {
-        return timeOfTheDay;
+    public LocalDateTime getTimeOfTheDayStart() {
+        return timeOfTheDayStart;
     }
 
-    public Schedule setTimeOfTheDay(LocalDateTime timeOfTheDay) {
-        this.timeOfTheDay = timeOfTheDay;
+    public Schedule setTimeOfTheDayStart(LocalDateTime timeOfTheDayStart) {
+        this.timeOfTheDayStart = timeOfTheDayStart;
         return this;
     }
 
@@ -152,6 +158,53 @@ public class Schedule extends Baseclass {
 
     public Schedule setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
         this.scheduleToActions = scheduleToActions;
+        return this;
+    }
+
+
+    public LocalDateTime getLastExecution() {
+        return lastExecution;
+    }
+
+    public Schedule setLastExecution(LocalDateTime lastExecution) {
+        this.lastExecution = lastExecution;
+        return this;
+    }
+
+    public long getCoolDownIntervalBeforeRepeat() {
+        return coolDownIntervalBeforeRepeat;
+    }
+
+    public Schedule setCoolDownIntervalBeforeRepeat(long coolDownIntervalBeforeRepeat) {
+        this.coolDownIntervalBeforeRepeat = coolDownIntervalBeforeRepeat;
+        return this;
+    }
+
+    public LocalDateTime getTimeOfTheDayEnd() {
+        return timeOfTheDayEnd;
+    }
+
+    public Schedule setTimeOfTheDayEnd(LocalDateTime timeOfTheDayEnd) {
+        this.timeOfTheDayEnd = timeOfTheDayEnd;
+        return this;
+    }
+
+
+    public double getTimeOfTheDayNameLat() {
+        return timeOfTheDayNameLat;
+    }
+
+    public Schedule setTimeOfTheDayNameLat(double timeOfTheDayNameLat) {
+        this.timeOfTheDayNameLat = timeOfTheDayNameLat;
+        return this;
+    }
+
+    public double getTimeOfTheDayNameLon() {
+        return timeOfTheDayNameLon;
+    }
+
+    public Schedule setTimeOfTheDayNameLon(double timeOfTheDayNameLon) {
+        this.timeOfTheDayNameLon = timeOfTheDayNameLon;
         return this;
     }
 }
