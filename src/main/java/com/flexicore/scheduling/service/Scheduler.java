@@ -7,6 +7,7 @@ import com.flexicore.security.SecurityContext;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +53,8 @@ public class Scheduler implements Runnable {
                         try {
                             boolean shouldRun = shouldRun(schedule, now);
                             if (shouldRun) {
+                                schedule.setLastExecution(LocalDateTime.now());
+                                schedulingService.merge(schedule);
                                 logger.info("schedule time " + schedule.getName() + " has arrived");
                                 schedulingService.runSchedule(entry.getValue(), securityContext);
                                 logger.info("done running schedule " + schedule.getName());
@@ -79,15 +82,30 @@ public class Scheduler implements Runnable {
     }
 
     private boolean shouldRun(Schedule schedule, LocalDateTime now) {
-        return isInTimeFrame(schedule,now) && isDay(schedule,now)&&isTime(schedule,now);
+        return isInTimeFrame(schedule,now) && isDay(schedule,now)&&isTime(schedule,now) && checkPreviousRun(schedule,now);
+    }
+
+    private boolean checkPreviousRun(Schedule schedule, LocalDateTime now) {
+        LocalTime nowTime = now.toLocalTime();
+        if(schedule.getCoolDownIntervalBeforeRepeat()> 0){
+            return schedule.getLastExecution()==null || schedule.getLastExecution().toLocalTime().plus(schedule.getCoolDownIntervalBeforeRepeat(),ChronoUnit.MILLIS).isAfter(nowTime);
+        }
+        else{
+            return schedule.getLastExecution()==null ||!isTime(schedule,schedule.getLastExecution());
+        }
+
     }
 
     private boolean isTime(Schedule schedule, LocalDateTime now) {
-        LocalDateTime time=schedule.getTimeOfTheDay();
+        LocalTime nowTime = now.toLocalTime();
+        LocalTime start=schedule.getTimeFrameStart().toLocalTime();
         if(schedule.getTimeOfTheDayName()!=null){
-            time=schedulingService.getTimeFromName(schedule.getTimeOfTheDayName());
+            start=schedulingService.getTimeFromName(schedule.getTimeOfTheDayName());
         }
-        return time != null && time.getHour() == now.getHour();
+        LocalTime end=schedule.getTimeOfTheDayEnd()!=null?schedule.getTimeOfTheDayEnd().toLocalTime():null;
+
+
+        return start != null && nowTime.isAfter(start) && (end==null || nowTime.isBefore(end));
     }
 
     private boolean isInTimeFrame(Schedule schedule, LocalDateTime now) {

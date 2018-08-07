@@ -110,6 +110,25 @@ public class SchedulingRESTService implements RestServicePlugin {
 		return service.createSchedule(securityContext, createScheduling);
 	}
 
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "updateSchedule", notes = "Update Schedule")
+	@Path("updateSchedule")
+	public Schedule updateSchedule(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			UpdateScheduling updateScheduling,
+			@Context SecurityContext securityContext) {
+
+		Schedule schedule=updateScheduling.getScheduleId()!=null?service.getByIdOrNull(updateScheduling.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null&&updateScheduling.getScheduleId()!=null){
+			throw new BadRequestException("No Schedule with id "+updateScheduling.getScheduleId());
+		}
+		updateScheduling.setSchedule(schedule);
+
+		return service.updateSchedule(securityContext, updateScheduling);
+	}
+
 
 	@POST
 	@Produces("application/json")
@@ -123,6 +142,28 @@ public class SchedulingRESTService implements RestServicePlugin {
 
 		return service.createScheduleAction(securityContext, createScheduling);
 	}
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "updateScheduleAction", notes = "Update Schedule Action")
+	@Path("updateScheduleAction")
+	public ScheduleAction updateScheduleAction(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			UpdateSchedulingAction updateSchedulingAction,
+			@Context SecurityContext securityContext) {
+
+		ScheduleAction action=updateSchedulingAction.getScheduleActionId()!=null?service.getByIdOrNull(updateSchedulingAction.getScheduleActionId(),ScheduleAction.class,null,securityContext):null;
+		if(action==null&&updateSchedulingAction.getScheduleActionId()!=null){
+			throw new BadRequestException("No action with id "+updateSchedulingAction.getScheduleActionId());
+		}
+		updateSchedulingAction.setScheduleAction(action);
+
+		return service.updateScheduleAction(securityContext, updateSchedulingAction);
+	}
+
+
+
 
 
 	@POST

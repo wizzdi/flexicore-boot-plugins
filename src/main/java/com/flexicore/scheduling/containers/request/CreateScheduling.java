@@ -1,8 +1,6 @@
 package com.flexicore.scheduling.containers.request;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CreateScheduling {
 
@@ -11,15 +9,17 @@ public class CreateScheduling {
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
     private String timeOfTheDayName;
-    private LocalDateTime timeOfTheDay;
-    private long millisOffset;
-    private boolean sunday;
-    private boolean monday;
-    private boolean tuesday;
-    private boolean wednesday;
-    private boolean thursday;
-    private boolean friday;
-    private boolean saturday;
+    private LocalDateTime timeOfTheDayStart;
+    private LocalDateTime timeOfTheDayEnd;
+    private Long millisOffset;
+    private Long coolDownIntervalBeforeRepeat;
+    private Boolean sunday;
+    private Boolean monday;
+    private Boolean tuesday;
+    private Boolean wednesday;
+    private Boolean thursday;
+    private Boolean friday;
+    private Boolean saturday;
 
 
     public String getName() {
@@ -58,87 +58,16 @@ public class CreateScheduling {
         return this;
     }
 
-    public LocalDateTime getTimeOfTheDay() {
-        return timeOfTheDay;
-    }
 
-    public CreateScheduling setTimeOfTheDay(LocalDateTime timeOfTheDay) {
-        this.timeOfTheDay = timeOfTheDay;
-        return this;
-    }
 
-    public long getMillisOffset() {
+    public Long getMillisOffset() {
         return millisOffset;
     }
 
-    public CreateScheduling setMillisOffset(long millisOffset) {
+    public CreateScheduling setMillisOffset(Long millisOffset) {
         this.millisOffset = millisOffset;
         return this;
     }
-
-    public boolean isSunday() {
-        return sunday;
-    }
-
-    public CreateScheduling setSunday(boolean sunday) {
-        this.sunday = sunday;
-        return this;
-    }
-
-    public boolean isMonday() {
-        return monday;
-    }
-
-    public CreateScheduling setMonday(boolean monday) {
-        this.monday = monday;
-        return this;
-    }
-
-    public boolean isTuesday() {
-        return tuesday;
-    }
-
-    public CreateScheduling setTuesday(boolean tuesday) {
-        this.tuesday = tuesday;
-        return this;
-    }
-
-    public boolean isWednesday() {
-        return wednesday;
-    }
-
-    public CreateScheduling setWednesday(boolean wednesday) {
-        this.wednesday = wednesday;
-        return this;
-    }
-
-    public boolean isThursday() {
-        return thursday;
-    }
-
-    public CreateScheduling setThursday(boolean thursday) {
-        this.thursday = thursday;
-        return this;
-    }
-
-    public boolean isFriday() {
-        return friday;
-    }
-
-    public CreateScheduling setFriday(boolean friday) {
-        this.friday = friday;
-        return this;
-    }
-
-    public boolean isSaturday() {
-        return saturday;
-    }
-
-    public CreateScheduling setSaturday(boolean saturday) {
-        this.saturday = saturday;
-        return this;
-    }
-
 
     public String getDescription() {
         return description;
@@ -146,6 +75,96 @@ public class CreateScheduling {
 
     public CreateScheduling setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public Boolean getSunday() {
+        return sunday;
+    }
+
+    public CreateScheduling setSunday(Boolean sunday) {
+        this.sunday = sunday;
+        return this;
+    }
+
+    public Boolean getMonday() {
+        return monday;
+    }
+
+    public CreateScheduling setMonday(Boolean monday) {
+        this.monday = monday;
+        return this;
+    }
+
+    public Boolean getTuesday() {
+        return tuesday;
+    }
+
+    public CreateScheduling setTuesday(Boolean tuesday) {
+        this.tuesday = tuesday;
+        return this;
+    }
+
+    public Boolean getWednesday() {
+        return wednesday;
+    }
+
+    public CreateScheduling setWednesday(Boolean wednesday) {
+        this.wednesday = wednesday;
+        return this;
+    }
+
+    public Boolean getThursday() {
+        return thursday;
+    }
+
+    public CreateScheduling setThursday(Boolean thursday) {
+        this.thursday = thursday;
+        return this;
+    }
+
+    public Boolean getFriday() {
+        return friday;
+    }
+
+    public CreateScheduling setFriday(Boolean friday) {
+        this.friday = friday;
+        return this;
+    }
+
+    public Boolean getSaturday() {
+        return saturday;
+    }
+
+    public CreateScheduling setSaturday(Boolean saturday) {
+        this.saturday = saturday;
+        return this;
+    }
+
+    public LocalDateTime getTimeOfTheDayStart() {
+        return timeOfTheDayStart;
+    }
+
+    public CreateScheduling setTimeOfTheDayStart(LocalDateTime timeOfTheDayStart) {
+        this.timeOfTheDayStart = timeOfTheDayStart;
+        return this;
+    }
+
+    public LocalDateTime getTimeOfTheDayEnd() {
+        return timeOfTheDayEnd;
+    }
+
+    public CreateScheduling setTimeOfTheDayEnd(LocalDateTime timeOfTheDayEnd) {
+        this.timeOfTheDayEnd = timeOfTheDayEnd;
+        return this;
+    }
+
+    public Long getCoolDownIntervalBeforeRepeat() {
+        return coolDownIntervalBeforeRepeat;
+    }
+
+    public CreateScheduling setCoolDownIntervalBeforeRepeat(Long coolDownIntervalBeforeRepeat) {
+        this.coolDownIntervalBeforeRepeat = coolDownIntervalBeforeRepeat;
         return this;
     }
 }

@@ -28,6 +28,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,26 +94,95 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     public Schedule createScheduleNoMerge(SecurityContext securityContext, CreateScheduling createScheduling) {
         Schedule scheduling = Schedule.s().CreateUnchecked(createScheduling.getName(), securityContext.getUser());
         scheduling.Init();
-        scheduling.setDescription(createScheduling.getDescription());
-        scheduling.setSunday(createScheduling.isSunday());
-        scheduling.setMonday(createScheduling.isMonday());
-        scheduling.setTuesday(createScheduling.isTuesday());
-        scheduling.setWednesday(createScheduling.isWednesday());
-        scheduling.setThursday(createScheduling.isThursday());
-        scheduling.setFriday(createScheduling.isFriday());
-        scheduling.setSaturday(createScheduling.isSaturday());
-        scheduling.setMillisOffset(createScheduling.getMillisOffset());
-        scheduling.setTimeFrameStart(createScheduling.getTimeFrameStart());
-        scheduling.setTimeFrameEnd(createScheduling.getTimeFrameEnd());
-        scheduling.setTimeOfTheDay(createScheduling.getTimeOfTheDay());
-        scheduling.setTimeOfTheDayName(createScheduling.getTimeOfTheDayName());
-
+        updateScheduleNoMerge(scheduling, createScheduling);
         return scheduling;
 
     }
 
+    public boolean updateScheduleNoMerge(Schedule schedule, CreateScheduling createScheduling) {
+        boolean update = false;
+        if (createScheduling.getDescription() != null && !createScheduling.getDescription().equals(schedule.getDescription())) {
+            schedule.setDescription(createScheduling.getDescription());
+            update = true;
+        }
+
+        if (createScheduling.getName() != null && !createScheduling.getName().equals(schedule.getName())) {
+            schedule.setName(createScheduling.getName());
+            update = true;
+        }
+        if (createScheduling.getMillisOffset() != null && !createScheduling.getMillisOffset().equals(schedule.getMillisOffset())) {
+            schedule.setMillisOffset(createScheduling.getMillisOffset());
+            update = true;
+        }
+        if (createScheduling.getTimeFrameStart() != null && !createScheduling.getTimeFrameStart().equals(schedule.getTimeFrameStart())) {
+            schedule.setTimeFrameStart(createScheduling.getTimeFrameStart());
+            update = true;
+        }
+
+        if (createScheduling.getTimeFrameEnd() != null && !createScheduling.getTimeFrameEnd().equals(schedule.getTimeFrameEnd())) {
+            schedule.setTimeFrameEnd(createScheduling.getTimeFrameEnd());
+            update = true;
+        }
+
+        if (createScheduling.getTimeOfTheDayStart() != null && !createScheduling.getTimeOfTheDayStart().equals(schedule.getTimeOfTheDayStart())) {
+            schedule.setTimeOfTheDayStart(createScheduling.getTimeOfTheDayStart());
+            update = true;
+        }
+
+        if (createScheduling.getTimeOfTheDayEnd() != null && !createScheduling.getTimeOfTheDayEnd().equals(schedule.getTimeOfTheDayEnd())) {
+            schedule.setTimeOfTheDayEnd(createScheduling.getTimeOfTheDayEnd());
+            update = true;
+        }
+
+        if (createScheduling.getCoolDownIntervalBeforeRepeat() != null && !createScheduling.getCoolDownIntervalBeforeRepeat().equals(schedule.getCoolDownIntervalBeforeRepeat())) {
+            schedule.setCoolDownIntervalBeforeRepeat(createScheduling.getCoolDownIntervalBeforeRepeat());
+            update = true;
+        }
+
+        if (createScheduling.getTimeOfTheDayName() != null && !createScheduling.getTimeOfTheDayName().equals(schedule.getTimeOfTheDayName())) {
+            schedule.setTimeOfTheDayName(createScheduling.getTimeOfTheDayName());
+            update = true;
+        }
+
+        if (createScheduling.getSunday() != null && !createScheduling.getSunday().equals(schedule.isSunday())) {
+            schedule.setSunday(createScheduling.getSunday());
+            update = true;
+        }
+
+        if (createScheduling.getMonday() != null && !createScheduling.getMonday().equals(schedule.isMonday())) {
+            schedule.setMonday(createScheduling.getMonday());
+            update = true;
+        }
+
+        if (createScheduling.getTuesday() != null && !createScheduling.getTuesday().equals(schedule.isTuesday())) {
+            schedule.setTuesday(createScheduling.getTuesday());
+            update = true;
+        }
+
+        if (createScheduling.getWednesday() != null && !createScheduling.getWednesday().equals(schedule.isWednesday())) {
+            schedule.setWednesday(createScheduling.getWednesday());
+            update = true;
+        }
+
+        if (createScheduling.getThursday() != null && !createScheduling.getThursday().equals(schedule.isThursday())) {
+            schedule.setThursday(createScheduling.getThursday());
+            update = true;
+        }
+
+        if (createScheduling.getFriday() != null && !createScheduling.getFriday().equals(schedule.isFriday())) {
+            schedule.setFriday(createScheduling.getFriday());
+            update = true;
+        }
+
+        if (createScheduling.getSaturday() != null && !createScheduling.getSaturday().equals(schedule.isSaturday())) {
+            schedule.setSaturday(createScheduling.getSaturday());
+            update = true;
+        }
+        return update;
+    }
+
     public ScheduleAction createScheduleAction(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
-        ScheduleAction scheduleAction=createScheduleActionNoMerge(securityContext,createSchedulingAction);
+        ScheduleAction scheduleAction = createScheduleActionNoMerge(securityContext, createSchedulingAction);
         schedulingRepository.merge(scheduleAction);
         return scheduleAction;
     }
@@ -120,12 +190,36 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
         ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getMethodName(), securityContext.getUser());
         scheduleAction.Init();
-        scheduleAction.setMethodName(createSchedulingAction.getMethodName());
-        scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
-        scheduleAction.setParameter1(createSchedulingAction.getParameter1());
-        scheduleAction.setParameter2(createSchedulingAction.getParameter2());
-        scheduleAction.setParameter3(createSchedulingAction.getParameter3());
+        updateScheduleActionNoMerge(scheduleAction,createSchedulingAction);
         return scheduleAction;
+    }
+
+    public boolean updateScheduleActionNoMerge(ScheduleAction scheduleAction,CreateSchedulingAction createSchedulingAction){
+        boolean update=false;
+        if(createSchedulingAction.getMethodName()!=null&&!createSchedulingAction.getMethodName().equals(scheduleAction.getMethodName())){
+            scheduleAction.setMethodName(createSchedulingAction.getMethodName());
+            update=true;
+        }
+        if(createSchedulingAction.getParameter1()!=null&&!createSchedulingAction.getParameter1().equals(scheduleAction.getParameter1())){
+            scheduleAction.setParameter1(createSchedulingAction.getParameter1());
+            update=true;
+        }
+        if(createSchedulingAction.getParameter2()!=null&&!createSchedulingAction.getParameter2().equals(scheduleAction.getParameter2())){
+            scheduleAction.setParameter2(createSchedulingAction.getParameter2());
+            update=true;
+        }
+
+        if(createSchedulingAction.getParameter3()!=null&&!createSchedulingAction.getParameter3().equals(scheduleAction.getParameter3())){
+            scheduleAction.setParameter3(createSchedulingAction.getParameter3());
+            update=true;
+        }
+
+        if(createSchedulingAction.getServiceCanonicalName()!=null&&!createSchedulingAction.getServiceCanonicalName().equals(scheduleAction.getServiceCanonicalName())){
+            scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
+            update=true;
+        }
+        return update;
+
     }
 
     public List<Schedule> getAllSchedules(SecurityContext securityContext, SchedulingFiltering filtering) {
@@ -134,10 +228,10 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public List<ScheduleToAction> getAllScheduleLinks() {
-       return schedulingRepository.getAll(ScheduleToAction.class);
+        return schedulingRepository.getAll(ScheduleToAction.class);
     }
 
-    public LocalDateTime getTimeFromName(String timeOfTheDayName) {
+    public LocalTime getTimeFromName(String timeOfTheDayName) {
         return null;
     }
 
@@ -147,7 +241,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
         Map<String, SchedulingOperator> schedulingOperatorMap = list.parallelStream().collect(Collectors.toMap(f -> f.getClass().getCanonicalName(), f -> f));
         for (ScheduleToAction link : schedule) {
-            ScheduleAction scheduleAction=link.getRightside();
+            ScheduleAction scheduleAction = link.getRightside();
             SchedulingOperator schedulingOperator = schedulingOperatorMap.get(scheduleAction.getServiceCanonicalName());
             if (schedulingOperator != null) {
                 executeAction(schedulingOperator, scheduleAction, securityContext);
@@ -184,21 +278,21 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     private SchedulingOperatorContainer getSchedulingOperatorContainer(SchedulingOperator f) {
-        List<SchedulingMethod> list=new ArrayList<>();
+        List<SchedulingMethod> list = new ArrayList<>();
         Class<? extends SchedulingOperator> clazz = f.getClass();
         for (Method method : clazz.getDeclaredMethods()) {
-            if(matchParameters(method)){
-                com.flexicore.scheduling.interfaces.SchedulingMethod schedulingMethod=method.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.SchedulingMethod.class);
+            if (matchParameters(method)) {
+                com.flexicore.scheduling.interfaces.SchedulingMethod schedulingMethod = method.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.SchedulingMethod.class);
 
-                list.add(new SchedulingMethod(method.getName(),schedulingMethod));
+                list.add(new SchedulingMethod(method.getName(), schedulingMethod));
             }
         }
-        return new SchedulingOperatorContainer(clazz.getCanonicalName(),list);
+        return new SchedulingOperatorContainer(clazz.getCanonicalName(), list);
     }
 
     private boolean matchParameters(Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
-        return method.getParameterCount()==2 && ScheduleAction.class.isAssignableFrom(parameterTypes[0]) && parameterTypes[1]==SecurityContext.class;
+        return method.getParameterCount() == 2 && ScheduleAction.class.isAssignableFrom(parameterTypes[0]) && parameterTypes[1] == SecurityContext.class;
     }
 
 
@@ -208,13 +302,31 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
 
     public ScheduleToAction linkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction createScheduling) {
-        ScheduleToAction scheduleToAction=ScheduleToAction.s().CreateUnchecked("link",securityContext.getUser());
-        scheduleToAction.Init(createScheduling.getSchedule(),createScheduling.getScheduleAction());
+        ScheduleToAction scheduleToAction = ScheduleToAction.s().CreateUnchecked("link", securityContext.getUser());
+        scheduleToAction.Init(createScheduling.getSchedule(), createScheduling.getScheduleAction());
         schedulingRepository.merge(scheduleToAction);
         return scheduleToAction;
     }
 
     public List<ScheduleAction> getAllScheduleActions(SecurityContext securityContext, SchedulingActionFiltering filtering) {
-        return schedulingRepository.getAllScheduleActions(filtering,securityContext);
+        return schedulingRepository.getAllScheduleActions(filtering, securityContext);
+    }
+
+    public Schedule updateSchedule(SecurityContext securityContext, UpdateScheduling updateScheduling) {
+        if(updateScheduleNoMerge(updateScheduling.getSchedule(),updateScheduling)){
+            schedulingRepository.merge(updateScheduling.getSchedule());
+        }
+        return updateScheduling.getSchedule();
+    }
+
+    public ScheduleAction updateScheduleAction(SecurityContext securityContext, UpdateSchedulingAction updateSchedulingAction) {
+        if(updateScheduleActionNoMerge(updateSchedulingAction.getScheduleAction(),updateSchedulingAction)){
+            schedulingRepository.merge(updateSchedulingAction.getScheduleAction());
+        }
+        return updateSchedulingAction.getScheduleAction();
+    }
+
+    public void merge(Object o) {
+        schedulingRepository.merge(o);
     }
 }
