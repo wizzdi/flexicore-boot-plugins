@@ -22,6 +22,9 @@ import com.flexicore.service.SecurityService;
 import com.flexicore.service.UserService;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.calendar.astro.SolarTime;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -29,15 +32,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.flexicore.scheduling.service.SchedulingService.TimeOfTheDayName.SUNRISE;
+import static com.flexicore.scheduling.service.SchedulingService.TimeOfTheDayName.SUNSET;
 
 @PluginInfo(version = 1, autoInstansiate = true)
 public class SchedulingService implements ServicePlugin, InitPlugin {
@@ -144,6 +147,18 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             update = true;
         }
 
+        if (createScheduling.getTimeOfTheDayNameLat() != null && !createScheduling.getTimeOfTheDayNameLat().equals(schedule.getTimeOfTheDayNameLat())) {
+            schedule.setTimeOfTheDayNameLat(createScheduling.getTimeOfTheDayNameLat());
+            update = true;
+        }
+
+        if (createScheduling.getTimeOfTheDayNameLon() != null && !createScheduling.getTimeOfTheDayNameLon().equals(schedule.getTimeOfTheDayNameLon())) {
+            schedule.setTimeOfTheDayNameLon(createScheduling.getTimeOfTheDayNameLon());
+            update = true;
+        }
+
+
+
         if (createScheduling.getSunday() != null && !createScheduling.getSunday().equals(schedule.isSunday())) {
             schedule.setSunday(createScheduling.getSunday());
             update = true;
@@ -231,8 +246,24 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return schedulingRepository.getAll(ScheduleToAction.class);
     }
 
-    public LocalTime getTimeFromName(String timeOfTheDayName) {
-        return null;
+    enum TimeOfTheDayName{
+        SUNRISE,SUNSET;
+    }
+
+    public Optional<LocalTime> getTimeFromName(Schedule schedule) {
+        if(schedule.getTimeOfTheDayName().equals(SUNRISE.name())){
+            SolarTime solarTime=SolarTime.ofLocation(schedule.getTimeOfTheDayNameLat(), schedule.getTimeOfTheDayNameLon());
+            Optional<Moment> result = PlainDate.nowInSystemTime().get(solarTime.sunrise());
+            return result.map(f->f.toLocalTimestamp().toTemporalAccessor().toLocalTime());
+
+        }
+        if(schedule.getTimeOfTheDayName().equals(SUNSET.name())){
+            SolarTime solarTime=SolarTime.ofLocation(schedule.getTimeOfTheDayNameLat(), schedule.getTimeOfTheDayNameLon());
+            Optional<Moment> result = PlainDate.nowInSystemTime().get(solarTime.sunset());
+            return result.map(f->f.toLocalTimestamp().toTemporalAccessor().toLocalTime());
+
+        }
+        return Optional.empty();
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)

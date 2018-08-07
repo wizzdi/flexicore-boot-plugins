@@ -100,7 +100,7 @@ public class Scheduler implements Runnable {
         LocalTime nowTime = now.toLocalTime();
         LocalTime start=schedule.getTimeFrameStart().toLocalTime();
         if(schedule.getTimeOfTheDayName()!=null){
-            start=schedulingService.getTimeFromName(schedule.getTimeOfTheDayName());
+            start=schedulingService.getTimeFromName(schedule).orElse(null);
         }
         LocalTime end=schedule.getTimeOfTheDayEnd()!=null?schedule.getTimeOfTheDayEnd().toLocalTime():null;
 

@@ -9,6 +9,9 @@ public class CreateScheduling {
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
     private String timeOfTheDayName;
+    private Double timeOfTheDayNameLat;
+    private Double timeOfTheDayNameLon;
+
     private LocalDateTime timeOfTheDayStart;
     private LocalDateTime timeOfTheDayEnd;
     private Long millisOffset;
@@ -165,6 +168,24 @@ public class CreateScheduling {
 
     public CreateScheduling setCoolDownIntervalBeforeRepeat(Long coolDownIntervalBeforeRepeat) {
         this.coolDownIntervalBeforeRepeat = coolDownIntervalBeforeRepeat;
+        return this;
+    }
+
+    public Double getTimeOfTheDayNameLat() {
+        return timeOfTheDayNameLat;
+    }
+
+    public CreateScheduling setTimeOfTheDayNameLat(Double timeOfTheDayNameLat) {
+        this.timeOfTheDayNameLat = timeOfTheDayNameLat;
+        return this;
+    }
+
+    public Double getTimeOfTheDayNameLon() {
+        return timeOfTheDayNameLon;
+    }
+
+    public CreateScheduling setTimeOfTheDayNameLon(Double timeOfTheDayNameLon) {
+        this.timeOfTheDayNameLon = timeOfTheDayNameLon;
         return this;
     }
 }

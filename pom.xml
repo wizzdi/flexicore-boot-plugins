@@ -67,6 +67,22 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/net.time4j/time4j-core -->
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-core</artifactId>
+            <version>4.38</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.time4j/time4j-calendar -->
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-calendar</artifactId>
+            <version>4.38</version>
+        </dependency>
+
+
+
         <!-- Import the JAX-RS API, we use provided scope as the API is included
            in JBoss WildFly -->
         <dependency>
