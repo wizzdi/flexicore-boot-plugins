@@ -1,5 +1,7 @@
 package com.flexicore.scheduling.containers.request;
 
+import com.flexicore.scheduling.model.TimeOfTheDayName;
+
 import java.time.LocalDateTime;
 
 public class CreateScheduling {
@@ -8,7 +10,7 @@ public class CreateScheduling {
     private String description;
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
-    private String timeOfTheDayName;
+    private TimeOfTheDayName timeOfTheDayName;
     private Double timeOfTheDayNameLat;
     private Double timeOfTheDayNameLon;
 
@@ -23,6 +25,7 @@ public class CreateScheduling {
     private Boolean thursday;
     private Boolean friday;
     private Boolean saturday;
+    private Boolean holiday;
 
 
     public String getName() {
@@ -52,11 +55,11 @@ public class CreateScheduling {
         return this;
     }
 
-    public String getTimeOfTheDayName() {
+    public TimeOfTheDayName getTimeOfTheDayName() {
         return timeOfTheDayName;
     }
 
-    public CreateScheduling setTimeOfTheDayName(String timeOfTheDayName) {
+    public CreateScheduling setTimeOfTheDayName(TimeOfTheDayName timeOfTheDayName) {
         this.timeOfTheDayName = timeOfTheDayName;
         return this;
     }
@@ -186,6 +189,15 @@ public class CreateScheduling {
 
     public CreateScheduling setTimeOfTheDayNameLon(Double timeOfTheDayNameLon) {
         this.timeOfTheDayNameLon = timeOfTheDayNameLon;
+        return this;
+    }
+
+    public Boolean getHoliday() {
+        return holiday;
+    }
+
+    public CreateScheduling setHoliday(Boolean holiday) {
+        this.holiday = holiday;
         return this;
     }
 }
