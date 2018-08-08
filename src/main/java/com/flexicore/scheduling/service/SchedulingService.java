@@ -2,9 +2,11 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
+import com.flexicore.exceptions.ExceptionHolder;
 import com.flexicore.interfaces.InitPlugin;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.Operation;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.User;
 import com.flexicore.model.auditing.AuditingJob;
@@ -284,24 +286,52 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
         Map<String, SchedulingOperator> schedulingOperatorMap = list.parallelStream().collect(Collectors.toMap(f -> f.getClass().getCanonicalName(), f -> f));
         for (ScheduleToAction link : schedule) {
+
             ScheduleAction scheduleAction = link.getRightside();
             SchedulingOperator schedulingOperator = schedulingOperatorMap.get(scheduleAction.getServiceCanonicalName());
             if (schedulingOperator != null) {
-                long start=System.currentTimeMillis();
-                Object response=executeAction(schedulingOperator, scheduleAction, securityContext);
-                long timeTaken=System.currentTimeMillis()-start;
-                auditingService.addAuditingJob(new AuditingJob()
-                        .setDateOccured(Date.from(Instant.now()))
-                        .setResponse(response)
-                        .setTimeTaken(timeTaken)
-                        .setSecurityContext(securityContext)
-                        .setInvocationContext(new SchduelingInvocationContext(new Object[]{scheduleAction,securityContext}))
-                );
+                long start = System.currentTimeMillis();
+                boolean failed = false;
+                Object response = null;
+                try {
+                    response = executeAction(schedulingOperator, scheduleAction, securityContext);
+                } catch (Exception e) {
+                    response = e;
+                    failed = true;
+
+                } finally {
+                    auditSchedule(securityContext, scheduleAction, start, failed, response);
+                }
+
             }
         }
         for (SchedulingOperator schedulingOperator : list) {
             pluginService.cleanUpInstance(schedulingOperator);
         }
+    }
+
+    private void auditSchedule(SecurityContext securityContext, ScheduleAction scheduleAction, long start, boolean failed, Object response) {
+        long timeTaken = System.currentTimeMillis() - start;
+        SecurityContext securityContextForAuditing = getSecurityContextForAuditing(securityContext, scheduleAction);
+        auditingService.addAuditingJob(new AuditingJob()
+                .setDateOccured(Date.from(Instant.now()))
+                .setResponse(response)
+                .setTimeTaken(timeTaken)
+                .setSecurityContext(securityContextForAuditing)
+                .setInvocationContext(new SchduelingInvocationContext(new Object[]{scheduleAction, securityContext}))
+                .setAuditingType(SchedulingAuditTypes.SCHEDULING.name())
+                .setFailed(failed)
+        );
+    }
+
+    private SecurityContext getSecurityContextForAuditing(SecurityContext securityContext, ScheduleAction scheduleAction) {
+        SecurityContext securityContextForAuditing = new SecurityContext(securityContext.getTenants(), securityContext.getUser(), securityContext.getOperation(), securityContext.getTenantToCreateIn());
+        Operation schedulingOperation = new Operation();
+        schedulingOperation.setId(scheduleAction.getId());
+        schedulingOperation.setName(scheduleAction.getName());
+        schedulingOperation.setDescription(scheduleAction.getDescription());
+        securityContextForAuditing.setOperation(schedulingOperation);
+        return securityContext;
     }
 
     private Object executeAction(SchedulingOperator schedulingOperator, ScheduleAction scheduleAction, SecurityContext securityContext) {
