@@ -2,8 +2,7 @@ package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
-import com.flexicore.model.Clazz;
-import com.flexicore.model.Role;
+import com.flexicore.model.Tenant;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,9 +10,9 @@ import javax.persistence.ManyToOne;
 
 
 @Entity
-public class PresetToClazz extends Baselink {
-    static PresetToClazz s_Singleton = new PresetToClazz();
-    public static PresetToClazz s() {
+public class PresetToTenant extends Baselink {
+    static PresetToTenant s_Singleton = new PresetToTenant();
+    public static PresetToTenant s() {
         return s_Singleton;
     }
 
@@ -39,12 +38,12 @@ public class PresetToClazz extends Baselink {
     }
 
     @Override
-    @ManyToOne(targetEntity =Clazz.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Clazz getRightside() {
-        return (Clazz) super.getRightside();
+    @ManyToOne(targetEntity =Tenant.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
+    public Tenant getRightside() {
+        return (Tenant) super.getRightside();
     }
 
-    public void setRightside(Clazz rightside) {
+    public void setRightside(Tenant rightside) {
         super.setRightside(rightside);
     }
 
@@ -58,7 +57,7 @@ public class PresetToClazz extends Baselink {
         return priority;
     }
 
-    public PresetToClazz setPriority(int priority) {
+    public PresetToTenant setPriority(int priority) {
         this.priority = priority;
         return this;
     }
@@ -67,7 +66,7 @@ public class PresetToClazz extends Baselink {
         return enabled;
     }
 
-    public PresetToClazz setEnabled(boolean enabled) {
+    public PresetToTenant setEnabled(boolean enabled) {
         this.enabled = enabled;
         return this;
     }
