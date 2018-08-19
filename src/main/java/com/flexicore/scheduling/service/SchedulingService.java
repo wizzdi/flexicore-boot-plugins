@@ -2,7 +2,6 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
-import com.flexicore.exceptions.ExceptionHolder;
 import com.flexicore.interfaces.InitPlugin;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
@@ -14,6 +13,7 @@ import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.SchedulingMethod;
 import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.data.SchedulingRepository;
+import com.flexicore.scheduling.init.Config;
 import com.flexicore.scheduling.interfaces.SchedulingOperator;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
@@ -43,9 +43,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static com.flexicore.scheduling.service.SchedulingService.TimeOfTheDayName.SUNRISE;
-import static com.flexicore.scheduling.service.SchedulingService.TimeOfTheDayName.SUNSET;
 
 @PluginInfo(version = 1, autoInstansiate = true)
 public class SchedulingService implements ServicePlugin, InitPlugin {
@@ -84,7 +81,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public SecurityContext getAdminSecurityContext() {
-        User user = userService.getUserByMail("admin@flexicore.com");
+        User user = userService.getUserByMail(Config.scheduleUserEmail);
         RunningUser runningUser = userService.registerUserIntoSystem(user, LocalDateTime.now().plusYears(30));
         String adminToken = runningUser.getAuthenticationkey().getKey();
         return verifyLoggedIn(adminToken);
@@ -215,7 +212,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
-        ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getMethodName(), securityContext.getUser());
+        ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getName(), securityContext.getUser());
         scheduleAction.Init();
         updateScheduleActionNoMerge(scheduleAction, createSchedulingAction);
         return scheduleAction;

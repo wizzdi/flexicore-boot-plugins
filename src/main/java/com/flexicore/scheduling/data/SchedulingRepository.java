@@ -3,6 +3,7 @@ package com.flexicore.scheduling.data;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.interfaces.ServicePlugin;
+import com.flexicore.model.Baselink_;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.scheduling.containers.request.SchedulingActionFiltering;
 import com.flexicore.scheduling.model.ScheduleAction;
@@ -26,7 +27,7 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         List<Predicate> preds = new ArrayList<>();
         if (filtering.getSchedule() != null) {
             Join<ScheduleAction, ScheduleToAction> join = r.join(ScheduleAction_.scheduleToActions);
-            preds.add(cb.equal(join.get(ScheduleToAction_.rightside), filtering.getSchedule()));
+            preds.add(cb.equal(join.get(Baselink_.leftside), filtering.getSchedule()));
         }
         QueryInformationHolder<ScheduleAction> queryInformationHolder = new QueryInformationHolder<>(filtering, ScheduleAction.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
