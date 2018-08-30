@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @PluginInfo(version = 1,autoInstansiate = true)
 public class Config implements InitPlugin {
 
-    public static String scheduleUserEmail="admin@flexicore.com";
+  //  public static String scheduleUserEmail="admin@flexicore.com";
     private static AtomicBoolean init=new AtomicBoolean(false);
 
     @Inject
@@ -21,7 +21,7 @@ public class Config implements InitPlugin {
     @Override
     public void init() {
         if(init.compareAndSet(false,true)){
-            scheduleUserEmail=properties.getProperty("scheduleUserEmail",scheduleUserEmail);
+            //scheduleUserEmail=properties.getProperty("scheduleUserEmail",scheduleUserEmail);
         }
     }
 }

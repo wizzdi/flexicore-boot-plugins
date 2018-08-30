@@ -81,7 +81,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public SecurityContext getAdminSecurityContext() {
-        User user = userService.getUserByMail(Config.scheduleUserEmail);
+        User user = userService.getAdminUser();
         RunningUser runningUser = userService.registerUserIntoSystem(user, LocalDateTime.now().plusYears(30));
         String adminToken = runningUser.getAuthenticationkey().getKey();
         return verifyLoggedIn(adminToken);
@@ -214,6 +214,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
         ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getName(), securityContext.getUser());
         scheduleAction.Init();
+
         updateScheduleActionNoMerge(scheduleAction, createSchedulingAction);
         return scheduleAction;
     }
@@ -222,6 +223,16 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         boolean update = false;
         if (createSchedulingAction.getMethodName() != null && !createSchedulingAction.getMethodName().equals(scheduleAction.getMethodName())) {
             scheduleAction.setMethodName(createSchedulingAction.getMethodName());
+            update = true;
+        }
+
+        if (createSchedulingAction.getName() != null && !createSchedulingAction.getName().equals(scheduleAction.getName())) {
+            scheduleAction.setName(createSchedulingAction.getName());
+            update = true;
+        }
+
+        if (createSchedulingAction.getDescription() != null && !createSchedulingAction.getDescription().equals(scheduleAction.getDescription())) {
+            scheduleAction.setDescription(createSchedulingAction.getDescription());
             update = true;
         }
         if (createSchedulingAction.getParameter1() != null && !createSchedulingAction.getParameter1().equals(scheduleAction.getParameter1())) {
@@ -253,6 +264,18 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     public List<ScheduleToAction> getAllScheduleLinks() {
         return schedulingRepository.getAll(ScheduleToAction.class);
+    }
+
+    public ScheduleToAction unlinkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction linkScheduleToAction) {
+
+        List<ScheduleToAction> links=schedulingRepository.getAllSchedullingLinks(linkScheduleToAction,securityContext);
+        for (ScheduleToAction link : links) {
+            link.setSoftDelete(true);
+        }
+        for (ScheduleToAction link : links) {
+            schedulingRepository.merge(link);
+        }
+        return links.isEmpty()?null:links.get(0);
     }
 
     enum TimeOfTheDayName {
@@ -360,6 +383,8 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     private SchedulingOperatorContainer getSchedulingOperatorContainer(SchedulingOperator f) {
         List<SchedulingMethod> list = new ArrayList<>();
         Class<? extends SchedulingOperator> clazz = f.getClass();
+        com.flexicore.scheduling.interfaces.Scheduler schedulerInfo=clazz.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.Scheduler.class);
+
         for (Method method : clazz.getDeclaredMethods()) {
             if (matchParameters(method)) {
                 com.flexicore.scheduling.interfaces.SchedulingMethod schedulingMethod = method.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.SchedulingMethod.class);
@@ -367,7 +392,10 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
                 list.add(new SchedulingMethod(method.getName(), schedulingMethod));
             }
         }
-        return new SchedulingOperatorContainer(clazz.getCanonicalName(), list);
+
+        String displayName = schedulerInfo != null ? schedulerInfo.displayName() : clazz.getCanonicalName();
+        String description = schedulerInfo != null ? schedulerInfo.description() : null;
+        return new SchedulingOperatorContainer(description,displayName,clazz.getCanonicalName(), list);
     }
 
     private boolean matchParameters(Method method) {

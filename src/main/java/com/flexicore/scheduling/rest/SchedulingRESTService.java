@@ -176,6 +176,30 @@ public class SchedulingRESTService implements RestServicePlugin {
 			LinkScheduleToAction linkScheduleToAction,
 			@Context SecurityContext securityContext) {
 
+		verifyLinkContainer(linkScheduleToAction, securityContext);
+
+
+		return service.linkScheduleToAction(securityContext, linkScheduleToAction);
+	}
+
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "unlinkScheduleToAction", notes = "Unlinks Schedule To Action")
+	@Path("unlinkScheduleToAction")
+	public ScheduleToAction unlinkScheduleToAction(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			LinkScheduleToAction linkScheduleToAction,
+			@Context SecurityContext securityContext) {
+
+		verifyLinkContainer(linkScheduleToAction, securityContext);
+
+
+		return service.unlinkScheduleToAction(securityContext, linkScheduleToAction);
+	}
+
+	private void verifyLinkContainer(LinkScheduleToAction linkScheduleToAction, @Context SecurityContext securityContext) {
 		Schedule schedule=linkScheduleToAction.getScheduleId()!=null?service.getByIdOrNull(linkScheduleToAction.getScheduleId(),Schedule.class,null,securityContext):null;
 		if(schedule==null&&linkScheduleToAction.getScheduleId()!=null){
 			throw new BadRequestException("No Schedule with id "+linkScheduleToAction.getScheduleId());
@@ -187,9 +211,6 @@ public class SchedulingRESTService implements RestServicePlugin {
 			throw new BadRequestException("No action with id "+linkScheduleToAction.getActionId());
 		}
 		linkScheduleToAction.setScheduleAction(action);
-
-
-		return service.linkScheduleToAction(securityContext, linkScheduleToAction);
 	}
 
 

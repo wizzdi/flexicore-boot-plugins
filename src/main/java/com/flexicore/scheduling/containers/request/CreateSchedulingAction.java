@@ -3,6 +3,7 @@ package com.flexicore.scheduling.containers.request;
 public class CreateSchedulingAction {
 
     private String name;
+    private String description;
     private String serviceCanonicalName;
     private String methodName;
     private String parameter1;
@@ -61,6 +62,15 @@ public class CreateSchedulingAction {
 
     public CreateSchedulingAction setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public CreateSchedulingAction setDescription(String description) {
+        this.description = description;
         return this;
     }
 }
