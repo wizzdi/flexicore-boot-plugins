@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.flexicore</groupId>
             <artifactId>scheduling-model</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
             <scope>provided</scope>
         </dependency>
 

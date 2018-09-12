@@ -10,14 +10,6 @@ public class CreateScheduling {
     private String description;
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
-    private TimeOfTheDayName timeOfTheDayName;
-    private Double timeOfTheDayNameLat;
-    private Double timeOfTheDayNameLon;
-
-    private LocalDateTime timeOfTheDayStart;
-    private LocalDateTime timeOfTheDayEnd;
-    private Long millisOffset;
-    private Long coolDownIntervalBeforeRepeat;
     private Boolean sunday;
     private Boolean monday;
     private Boolean tuesday;
@@ -52,26 +44,6 @@ public class CreateScheduling {
 
     public CreateScheduling setTimeFrameEnd(LocalDateTime timeFrameEnd) {
         this.timeFrameEnd = timeFrameEnd;
-        return this;
-    }
-
-    public TimeOfTheDayName getTimeOfTheDayName() {
-        return timeOfTheDayName;
-    }
-
-    public CreateScheduling setTimeOfTheDayName(TimeOfTheDayName timeOfTheDayName) {
-        this.timeOfTheDayName = timeOfTheDayName;
-        return this;
-    }
-
-
-
-    public Long getMillisOffset() {
-        return millisOffset;
-    }
-
-    public CreateScheduling setMillisOffset(Long millisOffset) {
-        this.millisOffset = millisOffset;
         return this;
     }
 
@@ -147,50 +119,6 @@ public class CreateScheduling {
         return this;
     }
 
-    public LocalDateTime getTimeOfTheDayStart() {
-        return timeOfTheDayStart;
-    }
-
-    public CreateScheduling setTimeOfTheDayStart(LocalDateTime timeOfTheDayStart) {
-        this.timeOfTheDayStart = timeOfTheDayStart;
-        return this;
-    }
-
-    public LocalDateTime getTimeOfTheDayEnd() {
-        return timeOfTheDayEnd;
-    }
-
-    public CreateScheduling setTimeOfTheDayEnd(LocalDateTime timeOfTheDayEnd) {
-        this.timeOfTheDayEnd = timeOfTheDayEnd;
-        return this;
-    }
-
-    public Long getCoolDownIntervalBeforeRepeat() {
-        return coolDownIntervalBeforeRepeat;
-    }
-
-    public CreateScheduling setCoolDownIntervalBeforeRepeat(Long coolDownIntervalBeforeRepeat) {
-        this.coolDownIntervalBeforeRepeat = coolDownIntervalBeforeRepeat;
-        return this;
-    }
-
-    public Double getTimeOfTheDayNameLat() {
-        return timeOfTheDayNameLat;
-    }
-
-    public CreateScheduling setTimeOfTheDayNameLat(Double timeOfTheDayNameLat) {
-        this.timeOfTheDayNameLat = timeOfTheDayNameLat;
-        return this;
-    }
-
-    public Double getTimeOfTheDayNameLon() {
-        return timeOfTheDayNameLon;
-    }
-
-    public CreateScheduling setTimeOfTheDayNameLon(Double timeOfTheDayNameLon) {
-        this.timeOfTheDayNameLon = timeOfTheDayNameLon;
-        return this;
-    }
 
     public Boolean getHoliday() {
         return holiday;

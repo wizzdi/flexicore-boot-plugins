@@ -7,15 +7,13 @@ import com.flexicore.model.FilteringInformationHolder;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.scheduling.containers.request.LinkScheduleToAction;
 import com.flexicore.scheduling.containers.request.SchedulingActionFiltering;
-import com.flexicore.scheduling.model.ScheduleAction;
-import com.flexicore.scheduling.model.ScheduleAction_;
-import com.flexicore.scheduling.model.ScheduleToAction;
-import com.flexicore.scheduling.model.ScheduleToAction_;
+import com.flexicore.scheduling.model.*;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @PluginInfo(version = 1)
 public class SchedulingRepository extends AbstractRepositoryPlugin {
@@ -41,6 +39,17 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         List<Predicate> preds = new ArrayList<>();
         preds.add(cb.and(cb.equal(r.get(Baselink_.leftside),linkScheduleToAction.getSchedule()),cb.equal(r.get(Baselink_.rightside),linkScheduleToAction.getScheduleAction())));
         QueryInformationHolder<ScheduleToAction> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleToAction.class, securityContext);
+        return getAllFiltered(queryInformationHolder, preds, cb, q, r);
+    }
+
+    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds,SecurityContext securityContext) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<ScheduleTimeslot> q = cb.createQuery(ScheduleTimeslot.class);
+        Root<ScheduleTimeslot> r = q.from(ScheduleTimeslot.class);
+        Join<ScheduleTimeslot,Schedule> join=r.join(ScheduleTimeslot_.schedule);
+        List<Predicate> preds = new ArrayList<>();
+        preds.add(join.get(Schedule_.id).in(scheduleIds));
+        QueryInformationHolder<ScheduleTimeslot> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleTimeslot.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
     }
 }

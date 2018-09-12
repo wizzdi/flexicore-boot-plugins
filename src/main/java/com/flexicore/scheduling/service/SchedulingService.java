@@ -15,9 +15,7 @@ import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.data.SchedulingRepository;
 import com.flexicore.scheduling.init.Config;
 import com.flexicore.scheduling.interfaces.SchedulingOperator;
-import com.flexicore.scheduling.model.Schedule;
-import com.flexicore.scheduling.model.ScheduleAction;
-import com.flexicore.scheduling.model.ScheduleToAction;
+import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.service.AuditingService;
@@ -43,6 +41,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.flexicore.scheduling.model.TimeOfTheDayName.SUNRISE;
+import static com.flexicore.scheduling.model.TimeOfTheDayName.SUNSET;
 
 @PluginInfo(version = 1, autoInstansiate = true)
 public class SchedulingService implements ServicePlugin, InitPlugin {
@@ -118,10 +119,6 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             schedule.setName(createScheduling.getName());
             update = true;
         }
-        if (createScheduling.getMillisOffset() != null && !createScheduling.getMillisOffset().equals(schedule.getMillisOffset())) {
-            schedule.setMillisOffset(createScheduling.getMillisOffset());
-            update = true;
-        }
         if (createScheduling.getTimeFrameStart() != null && !createScheduling.getTimeFrameStart().equals(schedule.getTimeFrameStart())) {
             schedule.setTimeFrameStart(createScheduling.getTimeFrameStart());
             update = true;
@@ -131,37 +128,6 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             schedule.setTimeFrameEnd(createScheduling.getTimeFrameEnd());
             update = true;
         }
-
-        if (createScheduling.getTimeOfTheDayStart() != null && !createScheduling.getTimeOfTheDayStart().equals(schedule.getTimeOfTheDayStart())) {
-            schedule.setTimeOfTheDayStart(createScheduling.getTimeOfTheDayStart());
-            update = true;
-        }
-
-        if (createScheduling.getTimeOfTheDayEnd() != null && !createScheduling.getTimeOfTheDayEnd().equals(schedule.getTimeOfTheDayEnd())) {
-            schedule.setTimeOfTheDayEnd(createScheduling.getTimeOfTheDayEnd());
-            update = true;
-        }
-
-        if (createScheduling.getCoolDownIntervalBeforeRepeat() != null && !createScheduling.getCoolDownIntervalBeforeRepeat().equals(schedule.getCoolDownIntervalBeforeRepeat())) {
-            schedule.setCoolDownIntervalBeforeRepeat(createScheduling.getCoolDownIntervalBeforeRepeat());
-            update = true;
-        }
-
-        if (createScheduling.getTimeOfTheDayName() != null && !createScheduling.getTimeOfTheDayName().equals(schedule.getTimeOfTheDayName())) {
-            schedule.setTimeOfTheDayName(createScheduling.getTimeOfTheDayName());
-            update = true;
-        }
-
-        if (createScheduling.getTimeOfTheDayNameLat() != null && !createScheduling.getTimeOfTheDayNameLat().equals(schedule.getTimeOfTheDayNameLat())) {
-            schedule.setTimeOfTheDayNameLat(createScheduling.getTimeOfTheDayNameLat());
-            update = true;
-        }
-
-        if (createScheduling.getTimeOfTheDayNameLon() != null && !createScheduling.getTimeOfTheDayNameLon().equals(schedule.getTimeOfTheDayNameLon())) {
-            schedule.setTimeOfTheDayNameLon(createScheduling.getTimeOfTheDayNameLon());
-            update = true;
-        }
-
 
         if (createScheduling.getSunday() != null && !createScheduling.getSunday().equals(schedule.isSunday())) {
             schedule.setSunday(createScheduling.getSunday());
@@ -283,20 +249,109 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return links.isEmpty()?null:links.get(0);
     }
 
-    enum TimeOfTheDayName {
-        SUNRISE, SUNSET;
+    public ScheduleTimeslot createScheduleTimeSlot(SecurityContext securityContext, CreateTimeslot createTimeslot) {
+        ScheduleTimeslot scheduleTimeslot=ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(),securityContext.getUser());
+        scheduleTimeslot.Init();
+        updateScheduleTimeslot(scheduleTimeslot,createTimeslot);
+        schedulingRepository.merge(scheduleTimeslot);
+        return scheduleTimeslot;
     }
 
-    public Optional<LocalTime> getTimeFromName(Schedule schedule) {
+
+    public ScheduleTimeslot updateScheduleTimeSlot(SecurityContext securityContext, UpdateTimeslot updateTimeslot) {
+        ScheduleTimeslot scheduleTimeslot = updateTimeslot.getScheduleTimeslot();
+        if(updateScheduleTimeslot(scheduleTimeslot,updateTimeslot)){
+            schedulingRepository.merge(scheduleTimeslot);
+
+        }
+        return scheduleTimeslot;
+    }
+
+    private boolean updateScheduleTimeslot(ScheduleTimeslot scheduleTimeslot, CreateTimeslot createTimeslot) {
+        boolean update=false;
+        if (createTimeslot.getName() != null && !createTimeslot.getName().equals(scheduleTimeslot.getName())) {
+            scheduleTimeslot.setName(createTimeslot.getName());
+            update = true;
+        }
+
+        if (createTimeslot.getDescription() != null && !createTimeslot.getDescription().equals(scheduleTimeslot.getDescription())) {
+            scheduleTimeslot.setDescription(createTimeslot.getDescription());
+            update = true;
+        }
+        if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().equals(scheduleTimeslot.getStartTime())) {
+            scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().equals(scheduleTimeslot.getEndTime())) {
+            scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd());
+            update = true;
+        }
+
+        if (createTimeslot.getCoolDownIntervalBeforeRepeat() != null && !createTimeslot.getCoolDownIntervalBeforeRepeat().equals(scheduleTimeslot.getCoolDownIntervalBeforeRepeat())) {
+            scheduleTimeslot.setCoolDownIntervalBeforeRepeat(createTimeslot.getCoolDownIntervalBeforeRepeat());
+            update = true;
+        }
+
+        if (createTimeslot.getStartTimeOfTheDayName() != null && !createTimeslot.getStartTimeOfTheDayName().equals(scheduleTimeslot.getStartTimeOfTheDayName())) {
+            scheduleTimeslot.setStartTimeOfTheDayName(createTimeslot.getStartTimeOfTheDayName());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayNameStartLat() != null && !createTimeslot.getTimeOfTheDayNameStartLat().equals(scheduleTimeslot.getTimeOfTheDayNameStartLat())) {
+            scheduleTimeslot.setTimeOfTheDayNameEndLat(createTimeslot.getTimeOfTheDayNameStartLat());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayNameStartLon() != null && !createTimeslot.getTimeOfTheDayNameStartLon().equals(scheduleTimeslot.getTimeOfTheDayNameStartLon())) {
+            scheduleTimeslot.setTimeOfTheDayNameEndLon(createTimeslot.getTimeOfTheDayNameStartLon());
+            update = true;
+        }
+
+        if (createTimeslot.getEndTimeOfTheDayName() != null && !createTimeslot.getEndTimeOfTheDayName().equals(scheduleTimeslot.getEndTimeOfTheDayName())) {
+            scheduleTimeslot.setEndTimeOfTheDayName(createTimeslot.getEndTimeOfTheDayName());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayNameEndLat() != null && !createTimeslot.getTimeOfTheDayNameEndLat().equals(scheduleTimeslot.getTimeOfTheDayNameEndLat())) {
+            scheduleTimeslot.setTimeOfTheDayNameEndLat(createTimeslot.getTimeOfTheDayNameEndLat());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayNameEndLon() != null && !createTimeslot.getTimeOfTheDayNameEndLon().equals(scheduleTimeslot.getTimeOfTheDayNameEndLon())) {
+            scheduleTimeslot.setTimeOfTheDayNameEndLon(createTimeslot.getTimeOfTheDayNameEndLon());
+            update = true;
+        }
+
+        if (createTimeslot.getCoolDownIntervalBeforeRepeat() != null && !createTimeslot.getCoolDownIntervalBeforeRepeat().equals(scheduleTimeslot.getCoolDownIntervalBeforeRepeat())) {
+            scheduleTimeslot.setCoolDownIntervalBeforeRepeat(createTimeslot.getCoolDownIntervalBeforeRepeat());
+            update = true;
+        }
+
+        if (createTimeslot.getMillisOffset() != null && !createTimeslot.getMillisOffset().equals(scheduleTimeslot.getMillisOffset())) {
+            scheduleTimeslot.setMillisOffset(createTimeslot.getMillisOffset());
+            update = true;
+        }
+
+        if (createTimeslot.getSchedule() != null &&(scheduleTimeslot.getSchedule()==null|| !createTimeslot.getSchedule().getId().equals(scheduleTimeslot.getSchedule().getId()))) {
+            scheduleTimeslot.setSchedule(createTimeslot.getSchedule());
+            update = true;
+        }
+
+        return update;
+    }
+
+
+    public Optional<LocalTime> getTimeFromName(TimeOfTheDayName timeOfTheDayName,double lon,double lat) {
         SolarTime solarTime;
         Optional<Moment> result = Optional.empty();
-        switch (schedule.getTimeOfTheDayName()) {
+        switch (timeOfTheDayName) {
             case SUNRISE:
-                solarTime = SolarTime.ofLocation(schedule.getTimeOfTheDayNameLat(), schedule.getTimeOfTheDayNameLon());
+                solarTime = SolarTime.ofLocation(lat,lon);
                 result = PlainDate.nowInSystemTime().get(solarTime.sunrise());
                 break;
             case SUNSET:
-                solarTime = SolarTime.ofLocation(schedule.getTimeOfTheDayNameLat(), schedule.getTimeOfTheDayNameLon());
+                solarTime = SolarTime.ofLocation(lat,lon);
                 result = PlainDate.nowInSystemTime().get(solarTime.sunset());
                 break;
         }
@@ -400,7 +455,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
         String displayName = schedulerInfo != null ? schedulerInfo.displayName() : clazz.getCanonicalName();
         String description = schedulerInfo != null ? schedulerInfo.description() : null;
-        return new SchedulingOperatorContainer(description,displayName,clazz.getCanonicalName(), list);
+        return new SchedulingOperatorContainer(clazz.getCanonicalName(),displayName,description, list);
     }
 
     private boolean matchParameters(Method method) {
@@ -441,5 +496,9 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     public void merge(Object o) {
         schedulingRepository.merge(o);
+    }
+
+    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds,SecurityContext securityContext) {
+        return schedulingRepository.getAllTimeSlots(scheduleIds,securityContext);
     }
 }

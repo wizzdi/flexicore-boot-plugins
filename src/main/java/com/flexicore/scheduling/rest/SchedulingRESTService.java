@@ -3,6 +3,8 @@ package com.flexicore.scheduling.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
+import com.flexicore.annotations.rest.Update;
+import com.flexicore.annotations.rest.Write;
 import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
@@ -10,6 +12,7 @@ import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
+import com.flexicore.scheduling.model.ScheduleTimeslot;
 import com.flexicore.scheduling.model.ScheduleToAction;
 import com.flexicore.scheduling.service.SchedulingService;
 import com.flexicore.security.SecurityContext;
@@ -108,6 +111,44 @@ public class SchedulingRESTService implements RestServicePlugin {
 			@Context SecurityContext securityContext) {
 
 		return service.createSchedule(securityContext, createScheduling);
+	}
+
+
+	@POST
+	@Produces("application/json")
+	@Write
+	@ApiOperation(value = "createScheduleTimeSlot", notes = "Create Schedule time slot")
+	@Path("createScheduleTimeslot")
+	public ScheduleTimeslot createScheduleTimeSlot(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			CreateTimeslot createTimeslot,
+			@Context SecurityContext securityContext) {
+		Schedule schedule=createTimeslot.getScheduleId()!=null?service.getByIdOrNull(createTimeslot.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null){
+			throw new BadRequestException("No Schedule with id "+createTimeslot.getScheduleId());
+		}
+		createTimeslot.setSchedule(schedule);
+
+		return service.createScheduleTimeSlot(securityContext, createTimeslot);
+	}
+
+
+	@PUT
+	@Produces("application/json")
+	@Update
+	@ApiOperation(value = "updateScheduleTimeSlot", notes = "updates Schedule time slot")
+	@Path("updateScheduleTimeSlot")
+	public ScheduleTimeslot updateScheduleTimeSlot(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			UpdateTimeslot updateTimeslot,
+			@Context SecurityContext securityContext) {
+		ScheduleTimeslot scheduleTimeslot=updateTimeslot.getScheduleTimeslotId()!=null?service.getByIdOrNull(updateTimeslot.getScheduleTimeslotId(),ScheduleTimeslot.class,null,securityContext):null;
+		if(scheduleTimeslot==null){
+			throw new BadRequestException("No timeslot with id "+updateTimeslot.getScheduleTimeslotId());
+		}
+		updateTimeslot.setScheduleTimeslot(scheduleTimeslot);
+
+		return service.createScheduleTimeSlot(securityContext, updateTimeslot);
 	}
 
 	@POST
