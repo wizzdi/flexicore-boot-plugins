@@ -14,9 +14,13 @@ public class ScheduleTimeslot extends Baseclass {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private TimeOfTheDayName timeOfTheDayName;
-    private double timeOfTheDayNameLat;
-    private double timeOfTheDayNameLon;
+    private TimeOfTheDayName startTimeOfTheDayName;
+    private double timeOfTheDayNameStartLat;
+    private double timeOfTheDayNameStartLon;
+
+    private TimeOfTheDayName endTimeOfTheDayName;
+    private double timeOfTheDayNameEndLat;
+    private double timeOfTheDayNameEndLon;
     private long coolDownIntervalBeforeRepeat;
     private long millisOffset;
 
@@ -51,30 +55,30 @@ public class ScheduleTimeslot extends Baseclass {
         return this;
     }
 
-    public TimeOfTheDayName getTimeOfTheDayName() {
-        return timeOfTheDayName;
+    public TimeOfTheDayName getStartTimeOfTheDayName() {
+        return startTimeOfTheDayName;
     }
 
-    public ScheduleTimeslot setTimeOfTheDayName(TimeOfTheDayName timeOfTheDayName) {
-        this.timeOfTheDayName = timeOfTheDayName;
+    public ScheduleTimeslot setStartTimeOfTheDayName(TimeOfTheDayName startTimeOfTheDayName) {
+        this.startTimeOfTheDayName = startTimeOfTheDayName;
         return this;
     }
 
-    public double getTimeOfTheDayNameLat() {
-        return timeOfTheDayNameLat;
+    public double getTimeOfTheDayNameStartLat() {
+        return timeOfTheDayNameStartLat;
     }
 
-    public ScheduleTimeslot setTimeOfTheDayNameLat(double timeOfTheDayNameLat) {
-        this.timeOfTheDayNameLat = timeOfTheDayNameLat;
+    public ScheduleTimeslot setTimeOfTheDayNameStartLat(double timeOfTheDayNameStartLat) {
+        this.timeOfTheDayNameStartLat = timeOfTheDayNameStartLat;
         return this;
     }
 
-    public double getTimeOfTheDayNameLon() {
-        return timeOfTheDayNameLon;
+    public double getTimeOfTheDayNameStartLon() {
+        return timeOfTheDayNameStartLon;
     }
 
-    public ScheduleTimeslot setTimeOfTheDayNameLon(double timeOfTheDayNameLon) {
-        this.timeOfTheDayNameLon = timeOfTheDayNameLon;
+    public ScheduleTimeslot setTimeOfTheDayNameStartLon(double timeOfTheDayNameStartLon) {
+        this.timeOfTheDayNameStartLon = timeOfTheDayNameStartLon;
         return this;
     }
 
@@ -93,6 +97,34 @@ public class ScheduleTimeslot extends Baseclass {
 
     public ScheduleTimeslot setMillisOffset(long millisOffset) {
         this.millisOffset = millisOffset;
+        return this;
+    }
+
+
+    public TimeOfTheDayName getEndTimeOfTheDayName() {
+        return endTimeOfTheDayName;
+    }
+
+    public ScheduleTimeslot setEndTimeOfTheDayName(TimeOfTheDayName endTimeOfTheDayName) {
+        this.endTimeOfTheDayName = endTimeOfTheDayName;
+        return this;
+    }
+
+    public double getTimeOfTheDayNameEndLat() {
+        return timeOfTheDayNameEndLat;
+    }
+
+    public ScheduleTimeslot setTimeOfTheDayNameEndLat(double timeOfTheDayNameEndLat) {
+        this.timeOfTheDayNameEndLat = timeOfTheDayNameEndLat;
+        return this;
+    }
+
+    public double getTimeOfTheDayNameEndLon() {
+        return timeOfTheDayNameEndLon;
+    }
+
+    public ScheduleTimeslot setTimeOfTheDayNameEndLon(double timeOfTheDayNameEndLon) {
+        this.timeOfTheDayNameEndLon = timeOfTheDayNameEndLon;
         return this;
     }
 }
