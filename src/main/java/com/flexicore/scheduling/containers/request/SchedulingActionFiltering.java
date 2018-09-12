@@ -1,7 +1,7 @@
 package com.flexicore.scheduling.containers.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.data.jsoncontainers.FilteringInformationHolder;
+import com.flexicore.model.FilteringInformationHolder;
 import com.flexicore.scheduling.model.Schedule;
 
 public class SchedulingActionFiltering extends FilteringInformationHolder {

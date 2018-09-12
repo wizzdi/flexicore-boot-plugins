@@ -1,10 +1,9 @@
 package com.flexicore.scheduling.data;
 
 import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.FilteringInformationHolder;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
-import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baselink_;
+import com.flexicore.model.FilteringInformationHolder;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.scheduling.containers.request.LinkScheduleToAction;
 import com.flexicore.scheduling.containers.request.SchedulingActionFiltering;

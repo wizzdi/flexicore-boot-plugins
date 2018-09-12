@@ -1,5 +1,8 @@
 package com.flexicore.scheduling.containers.request;
 
+
+import com.flexicore.model.FilteringInformationHolder;
+
 public class CreateSchedulingAction {
 
     private String name;
@@ -9,6 +12,7 @@ public class CreateSchedulingAction {
     private String parameter1;
     private String parameter2;
     private String parameter3;
+    private FilteringInformationHolder filteringInformationHolder;
 
 
     public String getServiceCanonicalName() {
@@ -71,6 +75,15 @@ public class CreateSchedulingAction {
 
     public CreateSchedulingAction setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public FilteringInformationHolder getFilteringInformationHolder() {
+        return filteringInformationHolder;
+    }
+
+    public CreateSchedulingAction setFilteringInformationHolder(FilteringInformationHolder filteringInformationHolder) {
+        this.filteringInformationHolder = filteringInformationHolder;
         return this;
     }
 }

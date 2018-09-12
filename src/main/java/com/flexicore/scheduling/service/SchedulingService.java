@@ -253,6 +253,11 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
             update = true;
         }
+        if(createSchedulingAction.getFilteringInformationHolder()!=null){
+            createSchedulingAction.getFilteringInformationHolder().prepareForSave();
+            scheduleAction.setFilteringInformationHolder(createSchedulingAction.getFilteringInformationHolder());
+
+        }
         return update;
 
     }
