@@ -17,12 +17,18 @@ public class ScheduleTimeslot extends Baseclass {
     private TimeOfTheDayName startTimeOfTheDayName;
     private double timeOfTheDayNameStartLat;
     private double timeOfTheDayNameStartLon;
+    private long startMillisOffset;
+    private long endMillisOffset;
+
+
+    private LocalDateTime lastExecution;
+
 
     private TimeOfTheDayName endTimeOfTheDayName;
     private double timeOfTheDayNameEndLat;
     private double timeOfTheDayNameEndLon;
     private long coolDownIntervalBeforeRepeat;
-    private long millisOffset;
+
 
     @ManyToOne(targetEntity = Schedule.class)
     private Schedule schedule;
@@ -91,12 +97,12 @@ public class ScheduleTimeslot extends Baseclass {
         return this;
     }
 
-    public long getMillisOffset() {
-        return millisOffset;
+    public long getStartMillisOffset() {
+        return startMillisOffset;
     }
 
-    public ScheduleTimeslot setMillisOffset(long millisOffset) {
-        this.millisOffset = millisOffset;
+    public ScheduleTimeslot setStartMillisOffset(long startMillisOffset) {
+        this.startMillisOffset = startMillisOffset;
         return this;
     }
 
@@ -125,6 +131,24 @@ public class ScheduleTimeslot extends Baseclass {
 
     public ScheduleTimeslot setTimeOfTheDayNameEndLon(double timeOfTheDayNameEndLon) {
         this.timeOfTheDayNameEndLon = timeOfTheDayNameEndLon;
+        return this;
+    }
+
+    public LocalDateTime getLastExecution() {
+        return lastExecution;
+    }
+
+    public ScheduleTimeslot setLastExecution(LocalDateTime lastExecution) {
+        this.lastExecution = lastExecution;
+        return this;
+    }
+
+    public long getEndMillisOffset() {
+        return endMillisOffset;
+    }
+
+    public ScheduleTimeslot setEndMillisOffset(long endMillisOffset) {
+        this.endMillisOffset = endMillisOffset;
         return this;
     }
 }

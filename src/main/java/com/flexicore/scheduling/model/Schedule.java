@@ -22,9 +22,12 @@ public class Schedule extends Baseclass {
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(targetEntity = ScheduleTimeslot.class,mappedBy = "schedule",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<ScheduleTimeslot> timeslots=new ArrayList<>();
+
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
-    private LocalDateTime lastExecution;
 
     private boolean sunday;
     private boolean monday;
@@ -131,14 +134,6 @@ public class Schedule extends Baseclass {
     }
 
 
-    public LocalDateTime getLastExecution() {
-        return lastExecution;
-    }
-
-    public Schedule setLastExecution(LocalDateTime lastExecution) {
-        this.lastExecution = lastExecution;
-        return this;
-    }
 
 
     public boolean isHoliday() {
@@ -147,6 +142,17 @@ public class Schedule extends Baseclass {
 
     public Schedule setHoliday(boolean holiday) {
         this.holiday = holiday;
+        return this;
+    }
+
+    @JsonIgnore
+    @OneToMany(targetEntity = ScheduleTimeslot.class,mappedBy = "schedule",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    public List<ScheduleTimeslot> getTimeslots() {
+        return timeslots;
+    }
+
+    public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
+        this.timeslots = timeslots;
         return this;
     }
 }
