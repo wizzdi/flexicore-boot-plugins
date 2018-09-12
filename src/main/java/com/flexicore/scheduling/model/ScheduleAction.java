@@ -2,9 +2,9 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.FilteringInformationHolder;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +25,9 @@ public class ScheduleAction extends Baseclass {
     private String parameter2;
     @Lob
     private String parameter3;
+
+    @OneToOne(targetEntity = FilteringInformationHolder.class)
+    private FilteringInformationHolder filteringInformationHolder;
 
     @JsonIgnore
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
@@ -79,6 +82,16 @@ public class ScheduleAction extends Baseclass {
 
     public ScheduleAction setParameter3(String parameter3) {
         this.parameter3 = parameter3;
+        return this;
+    }
+
+    @OneToOne(targetEntity = FilteringInformationHolder.class)
+    public FilteringInformationHolder getFilteringInformationHolder() {
+        return filteringInformationHolder;
+    }
+
+    public ScheduleAction setFilteringInformationHolder(FilteringInformationHolder filteringInformationHolder) {
+        this.filteringInformationHolder = filteringInformationHolder;
         return this;
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>com.flexicore</groupId>
     <artifactId>scheduling-model</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.flexicore</groupId>
             <artifactId>FlexiCore</artifactId>
-            <version>1.9.8</version>
+            <version>2.0.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

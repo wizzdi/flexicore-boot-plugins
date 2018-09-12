@@ -25,14 +25,7 @@ public class Schedule extends Baseclass {
     private LocalDateTime timeFrameStart;
     private LocalDateTime timeFrameEnd;
     private LocalDateTime lastExecution;
-    private long coolDownIntervalBeforeRepeat;
-    private TimeOfTheDayName timeOfTheDayName;
-    private double timeOfTheDayNameLat;
-    private double timeOfTheDayNameLon;
-    private LocalDateTime timeOfTheDayStart;
-    private LocalDateTime timeOfTheDayEnd;
 
-    private long millisOffset;
     private boolean sunday;
     private boolean monday;
     private boolean tuesday;
@@ -61,32 +54,7 @@ public class Schedule extends Baseclass {
         return this;
     }
 
-    public TimeOfTheDayName getTimeOfTheDayName() {
-        return timeOfTheDayName;
-    }
 
-    public Schedule setTimeOfTheDayName(TimeOfTheDayName timeOfTheDayName) {
-        this.timeOfTheDayName = timeOfTheDayName;
-        return this;
-    }
-
-    public LocalDateTime getTimeOfTheDayStart() {
-        return timeOfTheDayStart;
-    }
-
-    public Schedule setTimeOfTheDayStart(LocalDateTime timeOfTheDayStart) {
-        this.timeOfTheDayStart = timeOfTheDayStart;
-        return this;
-    }
-
-    public long getMillisOffset() {
-        return millisOffset;
-    }
-
-    public Schedule setMillisOffset(long millisOffset) {
-        this.millisOffset = millisOffset;
-        return this;
-    }
 
     public boolean isSunday() {
         return sunday;
@@ -172,42 +140,6 @@ public class Schedule extends Baseclass {
         return this;
     }
 
-    public long getCoolDownIntervalBeforeRepeat() {
-        return coolDownIntervalBeforeRepeat;
-    }
-
-    public Schedule setCoolDownIntervalBeforeRepeat(long coolDownIntervalBeforeRepeat) {
-        this.coolDownIntervalBeforeRepeat = coolDownIntervalBeforeRepeat;
-        return this;
-    }
-
-    public LocalDateTime getTimeOfTheDayEnd() {
-        return timeOfTheDayEnd;
-    }
-
-    public Schedule setTimeOfTheDayEnd(LocalDateTime timeOfTheDayEnd) {
-        this.timeOfTheDayEnd = timeOfTheDayEnd;
-        return this;
-    }
-
-
-    public double getTimeOfTheDayNameLat() {
-        return timeOfTheDayNameLat;
-    }
-
-    public Schedule setTimeOfTheDayNameLat(double timeOfTheDayNameLat) {
-        this.timeOfTheDayNameLat = timeOfTheDayNameLat;
-        return this;
-    }
-
-    public double getTimeOfTheDayNameLon() {
-        return timeOfTheDayNameLon;
-    }
-
-    public Schedule setTimeOfTheDayNameLon(double timeOfTheDayNameLon) {
-        this.timeOfTheDayNameLon = timeOfTheDayNameLon;
-        return this;
-    }
 
     public boolean isHoliday() {
         return holiday;
