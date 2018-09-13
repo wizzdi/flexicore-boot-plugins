@@ -9,7 +9,6 @@ import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.scheduling.containers.request.*;
-import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
@@ -81,20 +80,6 @@ public class SchedulingRESTService implements RestServicePlugin {
 		filtering.setSchedule(schedule);
 
 		return service.getAllScheduleActions(securityContext, filtering);
-	}
-
-
-	@POST
-	@Produces("application/json")
-	@Read
-	@ApiOperation(value = "getAvailableSchedulingOperators", notes = "Gets All Scheduling operator containers")
-	@Path("getAvailableSchedulingOperators")
-	public List<SchedulingOperatorContainer> getAvailableSchedulingOperators(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			SchedulingOperatorsFiltering filtering,
-			@Context SecurityContext securityContext) {
-
-		return service.getAvailableSchedulingOperators(securityContext, filtering);
 	}
 
 

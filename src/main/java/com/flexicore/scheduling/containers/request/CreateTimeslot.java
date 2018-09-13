@@ -23,7 +23,9 @@ public class CreateTimeslot {
 
     private LocalDateTime timeOfTheDayStart;
     private LocalDateTime timeOfTheDayEnd;
-    private Long millisOffset;
+    private Long startMillisOffset;
+    private Long endMillisOffset;
+
     private Long coolDownIntervalBeforeRepeat;
 
     public TimeOfTheDayName getStartTimeOfTheDayName() {
@@ -98,12 +100,12 @@ public class CreateTimeslot {
         return this;
     }
 
-    public Long getMillisOffset() {
-        return millisOffset;
+    public Long getStartMillisOffset() {
+        return startMillisOffset;
     }
 
-    public CreateTimeslot setMillisOffset(Long millisOffset) {
-        this.millisOffset = millisOffset;
+    public CreateTimeslot setStartMillisOffset(Long startMillisOffset) {
+        this.startMillisOffset = startMillisOffset;
         return this;
     }
 
@@ -150,6 +152,15 @@ public class CreateTimeslot {
 
     public CreateTimeslot setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public Long getEndMillisOffset() {
+        return endMillisOffset;
+    }
+
+    public CreateTimeslot setEndMillisOffset(Long endMillisOffset) {
+        this.endMillisOffset = endMillisOffset;
         return this;
     }
 }

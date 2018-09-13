@@ -9,19 +9,13 @@ import com.flexicore.model.Operation;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.User;
 import com.flexicore.model.auditing.AuditingJob;
+import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
-import com.flexicore.scheduling.containers.response.SchedulingMethod;
-import com.flexicore.scheduling.containers.response.SchedulingOperatorContainer;
 import com.flexicore.scheduling.data.SchedulingRepository;
-import com.flexicore.scheduling.init.Config;
-import com.flexicore.scheduling.interfaces.SchedulingOperator;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.service.AuditingService;
-import com.flexicore.service.PluginService;
-import com.flexicore.service.SecurityService;
-import com.flexicore.service.UserService;
+import com.flexicore.service.*;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.time4j.Moment;
@@ -30,20 +24,14 @@ import net.time4j.calendar.astro.SolarTime;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static com.flexicore.scheduling.model.TimeOfTheDayName.SUNRISE;
-import static com.flexicore.scheduling.model.TimeOfTheDayName.SUNSET;
 
 @PluginInfo(version = 1, autoInstansiate = true)
 public class SchedulingService implements ServicePlugin, InitPlugin {
@@ -67,6 +55,9 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     @Inject
     private AuditingService auditingService;
+
+    @Inject
+    private DynamicInvokersService dynamicInvokersService;
 
     private static AtomicBoolean init = new AtomicBoolean(false);
     private static Scheduler scheduler;
@@ -201,27 +192,15 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             scheduleAction.setDescription(createSchedulingAction.getDescription());
             update = true;
         }
-        if (createSchedulingAction.getParameter1() != null && !createSchedulingAction.getParameter1().equals(scheduleAction.getParameter1())) {
-            scheduleAction.setParameter1(createSchedulingAction.getParameter1());
-            update = true;
-        }
-        if (createSchedulingAction.getParameter2() != null && !createSchedulingAction.getParameter2().equals(scheduleAction.getParameter2())) {
-            scheduleAction.setParameter2(createSchedulingAction.getParameter2());
-            update = true;
-        }
 
-        if (createSchedulingAction.getParameter3() != null && !createSchedulingAction.getParameter3().equals(scheduleAction.getParameter3())) {
-            scheduleAction.setParameter3(createSchedulingAction.getParameter3());
-            update = true;
-        }
 
         if (createSchedulingAction.getServiceCanonicalName() != null && !createSchedulingAction.getServiceCanonicalName().equals(scheduleAction.getServiceCanonicalName())) {
             scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
             update = true;
         }
-        if(createSchedulingAction.getFilteringInformationHolder()!=null){
-            createSchedulingAction.getFilteringInformationHolder().prepareForSave();
-            scheduleAction.setFilteringInformationHolder(createSchedulingAction.getFilteringInformationHolder());
+        if (createSchedulingAction.getExecutionParametersHolder() != null) {
+            createSchedulingAction.getExecutionParametersHolder().setId(Baseclass.getBase64ID());
+            scheduleAction.setExecutionParametersHolder(createSchedulingAction.getExecutionParametersHolder());
 
         }
         return update;
@@ -239,20 +218,20 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     public ScheduleToAction unlinkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction linkScheduleToAction) {
 
-        List<ScheduleToAction> links=schedulingRepository.getAllSchedullingLinks(linkScheduleToAction,securityContext);
+        List<ScheduleToAction> links = schedulingRepository.getAllSchedullingLinks(linkScheduleToAction, securityContext);
         for (ScheduleToAction link : links) {
             link.setSoftDelete(true);
         }
         for (ScheduleToAction link : links) {
             schedulingRepository.merge(link);
         }
-        return links.isEmpty()?null:links.get(0);
+        return links.isEmpty() ? null : links.get(0);
     }
 
     public ScheduleTimeslot createScheduleTimeSlot(SecurityContext securityContext, CreateTimeslot createTimeslot) {
-        ScheduleTimeslot scheduleTimeslot=ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(),securityContext.getUser());
+        ScheduleTimeslot scheduleTimeslot = ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(), securityContext.getUser());
         scheduleTimeslot.Init();
-        updateScheduleTimeslot(scheduleTimeslot,createTimeslot);
+        updateScheduleTimeslot(scheduleTimeslot, createTimeslot);
         schedulingRepository.merge(scheduleTimeslot);
         return scheduleTimeslot;
     }
@@ -260,7 +239,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     public ScheduleTimeslot updateScheduleTimeSlot(SecurityContext securityContext, UpdateTimeslot updateTimeslot) {
         ScheduleTimeslot scheduleTimeslot = updateTimeslot.getScheduleTimeslot();
-        if(updateScheduleTimeslot(scheduleTimeslot,updateTimeslot)){
+        if (updateScheduleTimeslot(scheduleTimeslot, updateTimeslot)) {
             schedulingRepository.merge(scheduleTimeslot);
 
         }
@@ -268,7 +247,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     private boolean updateScheduleTimeslot(ScheduleTimeslot scheduleTimeslot, CreateTimeslot createTimeslot) {
-        boolean update=false;
+        boolean update = false;
         if (createTimeslot.getName() != null && !createTimeslot.getName().equals(scheduleTimeslot.getName())) {
             scheduleTimeslot.setName(createTimeslot.getName());
             update = true;
@@ -328,12 +307,17 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             update = true;
         }
 
-        if (createTimeslot.getMillisOffset() != null && !createTimeslot.getMillisOffset().equals(scheduleTimeslot.getMillisOffset())) {
-            scheduleTimeslot.setMillisOffset(createTimeslot.getMillisOffset());
+        if (createTimeslot.getStartMillisOffset() != null && !createTimeslot.getStartMillisOffset().equals(scheduleTimeslot.getStartMillisOffset())) {
+            scheduleTimeslot.setStartMillisOffset(createTimeslot.getStartMillisOffset());
             update = true;
         }
 
-        if (createTimeslot.getSchedule() != null &&(scheduleTimeslot.getSchedule()==null|| !createTimeslot.getSchedule().getId().equals(scheduleTimeslot.getSchedule().getId()))) {
+        if (createTimeslot.getEndMillisOffset() != null && !createTimeslot.getEndMillisOffset().equals(scheduleTimeslot.getEndMillisOffset())) {
+            scheduleTimeslot.setEndMillisOffset(createTimeslot.getEndMillisOffset());
+            update = true;
+        }
+
+        if (createTimeslot.getSchedule() != null && (scheduleTimeslot.getSchedule() == null || !createTimeslot.getSchedule().getId().equals(scheduleTimeslot.getSchedule().getId()))) {
             scheduleTimeslot.setSchedule(createTimeslot.getSchedule());
             update = true;
         }
@@ -342,16 +326,16 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
 
-    public Optional<LocalTime> getTimeFromName(TimeOfTheDayName timeOfTheDayName,double lon,double lat) {
+    public Optional<LocalTime> getTimeFromName(TimeOfTheDayName timeOfTheDayName, double lon, double lat) {
         SolarTime solarTime;
         Optional<Moment> result = Optional.empty();
         switch (timeOfTheDayName) {
             case SUNRISE:
-                solarTime = SolarTime.ofLocation(lat,lon);
+                solarTime = SolarTime.ofLocation(lat, lon);
                 result = PlainDate.nowInSystemTime().get(solarTime.sunrise());
                 break;
             case SUNSET:
-                solarTime = SolarTime.ofLocation(lat,lon);
+                solarTime = SolarTime.ofLocation(lat, lon);
                 result = PlainDate.nowInSystemTime().get(solarTime.sunset());
                 break;
         }
@@ -360,34 +344,37 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     }
 
+    private ExecuteInvokerRequest getExecuteInvokerRequest(ScheduleToAction scheduleToAction, SecurityContext securityContext) {
+        Set<String> invokerNames = new HashSet<>();
+        invokerNames.add(scheduleToAction.getRightside().getServiceCanonicalName());
+        return new ExecuteInvokerRequest()
+                .setInvokerNames(invokerNames)
+                .setInvokerMethodName(scheduleToAction.getRightside().getMethodName())
+                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext));
+    }
+
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void runSchedule(List<ScheduleToAction> schedule, SecurityContext securityContext) {
-
-        List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
-        Map<String, SchedulingOperator> schedulingOperatorMap = list.parallelStream().collect(Collectors.toMap(f -> f.getClass().getCanonicalName(), f -> f));
         for (ScheduleToAction link : schedule) {
 
-            ScheduleAction scheduleAction = link.getRightside();
-            SchedulingOperator schedulingOperator = schedulingOperatorMap.get(scheduleAction.getServiceCanonicalName());
-            if (schedulingOperator != null) {
-                long start = System.currentTimeMillis();
-                boolean failed = false;
-                Object response = null;
-                try {
-                    response = executeAction(schedulingOperator, scheduleAction, securityContext);
-                } catch (Exception e) {
-                    response = e;
-                    failed = true;
+            ExecuteInvokerRequest execution = getExecuteInvokerRequest(link, securityContext);
+            long start = System.currentTimeMillis();
+            boolean failed = false;
+            Object response = null;
+            try {
+                response = dynamicInvokersService.executeInvoker(execution, securityContext);
+            } catch (Exception e) {
+                response = e;
+                failed = true;
 
-                } finally {
-                    auditSchedule(securityContext, scheduleAction, start, failed, response);
-                }
-
+            } finally {
+                auditSchedule(securityContext, link.getRightside(), start, failed, response);
             }
+
+
         }
-        for (SchedulingOperator schedulingOperator : list) {
-            pluginService.cleanUpInstance(schedulingOperator);
-        }
+
+
     }
 
     private void auditSchedule(SecurityContext securityContext, ScheduleAction scheduleAction, long start, boolean failed, Object response) {
@@ -414,49 +401,6 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return securityContext;
     }
 
-    private Object executeAction(SchedulingOperator schedulingOperator, ScheduleAction scheduleAction, SecurityContext securityContext) {
-        try {
-            Method m = methodCache.get(scheduleAction.getMethodName(), () -> getMethod(schedulingOperator, scheduleAction));
-            return m.invoke(schedulingOperator, scheduleAction, securityContext);
-        } catch (ExecutionException e) {
-            logger.log(Level.SEVERE, "unable to get method for " + scheduleAction, e);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            logger.log(Level.SEVERE, "unable to execute method for " + scheduleAction, e);
-
-        }
-        return null;
-    }
-
-    private Method getMethod(SchedulingOperator schedulingOperator, ScheduleAction scheduleAction) throws NoSuchMethodException {
-        return schedulingOperator.getClass().getDeclaredMethod(scheduleAction.getMethodName(), ScheduleAction.class, SecurityContext.class);
-    }
-
-    public List<SchedulingOperatorContainer> getAvailableSchedulingOperators(SecurityContext securityContext, SchedulingOperatorsFiltering filtering) {
-        List<SchedulingOperator> list = (List<SchedulingOperator>) pluginService.getPlugins(SchedulingOperator.class, new HashMap<>(), null);
-        List<SchedulingOperatorContainer> toRet = list.parallelStream().map(f -> getSchedulingOperatorContainer(f)).collect(Collectors.toList());
-        for (SchedulingOperator schedulingOperator : list) {
-            pluginService.cleanUpInstance(schedulingOperator);
-        }
-        return toRet;
-    }
-
-    private SchedulingOperatorContainer getSchedulingOperatorContainer(SchedulingOperator f) {
-        List<SchedulingMethod> list = new ArrayList<>();
-        Class<? extends SchedulingOperator> clazz = f.getClass();
-        com.flexicore.scheduling.interfaces.Scheduler schedulerInfo=clazz.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.Scheduler.class);
-
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (matchParameters(method)) {
-                com.flexicore.scheduling.interfaces.SchedulingMethod schedulingMethod = method.getDeclaredAnnotation(com.flexicore.scheduling.interfaces.SchedulingMethod.class);
-
-                list.add(new SchedulingMethod(method.getName(), schedulingMethod));
-            }
-        }
-
-        String displayName = schedulerInfo != null ? schedulerInfo.displayName() : clazz.getCanonicalName();
-        String description = schedulerInfo != null ? schedulerInfo.description() : null;
-        return new SchedulingOperatorContainer(clazz.getCanonicalName(),displayName,description, list);
-    }
 
     private boolean matchParameters(Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
@@ -498,7 +442,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         schedulingRepository.merge(o);
     }
 
-    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds,SecurityContext securityContext) {
-        return schedulingRepository.getAllTimeSlots(scheduleIds,securityContext);
+    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds, SecurityContext securityContext) {
+        return schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
     }
 }

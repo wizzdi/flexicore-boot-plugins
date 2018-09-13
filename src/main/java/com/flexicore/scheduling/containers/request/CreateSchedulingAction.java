@@ -1,7 +1,7 @@
 package com.flexicore.scheduling.containers.request;
 
 
-import com.flexicore.model.FilteringInformationHolder;
+import com.flexicore.model.dynamic.ExecutionParametersHolder;
 
 public class CreateSchedulingAction {
 
@@ -12,7 +12,7 @@ public class CreateSchedulingAction {
     private String parameter1;
     private String parameter2;
     private String parameter3;
-    private FilteringInformationHolder filteringInformationHolder;
+    private ExecutionParametersHolder executionParametersHolder;
 
 
     public String getServiceCanonicalName() {
@@ -78,12 +78,12 @@ public class CreateSchedulingAction {
         return this;
     }
 
-    public FilteringInformationHolder getFilteringInformationHolder() {
-        return filteringInformationHolder;
+    public ExecutionParametersHolder getExecutionParametersHolder() {
+        return executionParametersHolder;
     }
 
-    public CreateSchedulingAction setFilteringInformationHolder(FilteringInformationHolder filteringInformationHolder) {
-        this.filteringInformationHolder = filteringInformationHolder;
+    public CreateSchedulingAction setExecutionParametersHolder(ExecutionParametersHolder executionParametersHolder) {
+        this.executionParametersHolder = executionParametersHolder;
         return this;
     }
 }
