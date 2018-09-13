@@ -2,7 +2,7 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.FilteringInformationHolder;
+import com.flexicore.model.dynamic.ExecutionParametersHolder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,15 +19,9 @@ public class ScheduleAction extends Baseclass {
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
     private String serviceCanonicalName;
     private String methodName;
-    @Lob
-    private String parameter1;
-    @Lob
-    private String parameter2;
-    @Lob
-    private String parameter3;
 
-    @OneToOne(targetEntity = FilteringInformationHolder.class)
-    private FilteringInformationHolder filteringInformationHolder;
+    @OneToOne(targetEntity = ExecutionParametersHolder.class)
+    private ExecutionParametersHolder executionParametersHolder;
 
     @JsonIgnore
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
@@ -57,41 +51,15 @@ public class ScheduleAction extends Baseclass {
         this.methodName = methodName;
         return this;
     }
-    @Lob
-    public String getParameter1() {
-        return parameter1;
+
+
+    @OneToOne(targetEntity = ExecutionParametersHolder.class)
+    public ExecutionParametersHolder getExecutionParametersHolder() {
+        return executionParametersHolder;
     }
 
-    public ScheduleAction setParameter1(String parameter1) {
-        this.parameter1 = parameter1;
-        return this;
-    }
-    @Lob
-    public String getParameter2() {
-        return parameter2;
-    }
-
-    public ScheduleAction setParameter2(String parameter2) {
-        this.parameter2 = parameter2;
-        return this;
-    }
-    @Lob
-    public String getParameter3() {
-        return parameter3;
-    }
-
-    public ScheduleAction setParameter3(String parameter3) {
-        this.parameter3 = parameter3;
-        return this;
-    }
-
-    @OneToOne(targetEntity = FilteringInformationHolder.class)
-    public FilteringInformationHolder getFilteringInformationHolder() {
-        return filteringInformationHolder;
-    }
-
-    public ScheduleAction setFilteringInformationHolder(FilteringInformationHolder filteringInformationHolder) {
-        this.filteringInformationHolder = filteringInformationHolder;
+    public ScheduleAction setExecutionParametersHolder(ExecutionParametersHolder executionParametersHolder) {
+        this.executionParametersHolder = executionParametersHolder;
         return this;
     }
 }

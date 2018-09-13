@@ -8,7 +8,6 @@
         <class>com.flexicore.scheduling.model.ScheduleAction</class>
         <class>com.flexicore.scheduling.model.ScheduleTimeslot</class>
         <class>com.flexicore.scheduling.model.ScheduleToAction</class>
-        <class>com.flexicore.model.FilteringInformationHolder</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
     </persistence-unit>
 </persistence>
