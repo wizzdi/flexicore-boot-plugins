@@ -1,4 +1,3 @@
 uuid=${project.groupId}.${project.artifactId}
 version=${project.version}
-provides=com.flexicore.scheduling.interfaces.SchedulingOperator,com.flexicore.scheduling.interfaces.SchedulingMethod
 

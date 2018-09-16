@@ -70,7 +70,7 @@ public class Scheduler implements Runnable {
 
                                     }
                                 } catch (Exception e) {
-                                    logger.log(Level.SEVERE, "failed running schedule " + schedule.getName());
+                                    logger.log(Level.SEVERE, "failed running schedule " + schedule.getName(),e);
                                 }
                             }
 

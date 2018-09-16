@@ -350,7 +350,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return new ExecuteInvokerRequest()
                 .setInvokerNames(invokerNames)
                 .setInvokerMethodName(scheduleToAction.getRightside().getMethodName())
-                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext));
+                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder()!=null?scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext):null);
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
