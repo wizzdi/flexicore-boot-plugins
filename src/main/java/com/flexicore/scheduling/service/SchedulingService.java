@@ -443,6 +443,6 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds, SecurityContext securityContext) {
-        return schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
+        return scheduleIds.isEmpty()?new ArrayList<>():schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
     }
 }
