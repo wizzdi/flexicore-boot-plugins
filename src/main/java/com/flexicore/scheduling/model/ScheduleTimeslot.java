@@ -11,27 +11,27 @@ public class ScheduleTimeslot extends Baseclass {
     private static ScheduleTimeslot s_Singleton=new ScheduleTimeslot();
     public  static ScheduleTimeslot s() {return s_Singleton;}
 
+   
+    private LocalDateTime startTime; // the explicit time for TS start
+    private LocalDateTime endTime; //the explicit time for TS to end
+    private TimeOfTheDayName startTimeOfTheDayName; // alternate implicit start time, for example sunRize
+    private double timeOfTheDayNameStartLat; // location for implicit time 
+    private double timeOfTheDayNameStartLon; 
+    private long startMillisOffset; //offset from implicit time bame
+    private long endMillisOffset; //offset from implicit time name
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private TimeOfTheDayName startTimeOfTheDayName;
-    private double timeOfTheDayNameStartLat;
-    private double timeOfTheDayNameStartLon;
-    private long startMillisOffset;
-    private long endMillisOffset;
 
-
-    private LocalDateTime lastExecution;
+    private LocalDateTime lastExecution; // saved by the system
 
 
     private TimeOfTheDayName endTimeOfTheDayName;
     private double timeOfTheDayNameEndLat;
     private double timeOfTheDayNameEndLon;
-    private long coolDownIntervalBeforeRepeat;
+    private long coolDownIntervalBeforeRepeat; //this is the recurring interval for the timeslot. 
 
 
-    @ManyToOne(targetEntity = Schedule.class)
-    private Schedule schedule;
+    @ManyToOne(targetEntity = Schedule.class) 
+    private Schedule schedule; //parent schedule
 
 
     public LocalDateTime getStartTime() {
