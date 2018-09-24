@@ -445,4 +445,8 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds, SecurityContext securityContext) {
         return scheduleIds.isEmpty()?new ArrayList<>():schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
     }
+
+    public List<ScheduleTimeslot> getAllScheduleTimeslots(SecurityContext securityContext, SchedulingTimeslotFiltering filtering) {
+        return schedulingRepository.getAllScheduleTimeslots(filtering, securityContext);
+    }
 }

@@ -7,6 +7,7 @@ import com.flexicore.model.FilteringInformationHolder;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.scheduling.containers.request.LinkScheduleToAction;
 import com.flexicore.scheduling.containers.request.SchedulingActionFiltering;
+import com.flexicore.scheduling.containers.request.SchedulingTimeslotFiltering;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.SecurityContext;
 
@@ -26,7 +27,7 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         List<Predicate> preds = new ArrayList<>();
         if (filtering.getSchedule() != null) {
             Join<ScheduleAction, ScheduleToAction> join = r.join(ScheduleAction_.scheduleToActions);
-            preds.add(cb.and(cb.equal(join.get(Baselink_.leftside), filtering.getSchedule()),cb.not(cb.isTrue(join.get(ScheduleToAction_.softDelete)))));
+            preds.add(cb.and(cb.equal(join.get(Baselink_.leftside), filtering.getSchedule()), cb.not(cb.isTrue(join.get(ScheduleToAction_.softDelete)))));
         }
         QueryInformationHolder<ScheduleAction> queryInformationHolder = new QueryInformationHolder<>(filtering, ScheduleAction.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
@@ -37,18 +38,28 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         CriteriaQuery<ScheduleToAction> q = cb.createQuery(ScheduleToAction.class);
         Root<ScheduleToAction> r = q.from(ScheduleToAction.class);
         List<Predicate> preds = new ArrayList<>();
-        preds.add(cb.and(cb.equal(r.get(Baselink_.leftside),linkScheduleToAction.getSchedule()),cb.equal(r.get(Baselink_.rightside),linkScheduleToAction.getScheduleAction())));
+        preds.add(cb.and(cb.equal(r.get(Baselink_.leftside), linkScheduleToAction.getSchedule()), cb.equal(r.get(Baselink_.rightside), linkScheduleToAction.getScheduleAction())));
         QueryInformationHolder<ScheduleToAction> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleToAction.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
     }
 
-    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds,SecurityContext securityContext) {
+    public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<ScheduleTimeslot> q = cb.createQuery(ScheduleTimeslot.class);
         Root<ScheduleTimeslot> r = q.from(ScheduleTimeslot.class);
-        Join<ScheduleTimeslot,Schedule> join=r.join(ScheduleTimeslot_.schedule);
+        Join<ScheduleTimeslot, Schedule> join = r.join(ScheduleTimeslot_.schedule);
         List<Predicate> preds = new ArrayList<>();
         preds.add(join.get(Schedule_.id).in(scheduleIds));
+        QueryInformationHolder<ScheduleTimeslot> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleTimeslot.class, securityContext);
+        return getAllFiltered(queryInformationHolder, preds, cb, q, r);
+    }
+
+    public List<ScheduleTimeslot> getAllScheduleTimeslots(SchedulingTimeslotFiltering filtering, SecurityContext securityContext) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<ScheduleTimeslot> q = cb.createQuery(ScheduleTimeslot.class);
+        Root<ScheduleTimeslot> r = q.from(ScheduleTimeslot.class);
+        List<Predicate> preds = new ArrayList<>();
+        preds.add(cb.equal(r.get(ScheduleTimeslot_.schedule), filtering.getSchedule()));
         QueryInformationHolder<ScheduleTimeslot> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleTimeslot.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
     }

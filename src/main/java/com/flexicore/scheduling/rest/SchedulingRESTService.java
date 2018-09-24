@@ -82,6 +82,25 @@ public class SchedulingRESTService implements RestServicePlugin {
 		return service.getAllScheduleActions(securityContext, filtering);
 	}
 
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "getAllScheduleActions", notes = "Gets All Schedule Actions")
+	@Path("getAllScheduleTimeslots")
+	public List<ScheduleTimeslot> getAllScheduleTimeslots(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			SchedulingTimeslotFiltering filtering,
+			@Context SecurityContext securityContext) {
+
+		Schedule schedule=filtering.getScheduleId()!=null?service.getByIdOrNull(filtering.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null&&filtering.getScheduleId()!=null){
+			throw new BadRequestException("No Schedule with id "+filtering.getScheduleId());
+		}
+		filtering.setSchedule(schedule);
+
+		return service.getAllScheduleTimeslots(securityContext, filtering);
+	}
+
 
 
 
@@ -133,7 +152,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 		}
 		updateTimeslot.setScheduleTimeslot(scheduleTimeslot);
 
-		return service.createScheduleTimeSlot(securityContext, updateTimeslot);
+		return service.updateScheduleTimeSlot(securityContext, updateTimeslot);
 	}
 
 	@POST
