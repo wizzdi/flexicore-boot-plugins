@@ -9,9 +9,6 @@ public class CreateSchedulingAction {
     private String description;
     private String serviceCanonicalName;
     private String methodName;
-    private String parameter1;
-    private String parameter2;
-    private String parameter3;
     private ExecutionParametersHolder executionParametersHolder;
 
 
@@ -33,32 +30,6 @@ public class CreateSchedulingAction {
         return this;
     }
 
-    public String getParameter1() {
-        return parameter1;
-    }
-
-    public CreateSchedulingAction setParameter1(String parameter1) {
-        this.parameter1 = parameter1;
-        return this;
-    }
-
-    public String getParameter2() {
-        return parameter2;
-    }
-
-    public CreateSchedulingAction setParameter2(String parameter2) {
-        this.parameter2 = parameter2;
-        return this;
-    }
-
-    public String getParameter3() {
-        return parameter3;
-    }
-
-    public CreateSchedulingAction setParameter3(String parameter3) {
-        this.parameter3 = parameter3;
-        return this;
-    }
 
     public String getName() {
         return name;

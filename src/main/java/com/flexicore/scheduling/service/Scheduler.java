@@ -115,6 +115,9 @@ public class Scheduler implements Runnable {
                 }
 
     private boolean isTime(ScheduleTimeslot timeslot, LocalDateTime now) {
+        if(timeslot.getStartTime()==null || timeslot.getEndTime()==null){
+            return false;
+        }
         LocalTime nowTime = now.toLocalTime();
         LocalTime start=timeslot.getStartTime().toLocalTime();
         if(timeslot.getStartTimeOfTheDayName()!=null){

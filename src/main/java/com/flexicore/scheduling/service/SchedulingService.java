@@ -92,7 +92,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public Schedule createScheduleNoMerge(SecurityContext securityContext, CreateScheduling createScheduling) {
-        Schedule scheduling = Schedule.s().CreateUnchecked(createScheduling.getName(), securityContext.getUser());
+        Schedule scheduling = Schedule.s().CreateUnchecked(createScheduling.getName(), securityContext);
         scheduling.Init();
         updateScheduleNoMerge(scheduling, createScheduling);
         return scheduling;
@@ -169,7 +169,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
-        ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getName(), securityContext.getUser());
+        ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getName(), securityContext);
         scheduleAction.Init();
 
         updateScheduleActionNoMerge(scheduleAction, createSchedulingAction);
@@ -229,7 +229,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public ScheduleTimeslot createScheduleTimeSlot(SecurityContext securityContext, CreateTimeslot createTimeslot) {
-        ScheduleTimeslot scheduleTimeslot = ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(), securityContext.getUser());
+        ScheduleTimeslot scheduleTimeslot = ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(), securityContext);
         scheduleTimeslot.Init();
         updateScheduleTimeslot(scheduleTimeslot, createTimeslot);
         schedulingRepository.merge(scheduleTimeslot);
@@ -414,7 +414,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
 
     public ScheduleToAction linkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction createScheduling) {
-        ScheduleToAction scheduleToAction = ScheduleToAction.s().CreateUnchecked("link", securityContext.getUser());
+        ScheduleToAction scheduleToAction = ScheduleToAction.s().CreateUnchecked("link", securityContext);
         scheduleToAction.Init(createScheduling.getSchedule(), createScheduling.getScheduleAction());
         schedulingRepository.merge(scheduleToAction);
         return scheduleToAction;
