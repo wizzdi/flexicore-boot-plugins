@@ -4,10 +4,7 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
 import com.flexicore.interfaces.InitPlugin;
 import com.flexicore.interfaces.ServicePlugin;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Operation;
-import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.User;
+import com.flexicore.model.*;
 import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
@@ -194,9 +191,23 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         }
 
 
-        if (createSchedulingAction.getServiceCanonicalName() != null && !createSchedulingAction.getServiceCanonicalName().equals(scheduleAction.getServiceCanonicalName())) {
-            scheduleAction.setServiceCanonicalName(createSchedulingAction.getServiceCanonicalName());
-            update = true;
+
+        if (createSchedulingAction.getServiceCanonicalNames() != null ) {
+            Set<String> ids = scheduleAction.getServiceCanonicalNames().parallelStream().map(f -> f.getServiceCanonicalName()).collect(Collectors.toSet());
+            createSchedulingAction.getServiceCanonicalNames().removeAll(ids);
+            if(!createSchedulingAction.getServiceCanonicalNames().isEmpty()){
+                scheduleAction.getServiceCanonicalNames().addAll(createSchedulingAction.getServiceCanonicalNames().parallelStream()
+                        .map(f->new ServiceCanonicalName()
+                                .setId(Baseclass.getBase64ID())
+                                .setScheduleAction(scheduleAction)
+                                .setServiceCanonicalName(f)
+                        )
+                        .collect(Collectors.toList())
+                );
+                update = true;
+            }
+
+
         }
         if (createSchedulingAction.getExecutionParametersHolder() != null) {
             createSchedulingAction.getExecutionParametersHolder().setId(Baseclass.getBase64ID());
@@ -345,8 +356,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     private ExecuteInvokerRequest getExecuteInvokerRequest(ScheduleToAction scheduleToAction, SecurityContext securityContext) {
-        Set<String> invokerNames = new HashSet<>();
-        invokerNames.add(scheduleToAction.getRightside().getServiceCanonicalName());
+        Set<String> invokerNames = scheduleToAction.getRightside().getServiceCanonicalNames().parallelStream().map(f->f.getServiceCanonicalName()).collect(Collectors.toSet());
         return new ExecuteInvokerRequest()
                 .setInvokerNames(invokerNames)
                 .setInvokerMethodName(scheduleToAction.getRightside().getMethodName())

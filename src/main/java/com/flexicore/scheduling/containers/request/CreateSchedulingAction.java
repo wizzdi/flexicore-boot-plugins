@@ -3,21 +3,23 @@ package com.flexicore.scheduling.containers.request;
 
 import com.flexicore.model.dynamic.ExecutionParametersHolder;
 
+import java.util.Set;
+
 public class CreateSchedulingAction {
 
     private String name;
     private String description;
-    private String serviceCanonicalName;
+    private Set<String> serviceCanonicalNames;
     private String methodName;
     private ExecutionParametersHolder executionParametersHolder;
 
 
-    public String getServiceCanonicalName() {
-        return serviceCanonicalName;
+    public Set<String> getServiceCanonicalNames() {
+        return serviceCanonicalNames;
     }
 
-    public CreateSchedulingAction setServiceCanonicalName(String serviceCanonicalName) {
-        this.serviceCanonicalName = serviceCanonicalName;
+    public CreateSchedulingAction setServiceCanonicalNames(Set<String> serviceCanonicalNames) {
+        this.serviceCanonicalNames = serviceCanonicalNames;
         return this;
     }
 
