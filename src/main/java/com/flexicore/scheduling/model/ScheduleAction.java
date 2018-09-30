@@ -18,8 +18,8 @@ public class ScheduleAction extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
-    @OneToMany(targetEntity = BaseclassIdFiltering.class,mappedBy = "filteringInformationHolder",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    private List<BaseclassIdFiltering> serviceCanonicalNames=new ArrayList<>();
+    @OneToMany(targetEntity = ServiceCanonicalName.class,mappedBy = "scheduleAction",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<ServiceCanonicalName> serviceCanonicalNames=new ArrayList<>();
     private String methodName;
 
     @OneToOne(targetEntity = ExecutionParametersHolder.class)
@@ -37,12 +37,12 @@ public class ScheduleAction extends Baseclass {
     }
 
 
-    @OneToMany(targetEntity = BaseclassIdFiltering.class,mappedBy = "filteringInformationHolder",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    public List<BaseclassIdFiltering> getServiceCanonicalNames() {
+    @OneToMany(targetEntity = ServiceCanonicalName.class,mappedBy = "scheduleAction",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    public List<ServiceCanonicalName> getServiceCanonicalNames() {
         return serviceCanonicalNames;
     }
 
-    public ScheduleAction setServiceCanonicalNames(List<BaseclassIdFiltering> serviceCanonicalNames) {
+    public ScheduleAction setServiceCanonicalNames(List<ServiceCanonicalName> serviceCanonicalNames) {
         this.serviceCanonicalNames = serviceCanonicalNames;
         return this;
     }
