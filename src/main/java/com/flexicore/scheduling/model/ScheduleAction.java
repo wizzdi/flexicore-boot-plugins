@@ -2,6 +2,7 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.BaseclassIdFiltering;
 import com.flexicore.model.dynamic.ExecutionParametersHolder;
 
 import javax.persistence.*;
@@ -17,7 +18,8 @@ public class ScheduleAction extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
-    private String serviceCanonicalName;
+    @OneToMany(targetEntity = BaseclassIdFiltering.class,mappedBy = "filteringInformationHolder",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    private List<BaseclassIdFiltering> serviceCanonicalNames=new ArrayList<>();
     private String methodName;
 
     @OneToOne(targetEntity = ExecutionParametersHolder.class)
@@ -34,12 +36,14 @@ public class ScheduleAction extends Baseclass {
         return this;
     }
 
-    public String getServiceCanonicalName() {
-        return serviceCanonicalName;
+
+    @OneToMany(targetEntity = BaseclassIdFiltering.class,mappedBy = "filteringInformationHolder",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    public List<BaseclassIdFiltering> getServiceCanonicalNames() {
+        return serviceCanonicalNames;
     }
 
-    public ScheduleAction setServiceCanonicalName(String serviceCanonicalName) {
-        this.serviceCanonicalName = serviceCanonicalName;
+    public ScheduleAction setServiceCanonicalNames(List<BaseclassIdFiltering> serviceCanonicalNames) {
+        this.serviceCanonicalNames = serviceCanonicalNames;
         return this;
     }
 
