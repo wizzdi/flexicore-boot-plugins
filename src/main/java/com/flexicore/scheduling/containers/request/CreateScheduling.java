@@ -18,6 +18,7 @@ public class CreateScheduling {
     private Boolean friday;
     private Boolean saturday;
     private Boolean holiday;
+    private Boolean enabled;
 
 
     public String getName() {
@@ -126,6 +127,15 @@ public class CreateScheduling {
 
     public CreateScheduling setHoliday(Boolean holiday) {
         this.holiday = holiday;
+        return this;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public CreateScheduling setEnabled(Boolean enabled) {
+        this.enabled = enabled;
         return this;
     }
 }

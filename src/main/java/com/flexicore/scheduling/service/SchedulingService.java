@@ -156,6 +156,11 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             schedule.setHoliday(createScheduling.getHoliday());
             update = true;
         }
+
+        if (createScheduling.getEnabled() != null && !createScheduling.getEnabled().equals(schedule.isEnabled())) {
+            schedule.setEnabled(createScheduling.getEnabled());
+            update = true;
+        }
         return update;
     }
 

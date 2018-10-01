@@ -95,7 +95,7 @@ public class Scheduler implements Runnable {
     }
 
     private boolean shouldRun(Schedule schedule, LocalDateTime now) {
-        return isInTimeFrame(schedule,now) && isDay(schedule,now);
+        return schedule.isEnabled()&&isInTimeFrame(schedule,now) && isDay(schedule,now);
     }
 
     private boolean shouldRun(ScheduleTimeslot scheduleTimeslot,LocalDateTime now){
