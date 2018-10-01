@@ -294,12 +294,12 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         }
 
         if (createTimeslot.getTimeOfTheDayNameStartLat() != null && !createTimeslot.getTimeOfTheDayNameStartLat().equals(scheduleTimeslot.getTimeOfTheDayNameStartLat())) {
-            scheduleTimeslot.setTimeOfTheDayNameEndLat(createTimeslot.getTimeOfTheDayNameStartLat());
+            scheduleTimeslot.setTimeOfTheDayNameStartLat(createTimeslot.getTimeOfTheDayNameStartLat());
             update = true;
         }
 
         if (createTimeslot.getTimeOfTheDayNameStartLon() != null && !createTimeslot.getTimeOfTheDayNameStartLon().equals(scheduleTimeslot.getTimeOfTheDayNameStartLon())) {
-            scheduleTimeslot.setTimeOfTheDayNameEndLon(createTimeslot.getTimeOfTheDayNameStartLon());
+            scheduleTimeslot.setTimeOfTheDayNameStartLon(createTimeslot.getTimeOfTheDayNameStartLon());
             update = true;
         }
 
