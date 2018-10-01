@@ -37,6 +37,7 @@ public class Schedule extends Baseclass {
     private boolean friday;
     private boolean saturday;
     private boolean holiday;
+    private boolean enabled;
 
 
     public LocalDateTime getTimeFrameStart() {
@@ -153,6 +154,15 @@ public class Schedule extends Baseclass {
 
     public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
         this.timeslots = timeslots;
+        return this;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public Schedule setEnabled(boolean enabled) {
+        this.enabled = enabled;
         return this;
     }
 }
