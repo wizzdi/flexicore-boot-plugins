@@ -8,6 +8,7 @@ import com.flexicore.model.*;
 import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
+import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.data.SchedulingRepository;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
@@ -196,13 +197,12 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         }
 
 
-
-        if (createSchedulingAction.getServiceCanonicalNames() != null ) {
+        if (createSchedulingAction.getServiceCanonicalNames() != null) {
             Set<String> ids = scheduleAction.getServiceCanonicalNames().parallelStream().map(f -> f.getServiceCanonicalName()).collect(Collectors.toSet());
             createSchedulingAction.getServiceCanonicalNames().removeAll(ids);
-            if(!createSchedulingAction.getServiceCanonicalNames().isEmpty()){
+            if (!createSchedulingAction.getServiceCanonicalNames().isEmpty()) {
                 scheduleAction.getServiceCanonicalNames().addAll(createSchedulingAction.getServiceCanonicalNames().parallelStream()
-                        .map(f->new ServiceCanonicalName()
+                        .map(f -> new ServiceCanonicalName()
                                 .setId(Baseclass.getBase64ID())
                                 .setScheduleAction(scheduleAction)
                                 .setServiceCanonicalName(f)
@@ -215,7 +215,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
         }
         if (createSchedulingAction.getExecutionParametersHolder() != null) {
-            createSchedulingAction.getExecutionParametersHolder().setId(Baseclass.getBase64ID());
+            createSchedulingAction.getExecutionParametersHolder().prepareForSave();
             scheduleAction.setExecutionParametersHolder(createSchedulingAction.getExecutionParametersHolder());
 
         }
@@ -361,11 +361,11 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     private ExecuteInvokerRequest getExecuteInvokerRequest(ScheduleToAction scheduleToAction, SecurityContext securityContext) {
-        Set<String> invokerNames = scheduleToAction.getRightside().getServiceCanonicalNames().parallelStream().map(f->f.getServiceCanonicalName()).collect(Collectors.toSet());
+        Set<String> invokerNames = scheduleToAction.getRightside().getServiceCanonicalNames().parallelStream().map(f -> f.getServiceCanonicalName()).collect(Collectors.toSet());
         return new ExecuteInvokerRequest()
                 .setInvokerNames(invokerNames)
                 .setInvokerMethodName(scheduleToAction.getRightside().getMethodName())
-                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder()!=null?scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext):null);
+                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder() != null ? scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext) : null);
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
@@ -458,10 +458,21 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public List<ScheduleTimeslot> getAllTimeSlots(Set<String> scheduleIds, SecurityContext securityContext) {
-        return scheduleIds.isEmpty()?new ArrayList<>():schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
+        return scheduleIds.isEmpty() ? new ArrayList<>() : schedulingRepository.getAllTimeSlots(scheduleIds, securityContext);
     }
 
     public List<ScheduleTimeslot> getAllScheduleTimeslots(SecurityContext securityContext, SchedulingTimeslotFiltering filtering) {
         return schedulingRepository.getAllScheduleTimeslots(filtering, securityContext);
+    }
+
+    public ExecuteScheduleResponse executeScheduleNow(SecurityContext securityContext, ExecuteScheduleRequest executeScheduleRequest) {
+        Map<String, List<ScheduleToAction>> actionsMap = getAllScheduleLinks().parallelStream().filter(f -> f.getLeftside() != null).collect(Collectors.groupingBy(f -> f.getLeftside().getId(), Collectors.toList()));
+        List<ScheduleToAction> actions = actionsMap.getOrDefault(executeScheduleRequest.getSchedule().getId(), new ArrayList<>());
+        new Thread(() -> {
+            runSchedule(actions, securityContext);
+        }).start();
+        return new ExecuteScheduleResponse().setExecutedLinks(actions.parallelStream().map(f -> f.getId()).collect(Collectors.toSet()));
+
+
     }
 }

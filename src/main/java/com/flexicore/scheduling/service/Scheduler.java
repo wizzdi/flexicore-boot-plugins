@@ -1,6 +1,7 @@
 package com.flexicore.scheduling.service;
 
 import com.flexicore.scheduling.containers.request.SchedulingFiltering;
+import com.flexicore.scheduling.init.Config;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
 import com.flexicore.scheduling.model.ScheduleToAction;
@@ -11,9 +12,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ public class Scheduler implements Runnable {
     private SchedulingService schedulingService;
     private SecurityContext securityContext;
     private LocalDateTime lastFetch = null;
+    private ExecutorService executorService= Executors.newFixedThreadPool(Config.maxSchedulingThreads);
 
     public Scheduler(Logger logger, SchedulingService schedulingService, SecurityContext securityContext) {
         this.logger = logger;
@@ -51,6 +55,7 @@ public class Scheduler implements Runnable {
 
                 }
                 try {
+                    Map<String,Boolean> currentlyRunningSchedules=new ConcurrentHashMap<>();
                     for (Map.Entry<String, List<ScheduleToAction>> entry : actionsMap.entrySet()) {
                         Schedule schedule = entry.getValue().get(0).getLeftside();
                         boolean shouldRunSchedule = shouldRun(schedule, now);
@@ -62,12 +67,27 @@ public class Scheduler implements Runnable {
                             for (ScheduleTimeslot scheduleTimeslot : timeslots) {
                                 try {
                                     boolean shouldRunTimeslot = shouldRun(scheduleTimeslot, now);
-                                    if (shouldRunTimeslot) {
+                                    boolean executing=currentlyRunningSchedules.getOrDefault(scheduleTimeslot.getId(),false);
+                                    if (shouldRunTimeslot&&!executing) {
                                         scheduleTimeslot.setLastExecution(LocalDateTime.now());
                                         schedulingService.merge(scheduleTimeslot);
-                                        logger.info("schedule time " + schedule.getName() + "at timeslot " + scheduleTimeslot.getName() + " has arrived");
-                                        schedulingService.runSchedule(entry.getValue(), securityContext);
-                                        logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot.getName());
+                                        executorService.execute(()->{
+                                            try {
+                                                currentlyRunningSchedules.put(scheduleTimeslot.getId(), true);
+                                                logger.info("schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot.getName() + " has arrived");
+                                                schedulingService.runSchedule(entry.getValue(), securityContext);
+                                                logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot.getName());
+                                            }
+                                            catch (Exception e){
+                                                logger.log(Level.SEVERE,"failed executing ",e);
+                                            }
+                                            finally {
+                                                currentlyRunningSchedules.put(scheduleTimeslot.getId(), false);
+
+                                            }
+
+
+                                        });
 
                                     }
                                 } catch (Exception e) {
@@ -104,11 +124,10 @@ public class Scheduler implements Runnable {
     }
 
     private boolean checkPreviousRun(ScheduleTimeslot schedule, LocalDateTime now) {
-        LocalTime nowTime = now.toLocalTime();
         if (schedule.getCoolDownIntervalBeforeRepeat() > 0) {
-            return schedule.getLastExecution() == null || schedule.getLastExecution().toLocalTime().plus(schedule.getCoolDownIntervalBeforeRepeat(), ChronoUnit.MILLIS).isBefore(nowTime);
+            return schedule.getLastExecution() == null || schedule.getLastExecution().plus(schedule.getCoolDownIntervalBeforeRepeat(), ChronoUnit.MILLIS).isBefore(now);
         } else {
-            return schedule.getLastExecution() == null || !isTime(schedule, schedule.getLastExecution());
+            return schedule.getLastExecution() == null || !schedule.getLastExecution().getDayOfWeek().equals(now.getDayOfWeek());
         }
 
     }

@@ -9,6 +9,7 @@ import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.scheduling.containers.request.*;
+import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
@@ -24,7 +25,6 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -174,6 +174,26 @@ public class SchedulingRESTService implements RestServicePlugin {
 
 		return service.updateSchedule(securityContext, updateScheduling);
 	}
+
+	@POST
+	@Produces("application/json")
+	@Read
+	@ApiOperation(value = "executeScheduleNow", notes = "Execute Schedule Now")
+	@Path("executeScheduleNow")
+	public ExecuteScheduleResponse executeScheduleNow(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			ExecuteScheduleRequest executeScheduleRequest,
+			@Context SecurityContext securityContext) {
+
+		Schedule schedule= executeScheduleRequest.getScheduleId()!=null?service.getByIdOrNull(executeScheduleRequest.getScheduleId(),Schedule.class,null,securityContext):null;
+		if(schedule==null&& executeScheduleRequest.getScheduleId()!=null){
+			throw new BadRequestException("No Schedule with id "+ executeScheduleRequest.getScheduleId());
+		}
+		executeScheduleRequest.setSchedule(schedule);
+
+		return service.executeScheduleNow(securityContext, executeScheduleRequest);
+	}
+
 
 
 	@POST
