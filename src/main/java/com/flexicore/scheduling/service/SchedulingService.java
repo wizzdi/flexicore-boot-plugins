@@ -10,6 +10,7 @@ import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.data.SchedulingRepository;
+import com.flexicore.scheduling.interfaces.ISchedulingService;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @PluginInfo(version = 1, autoInstansiate = true)
-public class SchedulingService implements ServicePlugin, InitPlugin {
+public class SchedulingService implements ISchedulingService {
 
 
     @Inject
@@ -89,6 +90,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
 
     }
 
+    @Override
     public Schedule createScheduleNoMerge(SecurityContext securityContext, CreateScheduling createScheduling) {
         Schedule scheduling = Schedule.s().CreateUnchecked(createScheduling.getName(), securityContext);
         scheduling.Init();
@@ -171,6 +173,7 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
         return scheduleAction;
     }
 
+    @Override
     public ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
         ScheduleAction scheduleAction = ScheduleAction.s().CreateUnchecked(createSchedulingAction.getName(), securityContext);
         scheduleAction.Init();
@@ -245,10 +248,16 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
     }
 
     public ScheduleTimeslot createScheduleTimeSlot(SecurityContext securityContext, CreateTimeslot createTimeslot) {
+        ScheduleTimeslot scheduleTimeslot = createScheduleTimeSlotNoMerge(securityContext, createTimeslot);
+        schedulingRepository.merge(scheduleTimeslot);
+        return scheduleTimeslot;
+    }
+
+    @Override
+    public ScheduleTimeslot createScheduleTimeSlotNoMerge(SecurityContext securityContext, CreateTimeslot createTimeslot) {
         ScheduleTimeslot scheduleTimeslot = ScheduleTimeslot.s().CreateUnchecked(createTimeslot.getName(), securityContext);
         scheduleTimeslot.Init();
         updateScheduleTimeslot(scheduleTimeslot, createTimeslot);
-        schedulingRepository.merge(scheduleTimeslot);
         return scheduleTimeslot;
     }
 
@@ -451,6 +460,11 @@ public class SchedulingService implements ServicePlugin, InitPlugin {
             schedulingRepository.merge(updateSchedulingAction.getScheduleAction());
         }
         return updateSchedulingAction.getScheduleAction();
+    }
+
+    @Override
+    public void massMerge(List<?> toMerge) {
+        schedulingRepository.massMerge(toMerge);
     }
 
     public void merge(Object o) {
