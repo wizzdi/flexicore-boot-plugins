@@ -2,8 +2,6 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
-import com.flexicore.interfaces.InitPlugin;
-import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.*;
 import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.request.ExecuteInvokerRequest;
@@ -438,9 +436,15 @@ public class SchedulingService implements ISchedulingService {
 
 
     public ScheduleToAction linkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction createScheduling) {
+        ScheduleToAction scheduleToAction = linkScheduleToActionNoMerge(securityContext, createScheduling);
+        schedulingRepository.merge(scheduleToAction);
+        return scheduleToAction;
+    }
+
+    @Override
+    public ScheduleToAction linkScheduleToActionNoMerge(SecurityContext securityContext, LinkScheduleToAction createScheduling) {
         ScheduleToAction scheduleToAction = ScheduleToAction.s().CreateUnchecked("link", securityContext);
         scheduleToAction.Init(createScheduling.getSchedule(), createScheduling.getScheduleAction());
-        schedulingRepository.merge(scheduleToAction);
         return scheduleToAction;
     }
 
