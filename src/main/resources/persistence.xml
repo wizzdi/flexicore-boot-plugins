@@ -14,6 +14,9 @@
         <class>com.flexicore.organization.model.Organization</class>
         <class>com.flexicore.organization.model.SalesPerson</class>
         <class>com.flexicore.organization.model.Supplier</class>
+        <class>com.flexicore.organization.model.Branch</class>
+        <class>com.flexicore.organization.model.BranchToAddress</class>
+        <class>com.flexicore.model.territories.Address</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
     </persistence-unit>
 </persistence>
