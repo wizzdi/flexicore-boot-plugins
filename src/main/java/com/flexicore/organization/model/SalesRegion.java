@@ -6,10 +6,10 @@ import javax.persistence.Entity;
 
 
 @Entity
-public class SalesPerson extends Employee {
-    static SalesPerson s_Singleton = new SalesPerson();
+public class SalesRegion extends Baseclass {
+    static SalesRegion s_Singleton = new SalesRegion();
 
-    public static SalesPerson s() {
+    public static SalesRegion s() {
         return s_Singleton;
     }
 

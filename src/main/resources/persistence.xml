@@ -19,6 +19,8 @@
         <class>com.flexicore.organization.model.Supplier</class>
         <class>com.flexicore.organization.model.Site</class>
         <class>com.flexicore.organization.model.SupplierToProduct</class>
+        <class>com.flexicore.organization.model.SalesRegion</class>
+        <class>com.flexicore.organization.model.SalesPersonToRegion</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
 </persistence>
