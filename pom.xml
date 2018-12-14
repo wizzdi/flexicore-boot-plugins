@@ -6,9 +6,9 @@
 
     <groupId>com.flexicore</groupId>
     <artifactId>organization-model</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <properties>
-        <version.wildfly.bom>10.0.0.Final</version.wildfly.bom>
+        <jackson.version>2.9.5</jackson.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <version.eclipselink>2.7.1</version.eclipselink>
@@ -43,13 +43,10 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.wildfly.bom</groupId>
-                <artifactId>wildfly-javaee7</artifactId>
-                <version>${version.wildfly.bom}</version>
-
-                <scope>import</scope>
+                <artifactId>wildfly</artifactId>
+                <version>14.0.1.Final</version>
                 <type>pom</type>
             </dependency>
 
@@ -59,10 +56,15 @@
         <dependency>
             <groupId>com.flexicore</groupId>
             <artifactId>FlexiCore</artifactId>
-            <version>2.1.1</version>
+            <version>2.3.0</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
 
         <dependency>
@@ -79,15 +81,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>1.0.0.Final</version>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
+            <version>2.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -104,24 +102,8 @@
         <dependency>
             <groupId>com.flexicore</groupId>
             <artifactId>product-model</artifactId>
-            <version>1.1.1</version>
+            <version>1.2.0</version>
             <scope>provided</scope>
-        </dependency>
-
-
-
-
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jaxrs</artifactId>
-            <version>1.5.12</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>
@@ -220,8 +202,6 @@
             </plugin>
 
 
-
-
         </plugins>
         <resources>
             <resource>
@@ -231,8 +211,6 @@
             </resource>
         </resources>
     </build>
-
-
 
 
 </project>
