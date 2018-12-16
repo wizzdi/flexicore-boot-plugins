@@ -8,21 +8,33 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Site extends Baseclass {
-	static private Site s_Singleton = new Site();
-	static public Site s() {
-		return s_Singleton;
-	}
+    static private Site s_Singleton = new Site();
 
-	@ManyToOne(targetEntity = Address.class)
-	private Address address;
+    static public Site s() {
+        return s_Singleton;
+    }
 
-	@ManyToOne(targetEntity = Address.class)
-	public Address getAddress() {
-		return address;
-	}
+    private String externalId;
 
-	public Site setAddress(Address address) {
-		this.address = address;
-		return this;
-	}
+    @ManyToOne(targetEntity = Address.class)
+    private Address address;
+
+    @ManyToOne(targetEntity = Address.class)
+    public Address getAddress() {
+        return address;
+    }
+
+    public Site setAddress(Address address) {
+        this.address = address;
+        return this;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public Site setExternalId(String externalId) {
+        this.externalId = externalId;
+        return this;
+    }
 }
