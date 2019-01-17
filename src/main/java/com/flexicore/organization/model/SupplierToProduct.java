@@ -1,5 +1,6 @@
 package com.flexicore.organization.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.TimedLink;
 import com.flexicore.product.model.Product;
@@ -31,6 +32,7 @@ public class SupplierToProduct extends TimedLink {
     }
 
     @Override
+    @JsonIgnore
     public void setLeftside(Baseclass leftside) {
         super.setLeftside(leftside);
     }
@@ -46,6 +48,7 @@ public class SupplierToProduct extends TimedLink {
     }
 
     @Override
+    @JsonIgnore
     public void setRightside(Baseclass rightside) {
         super.setRightside(rightside);
     }
