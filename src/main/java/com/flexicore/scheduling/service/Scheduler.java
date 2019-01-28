@@ -22,15 +22,15 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Scheduler implements Runnable {
-    private static final long FETCH_INTERVAL = 60 * 1000;
-    private static final long CHECK_INTERVAL = 1000;
+    private static final long FETCH_INTERVAL = 5*60 * 1000;
+    private static final long CHECK_INTERVAL = 60 * 1000;
 
     private boolean stop;
     private Logger logger;
     private SchedulingService schedulingService;
     private SecurityContext securityContext;
     private LocalDateTime lastFetch = null;
-    private ExecutorService executorService= Executors.newFixedThreadPool(Config.maxSchedulingThreads);
+    private ExecutorService executorService = Executors.newFixedThreadPool(Config.maxSchedulingThreads);
 
     public Scheduler(Logger logger, SchedulingService schedulingService, SecurityContext securityContext) {
         this.logger = logger;
@@ -40,7 +40,6 @@ public class Scheduler implements Runnable {
 
     @Override
     public void run() {
-        SchedulingFiltering schedulingFiltering = new SchedulingFiltering();
         Map<String, List<ScheduleToAction>> actionsMap = new HashMap<>();
         Map<String, List<ScheduleTimeslot>> timeSlotsMap = new HashMap<>();
         logger.info("Scheduler Started");
@@ -55,46 +54,38 @@ public class Scheduler implements Runnable {
 
                 }
                 try {
-                    Map<String,Boolean> currentlyRunningSchedules=new ConcurrentHashMap<>();
-                    for (Map.Entry<String, List<ScheduleToAction>> entry : actionsMap.entrySet()) {
+                    Map<String, Boolean> currentlyRunningSchedules = new ConcurrentHashMap<>();
+                    for (Map.Entry<String, List<ScheduleToAction>> entry : actionsMap.entrySet().parallelStream().filter(f -> shouldRun(f.getValue().get(0).getLeftside(), now)).collect(Collectors.toList())) {
                         Schedule schedule = entry.getValue().get(0).getLeftside();
-                        boolean shouldRunSchedule = shouldRun(schedule, now);
-                        if (shouldRunSchedule) {
-                            List<ScheduleTimeslot> timeslots = timeSlotsMap.get(schedule.getId());
-                            if (timeslots == null) {
-                                continue;
-                            }
-                            for (ScheduleTimeslot scheduleTimeslot : timeslots) {
-                                try {
-                                    boolean shouldRunTimeslot = shouldRun(scheduleTimeslot, now);
-                                    boolean executing=currentlyRunningSchedules.getOrDefault(scheduleTimeslot.getId(),false);
-                                    if (shouldRunTimeslot&&!executing) {
-                                        scheduleTimeslot.setLastExecution(LocalDateTime.now());
-                                        schedulingService.merge(scheduleTimeslot);
-                                        executorService.execute(()->{
-                                            try {
-                                                currentlyRunningSchedules.put(scheduleTimeslot.getId(), true);
-                                                logger.info("schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot.getName() + " has arrived");
-                                                schedulingService.runSchedule(entry.getValue(), securityContext);
-                                                logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot.getName());
-                                            }
-                                            catch (Exception e){
-                                                logger.log(Level.SEVERE,"failed executing ",e);
-                                            }
-                                            finally {
-                                                currentlyRunningSchedules.put(scheduleTimeslot.getId(), false);
 
-                                            }
-
-
-                                        });
+                        List<ScheduleTimeslot> timeslots = timeSlotsMap.get(schedule.getId());
+                        if (timeslots == null) {
+                            continue;
+                        }
+                        for (ScheduleTimeslot scheduleTimeslot : timeslots.parallelStream().filter(f -> shouldRun(f, now) && !currentlyRunningSchedules.getOrDefault(f.getId(), false)).collect(Collectors.toList())) {
+                            try {
+                                scheduleTimeslot.setLastExecution(LocalDateTime.now());
+                                schedulingService.merge(scheduleTimeslot);
+                                executorService.execute(() -> {
+                                    try {
+                                        currentlyRunningSchedules.put(scheduleTimeslot.getId(), true);
+                                        logger.info("schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot.getName() + " has arrived");
+                                        schedulingService.runSchedule(entry.getValue(), securityContext);
+                                        logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot.getName());
+                                    } catch (Exception e) {
+                                        logger.log(Level.SEVERE, "failed executing ", e);
+                                    } finally {
+                                        currentlyRunningSchedules.put(scheduleTimeslot.getId(), false);
 
                                     }
-                                } catch (Exception e) {
-                                    logger.log(Level.SEVERE, "failed running schedule " + schedule.getName(), e);
-                                }
-                            }
 
+
+                                });
+
+
+                            } catch (Exception e) {
+                                logger.log(Level.SEVERE, "failed running schedule " + schedule.getName(), e);
+                            }
                         }
 
 
@@ -133,24 +124,23 @@ public class Scheduler implements Runnable {
     }
 
     private boolean isTime(ScheduleTimeslot timeslot, LocalDateTime now) {
-        if ((timeslot.getStartTime() == null && timeslot.getStartTimeOfTheDayName()==null)
-                || (timeslot.getEndTime() == null&& timeslot.getEndTimeOfTheDayName()==null )) {
+        if ((timeslot.getStartTime() == null && timeslot.getStartTimeOfTheDayName() == null)
+                || (timeslot.getEndTime() == null && timeslot.getEndTimeOfTheDayName() == null)) {
             return false;
         }
         LocalTime nowTime = now.toLocalTime();
-        LocalTime start = timeslot.getStartTime()!=null?timeslot.getStartTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toLocalTime():null;
+        LocalTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toLocalTime() : null;
         if (timeslot.getStartTimeOfTheDayName() != null) {
             start = schedulingService.getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
         }
-            start=start!=null?start.plus(timeslot.getStartMillisOffset(),ChronoUnit.MILLIS):null;
+        start = start != null ? start.plus(timeslot.getStartMillisOffset(), ChronoUnit.MILLIS) : null;
 
         LocalTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toLocalTime() : null;
         if (timeslot.getEndTimeOfTheDayName() != null) {
             end = schedulingService.getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
         }
-            end=end!=null?end.plus(timeslot.getEndMillisOffset(),ChronoUnit.MILLIS):null;
-
+        end = end != null ? end.plus(timeslot.getEndMillisOffset(), ChronoUnit.MILLIS) : null;
 
 
         return start != null && nowTime.isAfter(start) && (end == null || nowTime.isBefore(end));

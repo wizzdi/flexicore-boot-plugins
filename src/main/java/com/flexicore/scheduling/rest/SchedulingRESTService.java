@@ -16,10 +16,9 @@ import com.flexicore.scheduling.model.ScheduleTimeslot;
 import com.flexicore.scheduling.model.ScheduleToAction;
 import com.flexicore.scheduling.service.SchedulingService;
 import com.flexicore.security.SecurityContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Tag;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
@@ -37,11 +36,11 @@ import java.util.List;
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
 @Path("plugins/Scheduling")
 
-@SwaggerDefinition(tags = {
+@OpenAPIDefinition(tags = {
 		@Tag(name="Scheduling",description = "Scheduling Services")
 
 })
-@Api(tags = {"Scheduling"})
+@Tag(name = "Scheduling")
 
 public class SchedulingRESTService implements RestServicePlugin {
 
@@ -54,7 +53,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "getAllSchedules", notes = "Gets All Schedules")
+	@Operation(summary= "getAllSchedules", description ="Gets All Schedules")
 	@Path("getAllSchedules")
 	public List<Schedule> getAllSchedules(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -67,7 +66,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "getAllScheduleActions", notes = "Gets All Schedule Actions")
+	@Operation(summary= "getAllScheduleActions", description ="Gets All Schedule Actions")
 	@Path("getAllScheduleActions")
 	public List<ScheduleAction> getAllScheduleActions(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -86,7 +85,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "getAllScheduleActions", notes = "Gets All Schedule Actions")
+	@Operation(summary= "getAllScheduleActions", description ="Gets All Schedule Actions")
 	@Path("getAllScheduleTimeslots")
 	public List<ScheduleTimeslot> getAllScheduleTimeslots(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -108,7 +107,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "createSchedule", notes = "Create Schedule")
+	@Operation(summary= "createSchedule", description ="Create Schedule")
 	@Path("createSchedule")
 	public Schedule createSchedule(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -122,7 +121,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Write
-	@ApiOperation(value = "createScheduleTimeSlot", notes = "Create Schedule time slot")
+	@Operation(summary= "createScheduleTimeSlot", description ="Create Schedule time slot")
 	@Path("createScheduleTimeslot")
 	public ScheduleTimeslot createScheduleTimeSlot(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -141,7 +140,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@PUT
 	@Produces("application/json")
 	@Update
-	@ApiOperation(value = "updateScheduleTimeSlot", notes = "updates Schedule time slot")
+	@Operation(summary= "updateScheduleTimeSlot", description ="updates Schedule time slot")
 	@Path("updateScheduleTimeSlot")
 	public ScheduleTimeslot updateScheduleTimeSlot(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -159,7 +158,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "updateSchedule", notes = "Update Schedule")
+	@Operation(summary= "updateSchedule", description ="Update Schedule")
 	@Path("updateSchedule")
 	public Schedule updateSchedule(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -178,7 +177,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "executeScheduleNow", notes = "Execute Schedule Now")
+	@Operation(summary = "executeScheduleNow", description = "Execute Schedule Now")
 	@Path("executeScheduleNow")
 	public ExecuteScheduleResponse executeScheduleNow(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -199,7 +198,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "createScheduleAction", notes = "Create Schedule Action")
+	@Operation(summary= "createScheduleAction", description ="Create Schedule Action")
 	@Path("createScheduleAction")
 	public ScheduleAction createScheduleAction(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -212,7 +211,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "updateScheduleAction", notes = "Update Schedule Action")
+	@Operation(summary= "updateScheduleAction", description ="Update Schedule Action")
 	@Path("updateScheduleAction")
 	public ScheduleAction updateScheduleAction(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -235,7 +234,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "linkScheduleToAction", notes = "Link Schedule To Action")
+	@Operation(summary= "linkScheduleToAction", description ="Link Schedule To Action")
 	@Path("linkScheduleToAction")
 	public ScheduleToAction linkScheduleToAction(
 			@HeaderParam("authenticationKey") String authenticationKey,
@@ -252,7 +251,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 	@POST
 	@Produces("application/json")
 	@Read
-	@ApiOperation(value = "unlinkScheduleToAction", notes = "Unlinks Schedule To Action")
+	@Operation(summary= "unlinkScheduleToAction", description ="Unlinks Schedule To Action")
 	@Path("unlinkScheduleToAction")
 	public ScheduleToAction unlinkScheduleToAction(
 			@HeaderParam("authenticationKey") String authenticationKey,
