@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/meta-model" />
         <sourceTestOutputDir name="target/generated-sources/apt-test" />
         <outputRelativeToContentRoot value="true" />
-        <option name="eclipselink.persistencexml" value="C:\Users\asaf\dev\flexicore\uml-testing\scheduling-model/src/main/resources/persistence.xml" />
+        <option name="eclipselink.persistencexml" value="C:\Users\asaf\IdeaProjects\scheduling-model/src/main/resources/persistence.xml" />
         <processor name="org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor" />
         <module name="scheduling-model" />
       </profile>
