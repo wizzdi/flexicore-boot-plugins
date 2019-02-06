@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/flexicore-territories-serviceservice.iml" filepath="$PROJECT_DIR$/.idea/flexicore-territories-serviceservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/flexicore-territories-service.iml" filepath="$PROJECT_DIR$/.idea/flexicore-territories-service.iml" />
     </modules>
   </component>
 </project>
