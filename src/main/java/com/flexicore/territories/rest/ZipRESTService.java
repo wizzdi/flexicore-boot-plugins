@@ -24,11 +24,15 @@ import com.flexicore.territories.data.request.ZipCreationContainer;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 import com.flexicore.territories.data.request.ZipFiltering;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/ZipService")
+@Path("plugins/Zip")
+@Tag(name = "Zip")
+
+
 public class ZipRESTService implements RestServicePlugin {
 
 	@Inject

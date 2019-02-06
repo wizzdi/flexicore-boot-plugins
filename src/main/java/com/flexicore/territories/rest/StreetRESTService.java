@@ -25,13 +25,17 @@ import com.flexicore.model.territories.Street;
 import com.flexicore.territories.data.request.StreetUpdateContainer;
 import javax.ws.rs.BadRequestException;
 import com.flexicore.territories.data.request.StreetCreationContainer;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/StreetService")
+@Path("plugins/Street")
+@Tag(name = "Street")
+
 public class StreetRESTService implements RestServicePlugin {
 
 	@Inject

@@ -24,11 +24,14 @@ import com.flexicore.model.territories.Country;
 import com.flexicore.territories.data.request.CountryUpdateContainer;
 import javax.ws.rs.BadRequestException;
 import com.flexicore.territories.data.request.CountryCreationContainer;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/CountryService")
+@Path("plugins/Country")
+@Tag(name = "Country")
+
 public class CountryRESTService implements RestServicePlugin {
 
 	@Inject

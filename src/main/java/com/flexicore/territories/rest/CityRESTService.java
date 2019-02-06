@@ -25,13 +25,17 @@ import com.flexicore.model.territories.City;
 import com.flexicore.territories.data.request.CityUpdateContainer;
 import javax.ws.rs.BadRequestException;
 import com.flexicore.territories.data.request.CityCreationContainer;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/CityService")
+@Path("plugins/City")
+@Tag(name = "City")
+
 public class CityRESTService implements RestServicePlugin {
 
 	@Inject

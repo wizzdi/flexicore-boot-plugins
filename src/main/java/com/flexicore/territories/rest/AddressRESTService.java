@@ -17,6 +17,8 @@ import com.flexicore.security.SecurityContext;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.HeaderParam;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import com.flexicore.annotations.IOperation;
 import com.flexicore.territories.data.request.AddressUpdateContainer;
@@ -25,11 +27,21 @@ import com.flexicore.model.territories.Address;
 import com.flexicore.territories.data.request.AddressFiltering;
 import javax.ws.rs.BadRequestException;
 import com.flexicore.territories.data.request.AddressCreationContainer;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/AddressService")
+@Path("plugins/Address")
+@OpenAPIDefinition(tags = {
+		@Tag(name = "Address",description ="Address Api" ),
+		@Tag(name = "Street",description = "Street Api"),
+		@Tag(name = "ZipToStreet",description = "ZipToStreet Api"),
+		@Tag(name = "City",description = "City Api"),
+		@Tag(name = "Country",description = "Country Api"),
+		@Tag(name = "Zip",description = "Zip Api")
+})
+@Tag(name = "Address")
 public class AddressRESTService implements RestServicePlugin {
 
 	@Inject

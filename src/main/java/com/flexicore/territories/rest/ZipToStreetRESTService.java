@@ -27,11 +27,14 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
 import com.flexicore.territories.data.request.ZipToStreetFiltering;
 import com.flexicore.territories.data.request.ZipToStreetUpdateContainer;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
-@Path("plugins/ZipToStreetService")
+@Path("plugins/ZipToStreet")
+@Tag(name = "ZipToStreet")
+
 public class ZipToStreetRESTService implements RestServicePlugin {
 
 	@Inject
