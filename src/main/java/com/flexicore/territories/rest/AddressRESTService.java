@@ -39,7 +39,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 		@Tag(name = "ZipToStreet",description = "ZipToStreet Api"),
 		@Tag(name = "City",description = "City Api"),
 		@Tag(name = "Country",description = "Country Api"),
-		@Tag(name = "Zip",description = "Zip Api")
+		@Tag(name = "Zip",description = "Zip Api"),
+		@Tag(name = "Neighbourhood",description="Neighbourhood Api")
+
 })
 @Tag(name = "Address")
 public class AddressRESTService implements RestServicePlugin {
