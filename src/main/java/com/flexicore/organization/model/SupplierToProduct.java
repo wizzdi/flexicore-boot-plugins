@@ -17,6 +17,8 @@ public class SupplierToProduct extends TimedLink {
         return s_Singleton;
     }
 
+    private double price;
+
 
 
 
@@ -53,5 +55,12 @@ public class SupplierToProduct extends TimedLink {
         super.setRightside(rightside);
     }
 
+    public double getPrice() {
+        return price;
+    }
 
+    public SupplierToProduct setPrice(double price) {
+        this.price = price;
+        return this;
+    }
 }
