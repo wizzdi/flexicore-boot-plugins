@@ -34,17 +34,39 @@ public class ZipService implements IZipService {
 	public Zip updateZip(ZipUpdateContainer updateContainer,
 						 com.flexicore.security.SecurityContext securityContext) {
 		Zip zip = updateContainer.getZip();
-		repository.merge(zip);
+		if(updateZipNoMerge(zip, updateContainer)){
+			repository.merge(zip);
+		}
 		return zip;
 	}
 
 	@Override
 	public Zip createZip(ZipCreationContainer creationContainer,
 						 com.flexicore.security.SecurityContext securityContext) {
-		Zip zip = Zip.s().CreateUnchecked("Zip", securityContext);
-		zip.Init();
+		Zip zip = creteZipNoMerge(creationContainer,securityContext);
 		repository.merge(zip);
 		return zip;
+	}
+
+	private Zip creteZipNoMerge(ZipCreationContainer creationContainer, SecurityContext securityContext) {
+		Zip zip=Zip.s().CreateUnchecked("Zip", securityContext);
+		zip.Init();
+		updateZipNoMerge(zip,creationContainer);
+		return zip;
+	}
+
+	private boolean updateZipNoMerge(Zip zip, ZipCreationContainer creationContainer) {
+		boolean update=false;
+		if (creationContainer.getName() != null && !zip.getName().equals(creationContainer.getName())) {
+			zip.setName(creationContainer.getName());
+			update = true;
+		}
+		if (creationContainer.getDescription() != null && !zip.getDescription().equals(creationContainer.getDescription())) {
+			zip.setDescription(creationContainer.getDescription());
+			update = true;
+		}
+		return update;
+
 	}
 
 	@Override

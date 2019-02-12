@@ -50,17 +50,40 @@ public class CountryService implements ICountryService {
 	public Country updateCountry(CountryUpdateContainer updateContainer,
 								 com.flexicore.security.SecurityContext securityContext) {
 		Country country = updateContainer.getCountry();
-		repository.merge(country);
+		if(updateCountryNoMerge(country,updateContainer)){
+			repository.merge(country);
+
+		}
 		return country;
 	}
 
 	@Override
 	public Country createCountry(CountryCreationContainer creationContainer,
 								 com.flexicore.security.SecurityContext securityContext) {
-		Country country = Country.s().CreateUnchecked("Country",
-				securityContext);
-		country.Init();
+		Country country =createCountryNoMerge(creationContainer,securityContext);
 		repository.merge(country);
 		return country;
+	}
+
+	private Country createCountryNoMerge(CountryCreationContainer creationContainer, SecurityContext securityContext) {
+		Country country=Country.s().CreateUnchecked("Country",
+				securityContext);
+		country.Init();
+		updateCountryNoMerge(country,creationContainer);
+		return country;
+	}
+
+	private boolean updateCountryNoMerge(Country country, CountryCreationContainer creationContainer) {
+		boolean update=false;
+		if(creationContainer.getName()!=null && !country.getName().equals(creationContainer.getName())){
+			country.setName(creationContainer.getName());
+			update=true;
+		}
+		if(creationContainer.getDescription()!=null && !country.getDescription().equals(creationContainer.getDescription())){
+			country.setDescription(creationContainer.getDescription());
+			update=true;
+		}
+		return update;
+
 	}
 }

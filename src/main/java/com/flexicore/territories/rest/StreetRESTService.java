@@ -65,19 +65,14 @@ public class StreetRESTService implements RestServicePlugin {
 		Street street = service.getByIdOrNull(updateContainer.getId(),
 				Street.class, null, securityContext);
 		if (street == null) {
-			throw new BadRequestException("no Street with id "
-					+ updateContainer.getId());
+			throw new BadRequestException("no Street with id " + updateContainer.getId());
 		}
 		updateContainer.setStreet(street);
-		City city = updateContainer.getCityId()!=null?service.getByIdOrNull(updateContainer.getCityId(),
-				City.class, null, securityContext):null;
-		if (city == null&&updateContainer.getCityId()!=null) {
-			throw new BadRequestException("no City with id "
-					+ updateContainer.getCityId());
-		}
-		updateContainer.setCity(city);
+		service.validate(updateContainer, securityContext);
 		return service.updateStreet(updateContainer, securityContext);
 	}
+
+
 
 	@POST
 	@Produces("application/json")
@@ -91,8 +86,7 @@ public class StreetRESTService implements RestServicePlugin {
 		City city = service.getByIdOrNull(creationContainer.getCityId(),
 				City.class, null, securityContext);
 		if (city == null) {
-			throw new BadRequestException("no City with id "
-					+ creationContainer.getCityId());
+			throw new BadRequestException("no City with id " + creationContainer.getCityId());
 		}
 		creationContainer.setCity(city);
 		return service.createStreet(creationContainer, securityContext);

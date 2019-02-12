@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flexicore</groupId>
     <artifactId>flexicore-territories-service</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <properties>
         <version.jackson>2.9.5</version.jackson>
         <version.eclipselink>2.7.1</version.eclipselink>

@@ -50,23 +50,11 @@ public class ZipToStreetRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			ZipToStreetCreationContainer creationContainer,
 			@Context SecurityContext securityContext) {
-		Zip leftside = service.getByIdOrNull(creationContainer.getZipId(),
-				Zip.class, null, securityContext);
-		if (leftside == null) {
-			throw new BadRequestException("no Zip with id "
-					+ creationContainer.getZipId());
-		}
-		creationContainer.setZip(leftside);
-		Street rightside = service.getByIdOrNull(
-				creationContainer.getStreetId(), Street.class, null,
-				securityContext);
-		if (rightside == null) {
-			throw new BadRequestException("no Street with id "
-					+ creationContainer.getStreetId());
-		}
-		creationContainer.setStreet(rightside);
+		service.validate(creationContainer, securityContext);
 		return service.createZipToStreet(creationContainer, securityContext);
 	}
+
+
 
 	@DELETE
 	@Operation(summary = "deleteZipToStreet", description = "Deletes ZipToStreet")
@@ -103,25 +91,10 @@ public class ZipToStreetRESTService implements RestServicePlugin {
 				updateContainer.getId(), ZipToStreet.class, null,
 				securityContext);
 		if (zipToStreet == null) {
-			throw new BadRequestException("no ZipToStreet with id "
-					+ updateContainer.getId());
+			throw new BadRequestException("no ZipToStreet with id " + updateContainer.getId());
 		}
 		updateContainer.setZipToStreet(zipToStreet);
-		Zip leftside = service.getByIdOrNull(updateContainer.getZipId(),
-				Zip.class, null, securityContext);
-		if (leftside == null) {
-			throw new BadRequestException("no Zip with id "
-					+ updateContainer.getZipId());
-		}
-		updateContainer.setZip(leftside);
-		Street rightside = service.getByIdOrNull(
-				updateContainer.getStreetId(), Street.class, null,
-				securityContext);
-		if (rightside == null) {
-			throw new BadRequestException("no Street with id "
-					+ updateContainer.getStreetId());
-		}
-		updateContainer.setStreet(rightside);
+		service.validate(updateContainer, securityContext);
 		return service.updateZipToStreet(updateContainer, securityContext);
 	}
 }
