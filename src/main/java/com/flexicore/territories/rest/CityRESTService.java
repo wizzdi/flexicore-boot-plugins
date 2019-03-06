@@ -1,5 +1,6 @@
 package com.flexicore.territories.rest;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.annotations.plugins.PluginInfo;
@@ -62,7 +63,21 @@ public class CityRESTService implements RestServicePlugin {
     public List<City> listAllCities(
             @HeaderParam("authenticationKey") String authenticationKey,
             CityFiltering filtering, @Context SecurityContext securityContext) {
+        service.validate(filtering,securityContext);
         return service.listAllCities(securityContext, filtering);
+    }
+
+
+    @POST
+    @Produces("application/json")
+    @Operation(summary = "getAllCities", description = "Lists all Cities Filtered")
+    @IOperation(Name = "getAllCities", Description = "Lists all Cities Filtered")
+    @Path("getAllCities")
+    public PaginationResponse<City> getAllCities(
+            @HeaderParam("authenticationKey") String authenticationKey,
+            CityFiltering filtering, @Context SecurityContext securityContext) {
+        service.validate(filtering,securityContext);
+        return service.getAllCities(securityContext, filtering);
     }
 
     @POST

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.flexicore</groupId>
     <artifactId>flexicore-territories-service</artifactId>
-    <version>2.0.1</version>
+    <version>2.1.1</version>
     <properties>
         <version.jackson>2.9.5</version.jackson>
         <version.eclipselink>2.7.1</version.eclipselink>
@@ -21,6 +21,11 @@
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>${version.jackson}</version>
         </dependency>
 
 
@@ -98,6 +103,19 @@
 
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>run</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                    <version>${version.jackson}</version>
+                    <scope>compile</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <repositories>
         <repository>
             <id>flexicore-local</id>

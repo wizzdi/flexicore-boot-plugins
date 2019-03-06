@@ -5,9 +5,11 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.territories.data.CountryRepository;
 import javax.inject.Inject;
 import com.flexicore.model.Baseclass;
+import com.flexicore.territories.data.request.CountryFiltering;
 import com.flexicore.territories.interfaces.ICountryService;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.model.QueryInformationHolder;
@@ -38,12 +40,23 @@ public class CountryService implements ICountryService {
 	}
 
 	@Override
-	public List<Country> listAllCountries(
-			SecurityContext securityContext,
-			com.flexicore.territories.data.request.CountryFiltering filtering) {
-		QueryInformationHolder<Country> queryInfo = new QueryInformationHolder<>(
-				filtering, Country.class, securityContext);
-		return repository.getAllFiltered(queryInfo);
+	public List<Country> listAllCountries(SecurityContext securityContext, CountryFiltering filtering) {
+
+		return repository.listAllCountries(securityContext,filtering);
+	}
+
+
+	@Override
+	public PaginationResponse<Country> getAllCountries(SecurityContext securityContext, CountryFiltering filtering) {
+
+		List<Country> list= repository.listAllCountries(securityContext,filtering);
+		long count=repository.countAllCountries(securityContext,filtering);
+		return new PaginationResponse<>(list,filtering,count);
+	}
+
+	@Override
+	public void validate(CountryFiltering filtering, SecurityContext securityContext) {
+
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.Country;
 import com.flexicore.territories.data.CityRepository;
 
@@ -13,6 +14,7 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Context;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.territories.data.request.CityFiltering;
 import com.flexicore.territories.interfaces.ICityService;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.model.QueryInformationHolder;
@@ -36,12 +38,15 @@ public class CityService implements ICityService {
     }
 
     @Override
-    public List<City> listAllCities(
-            SecurityContext securityContext,
-            com.flexicore.territories.data.request.CityFiltering filtering) {
-        QueryInformationHolder<City> queryInfo = new QueryInformationHolder<>(
-                filtering, City.class, securityContext);
-        return repository.getAllFiltered(queryInfo);
+    public List<City> listAllCities(SecurityContext securityContext, CityFiltering filtering) {
+        return repository.listAllCities(securityContext,filtering);
+    }
+
+    @Override
+    public PaginationResponse<City> getAllCities(SecurityContext securityContext, CityFiltering filtering) {
+        List<City> list=repository.listAllCities(securityContext,filtering);
+        long count=repository.countAllCities(securityContext,filtering);
+        return new PaginationResponse<>(list,filtering,count);
     }
 
     @Override
@@ -55,6 +60,14 @@ public class CityService implements ICityService {
     }
 
     public void validate(CityCreationContainer creationContainer, SecurityContext securityContext) {
+        Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
+        if (country == null) {
+            throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
+        }
+        creationContainer.setCountry(country);
+    }
+
+    public void validate(CityFiltering creationContainer, SecurityContext securityContext) {
         Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
         if (country == null) {
             throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
@@ -77,17 +90,26 @@ public class CityService implements ICityService {
         return city;
     }
 
-    private boolean updateCityNoMerge(CityCreationContainer creationContainer, City city) {
+    public boolean updateCityNoMerge(CityCreationContainer creationContainer, City city) {
         boolean update = false;
-        if (creationContainer.getName() != null && !city.getName().equals(creationContainer.getName())) {
+        if(city.isSoftDelete()){
+            city.setSoftDelete(false);
+            update=true;
+        }
+        if (creationContainer.getExternalId() != null && !creationContainer.getExternalId().equals(city.getExternalId())) {
+            city.setExternalId(creationContainer.getExternalId());
+            update = true;
+        }
+
+        if (creationContainer.getName() != null && !creationContainer.getName().equals(city.getName())) {
             city.setName(creationContainer.getName());
             update = true;
         }
-        if (creationContainer.getDescription() != null && !city.getDescription().equals(creationContainer.getDescription())) {
+        if (creationContainer.getDescription() != null && !creationContainer.getDescription().equals(city.getDescription())) {
             city.setDescription(creationContainer.getDescription());
             update = true;
         }
-        if (creationContainer.getCountry() != null && (city.getCountry() == null || !city.getCountry().getId().equals(creationContainer.getCountry().getId()))) {
+        if (creationContainer.getCountry() != null && (city.getCountry() == null || !creationContainer.getCountry().getId().equals(city.getCountry().getId()))) {
             city.setCountry(creationContainer.getCountry());
             update = true;
         }

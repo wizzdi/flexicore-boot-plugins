@@ -1,5 +1,6 @@
 package com.flexicore.territories.rest;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.annotations.plugins.PluginInfo;
@@ -56,7 +57,20 @@ public class CountryRESTService implements RestServicePlugin {
 	public List<Country> listAllCountries(
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CountryFiltering filtering, @Context SecurityContext securityContext) {
+		service.validate(filtering,securityContext);
 		return service.listAllCountries(securityContext, filtering);
+	}
+
+	@POST
+	@Produces("application/json")
+	@Operation(summary = "getAllCountries", description = "Lists all Countries Filtered")
+	@IOperation(Name = "getAllCountries", Description = "Lists all Countries Filtered")
+	@Path("getAllCountries")
+	public PaginationResponse<Country> getAllCountries(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			CountryFiltering filtering, @Context SecurityContext securityContext) {
+		service.validate(filtering,securityContext);
+		return service.getAllCountries(securityContext, filtering);
 	}
 
 	@POST

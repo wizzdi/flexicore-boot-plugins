@@ -5,6 +5,7 @@ import com.flexicore.model.territories.City;
 
 public class StreetCreationContainer {
 
+	private String externalId;
 	private String name;
 	private String description;
 	private String cityId;
@@ -24,8 +25,9 @@ public class StreetCreationContainer {
 		return city;
 	}
 
-	public void setCity(City city) {
+	public <T extends StreetCreationContainer> T setCity(City city) {
 		this.city = city;
+		return (T) this;
 	}
 
 	public String getName() {
@@ -44,5 +46,14 @@ public class StreetCreationContainer {
 	public StreetCreationContainer setDescription(String description) {
 		this.description = description;
 		return this;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public <T extends StreetCreationContainer> T setExternalId(String externalId) {
+		this.externalId = externalId;
+		return (T) this;
 	}
 }

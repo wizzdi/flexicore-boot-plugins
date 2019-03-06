@@ -10,6 +10,8 @@ import com.flexicore.interfaces.RestServicePlugin;
 import javax.ws.rs.Path;
 
 import com.flexicore.model.territories.Street;
+import com.flexicore.territories.reponse.AddressImportResponse;
+import com.flexicore.territories.request.AddressImportRequest;
 import com.flexicore.territories.service.AddressService;
 import javax.inject.Inject;
 import com.flexicore.security.SecurityContext;
@@ -66,6 +68,17 @@ public class AddressRESTService implements RestServicePlugin {
 		updateContainer.setAddress(address);
 		service.validate(updateContainer,securityContext);
 		return service.updateAddress(updateContainer, securityContext);
+	}
+
+	@POST
+	@Produces("application/json")
+	@Operation(summary = "importAddresses", description = "Import Addresses")
+	@IOperation(Name = "importAddresses", Description = "Import Addresses")
+	@Path("importAddresses")
+	public AddressImportResponse importAddresses(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			AddressImportRequest addressImportRequest, @Context SecurityContext securityContext) {
+		return service.importAddresses(securityContext, addressImportRequest);
 	}
 
 

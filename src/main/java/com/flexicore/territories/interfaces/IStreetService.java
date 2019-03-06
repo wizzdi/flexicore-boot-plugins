@@ -1,5 +1,6 @@
 package com.flexicore.territories.interfaces;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Street;
@@ -14,6 +15,10 @@ public interface IStreetService extends ServicePlugin {
                                           Class<T> c, List<String> batch, SecurityContext securityContext);
 
     List<Street> listAllStreets(
+            SecurityContext securityContext,
+            com.flexicore.territories.data.request.StreetFiltering filtering);
+
+    PaginationResponse<Street> getAllStreets(
             SecurityContext securityContext,
             com.flexicore.territories.data.request.StreetFiltering filtering);
 

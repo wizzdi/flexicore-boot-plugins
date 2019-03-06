@@ -6,6 +6,8 @@ import com.flexicore.model.territories.Country;
 
 public class CityFiltering extends FilteringInformationHolder {
 
+
+
 	private String countryId;
 	@JsonIgnore
 	private Country country;

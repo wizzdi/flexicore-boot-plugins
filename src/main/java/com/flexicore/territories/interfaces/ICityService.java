@@ -1,9 +1,11 @@
 package com.flexicore.territories.interfaces;
 
+import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.City;
 import com.flexicore.territories.data.request.CityCreationContainer;
+import com.flexicore.territories.data.request.CityFiltering;
 import com.flexicore.territories.data.request.CityUpdateContainer;
 import com.flexicore.security.SecurityContext;
 
@@ -24,4 +26,6 @@ public interface ICityService extends ServicePlugin {
                     SecurityContext securityContext);
 
     void deleteCity(String cityid, SecurityContext securityContext);
+
+    PaginationResponse<City> getAllCities(SecurityContext securityContext, CityFiltering filtering);
 }

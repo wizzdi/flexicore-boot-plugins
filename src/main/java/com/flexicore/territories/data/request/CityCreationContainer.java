@@ -5,6 +5,7 @@ import com.flexicore.model.territories.Country;
 
 public class CityCreationContainer {
 
+	private String externalId;
 	private String name;
 	private String description;
 	private String countryId;
@@ -20,12 +21,14 @@ public class CityCreationContainer {
 	}
 
 	@JsonIgnore
+
 	public Country getCountry() {
 		return country;
 	}
 
-	public void setCountry(Country country) {
+	public <T extends CityCreationContainer> T setCountry(Country country) {
 		this.country = country;
+		return (T) this;
 	}
 
 	public String getName() {
@@ -44,5 +47,14 @@ public class CityCreationContainer {
 	public CityCreationContainer setDescription(String description) {
 		this.description = description;
 		return this;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public <T extends CityCreationContainer> T setExternalId(String externalId) {
+		this.externalId = externalId;
+		return (T) this;
 	}
 }
