@@ -48,7 +48,7 @@ public class Scheduler implements Runnable {
                 LocalDateTime now = LocalDateTime.now();
 
                 if (lastFetch == null || now.isAfter(lastFetch.plus(FETCH_INTERVAL, ChronoUnit.MILLIS))) {
-                    actionsMap = schedulingService.getAllScheduleLinks().parallelStream().filter(f -> f.getLeftside() != null).collect(Collectors.groupingBy(f -> f.getLeftside().getId(), Collectors.toList()));
+                    actionsMap = schedulingService.getAllScheduleLinks().parallelStream().filter(f -> f.getLeftside() != null && !f.getLeftside().isSoftDelete()).collect(Collectors.groupingBy(f -> f.getLeftside().getId(), Collectors.toList()));
                     timeSlotsMap = schedulingService.getAllTimeSlots(actionsMap.keySet(), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
                     lastFetch = now;
 

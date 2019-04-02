@@ -38,8 +38,6 @@ public class SchedulingService implements ISchedulingService {
     @PluginInfo(version = 1)
     private SchedulingRepository schedulingRepository;
 
-    @Inject
-    private PluginService pluginService;
 
     @Inject
     private Logger logger;
