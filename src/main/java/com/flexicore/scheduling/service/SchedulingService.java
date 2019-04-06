@@ -56,7 +56,6 @@ public class SchedulingService implements ISchedulingService {
 
     private static AtomicBoolean init = new AtomicBoolean(false);
     private static Scheduler scheduler;
-    private static Cache<String, Method> methodCache = CacheBuilder.newBuilder().maximumSize(100).build();
 
     @Override
     public void init() {
@@ -179,45 +178,7 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public boolean updateScheduleActionNoMerge(ScheduleAction scheduleAction, CreateSchedulingAction createSchedulingAction) {
-        boolean update = false;
-        if (createSchedulingAction.getMethodName() != null && !createSchedulingAction.getMethodName().equals(scheduleAction.getMethodName())) {
-            scheduleAction.setMethodName(createSchedulingAction.getMethodName());
-            update = true;
-        }
-
-        if (createSchedulingAction.getName() != null && !createSchedulingAction.getName().equals(scheduleAction.getName())) {
-            scheduleAction.setName(createSchedulingAction.getName());
-            update = true;
-        }
-
-        if (createSchedulingAction.getDescription() != null && !createSchedulingAction.getDescription().equals(scheduleAction.getDescription())) {
-            scheduleAction.setDescription(createSchedulingAction.getDescription());
-            update = true;
-        }
-
-
-        if (createSchedulingAction.getServiceCanonicalNames() != null) {
-            Set<String> ids = scheduleAction.getServiceCanonicalNames().parallelStream().map(f -> f.getServiceCanonicalName()).collect(Collectors.toSet());
-            createSchedulingAction.getServiceCanonicalNames().removeAll(ids);
-            if (!createSchedulingAction.getServiceCanonicalNames().isEmpty()) {
-                scheduleAction.getServiceCanonicalNames().addAll(createSchedulingAction.getServiceCanonicalNames().parallelStream()
-                        .map(f -> new ServiceCanonicalName()
-                                .setId(Baseclass.getBase64ID())
-                                .setScheduleAction(scheduleAction)
-                                .setServiceCanonicalName(f)
-                        )
-                        .collect(Collectors.toList())
-                );
-                update = true;
-            }
-
-
-        }
-        if (createSchedulingAction.getExecutionParametersHolder() != null) {
-            createSchedulingAction.getExecutionParametersHolder().prepareForSave();
-            scheduleAction.setExecutionParametersHolder(createSchedulingAction.getExecutionParametersHolder());
-
-        }
+        boolean update = dynamicInvokersService.updateDynamicExecutionNoMerge(createSchedulingAction,scheduleAction);
         return update;
 
     }
@@ -381,18 +342,18 @@ public class SchedulingService implements ISchedulingService {
     public void runSchedule(List<ScheduleToAction> schedule, SecurityContext securityContext) {
         for (ScheduleToAction link : schedule) {
 
-            ExecuteInvokerRequest execution = getExecuteInvokerRequest(link, securityContext);
             long start = System.currentTimeMillis();
             boolean failed = false;
             Object response = null;
+            ScheduleAction scheduleAction = link.getRightside();
             try {
-                response = dynamicInvokersService.executeInvoker(execution, securityContext);
+                response = dynamicInvokersService.executeInvoker(scheduleAction, securityContext);
             } catch (Exception e) {
                 response = e;
                 failed = true;
 
             } finally {
-                auditSchedule(securityContext, link.getRightside(), start, failed, response);
+                auditSchedule(securityContext, scheduleAction, start, failed, response);
             }
 
 
