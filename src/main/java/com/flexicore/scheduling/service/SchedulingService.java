@@ -280,11 +280,13 @@ public class SchedulingService implements ISchedulingService {
         }
         if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().equals(scheduleTimeslot.getStartTime())) {
             scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart());
+            scheduleTimeslot.setStartTimeOfTheDayName(null);
             update = true;
         }
 
         if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().equals(scheduleTimeslot.getEndTime())) {
             scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd());
+            scheduleTimeslot.setEndTimeOfTheDayName(null);
             update = true;
         }
 
@@ -295,6 +297,7 @@ public class SchedulingService implements ISchedulingService {
 
         if (createTimeslot.getStartTimeOfTheDayName() != null && !createTimeslot.getStartTimeOfTheDayName().equals(scheduleTimeslot.getStartTimeOfTheDayName())) {
             scheduleTimeslot.setStartTimeOfTheDayName(createTimeslot.getStartTimeOfTheDayName());
+            scheduleTimeslot.setStartTime(null);
             update = true;
         }
 
@@ -310,6 +313,7 @@ public class SchedulingService implements ISchedulingService {
 
         if (createTimeslot.getEndTimeOfTheDayName() != null && !createTimeslot.getEndTimeOfTheDayName().equals(scheduleTimeslot.getEndTimeOfTheDayName())) {
             scheduleTimeslot.setEndTimeOfTheDayName(createTimeslot.getEndTimeOfTheDayName());
+            scheduleTimeslot.setEndTime(null);
             update = true;
         }
 
