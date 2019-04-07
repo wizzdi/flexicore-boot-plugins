@@ -17,17 +17,17 @@ public class UiField extends Baseclass {
     private String displayName;
     @ManyToOne(targetEntity = Category.class)
     private Category category;
-    @ManyToOne(targetEntity = Preset.class)
-    private Preset preset;
+    @ManyToOne(targetEntity = GridPreset.class)
+    private GridPreset preset;
     private boolean sortable;
     private boolean filterable;
 
-    @ManyToOne(targetEntity = Preset.class)
-    public Preset getPreset() {
+    @ManyToOne(targetEntity = GridPreset.class)
+    public GridPreset getPreset() {
         return preset;
     }
 
-    public UiField setPreset(Preset preset) {
+    public UiField setPreset(GridPreset preset) {
         this.preset = preset;
         return this;
     }

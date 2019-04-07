@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Entity
-public class Dashboard extends Baseclass {
+public class Dashboard extends Preset {
     static Dashboard s_Singleton = new Dashboard();
     public static Dashboard s() {
         return s_Singleton;
