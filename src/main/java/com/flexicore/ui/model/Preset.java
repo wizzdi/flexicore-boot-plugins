@@ -1,5 +1,6 @@
 package com.flexicore.ui.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 
 import javax.persistence.CascadeType;
@@ -19,6 +20,7 @@ public class Preset extends Baseclass {
     private String relatedClassCanonicalName;
 
     @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
     private List<UiField> uiFields=new ArrayList<>();
 
 
@@ -32,6 +34,7 @@ public class Preset extends Baseclass {
     }
 
     @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
     public List<UiField> getUiFields() {
         return uiFields;
     }
