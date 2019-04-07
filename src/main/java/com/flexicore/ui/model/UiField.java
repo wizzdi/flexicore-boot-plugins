@@ -10,10 +10,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class UiField extends Baseclass {
     static UiField s_Singleton = new UiField();
-
-    public static UiField s() {
-        return s_Singleton;
-    }
+    public static UiField s() { return s_Singleton; }
 
     private int priority;
     private boolean visible;
