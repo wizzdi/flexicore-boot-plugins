@@ -9,9 +9,9 @@
         <class>com.flexicore.ui.model.PresetToUser</class>
         <class>com.flexicore.model.Baseclass</class>
         <class>com.flexicore.model.Baselink</class>
-        <class>com.flexicore.ui.model.Grid</class>
-        <class>com.flexicore.ui.model.GridElement</class>
-        <class>com.flexicore.ui.model.GridExecution</class>
+        <class>com.flexicore.ui.model.Dashboard</class>
+        <class>com.flexicore.ui.model.DashboardElement</class>
+        <class>com.flexicore.ui.model.DashboardExecution</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
