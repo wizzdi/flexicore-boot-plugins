@@ -13,6 +13,7 @@
         <class>com.flexicore.ui.model.DashboardElement</class>
         <class>com.flexicore.ui.model.DashboardExecution</class>
         <class>com.flexicore.ui.model.Preset</class>
+        <class>com.flexicore.ui.model.GridPreset</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
