@@ -13,7 +13,10 @@ public class ScheduleTimeslot extends Baseclass {
 
    
     private LocalDateTime startTime; // the explicit time for TS start
+    private String timeStartZoneId;
     private LocalDateTime endTime; //the explicit time for TS to end
+    private String timeEndZoneId;
+
     private TimeOfTheDayName startTimeOfTheDayName; // alternate implicit start time, for example sunRize
     private double timeOfTheDayNameStartLat; // location for implicit time 
     private double timeOfTheDayNameStartLon; 
@@ -150,5 +153,23 @@ public class ScheduleTimeslot extends Baseclass {
     public ScheduleTimeslot setEndMillisOffset(long endMillisOffset) {
         this.endMillisOffset = endMillisOffset;
         return this;
+    }
+
+    public String getTimeStartZoneId() {
+        return timeStartZoneId;
+    }
+
+    public <T extends ScheduleTimeslot> T setTimeStartZoneId(String timeStartZoneId) {
+        this.timeStartZoneId = timeStartZoneId;
+        return (T) this;
+    }
+
+    public String getTimeEndZoneId() {
+        return timeEndZoneId;
+    }
+
+    public <T extends ScheduleTimeslot> T setTimeEndZoneId(String timeEndZoneId) {
+        this.timeEndZoneId = timeEndZoneId;
+        return (T) this;
     }
 }
