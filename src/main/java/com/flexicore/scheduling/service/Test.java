@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.data.jsoncontainers.*;
 import com.flexicore.scheduling.containers.request.UpdateTimeslot;
+import com.flexicore.scheduling.model.ScheduleTimeslot;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
@@ -24,14 +25,16 @@ public class Test {
 
     public static void main(String[] args) throws IOException {
         ObjectMapper objectMapper=new ObjectMapper();
+
         configureObjectMapper(Test.class.getClassLoader(),objectMapper);
         UpdateTimeslot updateTimeslot=objectMapper.readValue("{\n" +
                 " \n" +
-                "  \"timeOfTheDayStart\": \"2019-04-22T03:00:00+03:00\",\n" +
+                "  \"timeOfTheDayStart\": \"2019-04-22T05:04:00+03:00\",\n" +
                 "  \"timeOfTheDayEnd\": \"2019-04-21T23:59:30+03:00\",\n" +
                 "  \"scheduleTimeslotId\": \"eICvd5ECS1KiJR5jfWGbAQ\"\n" +
                 "}", UpdateTimeslot.class);
-        System.out.println(updateTimeslot);
+        ScheduleTimeslot scheduleTimeslot=new ScheduleTimeslot().setStartTime(updateTimeslot.getTimeOfTheDayStart().toLocalDateTime());
+        System.out.println(objectMapper.writeValueAsString(scheduleTimeslot));
 
     }
 

@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -239,10 +240,14 @@ public class SchedulingService implements ISchedulingService {
             scheduleTimeslot.setDescription(createTimeslot.getDescription());
             update = true;
         }
-        if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().toLocalDateTime().equals(scheduleTimeslot.getStartTime())) {
-            scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart().toLocalDateTime());
-            scheduleTimeslot.setStartTimeOfTheDayName(null);
-            update = true;
+        if (createTimeslot.getTimeOfTheDayStart() != null ) {
+            LocalDateTime start=createTimeslot.getTimeOfTheDayStart().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+            if(!start.equals(scheduleTimeslot.getStartTime())){
+                scheduleTimeslot.setStartTime(start);
+                scheduleTimeslot.setStartTimeOfTheDayName(null);
+                update = true;
+            }
+
         }
 
         if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().getZone().getId().equals(scheduleTimeslot.getTimeStartZoneId())) {
@@ -250,10 +255,14 @@ public class SchedulingService implements ISchedulingService {
             update = true;
         }
 
-        if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().toLocalDateTime().equals(scheduleTimeslot.getEndTime())) {
-            scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd().toLocalDateTime());
-            scheduleTimeslot.setEndTimeOfTheDayName(null);
-            update = true;
+        if (createTimeslot.getTimeOfTheDayEnd() != null ) {
+            LocalDateTime end=createTimeslot.getTimeOfTheDayEnd().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
+            if( !end.equals(scheduleTimeslot.getEndTime())){
+                scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd().toLocalDateTime());
+                scheduleTimeslot.setEndTimeOfTheDayName(null);
+                update = true;
+            }
+
         }
 
         if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().getZone().getId().equals(scheduleTimeslot.getTimeEndZoneId())) {
