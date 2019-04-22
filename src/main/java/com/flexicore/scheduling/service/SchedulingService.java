@@ -189,7 +189,7 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public List<ScheduleToAction> getAllScheduleLinks() {
-        return schedulingRepository.getAll(ScheduleToAction.class);
+        return schedulingRepository.getAllSchedullingLinks(new LinkScheduleToAction(),null);
     }
 
     public ScheduleToAction unlinkScheduleToAction(SecurityContext securityContext, LinkScheduleToAction linkScheduleToAction) {
@@ -239,15 +239,25 @@ public class SchedulingService implements ISchedulingService {
             scheduleTimeslot.setDescription(createTimeslot.getDescription());
             update = true;
         }
-        if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().equals(scheduleTimeslot.getStartTime())) {
-            scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart());
+        if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().toLocalDateTime().equals(scheduleTimeslot.getStartTime())) {
+            scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart().toLocalDateTime());
             scheduleTimeslot.setStartTimeOfTheDayName(null);
             update = true;
         }
 
-        if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().equals(scheduleTimeslot.getEndTime())) {
-            scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd());
+        if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().getZone().getId().equals(scheduleTimeslot.getTimeStartZoneId())) {
+            scheduleTimeslot.setTimeStartZoneId(createTimeslot.getTimeOfTheDayStart().getZone().getId());
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().toLocalDateTime().equals(scheduleTimeslot.getEndTime())) {
+            scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd().toLocalDateTime());
             scheduleTimeslot.setEndTimeOfTheDayName(null);
+            update = true;
+        }
+
+        if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().getZone().getId().equals(scheduleTimeslot.getTimeEndZoneId())) {
+            scheduleTimeslot.setTimeEndZoneId(createTimeslot.getTimeOfTheDayEnd().getZone().getId());
             update = true;
         }
 

@@ -1,10 +1,12 @@
 package com.flexicore.scheduling.containers.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.TimeOfTheDayName;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class CreateTimeslot {
     private String scheduleId;
@@ -21,8 +23,11 @@ public class CreateTimeslot {
     private Double timeOfTheDayNameEndLon;
 
 
-    private LocalDateTime timeOfTheDayStart;
-    private LocalDateTime timeOfTheDayEnd;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private ZonedDateTime timeOfTheDayStart;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private ZonedDateTime timeOfTheDayEnd;
     private Long startMillisOffset;
     private Long endMillisOffset;
 
@@ -82,22 +87,22 @@ public class CreateTimeslot {
         return this;
     }
 
-    public LocalDateTime getTimeOfTheDayStart() {
+    public ZonedDateTime getTimeOfTheDayStart() {
         return timeOfTheDayStart;
     }
 
-    public CreateTimeslot setTimeOfTheDayStart(LocalDateTime timeOfTheDayStart) {
+    public <T extends CreateTimeslot> T setTimeOfTheDayStart(ZonedDateTime timeOfTheDayStart) {
         this.timeOfTheDayStart = timeOfTheDayStart;
-        return this;
+        return (T) this;
     }
 
-    public LocalDateTime getTimeOfTheDayEnd() {
+    public ZonedDateTime getTimeOfTheDayEnd() {
         return timeOfTheDayEnd;
     }
 
-    public CreateTimeslot setTimeOfTheDayEnd(LocalDateTime timeOfTheDayEnd) {
+    public <T extends CreateTimeslot> T setTimeOfTheDayEnd(ZonedDateTime timeOfTheDayEnd) {
         this.timeOfTheDayEnd = timeOfTheDayEnd;
-        return this;
+        return (T) this;
     }
 
     public Long getStartMillisOffset() {

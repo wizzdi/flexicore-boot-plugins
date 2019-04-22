@@ -38,7 +38,12 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         CriteriaQuery<ScheduleToAction> q = cb.createQuery(ScheduleToAction.class);
         Root<ScheduleToAction> r = q.from(ScheduleToAction.class);
         List<Predicate> preds = new ArrayList<>();
-        preds.add(cb.and(cb.equal(r.get(Baselink_.leftside), linkScheduleToAction.getSchedule()), cb.equal(r.get(Baselink_.rightside), linkScheduleToAction.getScheduleAction())));
+        if( linkScheduleToAction.getSchedule()!=null){
+            preds.add(cb.equal(r.get(Baselink_.leftside), linkScheduleToAction.getSchedule()));
+        }
+        if(linkScheduleToAction.getScheduleAction()!=null){
+            preds.add(cb.equal(r.get(Baselink_.rightside), linkScheduleToAction.getScheduleAction()));
+        }
         QueryInformationHolder<ScheduleToAction> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleToAction.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
     }

@@ -129,13 +129,15 @@ public class Scheduler implements Runnable {
             return false;
         }
         LocalTime nowTime = now.toLocalTime();
-        LocalTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toLocalTime() : null;
+        String startZoneId=timeslot.getTimeStartZoneId()!=null?timeslot.getTimeStartZoneId():"UTC";
+        LocalTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of(startZoneId)).toLocalDateTime().toLocalTime() : null;
         if (timeslot.getStartTimeOfTheDayName() != null) {
             start = schedulingService.getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
         }
         start = start != null ? start.plus(timeslot.getStartMillisOffset(), ChronoUnit.MILLIS) : null;
+        String endZoneId=timeslot.getTimeEndZoneId()!=null?timeslot.getTimeEndZoneId():"UTC";
 
-        LocalTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of("UTC")).toLocalDateTime().toLocalTime() : null;
+        LocalTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().atZone(ZoneId.systemDefault()).withZoneSameInstant(ZoneId.of(endZoneId)).toLocalDateTime().toLocalTime() : null;
         if (timeslot.getEndTimeOfTheDayName() != null) {
             end = schedulingService.getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
