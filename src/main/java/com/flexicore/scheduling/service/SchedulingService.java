@@ -258,7 +258,7 @@ public class SchedulingService implements ISchedulingService {
         if (createTimeslot.getTimeOfTheDayEnd() != null ) {
             LocalDateTime end=createTimeslot.getTimeOfTheDayEnd().withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime();
             if( !end.equals(scheduleTimeslot.getEndTime())){
-                scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd().toLocalDateTime());
+                scheduleTimeslot.setEndTime(end);
                 scheduleTimeslot.setEndTimeOfTheDayName(null);
                 update = true;
             }
