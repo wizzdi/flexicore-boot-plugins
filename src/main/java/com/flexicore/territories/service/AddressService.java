@@ -95,6 +95,11 @@ public class AddressService implements IAddressService {
             address.setFloorForAddress(creationContainer.getFloor());
             update = true;
         }
+
+        if (creationContainer.getNumber() != null && !creationContainer.getNumber().equals(address.getNumber())) {
+            address.setNumber(creationContainer.getNumber());
+            update = true;
+        }
         if (creationContainer.getNeighbourhood() != null && (address.getNeighbourhood() == null || !creationContainer.getNeighbourhood().getId().equals(address.getNeighbourhood().getId()))) {
             address.setNeighbourhood(creationContainer.getNeighbourhood());
             update = true;
