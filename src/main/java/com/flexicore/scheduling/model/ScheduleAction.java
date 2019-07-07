@@ -5,17 +5,17 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.model.dynamic.ExecutionParametersHolder;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class ScheduleAction extends DynamicExecution {
+public class ScheduleAction extends Baseclass {
     private static ScheduleAction s_Singleton=new ScheduleAction();
     public  static ScheduleAction s() {return s_Singleton;}
+
+    @ManyToOne(targetEntity = DynamicExecution.class)
+    private DynamicExecution dynamicExecution;
 
     @JsonIgnore
     @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
@@ -30,5 +30,15 @@ public class ScheduleAction extends DynamicExecution {
     public ScheduleAction setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
         this.scheduleToActions = scheduleToActions;
         return this;
+    }
+
+    @ManyToOne(targetEntity = DynamicExecution.class)
+    public DynamicExecution getDynamicExecution() {
+        return dynamicExecution;
+    }
+
+    public <T extends ScheduleAction> T setDynamicExecution(DynamicExecution dynamicExecution) {
+        this.dynamicExecution = dynamicExecution;
+        return (T) this;
     }
 }
