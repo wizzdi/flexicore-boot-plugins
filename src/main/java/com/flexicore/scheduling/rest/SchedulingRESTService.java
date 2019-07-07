@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.interceptor.Interceptors;
 import javax.ws.rs.*;
@@ -41,6 +42,7 @@ import java.util.List;
 
 })
 @Tag(name = "Scheduling")
+@RequestScoped
 
 public class SchedulingRESTService implements RestServicePlugin {
 
@@ -204,6 +206,7 @@ public class SchedulingRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CreateSchedulingAction createScheduling,
 			@Context SecurityContext securityContext) {
+		service.validateSchedulingAction(createScheduling,securityContext);
 
 		return service.createScheduleAction(securityContext, createScheduling);
 	}

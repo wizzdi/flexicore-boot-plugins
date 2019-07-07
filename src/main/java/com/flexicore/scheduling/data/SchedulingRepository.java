@@ -12,11 +12,13 @@ import com.flexicore.scheduling.model.*;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.criteria.*;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @PluginInfo(version = 1)
+@Transactional
 public class SchedulingRepository extends AbstractRepositoryPlugin {
 
     public List<ScheduleAction> getAllScheduleActions(SchedulingActionFiltering filtering, SecurityContext securityContext) {
@@ -30,6 +32,7 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
             preds.add(cb.and(cb.equal(join.get(Baselink_.leftside), filtering.getSchedule()), cb.not(cb.isTrue(join.get(ScheduleToAction_.softDelete)))));
         }
         QueryInformationHolder<ScheduleAction> queryInformationHolder = new QueryInformationHolder<>(filtering, ScheduleAction.class, securityContext);
+
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
     }
 
@@ -67,5 +70,11 @@ public class SchedulingRepository extends AbstractRepositoryPlugin {
         preds.add(cb.equal(r.get(ScheduleTimeslot_.schedule), filtering.getSchedule()));
         QueryInformationHolder<ScheduleTimeslot> queryInformationHolder = new QueryInformationHolder<>(new FilteringInformationHolder(), ScheduleTimeslot.class, securityContext);
         return getAllFiltered(queryInformationHolder, preds, cb, q, r);
+    }
+
+    @Override
+    @Transactional(Transactional.TxType.REQUIRED)
+    public void merge(Object base) {
+        super.merge(base);
     }
 }

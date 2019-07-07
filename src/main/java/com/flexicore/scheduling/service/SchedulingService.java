@@ -4,6 +4,7 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
 import com.flexicore.model.*;
 import com.flexicore.model.auditing.AuditingJob;
+import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
@@ -21,6 +22,7 @@ import net.time4j.calendar.astro.SolarTime;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @PluginInfo(version = 1, autoInstansiate = true)
+@Transactional
 public class SchedulingService implements ISchedulingService {
 
 
@@ -164,8 +167,9 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public ScheduleAction createScheduleAction(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
+        List<Object> toMerge=new ArrayList<>();
         ScheduleAction scheduleAction = createScheduleActionNoMerge(securityContext, createSchedulingAction);
-        schedulingRepository.merge(scheduleAction);
+        schedulingRepository.massMerge(toMerge);
         return scheduleAction;
     }
 
@@ -179,7 +183,19 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public boolean updateScheduleActionNoMerge(ScheduleAction scheduleAction, CreateSchedulingAction createSchedulingAction) {
-        boolean update = dynamicInvokersService.updateDynamicExecutionNoMerge(createSchedulingAction,scheduleAction);
+        boolean update=false;
+        if(createSchedulingAction.getName()!=null && !createSchedulingAction.getName().equals(scheduleAction.getName())){
+            scheduleAction.setName(createSchedulingAction.getName());
+            update=true;
+        }
+        if(createSchedulingAction.getDescription()!=null && !createSchedulingAction.getDescription().equals(scheduleAction.getDescription())){
+            scheduleAction.setDescription(createSchedulingAction.getDescription());
+            update=true;
+        }
+        if(createSchedulingAction.getDynamicExecution()!=null &&(scheduleAction.getDynamicExecution()==null|| !createSchedulingAction.getDynamicExecution().getId().equals(scheduleAction.getDynamicExecution().getId()))){
+            scheduleAction.setDynamicExecution(createSchedulingAction.getDynamicExecution());
+            update=true;
+        }
         return update;
 
     }
@@ -349,13 +365,6 @@ public class SchedulingService implements ISchedulingService {
 
     }
 
-    private ExecuteInvokerRequest getExecuteInvokerRequest(ScheduleToAction scheduleToAction, SecurityContext securityContext) {
-        Set<String> invokerNames = scheduleToAction.getRightside().getServiceCanonicalNames().parallelStream().map(f -> f.getServiceCanonicalName()).collect(Collectors.toSet());
-        return new ExecuteInvokerRequest()
-                .setInvokerNames(invokerNames)
-                .setInvokerMethodName(scheduleToAction.getRightside().getMethodName())
-                .setExecutionParametersHolder(scheduleToAction.getRightside().getExecutionParametersHolder() != null ? scheduleToAction.getRightside().getExecutionParametersHolder().setSecurityContext(securityContext) : null);
-    }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void runSchedule(List<ScheduleToAction> schedule, SecurityContext securityContext) {
@@ -366,7 +375,13 @@ public class SchedulingService implements ISchedulingService {
             Object response = null;
             ScheduleAction scheduleAction = link.getRightside();
             try {
-                response = dynamicInvokersService.executeInvoker(scheduleAction, securityContext);
+                DynamicExecution dynamicExecution = scheduleAction.getDynamicExecution();
+                if(dynamicExecution!=null){
+                    response = dynamicInvokersService.executeInvoker(dynamicExecution, securityContext);
+                }
+                else{
+                    logger.warning("Schedule Action "+scheduleAction.getName() +"("+scheduleAction.getId()+") had null dynamic Exection");
+                }
             } catch (Exception e) {
                 response = e;
                 failed = true;
@@ -442,8 +457,10 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public ScheduleAction updateScheduleAction(SecurityContext securityContext, UpdateSchedulingAction updateSchedulingAction) {
+        List<Object> toMerge=new ArrayList<>();
         if (updateScheduleActionNoMerge(updateSchedulingAction.getScheduleAction(), updateSchedulingAction)) {
-            schedulingRepository.merge(updateSchedulingAction.getScheduleAction());
+            toMerge.add(updateSchedulingAction.getScheduleAction());
+            schedulingRepository.massMerge(toMerge);
         }
         return updateSchedulingAction.getScheduleAction();
     }
@@ -474,5 +491,14 @@ public class SchedulingService implements ISchedulingService {
         return new ExecuteScheduleResponse().setExecutedLinks(actions.parallelStream().map(f -> f.getId()).collect(Collectors.toSet()));
 
 
+    }
+
+    public void validateSchedulingAction(CreateSchedulingAction createScheduling, SecurityContext securityContext) {
+        String dynamicExecutionId=createScheduling.getDynamicExecutionId();
+        DynamicExecution dynamicExecution=dynamicExecutionId!=null?getByIdOrNull(dynamicExecutionId,DynamicExecution.class,null,securityContext):null;
+        if(dynamicExecution==null && dynamicExecutionId!=null){
+            throw new BadRequestException("No Dynamic Execution With id "+dynamicExecutionId);
+        }
+        createScheduling.setDynamicExecution(dynamicExecution);
     }
 }
