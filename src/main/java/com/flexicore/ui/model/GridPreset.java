@@ -2,9 +2,11 @@ package com.flexicore.ui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.dynamic.DynamicExecution;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,11 @@ public class GridPreset extends Preset {
     }
 
     private String relatedClassCanonicalName;
+
+    @ManyToOne(targetEntity = DynamicExecution.class)
+    private DynamicExecution dynamicExecution;
+
+
 
     @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JsonIgnore
@@ -42,5 +49,16 @@ public class GridPreset extends Preset {
     public GridPreset setUiFields(List<UiField> uiFields) {
         this.uiFields = uiFields;
         return this;
+    }
+
+
+    @ManyToOne(targetEntity = DynamicExecution.class)
+    public DynamicExecution getDynamicExecution() {
+        return dynamicExecution;
+    }
+
+    public <T extends Preset> T setDynamicExecution(DynamicExecution dynamicExecution) {
+        this.dynamicExecution = dynamicExecution;
+        return (T) this;
     }
 }
