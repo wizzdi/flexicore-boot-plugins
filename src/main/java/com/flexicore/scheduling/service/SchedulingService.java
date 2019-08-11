@@ -167,9 +167,8 @@ public class SchedulingService implements ISchedulingService {
     }
 
     public ScheduleAction createScheduleAction(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction) {
-        List<Object> toMerge=new ArrayList<>();
         ScheduleAction scheduleAction = createScheduleActionNoMerge(securityContext, createSchedulingAction);
-        schedulingRepository.massMerge(toMerge);
+        schedulingRepository.merge(scheduleAction);
         return scheduleAction;
     }
 

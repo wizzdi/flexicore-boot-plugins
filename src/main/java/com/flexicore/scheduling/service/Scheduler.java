@@ -72,7 +72,7 @@ public class Scheduler implements Runnable {
                                         logger.info("schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot.getName() + " has arrived");
                                         schedulingService.runSchedule(entry.getValue(), securityContext);
                                         logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot.getName());
-                                    } catch (Exception e) {
+                                    } catch (Throwable e) {
                                         logger.log(Level.SEVERE, "failed executing ", e);
                                     } finally {
                                         currentlyRunningSchedules.put(scheduleTimeslot.getId(), false);
