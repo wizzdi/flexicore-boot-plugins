@@ -2,6 +2,7 @@ package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.dynamic.DynamicExecution;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -12,6 +13,13 @@ public class DashboardExecution extends Baseclass {
     static DashboardExecution s_Singleton = new DashboardExecution();
     public static DashboardExecution s() {
         return s_Singleton;
+    }
+
+    public DashboardExecution() {
+    }
+
+    public DashboardExecution(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     @ManyToOne(targetEntity = DynamicExecution.class)

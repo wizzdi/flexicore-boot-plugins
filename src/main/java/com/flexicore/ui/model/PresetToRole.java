@@ -4,6 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.model.Role;
 import com.flexicore.model.User;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,6 +16,13 @@ public class PresetToRole extends Baselink {
     static PresetToRole s_Singleton = new PresetToRole();
     public static PresetToRole s() {
         return s_Singleton;
+    }
+
+    public PresetToRole() {
+    }
+
+    public PresetToRole(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     private int priority;

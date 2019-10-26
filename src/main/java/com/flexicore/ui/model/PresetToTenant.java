@@ -3,6 +3,7 @@ package com.flexicore.ui.model;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.model.Tenant;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,6 +15,13 @@ public class PresetToTenant extends Baselink {
     static PresetToTenant s_Singleton = new PresetToTenant();
     public static PresetToTenant s() {
         return s_Singleton;
+    }
+
+    public PresetToTenant() {
+    }
+
+    public PresetToTenant(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     private int priority;

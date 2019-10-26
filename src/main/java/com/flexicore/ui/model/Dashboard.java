@@ -2,6 +2,7 @@ package com.flexicore.ui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -16,6 +17,13 @@ public class Dashboard extends Preset {
     static Dashboard s_Singleton = new Dashboard();
     public static Dashboard s() {
         return s_Singleton;
+    }
+
+    public Dashboard() {
+    }
+
+    public Dashboard(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     @Lob

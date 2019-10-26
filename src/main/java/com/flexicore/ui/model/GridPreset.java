@@ -3,6 +3,7 @@ package com.flexicore.ui.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.dynamic.DynamicExecution;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,6 +18,13 @@ public class GridPreset extends Preset {
     static GridPreset s_Singleton = new GridPreset();
     public static GridPreset s() {
         return s_Singleton;
+    }
+
+    public GridPreset() {
+    }
+
+    public GridPreset(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     private String relatedClassCanonicalName;

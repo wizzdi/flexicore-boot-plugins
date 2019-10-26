@@ -2,6 +2,8 @@ package com.flexicore.ui.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
+
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -15,6 +17,13 @@ public class DashboardElement extends Baseclass {
     static DashboardElement s_Singleton = new DashboardElement();
     public static DashboardElement s() {
         return s_Singleton;
+    }
+
+    public DashboardElement() {
+    }
+
+    public DashboardElement(String name, SecurityContext securityContext) {
+        super(name, securityContext);
     }
 
     @Lob
