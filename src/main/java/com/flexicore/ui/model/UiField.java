@@ -29,6 +29,7 @@ public class UiField extends Baseclass {
     private GridPreset preset;
     private boolean sortable;
     private boolean filterable;
+    private double defaultColumnWidth;
 
     @ManyToOne(targetEntity = GridPreset.class)
     public GridPreset getPreset() {
@@ -94,5 +95,14 @@ public class UiField extends Baseclass {
     public UiField setFilterable(boolean filterable) {
         this.filterable = filterable;
         return this;
+    }
+
+    public double getDefaultColumnWidth() {
+        return defaultColumnWidth;
+    }
+
+    public <T extends UiField> T setDefaultColumnWidth(double defaultColumnWidth) {
+        this.defaultColumnWidth = defaultColumnWidth;
+        return (T) this;
     }
 }
