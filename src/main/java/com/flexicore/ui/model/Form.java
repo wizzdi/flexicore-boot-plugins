@@ -1,16 +1,11 @@
 package com.flexicore.ui.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.model.dynamic.DynamicInvoker;
 import com.flexicore.security.SecurityContext;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Entity
@@ -29,16 +24,15 @@ public class Form extends Preset {
 
 
     @ManyToOne(targetEntity = DynamicExecution.class)
-    private DynamicInvoker dynamicInvoker;
-
+    private DynamicExecution dynamicExecution;
 
     @ManyToOne(targetEntity = DynamicExecution.class)
-    public DynamicInvoker getDynamicInvoker() {
-        return dynamicInvoker;
+    public DynamicExecution getDynamicExecution() {
+        return dynamicExecution;
     }
 
-    public <T extends Form> T setDynamicInvoker(DynamicInvoker dynamicInvoker) {
-        this.dynamicInvoker = dynamicInvoker;
+    public <T extends Form> T setDynamicExecution(DynamicExecution dynamicExecution) {
+        this.dynamicExecution = dynamicExecution;
         return (T) this;
     }
 }
