@@ -34,11 +34,6 @@ public class GridPreset extends Preset {
 
 
 
-    @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JsonIgnore
-    private List<UiField> uiFields=new ArrayList<>();
-
-
     public String getRelatedClassCanonicalName() {
         return relatedClassCanonicalName;
     }
@@ -48,16 +43,7 @@ public class GridPreset extends Preset {
         return this;
     }
 
-    @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JsonIgnore
-    public List<UiField> getUiFields() {
-        return uiFields;
-    }
 
-    public GridPreset setUiFields(List<UiField> uiFields) {
-        this.uiFields = uiFields;
-        return this;
-    }
 
 
     @ManyToOne(targetEntity = DynamicExecution.class)

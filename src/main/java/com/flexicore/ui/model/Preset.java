@@ -25,4 +25,22 @@ public class Preset extends Presenter {
     public Preset(String name, SecurityContext securityContext) {
         super(name, securityContext);
     }
+
+
+    @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
+    private List<UiField> uiFields=new ArrayList<>();
+
+
+
+    @OneToMany(targetEntity = UiField.class,mappedBy = "preset",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
+    public List<UiField> getUiFields() {
+        return uiFields;
+    }
+
+    public <T extends Preset> T  setUiFields(List<UiField> uiFields) {
+        this.uiFields = uiFields;
+        return (T) this;
+    }
 }

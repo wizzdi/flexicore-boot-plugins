@@ -15,6 +15,9 @@
         <class>com.flexicore.ui.model.Preset</class>
         <class>com.flexicore.ui.model.GridPreset</class>
         <class>com.flexicore.ui.model.ConfigurationPreset</class>
+        <class>com.flexicore.ui.model.Column</class>
+        <class>com.flexicore.ui.model.Form</class>
+        <class>com.flexicore.ui.model.FormField</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

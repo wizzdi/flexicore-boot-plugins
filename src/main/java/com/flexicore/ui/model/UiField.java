@@ -25,18 +25,16 @@ public class UiField extends Baseclass {
     private String displayName;
     @ManyToOne(targetEntity = Category.class)
     private Category category;
-    @ManyToOne(targetEntity = GridPreset.class)
-    private GridPreset preset;
-    private boolean sortable;
-    private boolean filterable;
-    private double defaultColumnWidth;
+    @ManyToOne(targetEntity = Preset.class)
+    private Preset preset;
 
-    @ManyToOne(targetEntity = GridPreset.class)
-    public GridPreset getPreset() {
+
+    @ManyToOne(targetEntity = Preset.class)
+    public Preset getPreset() {
         return preset;
     }
 
-    public UiField setPreset(GridPreset preset) {
+    public UiField setPreset(Preset preset) {
         this.preset = preset;
         return this;
     }
@@ -79,30 +77,4 @@ public class UiField extends Baseclass {
         return this;
     }
 
-    public boolean isSortable() {
-        return sortable;
-    }
-
-    public UiField setSortable(boolean sortable) {
-        this.sortable = sortable;
-        return this;
-    }
-
-    public boolean isFilterable() {
-        return filterable;
-    }
-
-    public UiField setFilterable(boolean filterable) {
-        this.filterable = filterable;
-        return this;
-    }
-
-    public double getDefaultColumnWidth() {
-        return defaultColumnWidth;
-    }
-
-    public <T extends UiField> T setDefaultColumnWidth(double defaultColumnWidth) {
-        this.defaultColumnWidth = defaultColumnWidth;
-        return (T) this;
-    }
 }
