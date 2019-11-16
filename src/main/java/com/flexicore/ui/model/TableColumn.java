@@ -6,14 +6,14 @@ import javax.persistence.Entity;
 
 
 @Entity
-public class FormColumn extends UiField {
-    static FormColumn s_Singleton = new FormColumn();
-    public static FormColumn s() { return s_Singleton; }
+public class TableColumn extends UiField {
+    static TableColumn s_Singleton = new TableColumn();
+    public static TableColumn s() { return s_Singleton; }
 
-    public FormColumn() {
+    public TableColumn() {
     }
 
-    public FormColumn(String name, SecurityContext securityContext) {
+    public TableColumn(String name, SecurityContext securityContext) {
         super(name, securityContext);
     }
 
@@ -27,7 +27,7 @@ public class FormColumn extends UiField {
         return sortable;
     }
 
-    public FormColumn setSortable(boolean sortable) {
+    public TableColumn setSortable(boolean sortable) {
         this.sortable = sortable;
         return this;
     }
@@ -36,7 +36,7 @@ public class FormColumn extends UiField {
         return filterable;
     }
 
-    public FormColumn setFilterable(boolean filterable) {
+    public TableColumn setFilterable(boolean filterable) {
         this.filterable = filterable;
         return this;
     }
@@ -45,7 +45,7 @@ public class FormColumn extends UiField {
         return defaultColumnWidth;
     }
 
-    public <T extends FormColumn> T setDefaultColumnWidth(double defaultColumnWidth) {
+    public <T extends TableColumn> T setDefaultColumnWidth(double defaultColumnWidth) {
         this.defaultColumnWidth = defaultColumnWidth;
         return (T) this;
     }
