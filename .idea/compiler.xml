@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/meta-model" />
         <sourceTestOutputDir name="target/generated-sources/apt-test" />
         <outputRelativeToContentRoot value="true" />
-        <option name="eclipselink.persistencexml" value="C:\Users\asaf\dev\shekel\organization-model/src/main/resources/persistence.xml" />
+        <option name="eclipselink.persistencexml" value="C:\Users\asaf\IdeaProjects\organization-model/src/main/resources/persistence.xml" />
         <processor name="org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor" />
         <module name="organization-model" />
       </profile>
