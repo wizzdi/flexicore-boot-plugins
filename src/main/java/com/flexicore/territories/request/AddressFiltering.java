@@ -4,44 +4,62 @@ import com.flexicore.model.FilteringInformationHolder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Street;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class AddressFiltering extends FilteringInformationHolder {
 
-	private Integer floor;
-	private String streetId;
+	private Set<Integer> floors;
+	private Set<String> streetsIds=new HashSet<>();
 	@JsonIgnore
-	private Street street;
-	private Integer number;
+	private List<Street> streets;
+	private Set<Integer> numbers;
+	private Set<String> zipCodes;
 
-	public Integer getFloor() {
-		return floor;
+	public Set<Integer> getFloors() {
+		return floors;
 	}
 
-	public void setFloor(Integer floor) {
-		this.floor = floor;
+	public <T extends AddressFiltering> T setFloors(Set<Integer> floors) {
+		this.floors = floors;
+		return (T) this;
 	}
 
-	public String getStreetId() {
-		return streetId;
+	public Set<String> getStreetsIds() {
+		return streetsIds;
 	}
 
-	public void setStreetId(String streetId) {
-		this.streetId = streetId;
+	public <T extends AddressFiltering> T setStreetsIds(Set<String> streetsIds) {
+		this.streetsIds = streetsIds;
+		return (T) this;
 	}
 
 	@JsonIgnore
-	public Street getStreet() {
-		return street;
+	public List<Street> getStreets() {
+		return streets;
 	}
 
-	public void setStreet(Street street) {
-		this.street = street;
+	public <T extends AddressFiltering> T setStreets(List<Street> streets) {
+		this.streets = streets;
+		return (T) this;
 	}
 
-	public Integer getNumber() {
-		return number;
+	public Set<Integer> getNumbers() {
+		return numbers;
 	}
 
-	public void setNumber(Integer number) {
-		this.number = number;
+	public <T extends AddressFiltering> T setNumbers(Set<Integer> numbers) {
+		this.numbers = numbers;
+		return (T) this;
+	}
+
+	public Set<String> getZipCodes() {
+		return zipCodes;
+	}
+
+	public <T extends AddressFiltering> T setZipCodes(Set<String> zipCodes) {
+		this.zipCodes = zipCodes;
+		return (T) this;
 	}
 }

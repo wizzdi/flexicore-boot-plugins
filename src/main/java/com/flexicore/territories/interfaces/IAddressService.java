@@ -22,6 +22,8 @@ public interface IAddressService extends ServicePlugin {
 
     PaginationResponse<Address> listAllAddresses(SecurityContext securityContext, AddressFiltering filtering);
 
+    List<Address> getAllAddresses(SecurityContext securityContext, AddressFiltering filtering);
+
     Address createAddress(AddressCreationContainer creationContainer,
                           SecurityContext securityContext);
 }

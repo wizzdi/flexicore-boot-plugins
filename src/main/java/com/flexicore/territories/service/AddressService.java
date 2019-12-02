@@ -24,7 +24,6 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.territories.request.*;
 import com.flexicore.territories.interfaces.IAddressService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.AddressImportRequest;
 import com.flexicore.territories.request.StreetEntry;
@@ -115,8 +114,15 @@ public class AddressService implements IAddressService {
 
     @Override
     public PaginationResponse<Address> listAllAddresses(SecurityContext securityContext, AddressFiltering filtering) {
-        QueryInformationHolder<Address> queryInfo = new QueryInformationHolder<>(filtering, Address.class, securityContext);
-        return new PaginationResponse<>(repository.getAllFiltered(queryInfo), filtering, repository.countAllFiltered(queryInfo));
+        List<Address> list=getAllAddresses(securityContext,filtering);
+        long count=repository.countAllAddresses(securityContext,filtering);
+        return new PaginationResponse<>(list, filtering,count);
+    }
+
+    @Override
+    public List<Address> getAllAddresses(SecurityContext securityContext, AddressFiltering filtering) {
+        return repository.getAllAddresses(securityContext,filtering);
+
     }
 
     @Override
