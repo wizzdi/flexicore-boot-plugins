@@ -6,13 +6,11 @@ import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.Street;
 import com.flexicore.model.territories.Street_;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.territories.data.request.StreetFiltering;
+import com.flexicore.territories.request.StreetFiltering;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @PluginInfo(version = 1)
 public class StreetRepository extends AbstractRepositoryPlugin {

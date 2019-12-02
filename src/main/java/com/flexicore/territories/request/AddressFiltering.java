@@ -1,34 +1,23 @@
-package com.flexicore.territories.data.request;
+package com.flexicore.territories.request;
 
 import com.flexicore.model.FilteringInformationHolder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Street;
-import com.flexicore.model.territories.Zip;
 
-public class ZipToStreetFiltering extends FilteringInformationHolder {
+public class AddressFiltering extends FilteringInformationHolder {
 
-	private String zipId;
-	@JsonIgnore
-	private Zip zip;
+	private Integer floor;
 	private String streetId;
 	@JsonIgnore
 	private Street street;
+	private Integer number;
 
-	public String getZipId() {
-		return zipId;
+	public Integer getFloor() {
+		return floor;
 	}
 
-	public void setZipId(String zipId) {
-		this.zipId = zipId;
-	}
-
-	@JsonIgnore
-	public Zip getZip() {
-		return zip;
-	}
-
-	public void setZip(Zip zip) {
-		this.zip = zip;
+	public void setFloor(Integer floor) {
+		this.floor = floor;
 	}
 
 	public String getStreetId() {
@@ -46,5 +35,13 @@ public class ZipToStreetFiltering extends FilteringInformationHolder {
 
 	public void setStreet(Street street) {
 		this.street = street;
+	}
+
+	public Integer getNumber() {
+		return number;
+	}
+
+	public void setNumber(Integer number) {
+		this.number = number;
 	}
 }

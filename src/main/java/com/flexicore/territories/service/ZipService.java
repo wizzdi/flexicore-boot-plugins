@@ -10,9 +10,9 @@ import javax.inject.Inject;
 import com.flexicore.model.Baseclass;
 import com.flexicore.territories.interfaces.IZipService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.territories.data.request.ZipUpdateContainer;
+import com.flexicore.territories.request.ZipUpdateContainer;
 import com.flexicore.model.territories.Zip;
-import com.flexicore.territories.data.request.ZipCreationContainer;
+import com.flexicore.territories.request.ZipCreationContainer;
 import com.flexicore.model.QueryInformationHolder;
 
 @PluginInfo(version = 1)
@@ -78,7 +78,7 @@ public class ZipService implements IZipService {
 	@Override
 	public List<Zip> listAllZips(
 			SecurityContext securityContext,
-			com.flexicore.territories.data.request.ZipFiltering filtering) {
+			com.flexicore.territories.request.ZipFiltering filtering) {
 		QueryInformationHolder<Zip> queryInfo = new QueryInformationHolder<>(
 				filtering, Zip.class, securityContext);
 		return repository.getAllFiltered(queryInfo);

@@ -6,12 +6,11 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.Neighbourhood;
-import com.flexicore.model.territories.Street;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.data.NeighbourhoodRepository;
-import com.flexicore.territories.data.request.NeighbourhoodCreationContainer;
-import com.flexicore.territories.data.request.NeighbourhoodFiltering;
-import com.flexicore.territories.data.request.NeighbourhoodUpdateContainer;
+import com.flexicore.territories.request.NeighbourhoodCreationContainer;
+import com.flexicore.territories.request.NeighbourhoodFiltering;
+import com.flexicore.territories.request.NeighbourhoodUpdateContainer;
 import com.flexicore.territories.interfaces.INeighbourhoodService;
 
 import javax.inject.Inject;

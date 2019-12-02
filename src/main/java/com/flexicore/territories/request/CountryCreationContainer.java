@@ -1,4 +1,4 @@
-package com.flexicore.territories.data.request;
+package com.flexicore.territories.request;
 
 public class CountryCreationContainer {
     private String name;

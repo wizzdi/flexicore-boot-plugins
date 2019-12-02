@@ -12,7 +12,6 @@ import com.flexicore.interfaces.RestServicePlugin;
 
 import javax.ws.rs.Path;
 
-import com.flexicore.model.territories.Country;
 import com.flexicore.territories.service.CityService;
 
 import javax.inject.Inject;
@@ -21,7 +20,7 @@ import com.flexicore.security.SecurityContext;
 
 import java.util.List;
 
-import com.flexicore.territories.data.request.CityFiltering;
+import com.flexicore.territories.request.CityFiltering;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
@@ -33,11 +32,11 @@ import com.flexicore.annotations.IOperation;
 import javax.ws.rs.core.Context;
 
 import com.flexicore.model.territories.City;
-import com.flexicore.territories.data.request.CityUpdateContainer;
+import com.flexicore.territories.request.CityUpdateContainer;
 
 import javax.ws.rs.BadRequestException;
 
-import com.flexicore.territories.data.request.CityCreationContainer;
+import com.flexicore.territories.request.CityCreationContainer;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.ws.rs.DELETE;

@@ -28,7 +28,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.jpa.jpql:2.7.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.core:2.7.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:FlexiCore:2.4.18" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:flexicore-territories-model:1.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:flexicore-territories-model:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.mashape.unirest:unirest-java:1.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />

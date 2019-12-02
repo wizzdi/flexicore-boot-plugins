@@ -11,16 +11,14 @@ import com.flexicore.territories.data.CityRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.territories.data.request.CityFiltering;
+import com.flexicore.territories.request.CityFiltering;
 import com.flexicore.territories.interfaces.ICityService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.City;
-import com.flexicore.territories.data.request.CityUpdateContainer;
-import com.flexicore.territories.data.request.CityCreationContainer;
+import com.flexicore.territories.request.CityUpdateContainer;
+import com.flexicore.territories.request.CityCreationContainer;
 
 @PluginInfo(version = 1)
 public class CityService implements ICityService {

@@ -9,13 +9,12 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.territories.data.CountryRepository;
 import javax.inject.Inject;
 import com.flexicore.model.Baseclass;
-import com.flexicore.territories.data.request.CountryFiltering;
+import com.flexicore.territories.request.CountryFiltering;
 import com.flexicore.territories.interfaces.ICountryService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.Country;
-import com.flexicore.territories.data.request.CountryUpdateContainer;
-import com.flexicore.territories.data.request.CountryCreationContainer;
+import com.flexicore.territories.request.CountryUpdateContainer;
+import com.flexicore.territories.request.CountryCreationContainer;
 
 @PluginInfo(version = 1)
 public class CountryService implements ICountryService {

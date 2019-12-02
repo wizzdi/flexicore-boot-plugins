@@ -1,8 +1,9 @@
-package com.flexicore.territories.data.request;
+package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.model.territories.Street;
+import com.flexicore.model.territories.Zip;
 
 public class AddressCreationContainer {
 
@@ -16,6 +17,9 @@ public class AddressCreationContainer {
 	private Neighbourhood neighbourhood;
 	private String name;
 	private String description;
+	private String zipId;
+	@JsonIgnore
+	private Zip zip;
 
 	public Integer getFloor() {
 		return floor;
@@ -85,5 +89,24 @@ public class AddressCreationContainer {
 	public AddressCreationContainer setDescription(String description) {
 		this.description = description;
 		return this;
+	}
+
+	public String getZipId() {
+		return zipId;
+	}
+
+	public <T extends AddressCreationContainer> T setZipId(String zipId) {
+		this.zipId = zipId;
+		return (T) this;
+	}
+
+	@JsonIgnore
+	public Zip getZip() {
+		return zip;
+	}
+
+	public <T extends AddressCreationContainer> T setZip(Zip zip) {
+		this.zip = zip;
+		return (T) this;
 	}
 }

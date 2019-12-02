@@ -4,9 +4,8 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.Country;
-import com.flexicore.model.territories.Country_;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.territories.data.request.CountryFiltering;
+import com.flexicore.territories.request.CountryFiltering;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

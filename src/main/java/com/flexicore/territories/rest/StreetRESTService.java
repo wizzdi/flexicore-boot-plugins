@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import com.flexicore.security.SecurityContext;
 import java.util.List;
 
-import com.flexicore.territories.data.request.StreetFiltering;
+import com.flexicore.territories.request.StreetFiltering;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.HeaderParam;
@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import com.flexicore.annotations.IOperation;
 import javax.ws.rs.core.Context;
 import com.flexicore.model.territories.Street;
-import com.flexicore.territories.data.request.StreetUpdateContainer;
+import com.flexicore.territories.request.StreetUpdateContainer;
 import javax.ws.rs.BadRequestException;
-import com.flexicore.territories.data.request.StreetCreationContainer;
+import com.flexicore.territories.request.StreetCreationContainer;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.ws.rs.DELETE;

@@ -1,7 +1,6 @@
-package com.flexicore.territories.data.request;
+package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.Neighbourhood;
 
 public class NeighbourhoodUpdateContainer extends NeighbourhoodCreationContainer{

@@ -11,16 +11,14 @@ import com.flexicore.territories.data.StreetRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.core.Context;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.territories.data.request.StreetFiltering;
+import com.flexicore.territories.request.StreetFiltering;
 import com.flexicore.territories.interfaces.IStreetService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.Street;
-import com.flexicore.territories.data.request.StreetUpdateContainer;
-import com.flexicore.territories.data.request.StreetCreationContainer;
+import com.flexicore.territories.request.StreetUpdateContainer;
+import com.flexicore.territories.request.StreetCreationContainer;
 
 @PluginInfo(version = 1)
 public class StreetService implements IStreetService {

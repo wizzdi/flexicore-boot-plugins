@@ -13,19 +13,16 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.flexicore.model.territories.City;
-import com.flexicore.model.territories.Country;
-import com.flexicore.model.territories.Street;
+import com.flexicore.model.territories.*;
 import com.flexicore.territories.data.AddressRepository;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.territories.data.request.*;
+import com.flexicore.territories.request.*;
 import com.flexicore.territories.interfaces.IAddressService;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.model.territories.Address;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.AddressImportRequest;
@@ -73,12 +70,20 @@ public class AddressService implements IAddressService {
     }
     @Override
     public void validate(AddressCreationContainer addressCreationContainer, SecurityContext securityContext) {
-        Street street = addressCreationContainer.getStreetId()!=null?getByIdOrNull(addressCreationContainer.getStreetId(),
-                Street.class, null, securityContext):null;
-        if (street == null&&addressCreationContainer.getStreetId()!=null) {
-            throw new BadRequestException("no Street with id " + addressCreationContainer.getStreetId());
+        String streetId = addressCreationContainer.getStreetId();
+        Street street = streetId !=null?getByIdOrNull(streetId, Street.class, null, securityContext):null;
+        if (street == null&& streetId !=null) {
+            throw new BadRequestException("no Street with id " + streetId);
         }
         addressCreationContainer.setStreet(street);
+
+        String zipId = addressCreationContainer.getZipId();
+        Zip zip = zipId !=null?getByIdOrNull(zipId, Zip.class, null, securityContext):null;
+        if (zip == null&& zipId !=null) {
+            throw new BadRequestException("no Zip with id " + zipId);
+        }
+        addressCreationContainer.setZip(zip);
+
     }
 
     private boolean updateAddressNoMerge(Address address, AddressCreationContainer creationContainer) {
@@ -106,6 +111,11 @@ public class AddressService implements IAddressService {
         }
         if (creationContainer.getStreet() != null && (address.getStreet() == null || !creationContainer.getStreet().getId().equals(address.getStreet().getId()))) {
             address.setStreet(creationContainer.getStreet());
+            update = true;
+        }
+
+        if (creationContainer.getZip() != null && (address.getZip() == null || !creationContainer.getZip().getId().equals(address.getZip().getId()))) {
+            address.setZip(creationContainer.getZip());
             update = true;
         }
         return update;

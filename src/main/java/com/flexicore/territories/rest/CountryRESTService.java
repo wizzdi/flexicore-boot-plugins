@@ -18,13 +18,13 @@ import javax.ws.rs.PathParam;
 import io.swagger.v3.oas.annotations.Operation;
 import com.flexicore.annotations.IOperation;
 import javax.ws.rs.core.Context;
-import com.flexicore.territories.data.request.CountryFiltering;
+import com.flexicore.territories.request.CountryFiltering;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import com.flexicore.model.territories.Country;
-import com.flexicore.territories.data.request.CountryUpdateContainer;
+import com.flexicore.territories.request.CountryUpdateContainer;
 import javax.ws.rs.BadRequestException;
-import com.flexicore.territories.data.request.CountryCreationContainer;
+import com.flexicore.territories.request.CountryCreationContainer;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)

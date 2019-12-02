@@ -4,9 +4,9 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.City;
-import com.flexicore.territories.data.request.CityCreationContainer;
-import com.flexicore.territories.data.request.CityFiltering;
-import com.flexicore.territories.data.request.CityUpdateContainer;
+import com.flexicore.territories.request.CityCreationContainer;
+import com.flexicore.territories.request.CityFiltering;
+import com.flexicore.territories.request.CityUpdateContainer;
 import com.flexicore.security.SecurityContext;
 
 import java.util.List;
@@ -17,7 +17,7 @@ public interface ICityService extends ServicePlugin {
 
     List<City> listAllCities(
             SecurityContext securityContext,
-            com.flexicore.territories.data.request.CityFiltering filtering);
+            com.flexicore.territories.request.CityFiltering filtering);
 
     City updateCity(CityUpdateContainer updateContainer,
                     SecurityContext securityContext);

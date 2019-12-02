@@ -1,4 +1,4 @@
-package com.flexicore.territories.data.request;
+package com.flexicore.territories.request;
 
 import com.flexicore.model.territories.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;

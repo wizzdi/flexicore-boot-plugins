@@ -7,15 +7,12 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interceptors.DynamicResourceInjector;
 import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.Neighbourhood;
-import com.flexicore.model.territories.Street;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.territories.data.request.NeighbourhoodCreationContainer;
-import com.flexicore.territories.data.request.NeighbourhoodFiltering;
-import com.flexicore.territories.data.request.NeighbourhoodUpdateContainer;
+import com.flexicore.territories.request.NeighbourhoodCreationContainer;
+import com.flexicore.territories.request.NeighbourhoodFiltering;
+import com.flexicore.territories.request.NeighbourhoodUpdateContainer;
 import com.flexicore.territories.service.NeighbourhoodService;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 

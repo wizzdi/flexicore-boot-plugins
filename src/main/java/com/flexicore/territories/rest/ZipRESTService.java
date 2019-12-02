@@ -16,14 +16,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.HeaderParam;
 import io.swagger.v3.oas.annotations.Operation;
 import com.flexicore.annotations.IOperation;
-import com.flexicore.territories.data.request.ZipUpdateContainer;
+import com.flexicore.territories.request.ZipUpdateContainer;
 import javax.ws.rs.core.Context;
 import com.flexicore.model.territories.Zip;
 import javax.ws.rs.BadRequestException;
-import com.flexicore.territories.data.request.ZipCreationContainer;
+import com.flexicore.territories.request.ZipCreationContainer;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
-import com.flexicore.territories.data.request.ZipFiltering;
+import com.flexicore.territories.request.ZipFiltering;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @PluginInfo(version = 1)

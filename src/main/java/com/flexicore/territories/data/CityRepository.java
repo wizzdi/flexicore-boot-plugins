@@ -6,7 +6,7 @@ import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.City_;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.territories.data.request.CityFiltering;
+import com.flexicore.territories.request.CityFiltering;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;

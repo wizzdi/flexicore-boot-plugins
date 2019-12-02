@@ -4,9 +4,9 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Country;
-import com.flexicore.territories.data.request.CountryCreationContainer;
-import com.flexicore.territories.data.request.CountryFiltering;
-import com.flexicore.territories.data.request.CountryUpdateContainer;
+import com.flexicore.territories.request.CountryCreationContainer;
+import com.flexicore.territories.request.CountryFiltering;
+import com.flexicore.territories.request.CountryUpdateContainer;
 import com.flexicore.security.SecurityContext;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface ICountryService extends ServicePlugin {
 
     List<Country> listAllCountries(
             SecurityContext securityContext,
-            com.flexicore.territories.data.request.CountryFiltering filtering);
+            com.flexicore.territories.request.CountryFiltering filtering);
 
     PaginationResponse<Country> getAllCountries(SecurityContext securityContext, CountryFiltering filtering);
 
