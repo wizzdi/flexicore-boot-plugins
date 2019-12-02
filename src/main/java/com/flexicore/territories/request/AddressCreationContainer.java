@@ -3,9 +3,9 @@ package com.flexicore.territories.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.model.territories.Street;
-import com.flexicore.model.territories.Zip;
+import com.flexicore.request.BaseclassCreate;
 
-public class AddressCreationContainer {
+public class AddressCreationContainer extends BaseclassCreate {
 
 	private Integer floor;
 	private String streetId;
@@ -15,11 +15,8 @@ public class AddressCreationContainer {
 	private String neighbourhoodId;
 	@JsonIgnore
 	private Neighbourhood neighbourhood;
-	private String name;
-	private String description;
-	private String zipId;
-	@JsonIgnore
-	private Zip zip;
+	private String zipCode;
+
 
 	public Integer getFloor() {
 		return floor;
@@ -73,40 +70,16 @@ public class AddressCreationContainer {
 		return this;
 	}
 
-	public String getName() {
-		return name;
+
+
+	public String getZipCode() {
+		return zipCode;
 	}
 
-	public AddressCreationContainer setName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public AddressCreationContainer setDescription(String description) {
-		this.description = description;
-		return this;
-	}
-
-	public String getZipId() {
-		return zipId;
-	}
-
-	public <T extends AddressCreationContainer> T setZipId(String zipId) {
-		this.zipId = zipId;
+	public <T extends AddressCreationContainer> T setZipCode(String zipCode) {
+		this.zipCode = zipCode;
 		return (T) this;
 	}
 
-	@JsonIgnore
-	public Zip getZip() {
-		return zip;
-	}
 
-	public <T extends AddressCreationContainer> T setZip(Zip zip) {
-		this.zip = zip;
-		return (T) this;
-	}
 }

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.flexicore.model.territories.*;
+import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.AddressRepository;
 
 import javax.inject.Inject;
@@ -52,6 +53,9 @@ public class AddressService implements IAddressService {
     @PluginInfo(version = 1)
     private CountryService countryService;
 
+    @Inject
+    private BaseclassNewService baseclassNewService;
+
     @Override
     public <T extends Baseclass> T getByIdOrNull(java.lang.String id,
                                                  Class<T> c, List<String> batch, SecurityContext securityContext) {
@@ -70,6 +74,7 @@ public class AddressService implements IAddressService {
     }
     @Override
     public void validate(AddressCreationContainer addressCreationContainer, SecurityContext securityContext) {
+        baseclassNewService.validateCreate(addressCreationContainer,securityContext);
         String streetId = addressCreationContainer.getStreetId();
         Street street = streetId !=null?getByIdOrNull(streetId, Street.class, null, securityContext):null;
         if (street == null&& streetId !=null) {
@@ -77,25 +82,12 @@ public class AddressService implements IAddressService {
         }
         addressCreationContainer.setStreet(street);
 
-        String zipId = addressCreationContainer.getZipId();
-        Zip zip = zipId !=null?getByIdOrNull(zipId, Zip.class, null, securityContext):null;
-        if (zip == null&& zipId !=null) {
-            throw new BadRequestException("no Zip with id " + zipId);
-        }
-        addressCreationContainer.setZip(zip);
 
     }
 
     private boolean updateAddressNoMerge(Address address, AddressCreationContainer creationContainer) {
-        boolean update = false;
-        if (creationContainer.getName() != null && !creationContainer.getName().equals(address.getName())) {
-            address.setName(creationContainer.getName());
-            update = true;
-        }
-        if (creationContainer.getDescription() != null && !creationContainer.getDescription().equals(address.getDescription())) {
-            address.setDescription(creationContainer.getDescription());
-            update = true;
-        }
+        boolean update = baseclassNewService.updateBaseclassNoMerge(creationContainer,address);
+
         if (creationContainer.getFloor() != null && !creationContainer.getFloor().equals(address.getFloorForAddress())) {
             address.setFloorForAddress(creationContainer.getFloor());
             update = true;
@@ -114,8 +106,8 @@ public class AddressService implements IAddressService {
             update = true;
         }
 
-        if (creationContainer.getZip() != null && (address.getZip() == null || !creationContainer.getZip().getId().equals(address.getZip().getId()))) {
-            address.setZip(creationContainer.getZip());
+        if (creationContainer.getZipCode() != null && !creationContainer.getZipCode().equals(address.getZipCode())) {
+            address.setZipCode(creationContainer.getZipCode());
             update = true;
         }
         return update;
@@ -137,8 +129,7 @@ public class AddressService implements IAddressService {
 
     private Address createAddressNoMerge(AddressCreationContainer creationContainer, SecurityContext securityContext) {
 
-        Address address = Address.s().CreateUnchecked(creationContainer.getName(), securityContext);
-        address.Init();
+        Address address = new Address(creationContainer.getName(), securityContext);
         updateAddressNoMerge(address, creationContainer);
         return address;
     }
