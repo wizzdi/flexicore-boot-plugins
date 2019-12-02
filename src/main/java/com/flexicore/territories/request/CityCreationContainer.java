@@ -2,12 +2,12 @@ package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Country;
+import com.flexicore.request.BaseclassCreate;
 
-public class CityCreationContainer {
+public class CityCreationContainer extends BaseclassCreate {
 
 	private String externalId;
-	private String name;
-	private String description;
+
 	private String countryId;
 	@JsonIgnore
 	private Country country;
@@ -31,23 +31,7 @@ public class CityCreationContainer {
 		return (T) this;
 	}
 
-	public String getName() {
-		return name;
-	}
 
-	public CityCreationContainer setName(String name) {
-		this.name = name;
-		return this;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public CityCreationContainer setDescription(String description) {
-		this.description = description;
-		return this;
-	}
 
 	public String getExternalId() {
 		return externalId;

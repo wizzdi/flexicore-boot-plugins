@@ -1,24 +1,7 @@
 package com.flexicore.territories.request;
 
-public class CountryCreationContainer {
-    private String name;
-    private String description;
+import com.flexicore.request.BaseclassCreate;
 
-    public String getName() {
-        return name;
-    }
+public class CountryCreationContainer extends BaseclassCreate {
 
-    public CountryCreationContainer setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public CountryCreationContainer setDescription(String description) {
-        this.description = description;
-        return this;
-    }
 }

@@ -7,6 +7,7 @@ import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.security.SecurityContext;
+import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.NeighbourhoodRepository;
 import com.flexicore.territories.request.NeighbourhoodCreationContainer;
 import com.flexicore.territories.request.NeighbourhoodFiltering;
@@ -24,6 +25,9 @@ public class NeighbourhoodService implements INeighbourhoodService {
     @Inject
     @PluginInfo(version = 1)
     private NeighbourhoodRepository repository;
+    @Inject
+    private BaseclassNewService baseclassNewService;
+
     @Inject
     private Logger logger;
 
@@ -45,6 +49,7 @@ public class NeighbourhoodService implements INeighbourhoodService {
     }
     @Override
     public void validate(NeighbourhoodCreationContainer neighbourhoodCreationContainer, SecurityContext securityContext) {
+        baseclassNewService.validateCreate(neighbourhoodCreationContainer,securityContext);
         City city = getByIdOrNull(neighbourhoodCreationContainer.getCityId(), City.class, null, securityContext);
         if (city == null) {
             throw new BadRequestException("no City with id " + neighbourhoodCreationContainer.getCityId());
@@ -53,15 +58,7 @@ public class NeighbourhoodService implements INeighbourhoodService {
     }
 
     private boolean updateNeighbourhoodNoMerge(Neighbourhood neighbourhood, NeighbourhoodCreationContainer creationContainer) {
-        boolean update = false;
-        if (creationContainer.getName() != null && !creationContainer.getName().equals(neighbourhood.getName())) {
-            neighbourhood.setName(creationContainer.getName());
-            update = true;
-        }
-        if (creationContainer.getDescription() != null && !creationContainer.getDescription().equals(neighbourhood.getDescription())) {
-            neighbourhood.setDescription(creationContainer.getDescription());
-            update = true;
-        }
+        boolean update = baseclassNewService.updateBaseclassNoMerge(creationContainer,neighbourhood);
         if (creationContainer.getExternalId() != null && !creationContainer.getExternalId().equals(neighbourhood.getExternalId())) {
             neighbourhood.setExternalId(creationContainer.getExternalId());
             update = true;
@@ -90,8 +87,7 @@ public class NeighbourhoodService implements INeighbourhoodService {
 
     private Neighbourhood createNeighbourhoodNoMerge(NeighbourhoodCreationContainer creationContainer, SecurityContext securityContext) {
 
-        Neighbourhood neighbourhood = Neighbourhood.s().CreateUnchecked(creationContainer.getName(), securityContext);
-        neighbourhood.Init();
+        Neighbourhood neighbourhood = new Neighbourhood(creationContainer.getName(), securityContext);
         updateNeighbourhoodNoMerge(neighbourhood, creationContainer);
         return neighbourhood;
     }

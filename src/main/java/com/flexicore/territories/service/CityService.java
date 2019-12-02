@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.Country;
+import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.CityRepository;
 
 import javax.inject.Inject;
@@ -26,6 +27,9 @@ public class CityService implements ICityService {
     @Inject
     @PluginInfo(version = 1)
     private CityRepository repository;
+
+    @Inject
+    private BaseclassNewService baseclassNewService;
     @Inject
     private Logger logger;
 
@@ -58,6 +62,7 @@ public class CityService implements ICityService {
     }
 
     public void validate(CityCreationContainer creationContainer, SecurityContext securityContext) {
+        baseclassNewService.validateCreate(creationContainer,securityContext);
         Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
         if (country == null) {
             throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
@@ -66,6 +71,7 @@ public class CityService implements ICityService {
     }
 
     public void validate(CityFiltering creationContainer, SecurityContext securityContext) {
+        baseclassNewService.validateFilter(creationContainer,securityContext);
         Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
         if (country == null) {
             throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
@@ -82,14 +88,13 @@ public class CityService implements ICityService {
     }
 
     public City createCityNoMerge(CityCreationContainer creationContainer, SecurityContext securityContext) {
-        City city = City.s().CreateUnchecked("City", securityContext);
-        city.Init();
+        City city = new City(creationContainer.getName(), securityContext);
         updateCityNoMerge(creationContainer, city);
         return city;
     }
 
     public boolean updateCityNoMerge(CityCreationContainer creationContainer, City city) {
-        boolean update = false;
+        boolean update = baseclassNewService.updateBaseclassNoMerge(creationContainer,city);
         if(city.isSoftDelete()){
             city.setSoftDelete(false);
             update=true;
@@ -99,14 +104,6 @@ public class CityService implements ICityService {
             update = true;
         }
 
-        if (creationContainer.getName() != null && !creationContainer.getName().equals(city.getName())) {
-            city.setName(creationContainer.getName());
-            update = true;
-        }
-        if (creationContainer.getDescription() != null && !creationContainer.getDescription().equals(city.getDescription())) {
-            city.setDescription(creationContainer.getDescription());
-            update = true;
-        }
         if (creationContainer.getCountry() != null && (city.getCountry() == null || !creationContainer.getCountry().getId().equals(city.getCountry().getId()))) {
             city.setCountry(creationContainer.getCountry());
             update = true;

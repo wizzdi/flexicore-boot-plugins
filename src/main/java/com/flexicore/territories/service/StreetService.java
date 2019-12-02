@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.City;
+import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.StreetRepository;
 
 import javax.inject.Inject;
@@ -26,6 +27,10 @@ public class StreetService implements IStreetService {
     @Inject
     @PluginInfo(version = 1)
     private StreetRepository repository;
+
+    @Inject
+    private BaseclassNewService baseclassNewService;
+
     @Inject
     private Logger logger;
 
@@ -67,6 +72,7 @@ public class StreetService implements IStreetService {
     }
 
     public void validate(StreetFiltering streetFiltering, SecurityContext securityContext) {
+        baseclassNewService.validateFilter(streetFiltering,securityContext);
         City city = streetFiltering.getCityId() != null ? getByIdOrNull(streetFiltering.getCityId(), City.class, null, securityContext) : null;
         if (city == null && streetFiltering.getCityId() != null) {
             throw new BadRequestException("no City with id " + streetFiltering.getCityId());
@@ -75,8 +81,7 @@ public class StreetService implements IStreetService {
     }
 
     public Street createStreetNoMerge(StreetCreationContainer streetCreationContainer, SecurityContext securityContext) {
-        Street street = Street.s().CreateUnchecked("Street", securityContext);
-        street.Init();
+        Street street = new Street(streetCreationContainer.getName(), securityContext);
         updateStreetNoMerge(street, streetCreationContainer);
         return street;
 
@@ -84,21 +89,13 @@ public class StreetService implements IStreetService {
 
     public boolean updateStreetNoMerge(Street street, StreetCreationContainer streetCreationContainer) {
 
-        boolean update = false;
+        boolean update = baseclassNewService.updateBaseclassNoMerge(streetCreationContainer,street);
         if(street.isSoftDelete()){
             street.setSoftDelete(false);
             update=true;
         }
         if (streetCreationContainer.getExternalId() != null && !streetCreationContainer.getExternalId().equals(street.getExternalId())) {
             street.setExternalId(streetCreationContainer.getExternalId());
-            update = true;
-        }
-        if (streetCreationContainer.getName() != null && !streetCreationContainer.getName().equals(street.getName())) {
-            street.setName(streetCreationContainer.getName());
-            update = true;
-        }
-        if (streetCreationContainer.getDescription() != null && !streetCreationContainer.getDescription().equals(street.getDescription())) {
-            street.setDescription(streetCreationContainer.getDescription());
             update = true;
         }
         if (streetCreationContainer.getCity() != null && (street.getCity() == null || !streetCreationContainer.getCity().getId().equals(street.getCity().getId()))) {
