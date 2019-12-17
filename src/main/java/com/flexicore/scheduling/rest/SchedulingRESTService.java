@@ -1,12 +1,11 @@
 package com.flexicore.scheduling.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.annotations.ProtectedREST;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
 import com.flexicore.annotations.rest.Update;
 import com.flexicore.annotations.rest.Write;
-import com.flexicore.interceptors.DynamicResourceInjector;
-import com.flexicore.interceptors.SecurityImposer;
 import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
@@ -22,7 +21,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.interceptor.Interceptors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import java.util.List;
@@ -34,7 +32,7 @@ import java.util.List;
 
 @PluginInfo(version = 1)
 @OperationsInside
-@Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
+@ProtectedREST
 @Path("plugins/Scheduling")
 
 @OpenAPIDefinition(tags = {
