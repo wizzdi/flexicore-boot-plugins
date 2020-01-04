@@ -1,8 +1,8 @@
 package com.flexicore.territories.rest;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interceptors.SecurityImposer;
-import com.flexicore.interceptors.DynamicResourceInjector;
+import com.flexicore.annotations.ProtectedREST;
+
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.OperationsInside;
 import javax.interceptor.Interceptors;
@@ -33,7 +33,7 @@ import javax.ws.rs.PathParam;
 
 @PluginInfo(version = 1)
 @OperationsInside
-@Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
+@ProtectedREST
 @Path("plugins/Street")
 @Tag(name = "Street")
 

@@ -27,7 +27,6 @@ import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.AddressImportRequest;
 import com.flexicore.territories.request.StreetEntry;
-import com.google.api.client.http.HttpStatusCodes;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -149,7 +148,7 @@ public class AddressService implements IAddressService {
         try {
             String url = addressImportRequest.getUrl();
             HttpResponse<InputStream> response=Unirest.get(url).asBinary();
-            if(HttpStatusCodes.isSuccess(response.getStatus())){
+            if(response.getStatus()==200){
                 InputStream is=response.getBody();
                 try {
                     StreetEntry[] data=xmlMapper.readValue(is,  StreetEntry[].class);

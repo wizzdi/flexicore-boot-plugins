@@ -4,8 +4,8 @@ import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interceptors.DynamicResourceInjector;
-import com.flexicore.interceptors.SecurityImposer;
+
+import com.flexicore.annotations.ProtectedREST;
 import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.model.territories.Address;
 import com.flexicore.security.SecurityContext;
@@ -26,7 +26,7 @@ import javax.ws.rs.core.Context;
 
 @PluginInfo(version = 1)
 @OperationsInside
-@Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
+@ProtectedREST
 @Path("plugins/Address")
 @OpenAPIDefinition(tags = {
         @Tag(name = "Address", description = "Address Api"),

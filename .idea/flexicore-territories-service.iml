@@ -27,7 +27,22 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.glassfish:javax.json:1.0.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.jpa.jpql:2.7.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.core:2.7.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:FlexiCore:2.9.9" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:flexicore-api:3.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.swagger.core.v3:swagger-jaxrs2:2.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.github.classgraph:classgraph:4.6.32" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.javassist:javassist:3.22.0-GA" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.swagger.core.v3:swagger-models:2.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.swagger.core.v3:swagger-annotations:2.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.swagger.core.v3:swagger-integration:2.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.swagger.core.v3:swagger-core:2.0.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.xml.bind:jaxb-api:2.3.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-lang3:3.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.yaml:snakeyaml:1.23" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.validation:validation-api:1.1.0.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.8" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.flexicore:flexicore-territories-model:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.mashape.unirest:unirest-java:1.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />

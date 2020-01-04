@@ -1,35 +1,30 @@
 package com.flexicore.territories.rest;
 
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interceptors.SecurityImposer;
-import com.flexicore.interceptors.DynamicResourceInjector;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.annotations.OperationsInside;
-import javax.interceptor.Interceptors;
-import com.flexicore.interfaces.RestServicePlugin;
-import javax.ws.rs.Path;
-import com.flexicore.territories.service.CountryService;
-import javax.inject.Inject;
-import com.flexicore.security.SecurityContext;
-import java.util.List;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
-import io.swagger.v3.oas.annotations.Operation;
 import com.flexicore.annotations.IOperation;
-import javax.ws.rs.core.Context;
-import com.flexicore.territories.request.CountryFiltering;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
+import com.flexicore.annotations.OperationsInside;
+import com.flexicore.annotations.ProtectedREST;
+import com.flexicore.annotations.plugins.PluginInfo;
+import com.flexicore.data.jsoncontainers.PaginationResponse;
+import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.model.territories.Country;
-import com.flexicore.territories.request.CountryUpdateContainer;
-import javax.ws.rs.BadRequestException;
+import com.flexicore.security.SecurityContext;
+import com.flexicore.territories.reponse.ImportCountriesResponse;
 import com.flexicore.territories.request.CountryCreationContainer;
+import com.flexicore.territories.request.CountryFiltering;
+import com.flexicore.territories.request.CountryUpdateContainer;
+import com.flexicore.territories.request.ImportCountriesRequest;
+import com.flexicore.territories.service.CountryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import java.util.List;
 
 @PluginInfo(version = 1)
 @OperationsInside
-@Interceptors({SecurityImposer.class, DynamicResourceInjector.class})
+@ProtectedREST
 @Path("plugins/Country")
 @Tag(name = "Country")
 
@@ -47,6 +42,18 @@ public class CountryRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			@PathParam("id") String id, @Context SecurityContext securityContext) {
 		service.deleteCountry(id, securityContext);
+	}
+
+	@POST
+	@Produces("application/json")
+	@Operation(summary = "importCountries", description = "Import Countries")
+	@IOperation(Name = "importCountries", Description = "Import Countries")
+	@Path("importCountries")
+	public ImportCountriesResponse importCountries(
+			@HeaderParam("authenticationKey") String authenticationKey,
+			ImportCountriesRequest addressImportRequest, @Context SecurityContext securityContext) {
+
+		return service.importCountries(securityContext, addressImportRequest);
 	}
 
 	@POST
