@@ -2,31 +2,46 @@ package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
-import com.flexicore.model.Clazz;
-import com.flexicore.model.User;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-
 @Entity
-public class PresetToUser extends PresetToEntity {
-    static PresetToUser s_Singleton = new PresetToUser();
-    public static PresetToUser s() {
+public class PresetToEntity extends Baselink {
+    static PresetToEntity s_Singleton = new PresetToEntity();
+    public static PresetToEntity s() {
         return s_Singleton;
     }
 
-    public PresetToUser() {
+    public PresetToEntity() {
     }
 
-    public PresetToUser(String name, SecurityContext securityContext) {
+    public PresetToEntity(String name, SecurityContext securityContext) {
         super(name, securityContext);
     }
 
+    private int priority;
+    private boolean enabled;
 
+    public int getPriority() {
+        return priority;
+    }
 
+    public <T extends PresetToEntity> T setPriority(int priority) {
+        this.priority = priority;
+        return (T) this;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public <T extends PresetToEntity> T setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return (T) this;
+    }
 
 
     @Override
@@ -42,21 +57,6 @@ public class PresetToUser extends PresetToEntity {
     @Override
     public void setLeftside(Baseclass leftside) {
         super.setLeftside(leftside);
-    }
-
-    @Override
-    @ManyToOne(targetEntity =User.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public User getRightside() {
-        return (User) super.getRightside();
-    }
-
-    public void setRightside(User rightside) {
-        super.setRightside(rightside);
-    }
-
-    @Override
-    public void setRightside(Baseclass rightside) {
-        super.setRightside(rightside);
     }
 
 }

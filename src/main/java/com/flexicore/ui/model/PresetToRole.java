@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 
 
 @Entity
-public class PresetToRole extends Baselink {
+public class PresetToRole extends PresetToEntity {
     static PresetToRole s_Singleton = new PresetToRole();
     public static PresetToRole s() {
         return s_Singleton;
@@ -25,8 +25,7 @@ public class PresetToRole extends Baselink {
         super(name, securityContext);
     }
 
-    private int priority;
-    private boolean enabled;
+
 
 
 
@@ -62,21 +61,4 @@ public class PresetToRole extends Baselink {
     }
 
 
-    public int getPriority() {
-        return priority;
-    }
-
-    public PresetToRole setPriority(int priority) {
-        this.priority = priority;
-        return this;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public PresetToRole setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
 }

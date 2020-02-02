@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 
 
 @Entity
-public class PresetToTenant extends Baselink {
+public class PresetToTenant extends PresetToEntity {
     static PresetToTenant s_Singleton = new PresetToTenant();
     public static PresetToTenant s() {
         return s_Singleton;
@@ -24,8 +24,7 @@ public class PresetToTenant extends Baselink {
         super(name, securityContext);
     }
 
-    private int priority;
-    private boolean enabled;
+
 
 
 
@@ -60,22 +59,4 @@ public class PresetToTenant extends Baselink {
         super.setRightside(rightside);
     }
 
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public PresetToTenant setPriority(int priority) {
-        this.priority = priority;
-        return this;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public PresetToTenant setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
 }
