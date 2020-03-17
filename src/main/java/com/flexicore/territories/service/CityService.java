@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.Country;
+import com.flexicore.model.territories.State;
 import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.CityRepository;
 
@@ -63,20 +64,36 @@ public class CityService implements ICityService {
 
     public void validate(CityCreationContainer creationContainer, SecurityContext securityContext) {
         baseclassNewService.validateCreate(creationContainer,securityContext);
-        Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
+        String countryId = creationContainer.getCountryId();
+        Country country = countryId!=null?getByIdOrNull(countryId, Country.class, null, securityContext):null;
         if (country == null) {
-            throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
+            throw new BadRequestException("no Country with id " + countryId);
         }
         creationContainer.setCountry(country);
+
+        String stateId = creationContainer.getStateId();
+        State state = stateId!=null?getByIdOrNull(stateId, State.class, null, securityContext):null;
+        if (stateId!=null&&state == null) {
+            throw new BadRequestException("no State with id " + stateId);
+        }
+        creationContainer.setState(state);
     }
 
     public void validate(CityFiltering creationContainer, SecurityContext securityContext) {
         baseclassNewService.validateFilter(creationContainer,securityContext);
-        Country country = getByIdOrNull(creationContainer.getCountryId(), Country.class, null, securityContext);
-        if (country == null) {
-            throw new BadRequestException("no Country with id " + creationContainer.getCountryId());
+        String countryId = creationContainer.getCountryId();
+        Country country = countryId!=null?getByIdOrNull(countryId, Country.class, null, securityContext):null;
+        if (countryId!=null&&country == null) {
+            throw new BadRequestException("no Country with id " + countryId);
         }
         creationContainer.setCountry(country);
+
+        String stateId = creationContainer.getStateId();
+        State state = stateId!=null?getByIdOrNull(stateId, State.class, null, securityContext):null;
+        if (stateId!=null&&state == null) {
+            throw new BadRequestException("no State with id " + stateId);
+        }
+        creationContainer.setState(state);
     }
 
     @Override
@@ -106,6 +123,10 @@ public class CityService implements ICityService {
 
         if (creationContainer.getCountry() != null && (city.getCountry() == null || !creationContainer.getCountry().getId().equals(city.getCountry().getId()))) {
             city.setCountry(creationContainer.getCountry());
+            update = true;
+        }
+        if (creationContainer.getState() != null && (city.getState() == null || !creationContainer.getState().getId().equals(city.getState().getId()))) {
+            city.setState(creationContainer.getState());
             update = true;
         }
         return update;

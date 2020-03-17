@@ -47,5 +47,8 @@ public class CityRepository extends AbstractRepositoryPlugin {
         if(filtering.getCountry()!=null ){
             preds.add(cb.equal(r.get(City_.country),filtering.getCountry()));
         }
+        if(filtering.getState()!=null ){
+            preds.add(cb.equal(r.get(City_.state),filtering.getState()));
+        }
     }
 }
