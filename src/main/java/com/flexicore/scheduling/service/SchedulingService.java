@@ -376,7 +376,7 @@ public class SchedulingService implements ISchedulingService {
             try {
                 DynamicExecution dynamicExecution = scheduleAction.getDynamicExecution();
                 if(dynamicExecution!=null){
-                    response = dynamicInvokersService.executeInvoker(dynamicExecution, securityContext);
+                    response = dynamicInvokersService.executeInvoker(dynamicInvokersService.getExecuteInvokerRequest(dynamicExecution, securityContext),securityContext);
                 }
                 else{
                     logger.warning("Schedule Action "+scheduleAction.getName() +"("+scheduleAction.getId()+") had null dynamic Exection");
