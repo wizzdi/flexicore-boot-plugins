@@ -4,7 +4,11 @@ import com.flexicore.model.FilteringInformationHolder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.City;
 
+import java.util.Set;
+
 public class StreetFiltering extends FilteringInformationHolder {
+
+	private Set<String> externalIds;
 
 	private String cityId;
 	@JsonIgnore
@@ -25,5 +29,14 @@ public class StreetFiltering extends FilteringInformationHolder {
 
 	public void setCity(City city) {
 		this.city = city;
+	}
+
+	public Set<String> getExternalIds() {
+		return externalIds;
+	}
+
+	public <T extends StreetFiltering> T setExternalIds(Set<String> externalIds) {
+		this.externalIds = externalIds;
+		return (T) this;
 	}
 }

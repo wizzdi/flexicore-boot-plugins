@@ -22,6 +22,9 @@ public interface INeighbourhoodService extends ServicePlugin {
 
     PaginationResponse<Neighbourhood> listAllNeighbourhoodes(SecurityContext securityContext, NeighbourhoodFiltering filtering);
 
+    List<Neighbourhood> getAllNeighbourhoodes(SecurityContext securityContext, NeighbourhoodFiltering filtering);
+
+
     Neighbourhood createNeighbourhood(NeighbourhoodCreationContainer creationContainer,
                           SecurityContext securityContext);
 }

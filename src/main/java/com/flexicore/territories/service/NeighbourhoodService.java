@@ -78,6 +78,11 @@ public class NeighbourhoodService implements INeighbourhoodService {
     }
 
     @Override
+    public List<Neighbourhood> getAllNeighbourhoodes(SecurityContext securityContext, NeighbourhoodFiltering filtering) {
+        return repository.getAllNeighbourhoods(securityContext,filtering);
+    }
+
+    @Override
     public Neighbourhood createNeighbourhood(NeighbourhoodCreationContainer creationContainer,
                                  SecurityContext securityContext) {
         Neighbourhood neighbourhood = createNeighbourhoodNoMerge(creationContainer, securityContext);

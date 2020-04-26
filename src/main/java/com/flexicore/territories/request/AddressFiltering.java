@@ -16,6 +16,7 @@ public class AddressFiltering extends FilteringInformationHolder {
 	private List<Street> streets;
 	private Set<Integer> numbers;
 	private Set<String> zipCodes;
+	private Set<String> externalIds=new HashSet<>();
 
 	public Set<Integer> getFloors() {
 		return floors;
@@ -60,6 +61,16 @@ public class AddressFiltering extends FilteringInformationHolder {
 
 	public <T extends AddressFiltering> T setZipCodes(Set<String> zipCodes) {
 		this.zipCodes = zipCodes;
+		return (T) this;
+	}
+
+
+	public Set<String> getExternalIds() {
+		return externalIds;
+	}
+
+	public <T extends AddressFiltering> T setExternalIds(Set<String> externalIds) {
+		this.externalIds = externalIds;
 		return (T) this;
 	}
 }

@@ -44,6 +44,9 @@ public class AddressRepository extends AbstractRepositoryPlugin {
 
 
     private void addAddressPredicate(AddressFiltering filtering, CriteriaBuilder cb, Root<Address> r, List<Predicate> preds) {
+        if(filtering.getExternalIds()!=null && !filtering.getExternalIds().isEmpty() ){
+            preds.add(r.get(Address_.externalId).in(filtering.getExternalIds()));
+        }
         if(filtering.getFloors()!=null && !filtering.getFloors().isEmpty() ){
             preds.add(r.get(Address_.floorForAddress).in(filtering.getFloors()));
         }

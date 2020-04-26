@@ -45,6 +45,10 @@ public class StreetRepository extends AbstractRepositoryPlugin {
             preds.add(cb.equal(r.get(Street_.city),filtering.getCity()));
         }
 
+        if(filtering.getExternalIds()!=null &&!filtering.getExternalIds().isEmpty()){
+            preds.add(r.get(Street_.externalId).in(filtering.getExternalIds()));
+        }
+
 
 
 
