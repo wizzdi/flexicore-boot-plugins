@@ -19,7 +19,7 @@
         <repository>
             <id>datatech-local</id>
             <name>datatech-local</name>
-            <url>https://artifactory.wizzdi.com/artifactory/datatech-local</url>
+            <url>https://artifactory.wizzdi.com/artifactory/flexicore-local</url>
         </repository>
 
     </distributionManagement>
@@ -29,12 +29,6 @@
             <id>flexicore-local</id>
             <name>flexicore-local</name>
             <url>https://artifactory.wizzdi.com/artifactory/flexicore-local</url>
-        </repository>
-
-        <repository>
-            <id>datatech-local</id>
-            <name>datatech-local</name>
-            <url>https://artifactory.wizzdi.com/artifactory/datatech-local</url>
         </repository>
 
     </repositories>
