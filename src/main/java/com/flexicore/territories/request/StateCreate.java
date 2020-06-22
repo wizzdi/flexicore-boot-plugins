@@ -21,7 +21,6 @@ public class StateCreate extends BaseclassCreate {
 	}
 
 	@JsonIgnore
-
 	public Country getCountry() {
 		return country;
 	}
@@ -30,8 +29,6 @@ public class StateCreate extends BaseclassCreate {
 		this.country = country;
 		return (T) this;
 	}
-
-
 
 	public String getExternalId() {
 		return externalId;

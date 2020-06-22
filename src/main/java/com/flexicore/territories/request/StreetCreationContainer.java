@@ -30,7 +30,6 @@ public class StreetCreationContainer extends BaseclassCreate {
 		return (T) this;
 	}
 
-
 	public String getExternalId() {
 		return externalId;
 	}

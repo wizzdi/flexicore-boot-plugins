@@ -12,18 +12,27 @@ import com.flexicore.security.SecurityContext;
 import java.util.List;
 
 public interface IAddressService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    Address updateAddress(AddressUpdateContainer updateContainer,
-                          SecurityContext securityContext);
+	Address updateAddress(AddressUpdateContainer updateContainer,
+			SecurityContext securityContext);
 
-    void validate(AddressCreationContainer addressCreationContainer, SecurityContext securityContext);
+	void validate(AddressCreationContainer addressCreationContainer,
+			SecurityContext securityContext);
 
-    PaginationResponse<Address> listAllAddresses(SecurityContext securityContext, AddressFiltering filtering);
+	boolean updateAddressNoMerge(Address address,
+			AddressCreationContainer creationContainer);
 
-    List<Address> getAllAddresses(SecurityContext securityContext, AddressFiltering filtering);
+	PaginationResponse<Address> listAllAddresses(
+			SecurityContext securityContext, AddressFiltering filtering);
 
-    Address createAddress(AddressCreationContainer creationContainer,
-                          SecurityContext securityContext);
+	List<Address> getAllAddresses(SecurityContext securityContext,
+			AddressFiltering filtering);
+
+	Address createAddress(AddressCreationContainer creationContainer,
+			SecurityContext securityContext);
+
+	Address createAddressNoMerge(AddressCreationContainer creationContainer,
+			SecurityContext securityContext);
 }

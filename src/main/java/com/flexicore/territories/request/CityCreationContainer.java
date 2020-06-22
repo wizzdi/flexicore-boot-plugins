@@ -26,7 +26,6 @@ public class CityCreationContainer extends BaseclassCreate {
 	}
 
 	@JsonIgnore
-
 	public Country getCountry() {
 		return country;
 	}
@@ -35,8 +34,6 @@ public class CityCreationContainer extends BaseclassCreate {
 		this.country = country;
 		return (T) this;
 	}
-
-
 
 	public String getExternalId() {
 		return externalId;

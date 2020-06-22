@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 
 import com.flexicore.model.territories.City;
 import com.flexicore.territories.service.StreetService;
-import javax.inject.Inject;
 import com.flexicore.security.SecurityContext;
 import java.util.List;
 
@@ -30,17 +29,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PathParam;
+import org.pf4j.Extension;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @ProtectedREST
 @Path("plugins/Street")
 @Tag(name = "Street")
-
+@Extension
+@Component
 public class StreetRESTService implements RestServicePlugin {
 
-	@Inject
 	@PluginInfo(version = 1)
+	@Autowired
 	private StreetService service;
 
 	@POST
@@ -51,7 +54,7 @@ public class StreetRESTService implements RestServicePlugin {
 	public List<Street> listAllStreets(
 			@HeaderParam("authenticationKey") String authenticationKey,
 			StreetFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering,securityContext);
+		service.validate(filtering, securityContext);
 		return service.listAllStreets(securityContext, filtering);
 	}
 
@@ -63,7 +66,7 @@ public class StreetRESTService implements RestServicePlugin {
 	public PaginationResponse<Street> getAllStreets(
 			@HeaderParam("authenticationKey") String authenticationKey,
 			StreetFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering,securityContext);
+		service.validate(filtering, securityContext);
 		return service.getAllStreets(securityContext, filtering);
 	}
 
@@ -79,14 +82,13 @@ public class StreetRESTService implements RestServicePlugin {
 		Street street = service.getByIdOrNull(updateContainer.getId(),
 				Street.class, null, securityContext);
 		if (street == null) {
-			throw new BadRequestException("no Street with id " + updateContainer.getId());
+			throw new BadRequestException("no Street with id "
+					+ updateContainer.getId());
 		}
 		updateContainer.setStreet(street);
 		service.validate(updateContainer, securityContext);
 		return service.updateStreet(updateContainer, securityContext);
 	}
-
-
 
 	@POST
 	@Produces("application/json")
@@ -100,7 +102,8 @@ public class StreetRESTService implements RestServicePlugin {
 		City city = service.getByIdOrNull(creationContainer.getCityId(),
 				City.class, null, securityContext);
 		if (city == null) {
-			throw new BadRequestException("no City with id " + creationContainer.getCityId());
+			throw new BadRequestException("no City with id "
+					+ creationContainer.getCityId());
 		}
 		creationContainer.setCity(city);
 		return service.createStreet(creationContainer, securityContext);

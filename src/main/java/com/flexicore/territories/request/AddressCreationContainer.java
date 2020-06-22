@@ -16,7 +16,7 @@ public class AddressCreationContainer extends BaseclassCreate {
 	@JsonIgnore
 	private Neighbourhood neighbourhood;
 	private String zipCode;
-
+	private String externalId;
 
 	public Integer getFloor() {
 		return floor;
@@ -70,8 +70,6 @@ public class AddressCreationContainer extends BaseclassCreate {
 		return this;
 	}
 
-
-
 	public String getZipCode() {
 		return zipCode;
 	}
@@ -81,5 +79,13 @@ public class AddressCreationContainer extends BaseclassCreate {
 		return (T) this;
 	}
 
+	public String getExternalId() {
+		return externalId;
+	}
 
+	public <T extends AddressCreationContainer> T setExternalId(
+			String externalId) {
+		this.externalId = externalId;
+		return (T) this;
+	}
 }

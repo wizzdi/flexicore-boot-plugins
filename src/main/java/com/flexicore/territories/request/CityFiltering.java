@@ -7,13 +7,11 @@ import com.flexicore.model.territories.State;
 
 public class CityFiltering extends FilteringInformationHolder {
 
-
-
 	private String countryId;
 	@JsonIgnore
 	private Country country;
 
-	private  String stateId;
+	private String stateId;
 	@JsonIgnore
 	private State state;
 

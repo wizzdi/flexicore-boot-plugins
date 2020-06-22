@@ -12,20 +12,20 @@ import com.flexicore.security.SecurityContext;
 import java.util.List;
 
 public interface ICityService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    List<City> listAllCities(
-            SecurityContext securityContext,
-            com.flexicore.territories.request.CityFiltering filtering);
+	List<City> listAllCities(SecurityContext securityContext,
+			com.flexicore.territories.request.CityFiltering filtering);
 
-    City updateCity(CityUpdateContainer updateContainer,
-                    SecurityContext securityContext);
+	City updateCity(CityUpdateContainer updateContainer,
+			SecurityContext securityContext);
 
-    City createCity(CityCreationContainer creationContainer,
-                    SecurityContext securityContext);
+	City createCity(CityCreationContainer creationContainer,
+			SecurityContext securityContext);
 
-    void deleteCity(String cityid, SecurityContext securityContext);
+	void deleteCity(String cityid, SecurityContext securityContext);
 
-    PaginationResponse<City> getAllCities(SecurityContext securityContext, CityFiltering filtering);
+	PaginationResponse<City> getAllCities(SecurityContext securityContext,
+			CityFiltering filtering);
 }

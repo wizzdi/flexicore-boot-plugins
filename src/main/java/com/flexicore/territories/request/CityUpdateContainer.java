@@ -3,12 +3,11 @@ package com.flexicore.territories.request;
 import com.flexicore.model.territories.City;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class CityUpdateContainer extends CityCreationContainer{
+public class CityUpdateContainer extends CityCreationContainer {
 
 	private String id;
 	@JsonIgnore
 	private City City;
-
 
 	public String getId() {
 		return id;

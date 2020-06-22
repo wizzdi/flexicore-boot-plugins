@@ -12,22 +12,22 @@ import com.flexicore.security.SecurityContext;
 import java.util.List;
 
 public interface ICountryService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    void deleteCountry(String countryid, SecurityContext securityContext);
+	void deleteCountry(String countryid, SecurityContext securityContext);
 
-    List<Country> listAllCountries(
-            SecurityContext securityContext,
-            com.flexicore.territories.request.CountryFiltering filtering);
+	List<Country> listAllCountries(SecurityContext securityContext,
+			com.flexicore.territories.request.CountryFiltering filtering);
 
-    PaginationResponse<Country> getAllCountries(SecurityContext securityContext, CountryFiltering filtering);
+	PaginationResponse<Country> getAllCountries(
+			SecurityContext securityContext, CountryFiltering filtering);
 
-    Country updateCountry(CountryUpdateContainer updateContainer,
-                          SecurityContext securityContext);
+	Country updateCountry(CountryUpdateContainer updateContainer,
+			SecurityContext securityContext);
 
-    Country createCountry(CountryCreationContainer creationContainer,
-                          SecurityContext securityContext);
+	Country createCountry(CountryCreationContainer creationContainer,
+			SecurityContext securityContext);
 
-    void validate(CountryFiltering filtering, SecurityContext securityContext);
+	void validate(CountryFiltering filtering, SecurityContext securityContext);
 }

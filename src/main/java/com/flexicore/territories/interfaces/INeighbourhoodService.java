@@ -12,19 +12,31 @@ import com.flexicore.territories.request.NeighbourhoodUpdateContainer;
 import java.util.List;
 
 public interface INeighbourhoodService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    Neighbourhood updateNeighbourhood(NeighbourhoodUpdateContainer updateContainer,
-                          SecurityContext securityContext);
+	Neighbourhood updateNeighbourhood(
+			NeighbourhoodUpdateContainer updateContainer,
+			SecurityContext securityContext);
 
-    void validate(NeighbourhoodCreationContainer neighbourhoodCreationContainer, SecurityContext securityContext);
+	void validate(
+			NeighbourhoodCreationContainer neighbourhoodCreationContainer,
+			SecurityContext securityContext);
 
-    PaginationResponse<Neighbourhood> listAllNeighbourhoodes(SecurityContext securityContext, NeighbourhoodFiltering filtering);
+	boolean updateNeighbourhoodNoMerge(Neighbourhood neighbourhood,
+			NeighbourhoodCreationContainer creationContainer);
 
-    List<Neighbourhood> getAllNeighbourhoodes(SecurityContext securityContext, NeighbourhoodFiltering filtering);
+	PaginationResponse<Neighbourhood> listAllNeighbourhoodes(
+			SecurityContext securityContext, NeighbourhoodFiltering filtering);
 
+	List<Neighbourhood> getAllNeighbourhoodes(SecurityContext securityContext,
+			NeighbourhoodFiltering filtering);
 
-    Neighbourhood createNeighbourhood(NeighbourhoodCreationContainer creationContainer,
-                          SecurityContext securityContext);
+	Neighbourhood createNeighbourhood(
+			NeighbourhoodCreationContainer creationContainer,
+			SecurityContext securityContext);
+
+	Neighbourhood createNeighbourhoodNoMerge(
+			NeighbourhoodCreationContainer creationContainer,
+			SecurityContext securityContext);
 }

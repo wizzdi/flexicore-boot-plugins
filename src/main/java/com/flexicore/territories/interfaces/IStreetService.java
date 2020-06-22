@@ -11,22 +11,26 @@ import com.flexicore.security.SecurityContext;
 import java.util.List;
 
 public interface IStreetService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    List<Street> listAllStreets(
-            SecurityContext securityContext,
-            com.flexicore.territories.request.StreetFiltering filtering);
+	List<Street> listAllStreets(SecurityContext securityContext,
+			com.flexicore.territories.request.StreetFiltering filtering);
 
-    PaginationResponse<Street> getAllStreets(
-            SecurityContext securityContext,
-            com.flexicore.territories.request.StreetFiltering filtering);
+	PaginationResponse<Street> getAllStreets(SecurityContext securityContext,
+			com.flexicore.territories.request.StreetFiltering filtering);
 
-    Street updateStreet(StreetUpdateContainer updateContainer,
-                        SecurityContext securityContext);
+	Street updateStreet(StreetUpdateContainer updateContainer,
+			SecurityContext securityContext);
 
-    Street createStreet(StreetCreationContainer creationContainer,
-                        SecurityContext securityContext);
+	Street createStreetNoMerge(StreetCreationContainer streetCreationContainer,
+			SecurityContext securityContext);
 
-    void deleteStreet(String streetid, SecurityContext securityContext);
+	boolean updateStreetNoMerge(Street street,
+			StreetCreationContainer streetCreationContainer);
+
+	Street createStreet(StreetCreationContainer creationContainer,
+			SecurityContext securityContext);
+
+	void deleteStreet(String streetid, SecurityContext securityContext);
 }

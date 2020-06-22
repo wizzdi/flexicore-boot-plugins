@@ -3,12 +3,11 @@ package com.flexicore.territories.request;
 import com.flexicore.model.territories.Street;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class StreetUpdateContainer extends StreetCreationContainer{
+public class StreetUpdateContainer extends StreetCreationContainer {
 
 	private String id;
 	@JsonIgnore
 	private Street Street;
-
 
 	public String getId() {
 		return id;
@@ -26,6 +25,5 @@ public class StreetUpdateContainer extends StreetCreationContainer{
 	public void setStreet(Street Street) {
 		this.Street = Street;
 	}
-
 
 }

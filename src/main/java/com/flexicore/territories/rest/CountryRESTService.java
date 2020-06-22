@@ -17,21 +17,24 @@ import com.flexicore.territories.service.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import java.util.List;
+import org.pf4j.Extension;
+import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @PluginInfo(version = 1)
 @OperationsInside
 @ProtectedREST
 @Path("plugins/Country")
 @Tag(name = "Country")
-
+@Extension
+@Component
 public class CountryRESTService implements RestServicePlugin {
 
-	@Inject
 	@PluginInfo(version = 1)
+	@Autowired
 	private CountryService service;
 
 	@DELETE
@@ -51,7 +54,8 @@ public class CountryRESTService implements RestServicePlugin {
 	@Path("importCountries")
 	public ImportCountriesResponse importCountries(
 			@HeaderParam("authenticationKey") String authenticationKey,
-			ImportCountriesRequest addressImportRequest, @Context SecurityContext securityContext) {
+			ImportCountriesRequest addressImportRequest,
+			@Context SecurityContext securityContext) {
 
 		return service.importCountries(securityContext, addressImportRequest);
 	}
@@ -64,7 +68,7 @@ public class CountryRESTService implements RestServicePlugin {
 	public List<Country> listAllCountries(
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CountryFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering,securityContext);
+		service.validate(filtering, securityContext);
 		return service.listAllCountries(securityContext, filtering);
 	}
 
@@ -76,7 +80,7 @@ public class CountryRESTService implements RestServicePlugin {
 	public PaginationResponse<Country> getAllCountries(
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CountryFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering,securityContext);
+		service.validate(filtering, securityContext);
 		return service.getAllCountries(securityContext, filtering);
 	}
 

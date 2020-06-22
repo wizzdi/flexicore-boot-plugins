@@ -4,14 +4,15 @@ import com.flexicore.request.BaseclassCreate;
 
 public class CountryCreationContainer extends BaseclassCreate {
 
-    private String countryCode;
+	private String countryCode;
 
-    public String getCountryCode() {
-        return countryCode;
-    }
+	public String getCountryCode() {
+		return countryCode;
+	}
 
-    public <T extends CountryCreationContainer> T setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-        return (T) this;
-    }
+	public <T extends CountryCreationContainer> T setCountryCode(
+			String countryCode) {
+		this.countryCode = countryCode;
+		return (T) this;
+	}
 }

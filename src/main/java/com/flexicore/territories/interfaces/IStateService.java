@@ -12,20 +12,20 @@ import com.flexicore.territories.request.StateUpdate;
 import java.util.List;
 
 public interface IStateService extends ServicePlugin {
-    <T extends Baseclass> T getByIdOrNull(String id,
-                                          Class<T> c, List<String> batch, SecurityContext securityContext);
+	<T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
+			List<String> batch, SecurityContext securityContext);
 
-    List<State> listAllStates(
-            SecurityContext securityContext,
-            StateFiltering filtering);
+	List<State> listAllStates(SecurityContext securityContext,
+			StateFiltering filtering);
 
-    State updateState(StateUpdate updateContainer,
-                      SecurityContext securityContext);
+	State updateState(StateUpdate updateContainer,
+			SecurityContext securityContext);
 
-    State createState(StateCreate creationContainer,
-                      SecurityContext securityContext);
+	State createState(StateCreate creationContainer,
+			SecurityContext securityContext);
 
-    void deleteState(String stateid, SecurityContext securityContext);
+	void deleteState(String stateid, SecurityContext securityContext);
 
-    PaginationResponse<State> getAllStates(SecurityContext securityContext, StateFiltering filtering);
+	PaginationResponse<State> getAllStates(SecurityContext securityContext,
+			StateFiltering filtering);
 }

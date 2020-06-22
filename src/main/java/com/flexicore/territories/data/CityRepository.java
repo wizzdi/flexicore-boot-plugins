@@ -14,41 +14,47 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import org.pf4j.Extension;
+import org.springframework.stereotype.Component;
 
 @PluginInfo(version = 1)
+@Extension
+@Component
 public class CityRepository extends AbstractRepositoryPlugin {
 
+	public List<City> listAllCities(SecurityContext securityContext,
+			CityFiltering filtering) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<City> q = cb.createQuery(City.class);
+		Root<City> r = q.from(City.class);
+		List<Predicate> preds = new ArrayList<>();
+		addCityPredicate(filtering, cb, r, preds);
+		QueryInformationHolder<City> queryInformationHolder = new QueryInformationHolder<>(
+				filtering, City.class, securityContext);
+		return getAllFiltered(queryInformationHolder, preds, cb, q, r);
 
-    public List<City> listAllCities(SecurityContext securityContext, CityFiltering filtering) {
-        CriteriaBuilder cb=em.getCriteriaBuilder();
-        CriteriaQuery<City> q=cb.createQuery(City.class);
-        Root<City> r=q.from(City.class);
-        List<Predicate> preds=new ArrayList<>();
-        addCityPredicate(filtering,cb,r,preds);
-        QueryInformationHolder<City> queryInformationHolder=new QueryInformationHolder<>(filtering,City.class,securityContext);
-        return getAllFiltered(queryInformationHolder,preds,cb,q,r);
+	}
 
-    }
+	public long countAllCities(SecurityContext securityContext,
+			CityFiltering filtering) {
+		CriteriaBuilder cb = em.getCriteriaBuilder();
+		CriteriaQuery<Long> q = cb.createQuery(Long.class);
+		Root<City> r = q.from(City.class);
+		List<Predicate> preds = new ArrayList<>();
+		addCityPredicate(filtering, cb, r, preds);
+		QueryInformationHolder<City> queryInformationHolder = new QueryInformationHolder<>(
+				filtering, City.class, securityContext);
+		return countAllFiltered(queryInformationHolder, preds, cb, q, r);
 
+	}
 
-    public long countAllCities(SecurityContext securityContext, CityFiltering filtering) {
-        CriteriaBuilder cb=em.getCriteriaBuilder();
-        CriteriaQuery<Long> q=cb.createQuery(Long.class);
-        Root<City> r=q.from(City.class);
-        List<Predicate> preds=new ArrayList<>();
-        addCityPredicate(filtering,cb,r,preds);
-        QueryInformationHolder<City> queryInformationHolder=new QueryInformationHolder<>(filtering,City.class,securityContext);
-        return countAllFiltered(queryInformationHolder,preds,cb,q,r);
-
-    }
-
-
-    private void addCityPredicate(CityFiltering filtering, CriteriaBuilder cb, Root<City> r, List<Predicate> preds) {
-        if(filtering.getCountry()!=null ){
-            preds.add(cb.equal(r.get(City_.country),filtering.getCountry()));
-        }
-        if(filtering.getState()!=null ){
-            preds.add(cb.equal(r.get(City_.state),filtering.getState()));
-        }
-    }
+	private void addCityPredicate(CityFiltering filtering, CriteriaBuilder cb,
+			Root<City> r, List<Predicate> preds) {
+		if (filtering.getCountry() != null) {
+			preds.add(cb.equal(r.get(City_.country), filtering.getCountry()));
+		}
+		if (filtering.getState() != null) {
+			preds.add(cb.equal(r.get(City_.state), filtering.getState()));
+		}
+	}
 }

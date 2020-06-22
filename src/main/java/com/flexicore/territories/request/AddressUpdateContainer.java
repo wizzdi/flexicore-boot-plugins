@@ -3,12 +3,11 @@ package com.flexicore.territories.request;
 import com.flexicore.model.territories.Address;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class AddressUpdateContainer extends AddressCreationContainer{
+public class AddressUpdateContainer extends AddressCreationContainer {
 
 	private String id;
 	@JsonIgnore
 	private Address Address;
-
 
 	public String getId() {
 		return id;

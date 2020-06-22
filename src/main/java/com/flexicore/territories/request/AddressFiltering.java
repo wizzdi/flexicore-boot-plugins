@@ -11,12 +11,12 @@ import java.util.Set;
 public class AddressFiltering extends FilteringInformationHolder {
 
 	private Set<Integer> floors;
-	private Set<String> streetsIds=new HashSet<>();
+	private Set<String> streetsIds = new HashSet<>();
 	@JsonIgnore
 	private List<Street> streets;
 	private Set<Integer> numbers;
 	private Set<String> zipCodes;
-	private Set<String> externalIds=new HashSet<>();
+	private Set<String> externalIds = new HashSet<>();
 
 	public Set<Integer> getFloors() {
 		return floors;
@@ -63,7 +63,6 @@ public class AddressFiltering extends FilteringInformationHolder {
 		this.zipCodes = zipCodes;
 		return (T) this;
 	}
-
 
 	public Set<String> getExternalIds() {
 		return externalIds;
