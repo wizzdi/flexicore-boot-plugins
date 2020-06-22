@@ -8,40 +8,40 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 public class Supplier extends Organization {
-    static Supplier s_Singleton = new Supplier();
+	static Supplier s_Singleton = new Supplier();
 
-    public static Supplier s() {
-        return s_Singleton;
-    }
+	public static Supplier s() {
+		return s_Singleton;
+	}
 
-    @OneToMany(targetEntity = SupplierToProduct.class,mappedBy = "leftside")
-    @JsonIgnore
-    private List<SupplierToProduct> supplierToProducts=new ArrayList<>();
+	@OneToMany(targetEntity = SupplierToProduct.class, mappedBy = "leftside")
+	@JsonIgnore
+	private List<SupplierToProduct> supplierToProducts = new ArrayList<>();
 
-    @ManyToOne(targetEntity = SupplierApi.class)
-    private SupplierApi supplierApi;
+	@ManyToOne(targetEntity = SupplierApi.class)
+	private SupplierApi supplierApi;
 
-    @OneToMany(targetEntity = SupplierToProduct.class,mappedBy = "leftside")
-    @JsonIgnore
-    public List<SupplierToProduct> getSupplierToProducts() {
-        return supplierToProducts;
-    }
+	@OneToMany(targetEntity = SupplierToProduct.class, mappedBy = "leftside")
+	@JsonIgnore
+	public List<SupplierToProduct> getSupplierToProducts() {
+		return supplierToProducts;
+	}
 
-    public Supplier setSupplierToProducts(List<SupplierToProduct> supplierToProducts) {
-        this.supplierToProducts = supplierToProducts;
-        return this;
-    }
+	public Supplier setSupplierToProducts(
+			List<SupplierToProduct> supplierToProducts) {
+		this.supplierToProducts = supplierToProducts;
+		return this;
+	}
 
-    @ManyToOne(targetEntity = SupplierApi.class)
-    public SupplierApi getSupplierApi() {
-        return supplierApi;
-    }
+	@ManyToOne(targetEntity = SupplierApi.class)
+	public SupplierApi getSupplierApi() {
+		return supplierApi;
+	}
 
-    public <T extends Supplier> T setSupplierApi(SupplierApi supplierApi) {
-        this.supplierApi = supplierApi;
-        return (T) this;
-    }
+	public <T extends Supplier> T setSupplierApi(SupplierApi supplierApi) {
+		this.supplierApi = supplierApi;
+		return (T) this;
+	}
 }

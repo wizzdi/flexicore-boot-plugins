@@ -9,58 +9,55 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-
 @Entity
 public class SupplierToProduct extends TimedLink {
-    static SupplierToProduct s_Singleton = new SupplierToProduct();
-    public static SupplierToProduct s() {
-        return s_Singleton;
-    }
+	static SupplierToProduct s_Singleton = new SupplierToProduct();
+	public static SupplierToProduct s() {
+		return s_Singleton;
+	}
 
-    private double price;
+	private double price;
 
+	@Override
+	@ManyToOne(targetEntity = Supplier.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	public Supplier getLeftside() {
+		return (Supplier) super.getLeftside();
+	}
 
+	public void setLeftside(Supplier leftside) {
+		super.setLeftside(leftside);
+	}
 
+	@Override
+	@JsonIgnore
+	public void setLeftside(Baseclass leftside) {
+		super.setLeftside(leftside);
+	}
 
+	@Override
+	@ManyToOne(targetEntity = Product.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	public Product getRightside() {
+		return (Product) super.getRightside();
+	}
 
-    @Override
-    @ManyToOne(targetEntity = Supplier.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Supplier getLeftside() {
-        return (Supplier) super.getLeftside();
-    }
+	public void setRightside(Product rightside) {
+		super.setRightside(rightside);
+	}
 
-    public void setLeftside(Supplier leftside) {
-        super.setLeftside(leftside);
-    }
+	@Override
+	@JsonIgnore
+	public void setRightside(Baseclass rightside) {
+		super.setRightside(rightside);
+	}
 
-    @Override
-    @JsonIgnore
-    public void setLeftside(Baseclass leftside) {
-        super.setLeftside(leftside);
-    }
+	public double getPrice() {
+		return price;
+	}
 
-    @Override
-    @ManyToOne(targetEntity = Product.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Product getRightside() {
-        return (Product) super.getRightside();
-    }
-
-    public void setRightside(Product rightside) {
-        super.setRightside(rightside);
-    }
-
-    @Override
-    @JsonIgnore
-    public void setRightside(Baseclass rightside) {
-        super.setRightside(rightside);
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public SupplierToProduct setPrice(double price) {
-        this.price = price;
-        return this;
-    }
+	public SupplierToProduct setPrice(double price) {
+		this.price = price;
+		return this;
+	}
 }

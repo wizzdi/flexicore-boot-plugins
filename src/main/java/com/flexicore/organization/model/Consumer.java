@@ -5,13 +5,12 @@ import com.flexicore.model.User;
 
 import javax.persistence.Entity;
 
-
 @Entity
 public class Consumer extends User {
-    static Consumer s_Singleton = new Consumer();
+	static Consumer s_Singleton = new Consumer();
 
-    public static Consumer s() {
-        return s_Singleton;
-    }
+	public static Consumer s() {
+		return s_Singleton;
+	}
 
 }
