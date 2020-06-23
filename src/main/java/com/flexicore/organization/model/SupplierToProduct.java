@@ -29,7 +29,7 @@ public class SupplierToProduct extends TimedLink {
 	public Supplier getLeftside() {
 		return (Supplier) super.getLeftside();
 	}
-
+	@JsonIgnore
 	public void setLeftside(Supplier leftside) {
 		super.setLeftside(leftside);
 	}
@@ -47,6 +47,7 @@ public class SupplierToProduct extends TimedLink {
 		return (Product) super.getRightside();
 	}
 
+	@JsonIgnore
 	public void setRightside(Product rightside) {
 		super.setRightside(rightside);
 	}
