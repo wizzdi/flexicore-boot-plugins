@@ -1,13 +1,18 @@
 package com.flexicore.organization.model;
 
+import com.flexicore.security.SecurityContext;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Branch extends Site {
-	static private Branch s_Singleton = new Branch();
-	static public Branch s() {
-		return s_Singleton;
+
+	public Branch() {
+	}
+
+	public Branch(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@ManyToOne(targetEntity = Organization.class)

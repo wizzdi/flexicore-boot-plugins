@@ -1,15 +1,17 @@
 package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
 @Entity
 public class Customer extends Organization {
-	static Customer s_Singleton = new Customer();
 
-	public static Customer s() {
-		return s_Singleton;
+	public Customer() {
 	}
 
+	public Customer(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 }

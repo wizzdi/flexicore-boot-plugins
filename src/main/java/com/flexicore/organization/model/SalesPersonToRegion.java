@@ -3,6 +3,7 @@ package com.flexicore.organization.model;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.TimedLink;
 import com.flexicore.product.model.Product;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -10,9 +11,12 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class SalesPersonToRegion extends TimedLink {
-	static SalesPersonToRegion s_Singleton = new SalesPersonToRegion();
-	public static SalesPersonToRegion s() {
-		return s_Singleton;
+
+	public SalesPersonToRegion() {
+	}
+
+	public SalesPersonToRegion(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@Override

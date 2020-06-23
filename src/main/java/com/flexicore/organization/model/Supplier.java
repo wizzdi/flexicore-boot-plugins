@@ -1,6 +1,7 @@
 package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -10,10 +11,12 @@ import java.util.List;
 
 @Entity
 public class Supplier extends Organization {
-	static Supplier s_Singleton = new Supplier();
 
-	public static Supplier s() {
-		return s_Singleton;
+	public Supplier() {
+	}
+
+	public Supplier(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@OneToMany(targetEntity = SupplierToProduct.class, mappedBy = "leftside")

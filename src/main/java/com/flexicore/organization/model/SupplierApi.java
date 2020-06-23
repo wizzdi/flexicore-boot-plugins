@@ -1,14 +1,18 @@
 package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
 @Entity
 public class SupplierApi extends Baseclass {
-	static SupplierApi s_Singleton = new SupplierApi();
-	public static SupplierApi s() {
-		return s_Singleton;
+
+	public SupplierApi() {
+	}
+
+	public SupplierApi(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	private String implementorCanonicalName;

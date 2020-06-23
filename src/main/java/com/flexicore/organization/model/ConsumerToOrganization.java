@@ -2,6 +2,7 @@ package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,9 +10,12 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ConsumerToOrganization extends Baselink {
-	static ConsumerToOrganization s_Singleton = new ConsumerToOrganization();
-	public static ConsumerToOrganization s() {
-		return s_Singleton;
+
+	public ConsumerToOrganization() {
+	}
+
+	public ConsumerToOrganization(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@Override

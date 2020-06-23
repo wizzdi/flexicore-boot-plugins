@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.TimedLink;
 import com.flexicore.product.model.Product;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -11,9 +12,13 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class SupplierToProduct extends TimedLink {
-	static SupplierToProduct s_Singleton = new SupplierToProduct();
-	public static SupplierToProduct s() {
-		return s_Singleton;
+
+
+	public SupplierToProduct() {
+	}
+
+	public SupplierToProduct(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	private double price;

@@ -1,16 +1,19 @@
 package com.flexicore.organization.model;
 
 import com.flexicore.model.User;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Employee extends User {
-	static Employee s_Singleton = new Employee();
 
-	public static Employee s() {
-		return s_Singleton;
+	public Employee() {
+	}
+
+	public Employee(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@ManyToOne(targetEntity = Organization.class)

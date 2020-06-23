@@ -2,16 +2,19 @@ package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Address;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Site extends Baseclass {
-	static private Site s_Singleton = new Site();
 
-	static public Site s() {
-		return s_Singleton;
+	public Site() {
+	}
+
+	public Site(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	private String externalId;

@@ -2,6 +2,7 @@ package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -12,10 +13,12 @@ import java.util.List;
 
 @Entity
 public class Organization extends Baseclass {
-	static Organization s_Singleton = new Organization();
 
-	public static Organization s() {
-		return s_Singleton;
+	public Organization() {
+	}
+
+	public Organization(String name, SecurityContext securityContext) {
+		super(name, securityContext);
 	}
 
 	@OneToMany(targetEntity = Branch.class, mappedBy = "organization")
