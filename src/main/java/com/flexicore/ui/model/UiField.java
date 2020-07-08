@@ -9,10 +9,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class UiField extends Baseclass {
-	static UiField s_Singleton = new UiField();
-	public static UiField s() {
-		return s_Singleton;
-	}
 
 	public UiField() {
 	}

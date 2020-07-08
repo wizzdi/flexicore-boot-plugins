@@ -12,10 +12,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PresetToRole extends PresetToEntity {
-	static PresetToRole s_Singleton = new PresetToRole();
-	public static PresetToRole s() {
-		return s_Singleton;
-	}
 
 	public PresetToRole() {
 	}

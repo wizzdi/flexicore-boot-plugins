@@ -9,10 +9,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Form extends Preset {
-	static Form s_Singleton = new Form();
-	public static Form s() {
-		return s_Singleton;
-	}
 
 	public Form() {
 	}

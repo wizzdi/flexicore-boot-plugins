@@ -9,10 +9,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class DashboardExecution extends Baseclass {
-	static DashboardExecution s_Singleton = new DashboardExecution();
-	public static DashboardExecution s() {
-		return s_Singleton;
-	}
 
 	public DashboardExecution() {
 	}

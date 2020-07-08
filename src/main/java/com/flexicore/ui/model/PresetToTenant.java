@@ -11,10 +11,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PresetToTenant extends PresetToEntity {
-	static PresetToTenant s_Singleton = new PresetToTenant();
-	public static PresetToTenant s() {
-		return s_Singleton;
-	}
 
 	public PresetToTenant() {
 	}

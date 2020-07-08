@@ -13,10 +13,6 @@ import java.util.List;
 
 @Entity
 public class DashboardElement extends Baseclass {
-	static DashboardElement s_Singleton = new DashboardElement();
-	public static DashboardElement s() {
-		return s_Singleton;
-	}
 
 	public DashboardElement() {
 	}

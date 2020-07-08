@@ -6,10 +6,6 @@ import javax.persistence.Entity;
 
 @Entity
 public class TableColumn extends UiField {
-	static TableColumn s_Singleton = new TableColumn();
-	public static TableColumn s() {
-		return s_Singleton;
-	}
 
 	public TableColumn() {
 	}

@@ -7,10 +7,6 @@ import javax.persistence.Lob;
 
 @Entity
 public class ConfigurationPreset extends Preset {
-	static ConfigurationPreset s_Singleton = new ConfigurationPreset();
-	public static ConfigurationPreset s() {
-		return s_Singleton;
-	}
 
 	public ConfigurationPreset() {
 	}

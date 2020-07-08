@@ -6,10 +6,6 @@ import javax.persistence.Entity;
 
 @Entity
 public class FormField extends UiField {
-	static FormField s_Singleton = new FormField();
-	public static FormField s() {
-		return s_Singleton;
-	}
 
 	public FormField() {
 	}

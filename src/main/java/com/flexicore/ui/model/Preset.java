@@ -15,10 +15,6 @@ import java.util.List;
 
 @Entity
 public class Preset extends Presenter {
-	static Preset s_Singleton = new Preset();
-	public static Preset s() {
-		return s_Singleton;
-	}
 
 	public Preset() {
 	}

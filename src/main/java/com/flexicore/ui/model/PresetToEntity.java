@@ -10,10 +10,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PresetToEntity extends Baselink {
-	static PresetToEntity s_Singleton = new PresetToEntity();
-	public static PresetToEntity s() {
-		return s_Singleton;
-	}
 
 	public PresetToEntity() {
 	}

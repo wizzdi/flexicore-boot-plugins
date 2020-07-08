@@ -14,10 +14,6 @@ import java.util.List;
 
 @Entity
 public class GridPreset extends Preset {
-	static GridPreset s_Singleton = new GridPreset();
-	public static GridPreset s() {
-		return s_Singleton;
-	}
 
 	public GridPreset() {
 	}

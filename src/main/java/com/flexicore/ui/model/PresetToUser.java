@@ -12,10 +12,6 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PresetToUser extends PresetToEntity {
-	static PresetToUser s_Singleton = new PresetToUser();
-	public static PresetToUser s() {
-		return s_Singleton;
-	}
 
 	public PresetToUser() {
 	}
