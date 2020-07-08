@@ -3,6 +3,7 @@ package com.flexicore.scheduling.model;
 import com.flexicore.model.Baseclass;
 import com.flexicore.security.SecurityContext;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.time.OffsetDateTime;
@@ -11,8 +12,10 @@ import java.time.OffsetDateTime;
 public class ScheduleTimeslot extends Baseclass {
 
 
+	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime startTime; // the explicit time for TS start
 	private String timeStartZoneId;
+	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime endTime; // the explicit time for TS to end
 	private String timeEndZoneId;
 
@@ -23,6 +26,7 @@ public class ScheduleTimeslot extends Baseclass {
 	private long startMillisOffset; // offset from implicit time bame
 	private long endMillisOffset; // offset from implicit time name
 
+	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime lastExecution; // saved by the system
 
 	private TimeOfTheDayName endTimeOfTheDayName;

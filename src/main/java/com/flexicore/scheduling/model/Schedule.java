@@ -5,6 +5,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.time.OffsetDateTime;
@@ -24,7 +25,9 @@ public class Schedule extends Baseclass {
 			CascadeType.PERSIST, CascadeType.MERGE})
 	private List<ScheduleTimeslot> timeslots = new ArrayList<>();
 
+	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime timeFrameStart;
+	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime timeFrameEnd;
 
 	private boolean sunday;
