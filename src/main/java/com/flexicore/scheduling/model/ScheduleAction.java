@@ -11,34 +11,36 @@ import java.util.List;
 
 @Entity
 public class ScheduleAction extends Baseclass {
-    private static ScheduleAction s_Singleton=new ScheduleAction();
-    public  static ScheduleAction s() {return s_Singleton;}
 
-    @ManyToOne(targetEntity = DynamicExecution.class)
-    private DynamicExecution dynamicExecution;
+	@ManyToOne(targetEntity = DynamicExecution.class)
+	private DynamicExecution dynamicExecution;
 
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "rightside", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "rightside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    public List<ScheduleToAction> getScheduleToActions() {
-        return scheduleToActions;
-    }
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "rightside", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	public List<ScheduleToAction> getScheduleToActions() {
+		return scheduleToActions;
+	}
 
-    public ScheduleAction setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
-        this.scheduleToActions = scheduleToActions;
-        return this;
-    }
+	public ScheduleAction setScheduleToActions(
+			List<ScheduleToAction> scheduleToActions) {
+		this.scheduleToActions = scheduleToActions;
+		return this;
+	}
 
-    @ManyToOne(targetEntity = DynamicExecution.class)
-    public DynamicExecution getDynamicExecution() {
-        return dynamicExecution;
-    }
+	@ManyToOne(targetEntity = DynamicExecution.class)
+	public DynamicExecution getDynamicExecution() {
+		return dynamicExecution;
+	}
 
-    public <T extends ScheduleAction> T setDynamicExecution(DynamicExecution dynamicExecution) {
-        this.dynamicExecution = dynamicExecution;
-        return (T) this;
-    }
+	public <T extends ScheduleAction> T setDynamicExecution(
+			DynamicExecution dynamicExecution) {
+		this.dynamicExecution = dynamicExecution;
+		return (T) this;
+	}
 }

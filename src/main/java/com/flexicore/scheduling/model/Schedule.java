@@ -12,157 +12,151 @@ import java.util.List;
 
 @Entity
 public class Schedule extends Baseclass {
-    private static Schedule s_Singleton = new Schedule();
 
-    public static Schedule s() {
-        return s_Singleton;
-    }
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "leftside", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    private List<ScheduleToAction> scheduleToActions=new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	private List<ScheduleTimeslot> timeslots = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleTimeslot.class,mappedBy = "schedule",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    private List<ScheduleTimeslot> timeslots=new ArrayList<>();
+	private LocalDateTime timeFrameStart;
+	private LocalDateTime timeFrameEnd;
 
-    private LocalDateTime timeFrameStart;
-    private LocalDateTime timeFrameEnd;
+	private boolean sunday;
+	private boolean monday;
+	private boolean tuesday;
+	private boolean wednesday;
+	private boolean thursday;
+	private boolean friday;
+	private boolean saturday;
+	private boolean holiday;
+	private boolean enabled;
 
-    private boolean sunday;
-    private boolean monday;
-    private boolean tuesday;
-    private boolean wednesday;
-    private boolean thursday;
-    private boolean friday;
-    private boolean saturday;
-    private boolean holiday;
-    private boolean enabled;
+	public LocalDateTime getTimeFrameStart() {
+		return timeFrameStart;
+	}
 
+	public Schedule setTimeFrameStart(LocalDateTime timeFrameStart) {
+		this.timeFrameStart = timeFrameStart;
+		return this;
+	}
 
-    public LocalDateTime getTimeFrameStart() {
-        return timeFrameStart;
-    }
+	public LocalDateTime getTimeFrameEnd() {
+		return timeFrameEnd;
+	}
 
-    public Schedule setTimeFrameStart(LocalDateTime timeFrameStart) {
-        this.timeFrameStart = timeFrameStart;
-        return this;
-    }
+	public Schedule setTimeFrameEnd(LocalDateTime timeFrameEnd) {
+		this.timeFrameEnd = timeFrameEnd;
+		return this;
+	}
 
-    public LocalDateTime getTimeFrameEnd() {
-        return timeFrameEnd;
-    }
+	public boolean isSunday() {
+		return sunday;
+	}
 
-    public Schedule setTimeFrameEnd(LocalDateTime timeFrameEnd) {
-        this.timeFrameEnd = timeFrameEnd;
-        return this;
-    }
+	public Schedule setSunday(boolean sunday) {
+		this.sunday = sunday;
+		return this;
+	}
 
+	public boolean isMonday() {
+		return monday;
+	}
 
+	public Schedule setMonday(boolean monday) {
+		this.monday = monday;
+		return this;
+	}
 
-    public boolean isSunday() {
-        return sunday;
-    }
+	public boolean isTuesday() {
+		return tuesday;
+	}
 
-    public Schedule setSunday(boolean sunday) {
-        this.sunday = sunday;
-        return this;
-    }
+	public Schedule setTuesday(boolean tuesday) {
+		this.tuesday = tuesday;
+		return this;
+	}
 
-    public boolean isMonday() {
-        return monday;
-    }
+	public boolean isWednesday() {
+		return wednesday;
+	}
 
-    public Schedule setMonday(boolean monday) {
-        this.monday = monday;
-        return this;
-    }
+	public Schedule setWednesday(boolean wednesday) {
+		this.wednesday = wednesday;
+		return this;
+	}
 
-    public boolean isTuesday() {
-        return tuesday;
-    }
+	public boolean isThursday() {
+		return thursday;
+	}
 
-    public Schedule setTuesday(boolean tuesday) {
-        this.tuesday = tuesday;
-        return this;
-    }
+	public Schedule setThursday(boolean thursday) {
+		this.thursday = thursday;
+		return this;
+	}
 
-    public boolean isWednesday() {
-        return wednesday;
-    }
+	public boolean isFriday() {
+		return friday;
+	}
 
-    public Schedule setWednesday(boolean wednesday) {
-        this.wednesday = wednesday;
-        return this;
-    }
+	public Schedule setFriday(boolean friday) {
+		this.friday = friday;
+		return this;
+	}
 
-    public boolean isThursday() {
-        return thursday;
-    }
+	public boolean isSaturday() {
+		return saturday;
+	}
 
-    public Schedule setThursday(boolean thursday) {
-        this.thursday = thursday;
-        return this;
-    }
+	public Schedule setSaturday(boolean saturday) {
+		this.saturday = saturday;
+		return this;
+	}
 
-    public boolean isFriday() {
-        return friday;
-    }
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "leftside", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	public List<ScheduleToAction> getScheduleToActions() {
+		return scheduleToActions;
+	}
 
-    public Schedule setFriday(boolean friday) {
-        this.friday = friday;
-        return this;
-    }
+	public Schedule setScheduleToActions(
+			List<ScheduleToAction> scheduleToActions) {
+		this.scheduleToActions = scheduleToActions;
+		return this;
+	}
 
-    public boolean isSaturday() {
-        return saturday;
-    }
+	public boolean isHoliday() {
+		return holiday;
+	}
 
-    public Schedule setSaturday(boolean saturday) {
-        this.saturday = saturday;
-        return this;
-    }
+	public Schedule setHoliday(boolean holiday) {
+		this.holiday = holiday;
+		return this;
+	}
 
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleToAction.class,mappedBy = "leftside",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    public List<ScheduleToAction> getScheduleToActions() {
-        return scheduleToActions;
-    }
+	@JsonIgnore
+	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule", cascade = {
+			CascadeType.PERSIST, CascadeType.MERGE})
+	public List<ScheduleTimeslot> getTimeslots() {
+		return timeslots;
+	}
 
-    public Schedule setScheduleToActions(List<ScheduleToAction> scheduleToActions) {
-        this.scheduleToActions = scheduleToActions;
-        return this;
-    }
+	public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
+		this.timeslots = timeslots;
+		return this;
+	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-
-
-    public boolean isHoliday() {
-        return holiday;
-    }
-
-    public Schedule setHoliday(boolean holiday) {
-        this.holiday = holiday;
-        return this;
-    }
-
-    @JsonIgnore
-    @OneToMany(targetEntity = ScheduleTimeslot.class,mappedBy = "schedule",cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    public List<ScheduleTimeslot> getTimeslots() {
-        return timeslots;
-    }
-
-    public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
-        this.timeslots = timeslots;
-        return this;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public Schedule setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
+	public Schedule setEnabled(boolean enabled) {
+		this.enabled = enabled;
+		return this;
+	}
 }
