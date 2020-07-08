@@ -15,13 +15,18 @@ import com.flexicore.security.SecurityContext;
 import java.util.List;
 
 public interface ISchedulingService extends ServicePlugin, InitPlugin {
-    Schedule createScheduleNoMerge(SecurityContext securityContext, CreateScheduling createScheduling);
+	Schedule createScheduleNoMerge(SecurityContext securityContext,
+			CreateScheduling createScheduling);
 
-    ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext, CreateSchedulingAction createSchedulingAction);
+	ScheduleAction createScheduleActionNoMerge(SecurityContext securityContext,
+			CreateSchedulingAction createSchedulingAction);
 
-    ScheduleTimeslot createScheduleTimeSlotNoMerge(SecurityContext securityContext, CreateTimeslot createTimeslot);
+	ScheduleTimeslot createScheduleTimeSlotNoMerge(
+			SecurityContext securityContext, CreateTimeslot createTimeslot);
 
-    ScheduleToAction linkScheduleToActionNoMerge(SecurityContext securityContext, LinkScheduleToAction createScheduling);
+	ScheduleToAction linkScheduleToActionNoMerge(
+			SecurityContext securityContext,
+			LinkScheduleToAction createScheduling);
 
-    void massMerge(List<?> toMerge);
+	void massMerge(List<?> toMerge);
 }

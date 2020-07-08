@@ -6,28 +6,26 @@ import com.flexicore.scheduling.model.Schedule;
 
 public class SchedulingTimeslotFiltering extends FilteringInformationHolder {
 
-    private String scheduleId;
-    @JsonIgnore
-    private Schedule schedule;
+	private String scheduleId;
+	@JsonIgnore
+	private Schedule schedule;
 
+	public String getScheduleId() {
+		return scheduleId;
+	}
 
-    public String getScheduleId() {
-        return scheduleId;
-    }
+	public SchedulingTimeslotFiltering setScheduleId(String scheduleId) {
+		this.scheduleId = scheduleId;
+		return this;
+	}
 
-    public SchedulingTimeslotFiltering setScheduleId(String scheduleId) {
-        this.scheduleId = scheduleId;
-        return this;
-    }
+	@JsonIgnore
+	public Schedule getSchedule() {
+		return schedule;
+	}
 
-
-    @JsonIgnore
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public SchedulingTimeslotFiltering setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-        return this;
-    }
+	public SchedulingTimeslotFiltering setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+		return this;
+	}
 }

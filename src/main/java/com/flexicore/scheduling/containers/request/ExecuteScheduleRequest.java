@@ -5,27 +5,27 @@ import com.flexicore.scheduling.model.Schedule;
 
 public class ExecuteScheduleRequest {
 
-    private String scheduleId;
+	private String scheduleId;
 
-    @JsonIgnore
-    private Schedule schedule;
+	@JsonIgnore
+	private Schedule schedule;
 
-    public String getScheduleId() {
-        return scheduleId;
-    }
+	public String getScheduleId() {
+		return scheduleId;
+	}
 
-    public ExecuteScheduleRequest setScheduleId(String scheduleId) {
-        this.scheduleId = scheduleId;
-        return this;
-    }
+	public ExecuteScheduleRequest setScheduleId(String scheduleId) {
+		this.scheduleId = scheduleId;
+		return this;
+	}
 
-    @JsonIgnore
-    public Schedule getSchedule() {
-        return schedule;
-    }
+	@JsonIgnore
+	public Schedule getSchedule() {
+		return schedule;
+	}
 
-    public ExecuteScheduleRequest setSchedule(Schedule schedule) {
-        this.schedule = schedule;
-        return this;
-    }
+	public ExecuteScheduleRequest setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+		return this;
+	}
 }
