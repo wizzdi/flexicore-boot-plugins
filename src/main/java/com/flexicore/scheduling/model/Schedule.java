@@ -2,11 +2,12 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class Schedule extends Baseclass {
 			CascadeType.PERSIST, CascadeType.MERGE})
 	private List<ScheduleTimeslot> timeslots = new ArrayList<>();
 
-	private LocalDateTime timeFrameStart;
-	private LocalDateTime timeFrameEnd;
+	private OffsetDateTime timeFrameStart;
+	private OffsetDateTime timeFrameEnd;
 
 	private boolean sunday;
 	private boolean monday;
@@ -36,20 +37,27 @@ public class Schedule extends Baseclass {
 	private boolean holiday;
 	private boolean enabled;
 
-	public LocalDateTime getTimeFrameStart() {
+	public Schedule() {
+	}
+
+	public Schedule(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
+
+	public OffsetDateTime getTimeFrameStart() {
 		return timeFrameStart;
 	}
 
-	public Schedule setTimeFrameStart(LocalDateTime timeFrameStart) {
+	public Schedule setTimeFrameStart(OffsetDateTime timeFrameStart) {
 		this.timeFrameStart = timeFrameStart;
 		return this;
 	}
 
-	public LocalDateTime getTimeFrameEnd() {
+	public OffsetDateTime getTimeFrameEnd() {
 		return timeFrameEnd;
 	}
 
-	public Schedule setTimeFrameEnd(LocalDateTime timeFrameEnd) {
+	public Schedule setTimeFrameEnd(OffsetDateTime timeFrameEnd) {
 		this.timeFrameEnd = timeFrameEnd;
 		return this;
 	}

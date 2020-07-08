@@ -1,18 +1,19 @@
 package com.flexicore.scheduling.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 public class ScheduleTimeslot extends Baseclass {
 
 
-	private LocalDateTime startTime; // the explicit time for TS start
+	private OffsetDateTime startTime; // the explicit time for TS start
 	private String timeStartZoneId;
-	private LocalDateTime endTime; // the explicit time for TS to end
+	private OffsetDateTime endTime; // the explicit time for TS to end
 	private String timeEndZoneId;
 
 	private TimeOfTheDayName startTimeOfTheDayName; // alternate implicit start
@@ -22,7 +23,7 @@ public class ScheduleTimeslot extends Baseclass {
 	private long startMillisOffset; // offset from implicit time bame
 	private long endMillisOffset; // offset from implicit time name
 
-	private LocalDateTime lastExecution; // saved by the system
+	private OffsetDateTime lastExecution; // saved by the system
 
 	private TimeOfTheDayName endTimeOfTheDayName;
 	private double timeOfTheDayNameEndLat;
@@ -33,20 +34,27 @@ public class ScheduleTimeslot extends Baseclass {
 	@ManyToOne(targetEntity = Schedule.class)
 	private Schedule schedule; // parent schedule
 
-	public LocalDateTime getStartTime() {
+	public ScheduleTimeslot() {
+	}
+
+	public ScheduleTimeslot(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
+
+	public OffsetDateTime getStartTime() {
 		return startTime;
 	}
 
-	public ScheduleTimeslot setStartTime(LocalDateTime startTime) {
+	public ScheduleTimeslot setStartTime(OffsetDateTime startTime) {
 		this.startTime = startTime;
 		return this;
 	}
 
-	public LocalDateTime getEndTime() {
+	public OffsetDateTime getEndTime() {
 		return endTime;
 	}
 
-	public ScheduleTimeslot setEndTime(LocalDateTime endTime) {
+	public ScheduleTimeslot setEndTime(OffsetDateTime endTime) {
 		this.endTime = endTime;
 		return this;
 	}
@@ -139,11 +147,11 @@ public class ScheduleTimeslot extends Baseclass {
 		return this;
 	}
 
-	public LocalDateTime getLastExecution() {
+	public OffsetDateTime getLastExecution() {
 		return lastExecution;
 	}
 
-	public ScheduleTimeslot setLastExecution(LocalDateTime lastExecution) {
+	public ScheduleTimeslot setLastExecution(OffsetDateTime lastExecution) {
 		this.lastExecution = lastExecution;
 		return this;
 	}

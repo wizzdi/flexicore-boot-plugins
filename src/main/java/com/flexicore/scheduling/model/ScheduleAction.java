@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.model.dynamic.ExecutionParametersHolder;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,6 +20,13 @@ public class ScheduleAction extends Baseclass {
 	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "rightside", cascade = {
 			CascadeType.PERSIST, CascadeType.MERGE})
 	private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
+
+	public ScheduleAction() {
+	}
+
+	public ScheduleAction(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 
 	@JsonIgnore
 	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "rightside", cascade = {

@@ -2,6 +2,7 @@ package com.flexicore.scheduling.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,6 +10,13 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ScheduleToAction extends Baselink {
+
+	public ScheduleToAction() {
+	}
+
+	public ScheduleToAction(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 
 	@Override
 	@ManyToOne(targetEntity = Schedule.class, cascade = {CascadeType.MERGE,
