@@ -10,6 +10,12 @@
         <processor name="org.eclipse.persistence.internal.jpa.modelgen.CanonicalModelProcessor" />
         <module name="flexicore-ui-model" />
       </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="flexicore-ui-model-migrate" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">

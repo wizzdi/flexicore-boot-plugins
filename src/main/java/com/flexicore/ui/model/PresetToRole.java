@@ -10,55 +10,50 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-
 @Entity
 public class PresetToRole extends PresetToEntity {
-    static PresetToRole s_Singleton = new PresetToRole();
-    public static PresetToRole s() {
-        return s_Singleton;
-    }
+	static PresetToRole s_Singleton = new PresetToRole();
+	public static PresetToRole s() {
+		return s_Singleton;
+	}
 
-    public PresetToRole() {
-    }
+	public PresetToRole() {
+	}
 
-    public PresetToRole(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
+	public PresetToRole(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 
+	@Override
+	@ManyToOne(targetEntity = Preset.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	public Preset getLeftside() {
+		return (Preset) super.getLeftside();
+	}
 
+	public void setLeftside(Preset leftside) {
+		super.setLeftside(leftside);
+	}
 
+	@Override
+	public void setLeftside(Baseclass leftside) {
+		super.setLeftside(leftside);
+	}
 
+	@Override
+	@ManyToOne(targetEntity = Role.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	public Role getRightside() {
+		return (Role) super.getRightside();
+	}
 
+	public void setRightside(Role rightside) {
+		super.setRightside(rightside);
+	}
 
-    @Override
-    @ManyToOne(targetEntity =Preset.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Preset getLeftside() {
-        return (Preset) super.getLeftside();
-    }
-
-    public void setLeftside(Preset leftside) {
-        super.setLeftside(leftside);
-    }
-
-    @Override
-    public void setLeftside(Baseclass leftside) {
-        super.setLeftside(leftside);
-    }
-
-    @Override
-    @ManyToOne(targetEntity =Role.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Role getRightside() {
-        return (Role) super.getRightside();
-    }
-
-    public void setRightside(Role rightside) {
-        super.setRightside(rightside);
-    }
-
-    @Override
-    public void setRightside(Baseclass rightside) {
-        super.setRightside(rightside);
-    }
-
+	@Override
+	public void setRightside(Baseclass rightside) {
+		super.setRightside(rightside);
+	}
 
 }

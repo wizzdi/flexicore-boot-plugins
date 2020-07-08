@@ -10,53 +10,53 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class PresetToEntity extends Baselink {
-    static PresetToEntity s_Singleton = new PresetToEntity();
-    public static PresetToEntity s() {
-        return s_Singleton;
-    }
+	static PresetToEntity s_Singleton = new PresetToEntity();
+	public static PresetToEntity s() {
+		return s_Singleton;
+	}
 
-    public PresetToEntity() {
-    }
+	public PresetToEntity() {
+	}
 
-    public PresetToEntity(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
+	public PresetToEntity(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 
-    private int priority;
-    private boolean enabled;
+	private int priority;
+	private boolean enabled;
 
-    public int getPriority() {
-        return priority;
-    }
+	public int getPriority() {
+		return priority;
+	}
 
-    public <T extends PresetToEntity> T setPriority(int priority) {
-        this.priority = priority;
-        return (T) this;
-    }
+	public <T extends PresetToEntity> T setPriority(int priority) {
+		this.priority = priority;
+		return (T) this;
+	}
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-    public <T extends PresetToEntity> T setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return (T) this;
-    }
+	public <T extends PresetToEntity> T setEnabled(boolean enabled) {
+		this.enabled = enabled;
+		return (T) this;
+	}
 
+	@Override
+	@ManyToOne(targetEntity = Preset.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	public Preset getLeftside() {
+		return (Preset) super.getLeftside();
+	}
 
-    @Override
-    @ManyToOne(targetEntity =Preset.class, cascade = {CascadeType.MERGE ,CascadeType.PERSIST})
-    public Preset getLeftside() {
-        return (Preset) super.getLeftside();
-    }
+	public void setLeftside(Preset leftside) {
+		super.setLeftside(leftside);
+	}
 
-    public void setLeftside(Preset leftside) {
-        super.setLeftside(leftside);
-    }
-
-    @Override
-    public void setLeftside(Baseclass leftside) {
-        super.setLeftside(leftside);
-    }
+	@Override
+	public void setLeftside(Baseclass leftside) {
+		super.setLeftside(leftside);
+	}
 
 }
