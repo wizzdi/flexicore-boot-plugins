@@ -14,7 +14,7 @@ import com.flexicore.security.SecurityContext;
 
 import java.util.List;
 
-public interface ISchedulingService extends ServicePlugin, InitPlugin {
+public interface ISchedulingService extends ServicePlugin {
 	Schedule createScheduleNoMerge(SecurityContext securityContext,
 			CreateScheduling createScheduling);
 

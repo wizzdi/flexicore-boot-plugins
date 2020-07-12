@@ -2,6 +2,7 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
+import com.flexicore.events.PluginsLoadedEvent;
 import com.flexicore.model.*;
 import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.model.dynamic.DynamicExecution;
@@ -20,7 +21,6 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
 
-import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import java.lang.reflect.Method;
 import java.time.Instant;
@@ -32,13 +32,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.pf4j.Extension;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
-@PluginInfo(version = 1, autoInstansiate = true)
-@Transactional
+@PluginInfo(version = 1)
 @Extension
 @Component
+@Transactional
 public class SchedulingService implements ISchedulingService {
 
 	@PluginInfo(version = 1)
@@ -63,8 +65,8 @@ public class SchedulingService implements ISchedulingService {
 	private static AtomicBoolean init = new AtomicBoolean(false);
 	private static Scheduler scheduler;
 
-	@Override
-	public void init() {
+	@EventListener
+	public void init(PluginsLoadedEvent e) {
 		if (init.compareAndSet(false, true)) {
 			SecurityContext securityContext = getAdminSecurityContext();
 			scheduler = new Scheduler(logger, this, securityContext);
@@ -462,7 +464,7 @@ public class SchedulingService implements ISchedulingService {
 
 	}
 
-	@Transactional(Transactional.TxType.REQUIRES_NEW)
+	@Transactional
 	public void runSchedule(List<ScheduleToAction> schedule,
 			SecurityContext securityContext) {
 		for (ScheduleToAction link : schedule) {
