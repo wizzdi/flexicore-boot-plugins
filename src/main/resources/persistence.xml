@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             version="2.1"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="primary">
+
+
+        <class>com.flexicore.billing.model.BusinessService</class>
+        <class>com.flexicore.billing.model.Contract</class>
+        <class>com.flexicore.billing.model.ContractItem</class>
+        <class>com.flexicore.billing.model.Currency</class>
+        <class>com.flexicore.billing.model.Invoice</class>
+        <class>com.flexicore.billing.model.InvoiceItem</class>
+        <class>com.flexicore.billing.model.PaymentMethod</class>
+        <class>com.flexicore.billing.model.PaymentMethodType</class>
+        <class>com.flexicore.billing.model.PriceList</class>
+        <class>com.flexicore.billing.model.PriceListToService</class>
+        <class>com.flexicore.model.Baseclass</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    </persistence-unit>
+</persistence>
