@@ -13,7 +13,7 @@ import java.util.List;
 public class Industry extends Baseclass {
 
     @JsonIgnore
-    @OneToMany(targetEntity = IndividualCustomer.class,mappedBy = "industry")
+    @OneToMany(targetEntity = IndustryToCustomer.class,mappedBy = "industry")
     private List<IndustryToCustomer> industryToCustomers=new ArrayList<>();
 
     public Industry() {
@@ -24,7 +24,7 @@ public class Industry extends Baseclass {
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = IndividualCustomer.class,mappedBy = "industry")
+    @OneToMany(targetEntity = IndustryToCustomer.class,mappedBy = "industry")
     public List<IndustryToCustomer> getIndustryToCustomers() {
         return industryToCustomers;
     }

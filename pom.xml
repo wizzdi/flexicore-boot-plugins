@@ -153,9 +153,9 @@
         </dependencies>
       </plugin>
       <plugin>
-        <groupId>com.flexicore</groupId>
-        <artifactId>flexicore-plugin</artifactId>
-        <version>1</version>
+        <groupId>com.wizzdi</groupId>
+        <artifactId>metamodel-inheritence-fix-processor</artifactId>
+        <version>1.0.1</version>
         <executions>
           <execution>
             <id>flexicore</id>

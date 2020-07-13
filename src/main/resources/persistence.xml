@@ -22,6 +22,11 @@
         <class>com.flexicore.organization.model.SalesRegion</class>
         <class>com.flexicore.organization.model.SalesPersonToRegion</class>
         <class>com.flexicore.organization.model.SupplierApi</class>
+        <class>com.flexicore.organization.model.CustomerDocument</class>
+        <class>com.flexicore.organization.model.Industry</class>
+        <class>com.flexicore.organization.model.IndividualCustomer</class>
+        <class>com.flexicore.organization.model.OrganizationalCustomer</class>
+        <class>com.flexicore.organization.model.IndustryToCustomer</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
 </persistence>
