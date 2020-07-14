@@ -2,6 +2,7 @@ package com.flexicore.billing.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.organization.model.Customer;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -16,6 +17,12 @@ public class PaymentMethod extends Baseclass {
 
     private boolean active;
 
+    public PaymentMethod() {
+    }
+
+    public PaymentMethod(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     @ManyToOne(targetEntity = Customer.class)
     public Customer getCustomer() {

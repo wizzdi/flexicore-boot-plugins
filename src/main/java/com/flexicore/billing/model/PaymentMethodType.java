@@ -1,6 +1,7 @@
 package com.flexicore.billing.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
@@ -8,6 +9,13 @@ import javax.persistence.Entity;
 public class PaymentMethodType extends Baseclass {
 
     private String canonicalClassName;
+
+    public PaymentMethodType() {
+    }
+
+    public PaymentMethodType(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     public String getCanonicalClassName() {
         return canonicalClassName;
