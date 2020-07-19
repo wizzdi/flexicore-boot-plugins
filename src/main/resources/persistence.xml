@@ -19,6 +19,7 @@
         <class>com.flexicore.ui.model.TableColumn</class>
         <class>com.flexicore.ui.model.Form</class>
         <class>com.flexicore.ui.model.FormField</class>
+        <class>com.flexicore.ui.model.FilterProperties</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

@@ -16,6 +16,8 @@ import java.util.List;
 @Entity
 public class Preset extends Presenter {
 
+	private String externalId;
+
 	public Preset() {
 	}
 
@@ -37,6 +39,15 @@ public class Preset extends Presenter {
 
 	public <T extends Preset> T setUiFields(List<UiField> uiFields) {
 		this.uiFields = uiFields;
+		return (T) this;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public <T extends Preset> T setExternalId(String externalId) {
+		this.externalId = externalId;
 		return (T) this;
 	}
 }
