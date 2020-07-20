@@ -33,7 +33,6 @@ public class PriceListToServiceService implements ServicePlugin {
     @Autowired
     private PriceListToServiceRepository repository;
 
-    @PluginInfo(version = 1)
     @Autowired
     private BaseclassNewService baseclassNewService;
 

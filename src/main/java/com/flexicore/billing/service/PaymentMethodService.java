@@ -33,7 +33,6 @@ public class PaymentMethodService implements ServicePlugin {
 	@Autowired
 	private PaymentMethodRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

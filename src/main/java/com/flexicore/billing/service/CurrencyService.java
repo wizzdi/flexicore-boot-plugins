@@ -29,7 +29,6 @@ public class CurrencyService implements ServicePlugin {
 	@Autowired
 	private CurrencyRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

@@ -35,7 +35,6 @@ public class ContractItemService implements ServicePlugin {
 	@Autowired
 	private ContractItemRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

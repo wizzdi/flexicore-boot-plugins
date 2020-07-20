@@ -29,7 +29,6 @@ public class ContractService implements ServicePlugin {
 	@Autowired
 	private ContractRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

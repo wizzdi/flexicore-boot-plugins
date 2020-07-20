@@ -29,7 +29,6 @@ public class PriceListService implements ServicePlugin {
 	@Autowired
 	private PriceListRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

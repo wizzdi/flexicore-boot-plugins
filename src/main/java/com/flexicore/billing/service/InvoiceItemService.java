@@ -30,7 +30,6 @@ public class InvoiceItemService implements ServicePlugin {
 	@Autowired
 	private InvoiceItemRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

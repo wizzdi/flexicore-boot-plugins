@@ -29,7 +29,6 @@ public class BusinessServiceService implements ServicePlugin {
 	@Autowired
 	private BusinessServiceRepository repository;
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private BaseclassNewService baseclassNewService;
 

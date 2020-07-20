@@ -29,7 +29,6 @@ public class PaymentMethodTypeService implements ServicePlugin {
     @Autowired
     private PaymentMethodTypeRepository repository;
 
-    @PluginInfo(version = 1)
     @Autowired
     private BaseclassNewService baseclassNewService;
 
