@@ -33,7 +33,7 @@ public class ContractItemService implements ServicePlugin {
 
 	@PluginInfo(version = 1)
 	@Autowired
-	private ContractItemRepository repository;
+	private ContractItemRepository repository;1
 
 	@Autowired
 	private BaseclassNewService baseclassNewService;
