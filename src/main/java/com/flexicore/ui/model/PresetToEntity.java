@@ -1,5 +1,6 @@
 package com.flexicore.ui.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.security.SecurityContext;
@@ -46,6 +47,7 @@ public class PresetToEntity extends Baselink {
 		return (Preset) super.getLeftside();
 	}
 
+	@JsonIgnore
 	public void setLeftside(Preset leftside) {
 		super.setLeftside(leftside);
 	}

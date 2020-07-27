@@ -1,5 +1,6 @@
 package com.flexicore.ui.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.model.Clazz;
@@ -27,6 +28,7 @@ public class PresetToUser extends PresetToEntity {
 		return (Preset) super.getLeftside();
 	}
 
+	@JsonIgnore
 	public void setLeftside(Preset leftside) {
 		super.setLeftside(leftside);
 	}
@@ -43,6 +45,7 @@ public class PresetToUser extends PresetToEntity {
 		return (User) super.getRightside();
 	}
 
+	@JsonIgnore
 	public void setRightside(User rightside) {
 		super.setRightside(rightside);
 	}

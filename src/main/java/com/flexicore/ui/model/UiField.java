@@ -24,6 +24,7 @@ public class UiField extends Baseclass {
 	private Category category;
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset preset;
+	private boolean dynamicField;
 
 	@ManyToOne(targetEntity = Preset.class)
 	public Preset getPreset() {
@@ -72,4 +73,12 @@ public class UiField extends Baseclass {
 		return this;
 	}
 
+	public boolean isDynamicField() {
+		return dynamicField;
+	}
+
+	public <T extends UiField> T setDynamicField(boolean dynamicField) {
+		this.dynamicField = dynamicField;
+		return (T) this;
+	}
 }
