@@ -2,6 +2,7 @@ package com.flexicore.ui.grid.layout;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.ui.model.Preset;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class DashboardPreset extends Baseclass {
+public class DashboardPreset extends Preset {
 
     @ManyToOne(targetEntity = GridLayout.class)
     private GridLayout gridLayout;
