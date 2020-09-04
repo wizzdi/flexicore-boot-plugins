@@ -34,4 +34,9 @@ public class GridLayoutCellFiltering extends FilteringInformationHolder {
         this.gridLayouts = gridLayouts;
         return (T) this;
     }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
+    }
 }

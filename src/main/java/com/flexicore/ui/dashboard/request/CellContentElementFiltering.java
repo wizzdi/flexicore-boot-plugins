@@ -32,4 +32,9 @@ public class CellContentElementFiltering extends FilteringInformationHolder {
         this.cellContents = cellContents;
         return (T) this;
     }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
+    }
 }

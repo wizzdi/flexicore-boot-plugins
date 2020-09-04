@@ -46,10 +46,6 @@ public class GridLayoutService implements ServicePlugin {
 
 	public boolean GridLayoutUpdateNoMerge(GridLayoutCreate gridLayoutCreate, GridLayout gridLayout) {
 		boolean update = baseclassNewService.updateBaseclassNoMerge(gridLayoutCreate, gridLayout);
-		if(gridLayoutCreate.getContextString()!=null&&!gridLayoutCreate.getContextString().equals(gridLayout.getContextString())){
-			gridLayout.setContextString(gridLayoutCreate.getContextString());
-			update=true;
-		}
 
 		return update;
 	}

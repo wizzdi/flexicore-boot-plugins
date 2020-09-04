@@ -6,20 +6,11 @@ import com.flexicore.ui.dashboard.model.GridLayout;
 
 public class GridLayoutCellCreate extends BaseclassCreate {
 
-    private String contextString;
 
     private String gridLayoutId;
     @JsonIgnore
     private GridLayout gridLayout;
 
-    public String getContextString() {
-        return contextString;
-    }
-
-    public <T extends GridLayoutCellCreate> T setContextString(String contextString) {
-        this.contextString = contextString;
-        return (T) this;
-    }
 
     public String getGridLayoutId() {
         return gridLayoutId;
@@ -38,5 +29,10 @@ public class GridLayoutCellCreate extends BaseclassCreate {
     public <T extends GridLayoutCellCreate> T setGridLayout(GridLayout gridLayout) {
         this.gridLayout = gridLayout;
         return (T) this;
+    }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
     }
 }

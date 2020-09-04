@@ -48,10 +48,7 @@ public class CellContentElementService implements ServicePlugin {
 
 	public boolean CellContentElementUpdateNoMerge(CellContentElementCreate cellContentElementCreate, CellContentElement cellContentElement) {
 		boolean update = baseclassNewService.updateBaseclassNoMerge(cellContentElementCreate, cellContentElement);
-		if(cellContentElementCreate.getContextString()!=null&&!cellContentElementCreate.getContextString().equals(cellContentElement.getContextString())){
-			cellContentElement.setContextString(cellContentElementCreate.getContextString());
-			update=true;
-		}
+
 
 		if(cellContentElementCreate.getCellContent()!=null&&(cellContentElement.getCellContent()==null||!cellContentElementCreate.getCellContent().getId().equals(cellContentElement.getCellContent().getId()))){
 			cellContentElement.setCellContent(cellContentElementCreate.getCellContent());
