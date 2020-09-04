@@ -1,7 +1,8 @@
-package com.flexicore.ui.grid.layout;
+package com.flexicore.ui.dashboard.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.dynamic.DynamicExecution;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -17,6 +18,14 @@ public class DataMapper extends Baseclass {
     private String staticData;
     @ManyToOne(targetEntity = CellContentElement.class)
     private CellContentElement cellContentElement;
+
+    public DataMapper() {
+        super();
+    }
+
+    public DataMapper(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     public CellToLayout getCellToLayout() {
         return cellToLayout;

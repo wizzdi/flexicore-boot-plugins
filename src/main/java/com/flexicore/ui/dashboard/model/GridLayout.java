@@ -1,9 +1,11 @@
-package com.flexicore.ui.grid.layout;
+package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +13,19 @@ import java.util.List;
 @Entity
 public class GridLayout extends Baseclass {
 
-    private String contextString;
+
 
     @JsonIgnore
     @OneToMany(targetEntity = GridLayoutCell.class,mappedBy = "gridLayout")
     private List<GridLayoutCell> cells=new ArrayList<>();
+
+    public GridLayout() {
+        super();
+    }
+
+    public GridLayout(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     @JsonIgnore
     @OneToMany(targetEntity = GridLayoutCell.class,mappedBy = "gridLayout")
@@ -28,12 +38,4 @@ public class GridLayout extends Baseclass {
         return (T) this;
     }
 
-    public String getContextString() {
-        return contextString;
-    }
-
-    public <T extends GridLayout> T setContextString(String contextString) {
-        this.contextString = contextString;
-        return (T) this;
-    }
 }

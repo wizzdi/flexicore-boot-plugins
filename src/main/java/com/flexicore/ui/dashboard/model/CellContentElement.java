@@ -1,8 +1,10 @@
-package com.flexicore.ui.grid.layout;
+package com.flexicore.ui.dashboard.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -10,7 +12,14 @@ public class CellContentElement extends Baseclass {
 
     @ManyToOne(targetEntity = CellContent.class)
     private CellContent cellContent;
-    private String contextString;
+
+    public CellContentElement() {
+        super();
+    }
+
+    public CellContentElement(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     @ManyToOne(targetEntity = CellContent.class)
     public CellContent getCellContent() {
@@ -22,12 +31,4 @@ public class CellContentElement extends Baseclass {
         return (T) this;
     }
 
-    public String getContextString() {
-        return contextString;
-    }
-
-    public <T extends CellContentElement> T setContextString(String contextString) {
-        this.contextString = contextString;
-        return (T) this;
-    }
 }

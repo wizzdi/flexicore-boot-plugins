@@ -1,7 +1,7 @@
-package com.flexicore.ui.grid.layout;
+package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.model.Preset;
 
 import javax.persistence.Entity;
@@ -19,6 +19,14 @@ public class DashboardPreset extends Preset {
     @JsonIgnore
     @OneToMany(targetEntity = CellToLayout.class,mappedBy = "dashboardPreset")
     private List<CellToLayout> cellToLayouts=new ArrayList<>();
+
+    public DashboardPreset() {
+    }
+
+    public DashboardPreset(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
+
 
     @ManyToOne(targetEntity = GridLayout.class)
 

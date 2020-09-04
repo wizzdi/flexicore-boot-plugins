@@ -1,17 +1,27 @@
-package com.flexicore.ui.grid.layout;
+package com.flexicore.ui.dashboard.model;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class GridLayoutCell extends Baseclass {
 
     private String externalId;
-    private String contextString;
+
     @ManyToOne(targetEntity = GridLayout.class)
     private GridLayout gridLayout;
+
+    public GridLayoutCell() {
+        super();
+    }
+
+    public GridLayoutCell(String name, SecurityContext securityContext) {
+        super(name, securityContext);
+    }
 
     public String getExternalId() {
         return externalId;
@@ -22,15 +32,7 @@ public class GridLayoutCell extends Baseclass {
         return (T) this;
     }
 
-    public String getContextString() {
-        return contextString;
-    }
-
-    public <T extends GridLayoutCell> T setContextString(String contextString) {
-        this.contextString = contextString;
-        return (T) this;
-    }
-
+    @ManyToOne(targetEntity = GridLayout.class)
     public GridLayout getGridLayout() {
         return gridLayout;
     }
