@@ -33,7 +33,6 @@ public class GridLayoutService implements ServicePlugin {
 	private GridLayoutRepository gridLayoutRepository;
 
 	@Autowired
-	@PluginInfo(version = 1)
 	private BaseclassNewService baseclassNewService;
 
 	public GridLayout updateGridLayout(GridLayoutUpdate gridLayoutUpdate, SecurityContext securityContext) {

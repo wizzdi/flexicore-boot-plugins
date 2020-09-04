@@ -34,7 +34,6 @@ public class CellToLayoutService implements ServicePlugin {
 	private CellToLayoutRepository cellToLayoutRepository;
 
 	@Autowired
-	@PluginInfo(version = 1)
 	private BaseclassNewService baseclassNewService;
 
 	public CellToLayout updateCellToLayout(CellToLayoutUpdate cellToLayoutUpdate, SecurityContext securityContext) {

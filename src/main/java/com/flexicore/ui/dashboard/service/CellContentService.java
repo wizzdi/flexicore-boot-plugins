@@ -31,7 +31,6 @@ public class CellContentService implements ServicePlugin {
 	private CellContentRepository cellContentRepository;
 
 	@Autowired
-	@PluginInfo(version = 1)
 	private BaseclassNewService baseclassNewService;
 
 	public CellContent updateCellContent(CellContentUpdate cellContentUpdate, SecurityContext securityContext) {

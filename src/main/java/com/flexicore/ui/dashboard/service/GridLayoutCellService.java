@@ -36,7 +36,6 @@ public class GridLayoutCellService implements ServicePlugin {
 	private GridLayoutCellRepository gridLayoutCellRepository;
 
 	@Autowired
-	@PluginInfo(version = 1)
 	private BaseclassNewService baseclassNewService;
 
 	public GridLayoutCell updateGridLayoutCell(GridLayoutCellUpdate gridLayoutCellUpdate, SecurityContext securityContext) {
