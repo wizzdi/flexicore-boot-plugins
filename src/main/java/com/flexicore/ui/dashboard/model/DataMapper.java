@@ -27,6 +27,7 @@ public class DataMapper extends Baseclass {
         super(name, securityContext);
     }
 
+    @ManyToOne(targetEntity = CellToLayout.class)
     public CellToLayout getCellToLayout() {
         return cellToLayout;
     }
@@ -45,6 +46,7 @@ public class DataMapper extends Baseclass {
         return (T) this;
     }
 
+    @ManyToOne(targetEntity = CellContentElement.class)
     public CellContentElement getCellContentElement() {
         return cellContentElement;
     }
@@ -63,6 +65,7 @@ public class DataMapper extends Baseclass {
         return (T) this;
     }
 
+    @ManyToOne(targetEntity = DynamicExecution.class)
     public DynamicExecution getDynamicExecution() {
         return dynamicExecution;
     }

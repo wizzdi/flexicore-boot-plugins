@@ -22,8 +22,8 @@ public class CellToLayout extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = DataMapper.class,mappedBy = "cellToLayout")
     private List<DataMapper> dataMappers=new ArrayList<>();
-    @ManyToOne(targetEntity = DynamicExecution.class)
-    private DynamicExecution dynamicExecution;
+    private String listFieldPath;
+
 
     public CellToLayout() {
         super();
@@ -45,7 +45,6 @@ public class CellToLayout extends Baseclass {
     }
 
     @ManyToOne(targetEntity = CellContent.class)
-
     public CellContent getCellContent() {
         return cellContent;
     }
@@ -56,7 +55,6 @@ public class CellToLayout extends Baseclass {
     }
 
     @ManyToOne(targetEntity = DashboardPreset.class)
-
     public DashboardPreset getDashboardPreset() {
         return dashboardPreset;
     }
@@ -66,15 +64,6 @@ public class CellToLayout extends Baseclass {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = DynamicExecution.class)
-    public DynamicExecution getDynamicExecution() {
-        return dynamicExecution;
-    }
-
-    public <T extends CellToLayout> T setDynamicExecution(DynamicExecution dynamicExecution) {
-        this.dynamicExecution = dynamicExecution;
-        return (T) this;
-    }
 
     @JsonIgnore
     @OneToMany(targetEntity = DataMapper.class,mappedBy = "cellToLayout")
@@ -84,6 +73,15 @@ public class CellToLayout extends Baseclass {
 
     public <T extends CellToLayout> T setDataMappers(List<DataMapper> dataMappers) {
         this.dataMappers = dataMappers;
+        return (T) this;
+    }
+
+    public String getListFieldPath() {
+        return listFieldPath;
+    }
+
+    public <T extends CellToLayout> T setListFieldPath(String listFieldPath) {
+        this.listFieldPath = listFieldPath;
         return (T) this;
     }
 }

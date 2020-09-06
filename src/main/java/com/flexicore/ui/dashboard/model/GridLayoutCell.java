@@ -1,11 +1,15 @@
 package com.flexicore.ui.dashboard.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class GridLayoutCell extends Baseclass {
@@ -14,6 +18,10 @@ public class GridLayoutCell extends Baseclass {
 
     @ManyToOne(targetEntity = GridLayout.class)
     private GridLayout gridLayout;
+
+    @JsonIgnore
+    @OneToMany(targetEntity = CellToLayout.class)
+    private List<CellToLayout> cellToLayouts=new ArrayList<>();
 
     public GridLayoutCell() {
         super();
@@ -39,6 +47,18 @@ public class GridLayoutCell extends Baseclass {
 
     public <T extends GridLayoutCell> T setGridLayout(GridLayout gridLayout) {
         this.gridLayout = gridLayout;
+        return (T) this;
+    }
+
+
+    @JsonIgnore
+    @OneToMany(targetEntity = CellToLayout.class)
+    public List<CellToLayout> getCellToLayouts() {
+        return cellToLayouts;
+    }
+
+    public <T extends GridLayoutCell> T setCellToLayouts(List<CellToLayout> cellToLayouts) {
+        this.cellToLayouts = cellToLayouts;
         return (T) this;
     }
 }
