@@ -20,9 +20,8 @@ public class CellToLayoutCreate extends BaseclassCreate {
     private String dashboardPresetId;
     @JsonIgnore
     private DashboardPreset dashboardPreset;
-    private String dynamicExecutionId;
-    @JsonIgnore
-    private DynamicExecution dynamicExecution;
+    private String listFieldPath;
+
 
 
     public String getGridLayoutCellId() {
@@ -82,22 +81,13 @@ public class CellToLayoutCreate extends BaseclassCreate {
         return (T) this;
     }
 
-    public String getDynamicExecutionId() {
-        return dynamicExecutionId;
+
+    public String getListFieldPath() {
+        return listFieldPath;
     }
 
-    public <T extends CellToLayoutCreate> T setDynamicExecutionId(String dynamicExecutionId) {
-        this.dynamicExecutionId = dynamicExecutionId;
-        return (T) this;
-    }
-
-    @JsonIgnore
-    public DynamicExecution getDynamicExecution() {
-        return dynamicExecution;
-    }
-
-    public <T extends CellToLayoutCreate> T setDynamicExecution(DynamicExecution dynamicExecution) {
-        this.dynamicExecution = dynamicExecution;
+    public <T extends CellToLayoutCreate> T setListFieldPath(String listFieldPath) {
+        this.listFieldPath = listFieldPath;
         return (T) this;
     }
 }

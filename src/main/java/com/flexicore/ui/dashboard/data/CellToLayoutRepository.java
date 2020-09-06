@@ -49,12 +49,6 @@ public class CellToLayoutRepository extends AbstractRepositoryPlugin {
 			preds.add(join.get(DashboardPreset_.id).in(ids));
 		}
 
-		if(cellToLayoutFiltering.getDynamicExecutions()!=null &&!cellToLayoutFiltering.getDynamicExecutions().isEmpty()){
-			Set<String> ids=cellToLayoutFiltering.getDynamicExecutions().stream().map(f->f.getId()).collect(Collectors.toSet());
-			Join<CellToLayout, DynamicExecution> join=r.join(CellToLayout_.dynamicExecution);
-			preds.add(join.get(DynamicExecution_.id).in(ids));
-		}
-
 		if(cellToLayoutFiltering.getGridLayoutCells()!=null &&!cellToLayoutFiltering.getGridLayoutCells().isEmpty()){
 			Set<String> ids=cellToLayoutFiltering.getGridLayoutCells().stream().map(f->f.getId()).collect(Collectors.toSet());
 			Join<CellToLayout, GridLayoutCell> join=r.join(CellToLayout_.gridLayoutCell);

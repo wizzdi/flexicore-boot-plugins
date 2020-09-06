@@ -22,9 +22,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
     private Set<String> dashboardPresetIds=new HashSet<>();
     @JsonIgnore
     private List<DashboardPreset> dashboardPresets;
-    private Set<String> dynamicExecutionIds=new HashSet<>();
-    @JsonIgnore
-    private List<DynamicExecution> dynamicExecutions;
+
 
     public CellToLayoutFiltering() {
     }
@@ -87,22 +85,4 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return (T) this;
     }
 
-    public Set<String> getDynamicExecutionIds() {
-        return dynamicExecutionIds;
-    }
-
-    public <T extends CellToLayoutFiltering> T setDynamicExecutionIds(Set<String> dynamicExecutionIds) {
-        this.dynamicExecutionIds = dynamicExecutionIds;
-        return (T) this;
-    }
-
-    @JsonIgnore
-    public List<DynamicExecution> getDynamicExecutions() {
-        return dynamicExecutions;
-    }
-
-    public <T extends CellToLayoutFiltering> T setDynamicExecutions(List<DynamicExecution> dynamicExecutions) {
-        this.dynamicExecutions = dynamicExecutions;
-        return (T) this;
-    }
 }

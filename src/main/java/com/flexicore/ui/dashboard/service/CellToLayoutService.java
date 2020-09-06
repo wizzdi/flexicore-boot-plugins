@@ -55,13 +55,13 @@ public class CellToLayoutService implements ServicePlugin {
 			update=true;
 		}
 
-		if(cellToLayoutCreate.getDynamicExecution()!=null&&(cellToLayout.getDynamicExecution()==null||!cellToLayoutCreate.getDynamicExecution().getId().equals(cellToLayout.getDynamicExecution().getId()))){
-			cellToLayout.setDynamicExecution(cellToLayoutCreate.getDynamicExecution());
-			update=true;
-		}
 
 		if(cellToLayoutCreate.getGridLayoutCell()!=null&&(cellToLayout.getGridLayoutCell()==null||!cellToLayoutCreate.getGridLayoutCell().getId().equals(cellToLayout.getGridLayoutCell().getId()))){
 			cellToLayout.setGridLayoutCell(cellToLayoutCreate.getGridLayoutCell());
+			update=true;
+		}
+		if(cellToLayoutCreate.getListFieldPath()!=null&&!cellToLayoutCreate.getListFieldPath().equals(cellToLayout.getListFieldPath())){
+			cellToLayout.setListFieldPath(cellToLayoutCreate.getListFieldPath());
 			update=true;
 		}
 
@@ -131,12 +131,6 @@ public class CellToLayoutService implements ServicePlugin {
 		}
 		createCellToLayout.setGridLayoutCell(gridLayoutCell);
 
-		String dynamicExecutionId=createCellToLayout.getDynamicExecutionId();
-		DynamicExecution dynamicExecution=dynamicExecutionId!=null?getByIdOrNull(dynamicExecutionId, DynamicExecution.class,null,securityContext):null;
-		if(dynamicExecution==null){
-			throw new BadRequestException("No DynamicExecution with id "+dynamicExecutionId);
-		}
-		createCellToLayout.setDynamicExecution(dynamicExecution);
 	}
 
 	public void validate(CellToLayoutFiltering cellToLayoutFiltering,
@@ -167,13 +161,6 @@ public class CellToLayoutService implements ServicePlugin {
 		}
 		cellToLayoutFiltering.setGridLayoutCells(new ArrayList<>(gridLayoutCellMap.values()));
 
-		Set<String> dynamicExecutionIds=cellToLayoutFiltering.getDynamicExecutionIds();
-		Map<String,DynamicExecution> dynamicExecutionMap=dynamicExecutionIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(DynamicExecution.class,dynamicExecutionIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
-		dynamicExecutionIds.removeAll(dynamicExecutionMap.keySet());
-		if(!dynamicExecutionIds.isEmpty()){
-			throw new BadRequestException("No DynamicExecution with ids "+dynamicExecutionIds);
-		}
-		cellToLayoutFiltering.setDynamicExecutions(new ArrayList<>(dynamicExecutionMap.values()));
 
 	}
 
