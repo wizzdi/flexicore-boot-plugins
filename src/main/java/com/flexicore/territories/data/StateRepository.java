@@ -3,17 +3,16 @@ package com.flexicore.territories.data;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.territories.State;
-import com.flexicore.model.territories.State_;
+import com.flexicore.model.territories.*;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.request.StateFiltering;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
@@ -50,8 +49,10 @@ public class StateRepository extends AbstractRepositoryPlugin {
 
 	private void addStatePredicate(StateFiltering filtering,
 			CriteriaBuilder cb, Root<State> r, List<Predicate> preds) {
-		if (filtering.getCountry() != null) {
-			preds.add(cb.equal(r.get(State_.country), filtering.getCountry()));
+		if (filtering.getCountries() != null && !filtering.getCountries().isEmpty()) {
+			Set<String> ids=filtering.getCountries().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<State, Country> countryJoin=r.join(State_.country);
+			preds.add(countryJoin.get(Country_.id).in(ids));
 		}
 
 	}

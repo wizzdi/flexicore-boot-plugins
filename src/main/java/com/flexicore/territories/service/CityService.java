@@ -2,8 +2,9 @@ package com.flexicore.territories.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.Country;
@@ -88,24 +89,24 @@ public class CityService implements ICityService {
 		creationContainer.setState(state);
 	}
 
-	public void validate(CityFiltering creationContainer,
+	public void validate(CityFiltering cityFiltering,
 			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(creationContainer, securityContext);
-		String countryId = creationContainer.getCountryId();
-		Country country = countryId != null ? getByIdOrNull(countryId,
-				Country.class, null, securityContext) : null;
-		if (countryId != null && country == null) {
-			throw new BadRequestException("no Country with id " + countryId);
+		baseclassNewService.validateFilter(cityFiltering, securityContext);
+		Set<String> countriesIds = cityFiltering.getCountriesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		countriesIds.removeAll(countryMap.keySet());
+		if(!countriesIds.isEmpty()){
+			throw new BadRequestException("No Countries with ids "+countriesIds);
 		}
-		creationContainer.setCountry(country);
+		cityFiltering.setCountries(new ArrayList<>(countryMap.values()));
 
-		String stateId = creationContainer.getStateId();
-		State state = stateId != null ? getByIdOrNull(stateId, State.class,
-				null, securityContext) : null;
-		if (stateId != null && state == null) {
-			throw new BadRequestException("no State with id " + stateId);
+		Set<String> stateIds = cityFiltering.getStatesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String, State> stateMa = stateIds.isEmpty()?new HashMap<>():repository.listByIds(State.class,stateIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		stateIds.removeAll(stateMa.keySet());
+		if(!stateIds.isEmpty()){
+			throw new BadRequestException("No States with ids "+stateIds);
 		}
-		creationContainer.setState(state);
+		cityFiltering.setStates(new ArrayList<>(stateMa.values()));
 	}
 
 	@Override

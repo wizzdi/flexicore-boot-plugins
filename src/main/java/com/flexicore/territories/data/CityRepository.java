@@ -3,17 +3,16 @@ package com.flexicore.territories.data;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.territories.City;
-import com.flexicore.model.territories.City_;
+import com.flexicore.model.territories.*;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.request.CityFiltering;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
@@ -50,11 +49,18 @@ public class CityRepository extends AbstractRepositoryPlugin {
 
 	private void addCityPredicate(CityFiltering filtering, CriteriaBuilder cb,
 			Root<City> r, List<Predicate> preds) {
-		if (filtering.getCountry() != null) {
-			preds.add(cb.equal(r.get(City_.country), filtering.getCountry()));
+
+		if (filtering.getCountries() != null && !filtering.getCountries().isEmpty()) {
+			Set<String> ids=filtering.getCountries().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<City, Country> countryJoin=r.join(City_.country);
+			preds.add(countryJoin.get(Country_.id).in(ids));
 		}
-		if (filtering.getState() != null) {
-			preds.add(cb.equal(r.get(City_.state), filtering.getState()));
+
+		if (filtering.getStates() != null && !filtering.getStates().isEmpty()) {
+			Set<String> ids=filtering.getStates().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<City, State> stateJoin=r.join(City_.state);
+			preds.add(stateJoin.get(State_.id).in(ids));
 		}
+
 	}
 }

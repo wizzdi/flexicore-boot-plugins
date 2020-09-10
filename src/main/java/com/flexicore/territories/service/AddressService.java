@@ -74,6 +74,20 @@ public class AddressService implements IAddressService {
 		}
 		return address;
 	}
+
+	public void validate(AddressFiltering addressFiltering,
+						 SecurityContext securityContext) {
+		Set<String> streetIds = addressFiltering.getStreetsIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String,Street> streetMap = streetIds.isEmpty()?new HashMap<>():repository.listByIds(Street.class,streetIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		streetIds.removeAll(streetMap.keySet());
+		if(!streetIds.isEmpty()){
+			throw new BadRequestException("No Street with ids "+streetIds);
+		}
+		addressFiltering.setStreets(new ArrayList<>(streetMap.values()));
+
+
+
+	}
 	@Override
 	public void validate(AddressCreationContainer addressCreationContainer,
 			SecurityContext securityContext) {

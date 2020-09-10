@@ -15,8 +15,10 @@ import com.flexicore.territories.request.StateFiltering;
 import com.flexicore.territories.request.StateUpdate;
 
 import javax.ws.rs.BadRequestException;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,14 +83,14 @@ public class StateService implements IStateService {
 	public void validate(StateFiltering stateFiltering,
 			SecurityContext securityContext) {
 		baseclassNewService.validateFilter(stateFiltering, securityContext);
-		Country country = stateFiltering.getCountryId() != null
-				? getByIdOrNull(stateFiltering.getCountryId(), Country.class,
-						null, securityContext) : null;
-		if (country == null && stateFiltering.getCountryId() != null) {
-			throw new BadRequestException("no Country with id "
-					+ stateFiltering.getCountryId());
+		Set<String> countriesIds = stateFiltering.getCountriesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		countriesIds.removeAll(countryMap.keySet());
+		if(!countriesIds.isEmpty()){
+			throw new BadRequestException("No Countries with ids "+countriesIds);
 		}
-		stateFiltering.setCountry(country);
+		stateFiltering.setCountries(new ArrayList<>(countryMap.values()));
+
 	}
 
 	public State createStateNoMerge(StateCreate stateCreate,

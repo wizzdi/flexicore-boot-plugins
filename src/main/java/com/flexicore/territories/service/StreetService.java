@@ -2,11 +2,14 @@ package com.flexicore.territories.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.territories.City;
+import com.flexicore.model.territories.Country;
+import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.service.BaseclassNewService;
 import com.flexicore.territories.data.StreetRepository;
 
@@ -85,15 +88,32 @@ public class StreetService implements IStreetService {
 	public void validate(StreetFiltering streetFiltering,
 			SecurityContext securityContext) {
 		baseclassNewService.validateFilter(streetFiltering, securityContext);
-		City city = streetFiltering.getCityId() != null
-				? getByIdOrNull(streetFiltering.getCityId(), City.class, null,
-						securityContext) : null;
-		if (city == null && streetFiltering.getCityId() != null) {
-			throw new BadRequestException("no City with id "
-					+ streetFiltering.getCityId());
+		Set<String> citiesIds = streetFiltering.getCitiesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		citiesIds.removeAll(cityMap.keySet());
+		if(!citiesIds.isEmpty()){
+			throw new BadRequestException("No Cities with ids "+citiesIds);
 		}
-		streetFiltering.setCity(city);
+		streetFiltering.setCities(new ArrayList<>(cityMap.values()));
+
+		Set<String> countriesIds = streetFiltering.getCountriesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		countriesIds.removeAll(countryMap.keySet());
+		if(!countriesIds.isEmpty()){
+			throw new BadRequestException("No Countries with ids "+countriesIds);
+		}
+		streetFiltering.setCountries(new ArrayList<>(countryMap.values()));
+
+
+		Set<String> neighbourhoodsIds = streetFiltering.getNeighbourhoodsIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String, Neighbourhood> stringNeighbourhoodMap = neighbourhoodsIds.isEmpty()?new HashMap<>():repository.listByIds(Neighbourhood.class,neighbourhoodsIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		neighbourhoodsIds.removeAll(stringNeighbourhoodMap.keySet());
+		if(!neighbourhoodsIds.isEmpty()){
+			throw new BadRequestException("No Neighbourhoods with ids "+neighbourhoodsIds);
+		}
+		streetFiltering.setNeighbourhoods(new ArrayList<>(stringNeighbourhoodMap.values()));
 	}
+
 
 	@Override
 	public Street createStreetNoMerge(

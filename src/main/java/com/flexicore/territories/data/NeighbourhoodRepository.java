@@ -3,10 +3,7 @@ package com.flexicore.territories.data;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.territories.Neighbourhood;
-import com.flexicore.model.territories.Neighbourhood_;
-import com.flexicore.model.territories.Street;
-import com.flexicore.model.territories.Street_;
+import com.flexicore.model.territories.*;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.request.NeighbourhoodFiltering;
 
@@ -51,10 +48,14 @@ public class NeighbourhoodRepository extends AbstractRepositoryPlugin {
 
 	private void addNeighbourhoodPredicate(NeighbourhoodFiltering filtering,
 			CriteriaBuilder cb, Root<Neighbourhood> r, List<Predicate> preds) {
-		if (filtering.getExternalIds() != null
-				&& !filtering.getExternalIds().isEmpty()) {
-			preds.add(r.get(Neighbourhood_.externalId).in(
-					filtering.getExternalIds()));
+
+		if (filtering.getExternalIds() != null && !filtering.getExternalIds().isEmpty()) {
+			preds.add(r.get(Neighbourhood_.externalId).in(filtering.getExternalIds()));
+		}
+		if (filtering.getCities() != null && !filtering.getCities().isEmpty()) {
+			Set<String> ids=filtering.getCities().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<Neighbourhood, City> countryJoin=r.join(Neighbourhood_.city);
+			preds.add(countryJoin.get(City_.id).in(ids));
 		}
 
 	}

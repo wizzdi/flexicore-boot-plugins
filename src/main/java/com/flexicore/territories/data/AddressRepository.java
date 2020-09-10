@@ -66,8 +66,8 @@ public class AddressRepository extends AbstractRepositoryPlugin {
 			preds.add(r.get(Address_.zipCode).in(filtering.getZipCodes()));
 		}
 		if (filtering.getStreets() != null && !filtering.getStreets().isEmpty()) {
-			Set<String> ids = filtering.getStreets().parallelStream()
-					.map(f -> f.getId()).collect(Collectors.toSet());
+
+			Set<String> ids = filtering.getStreets().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
 			Join<Address, Street> join = r.join(Address_.street);
 			preds.add(join.get(Street_.id).in(ids));
 		}

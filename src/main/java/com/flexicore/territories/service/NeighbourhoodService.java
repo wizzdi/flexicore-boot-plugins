@@ -15,8 +15,10 @@ import com.flexicore.territories.request.NeighbourhoodUpdateContainer;
 import com.flexicore.territories.interfaces.INeighbourhoodService;
 
 import javax.ws.rs.BadRequestException;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +54,18 @@ public class NeighbourhoodService implements INeighbourhoodService {
 		}
 		return neighbourhood;
 	}
-	@Override
-	public void validate(
-			NeighbourhoodCreationContainer neighbourhoodCreationContainer,
-			SecurityContext securityContext) {
+	public void validate(NeighbourhoodFiltering neighbourhoodFiltering, SecurityContext securityContext) {
+		Set<String> citiesIds = neighbourhoodFiltering.getCitiesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
+		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		citiesIds.removeAll(cityMap.keySet());
+		if(!citiesIds.isEmpty()){
+			throw new BadRequestException("No Cities with ids "+citiesIds);
+		}
+		neighbourhoodFiltering.setCities(new ArrayList<>(cityMap.values()));
+	}
+
+		@Override
+	public void validate(NeighbourhoodCreationContainer neighbourhoodCreationContainer, SecurityContext securityContext) {
 		baseclassNewService.validateCreate(neighbourhoodCreationContainer,
 				securityContext);
 		City city = getByIdOrNull(neighbourhoodCreationContainer.getCityId(),

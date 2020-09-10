@@ -32,10 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Path("plugins/Address")
 @OpenAPIDefinition(tags = {@Tag(name = "Address", description = "Address Api"),
 		@Tag(name = "Street", description = "Street Api"),
-		@Tag(name = "ZipToStreet", description = "ZipToStreet Api"),
 		@Tag(name = "City", description = "City Api"),
 		@Tag(name = "Country", description = "Country Api"),
-		@Tag(name = "Zip", description = "Zip Api"),
 		@Tag(name = "Neighbourhood", description = "Neighbourhood Api")
 
 })
