@@ -21,12 +21,8 @@ public class CreateTimeslot {
 	private TimeOfTheDayName endTimeOfTheDayName;
 	private Double timeOfTheDayNameEndLat;
 	private Double timeOfTheDayNameEndLon;
-
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-	private ZonedDateTime timeOfTheDayStart;
-
-	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-	private ZonedDateTime timeOfTheDayEnd;
+	private OffsetDateTime timeOfTheDayStart;
+	private OffsetDateTime timeOfTheDayEnd;
 	private Long startMillisOffset;
 	private Long endMillisOffset;
 
@@ -92,22 +88,22 @@ public class CreateTimeslot {
 		return this;
 	}
 
-	public ZonedDateTime getTimeOfTheDayStart() {
+	public OffsetDateTime getTimeOfTheDayStart() {
 		return timeOfTheDayStart;
 	}
 
 	public <T extends CreateTimeslot> T setTimeOfTheDayStart(
-			ZonedDateTime timeOfTheDayStart) {
+			OffsetDateTime timeOfTheDayStart) {
 		this.timeOfTheDayStart = timeOfTheDayStart;
 		return (T) this;
 	}
 
-	public ZonedDateTime getTimeOfTheDayEnd() {
+	public OffsetDateTime getTimeOfTheDayEnd() {
 		return timeOfTheDayEnd;
 	}
 
 	public <T extends CreateTimeslot> T setTimeOfTheDayEnd(
-			ZonedDateTime timeOfTheDayEnd) {
+			OffsetDateTime timeOfTheDayEnd) {
 		this.timeOfTheDayEnd = timeOfTheDayEnd;
 		return (T) this;
 	}

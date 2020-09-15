@@ -3,10 +3,12 @@ package com.flexicore.scheduling.service;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
 import com.flexicore.events.PluginsLoadedEvent;
-import com.flexicore.model.*;
+import com.flexicore.model.Baseclass;
+import com.flexicore.model.Operation;
+import com.flexicore.model.QueryInformationHolder;
+import com.flexicore.model.User;
 import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.request.ExecuteInvokerRequest;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.data.SchedulingRepository;
@@ -14,28 +16,30 @@ import com.flexicore.scheduling.interfaces.ISchedulingService;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.service.*;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.flexicore.service.AuditingService;
+import com.flexicore.service.DynamicInvokersService;
+import com.flexicore.service.SecurityService;
+import com.flexicore.service.UserService;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
+import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.BadRequestException;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.pf4j.Extension;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 @PluginInfo(version = 1)
 @Extension
@@ -43,12 +47,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SchedulingService implements ISchedulingService {
 
+	private static final Logger logger= LoggerFactory.getLogger(SchedulingService.class);
+
 	@PluginInfo(version = 1)
 	@Autowired
 	private SchedulingRepository schedulingRepository;
 
-	@Autowired
-	private Logger logger;
+
 
 	@Autowired
 	private UserService userService;
@@ -68,8 +73,7 @@ public class SchedulingService implements ISchedulingService {
 	@EventListener
 	public void init(PluginsLoadedEvent e) {
 		if (init.compareAndSet(false, true)) {
-			SecurityContext securityContext = getAdminSecurityContext();
-			scheduler = new Scheduler(logger, this, securityContext);
+			scheduler = new Scheduler( this, securityService);
 			new Thread(scheduler).start();
 		}
 	}
@@ -278,9 +282,7 @@ public class SchedulingService implements ISchedulingService {
 	@Override
 	public ScheduleTimeslot createScheduleTimeSlotNoMerge(
 			SecurityContext securityContext, CreateTimeslot createTimeslot) {
-		ScheduleTimeslot scheduleTimeslot = ScheduleTimeslot.s()
-				.CreateUnchecked(createTimeslot.getName(), securityContext);
-		scheduleTimeslot.Init();
+		ScheduleTimeslot scheduleTimeslot = new ScheduleTimeslot(createTimeslot.getName(), securityContext);
 		updateScheduleTimeslot(scheduleTimeslot, createTimeslot);
 		return scheduleTimeslot;
 	}
@@ -311,45 +313,18 @@ public class SchedulingService implements ISchedulingService {
 			scheduleTimeslot.setDescription(createTimeslot.getDescription());
 			update = true;
 		}
-		if (createTimeslot.getTimeOfTheDayStart() != null) {
-			OffsetDateTime start = createTimeslot.getTimeOfTheDayStart()
-					.withZoneSameInstant(ZoneId.systemDefault())
-					.toOffsetDateTime();
-			if (!start.equals(scheduleTimeslot.getStartTime())) {
-				scheduleTimeslot.setStartTime(start);
+		if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().equals(scheduleTimeslot.getStartTime())) {
+				scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart());
 				scheduleTimeslot.setStartTimeOfTheDayName(null);
 				update = true;
-			}
-
 		}
 
-		if (createTimeslot.getTimeOfTheDayStart() != null
-				&& !createTimeslot.getTimeOfTheDayStart().getZone().getId()
-						.equals(scheduleTimeslot.getTimeStartZoneId())) {
-			scheduleTimeslot.setTimeStartZoneId(createTimeslot
-					.getTimeOfTheDayStart().getZone().getId());
+		if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().equals(scheduleTimeslot.getEndTime())) {
+			scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd());
+			scheduleTimeslot.setEndTimeOfTheDayName(null);
 			update = true;
 		}
 
-		if (createTimeslot.getTimeOfTheDayEnd() != null) {
-			OffsetDateTime end = createTimeslot.getTimeOfTheDayEnd()
-					.withZoneSameInstant(ZoneId.systemDefault())
-					.toOffsetDateTime();
-			if (!end.equals(scheduleTimeslot.getEndTime())) {
-				scheduleTimeslot.setEndTime(end);
-				scheduleTimeslot.setEndTimeOfTheDayName(null);
-				update = true;
-			}
-
-		}
-
-		if (createTimeslot.getTimeOfTheDayEnd() != null
-				&& !createTimeslot.getTimeOfTheDayEnd().getZone().getId()
-						.equals(scheduleTimeslot.getTimeEndZoneId())) {
-			scheduleTimeslot.setTimeEndZoneId(createTimeslot
-					.getTimeOfTheDayEnd().getZone().getId());
-			update = true;
-		}
 
 		if (createTimeslot.getCoolDownIntervalBeforeRepeat() != null
 				&& !createTimeslot.getCoolDownIntervalBeforeRepeat().equals(
@@ -444,7 +419,7 @@ public class SchedulingService implements ISchedulingService {
 		return update;
 	}
 
-	public Optional<LocalTime> getTimeFromName(
+	public Optional<OffsetTime> getTimeFromName(
 			TimeOfTheDayName timeOfTheDayName, double lon, double lat) {
 		SolarTime solarTime;
 		Optional<Moment> result = Optional.empty();
@@ -460,7 +435,7 @@ public class SchedulingService implements ISchedulingService {
 		}
 
 		return result.map(f -> f.toLocalTimestamp().toTemporalAccessor()
-				.toLocalTime());
+				.atZone(ZoneId.systemDefault()).toOffsetDateTime().toOffsetTime());
 
 	}
 
@@ -482,7 +457,7 @@ public class SchedulingService implements ISchedulingService {
 									dynamicExecution, securityContext),
 							securityContext);
 				} else {
-					logger.warning("Schedule Action "
+					logger.warn("Schedule Action "
 							+ scheduleAction.getName() + "("
 							+ scheduleAction.getId()
 							+ ") had null dynamic Exection");
@@ -558,10 +533,9 @@ public class SchedulingService implements ISchedulingService {
 	public ScheduleToAction linkScheduleToActionNoMerge(
 			SecurityContext securityContext,
 			LinkScheduleToAction createScheduling) {
-		ScheduleToAction scheduleToAction = ScheduleToAction.s()
-				.CreateUnchecked("link", securityContext);
-		scheduleToAction.Init(createScheduling.getSchedule(),
-				createScheduling.getScheduleAction());
+		ScheduleToAction scheduleToAction = new ScheduleToAction("link", securityContext);
+		scheduleToAction.setLeftside(createScheduling.getSchedule());
+		scheduleToAction.setRightside(createScheduling.getScheduleAction());
 		return scheduleToAction;
 	}
 
