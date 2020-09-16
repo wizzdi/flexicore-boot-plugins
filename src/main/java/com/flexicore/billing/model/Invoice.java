@@ -2,6 +2,7 @@ package com.flexicore.billing.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.organization.model.Customer;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import java.util.List;
 @Entity
 public class Invoice extends Baseclass {
 
+    @ManyToOne(targetEntity = Customer.class)
+    private Customer customer;
     @ManyToOne(targetEntity = PaymentMethod.class)
     private PaymentMethod usedPaymentMethod;
     @JsonIgnore
@@ -44,6 +47,16 @@ public class Invoice extends Baseclass {
 
     public <T extends Invoice> T setUsedPaymentMethod(PaymentMethod usedPaymentMethod) {
         this.usedPaymentMethod = usedPaymentMethod;
+        return (T) this;
+    }
+
+    @ManyToOne(targetEntity = Customer.class)
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public <T extends Invoice> T setCustomer(Customer customer) {
+        this.customer = customer;
         return (T) this;
     }
 }
