@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.wizzdi</groupId>
   <artifactId>flexicore-territories-service</artifactId>
-  <version>3.3.1</version>
+  <version>3.3.2</version>
   <distributionManagement>
     <repository>
       <id>flexicore-local</id>
@@ -36,6 +36,20 @@
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-xml</artifactId>
       <version>${version.jackson}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jackson-core</artifactId>
+          <groupId>com.fasterxml.jackson.core</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jackson-annotations</artifactId>
+          <groupId>com.fasterxml.jackson.core</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jackson-module-jaxb-annotations</artifactId>
+          <groupId>com.fasterxml.jackson.module</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.wizzdi</groupId>
@@ -44,9 +58,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.mashape.unirest</groupId>
+      <groupId>io.joshworks.unirest</groupId>
       <artifactId>unirest-java</artifactId>
-      <version>1.4.9</version>
+      <version>1.8.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

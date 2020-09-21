@@ -26,9 +26,10 @@ import com.flexicore.security.SecurityContext;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.AddressImportRequest;
 import com.flexicore.territories.request.StreetEntry;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+
+import io.joshworks.restclient.http.HttpResponse;
+import io.joshworks.restclient.http.Unirest;
+import io.joshworks.restclient.http.exceptions.RestClientException;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,7 +199,7 @@ public class AddressService implements IAddressService {
 			String url = addressImportRequest.getUrl();
 			HttpResponse<InputStream> response = Unirest.get(url).asBinary();
 			if (response.getStatus() == 200) {
-				InputStream is = response.getBody();
+				InputStream is = response.body();
 				try {
 					StreetEntry[] data = xmlMapper.readValue(is,
 							StreetEntry[].class);
@@ -337,7 +338,7 @@ public class AddressService implements IAddressService {
 				logger.severe("Request for db file from " + url
 						+ " failed with status " + response.getStatus());
 			}
-		} catch (UnirestException e) {
+		} catch (RestClientException e) {
 			logger.log(Level.SEVERE, "unable to get address db", e);
 		}
 		return addressImportResponse;

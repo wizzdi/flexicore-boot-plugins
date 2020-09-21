@@ -26,22 +26,19 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.11.0" level="project" />
-    <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
-    <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:4.2" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.woodstox:woodstox-core:6.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:2.2.0" level="project" />
-    <orderEntry type="library" name="Maven: com.mashape.unirest:unirest-java:1.4.9" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.12" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
-    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpasyncclient:4.1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore-nio:4.4.13" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.5.12" level="project" />
-    <orderEntry type="library" name="Maven: org.json:json:20160212" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: io.joshworks.unirest:unirest-java:1.8.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpclient:4.5.12" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-codec:commons-codec:1.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpasyncclient:4.1.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpcore-nio:4.4.13" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.httpcomponents:httpmime:4.5.12" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.json:json:20160212" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.code.gson:gson:2.8.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-actuator:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot:2.3.0.RELEASE" level="project" />
@@ -64,6 +61,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.mail:javax.mail:1.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.jpa:2.7.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:jakarta.persistence:2.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.persistence:org.eclipse.persistence.asm:2.7.7" level="project" />
@@ -85,9 +84,11 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.validation:validation-api:2.0.1.Final" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.11.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.activation:jakarta.activation-api:1.2.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.pf4j:pf4j-spring:0.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.pf4j:pf4j:3.2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.github.zafarkhaja:java-semver:0.9.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-core:5.2.6.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-jcl:5.2.6.RELEASE" level="project" />

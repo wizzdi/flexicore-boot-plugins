@@ -16,10 +16,7 @@ import com.flexicore.territories.request.CountryCreationContainer;
 import com.flexicore.territories.request.CountryFiltering;
 import com.flexicore.territories.request.CountryUpdateContainer;
 import com.flexicore.territories.request.ImportCountriesRequest;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.ObjectMapper;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +25,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import io.joshworks.restclient.http.HttpResponse;
+import io.joshworks.restclient.http.MediaType;
+import io.joshworks.restclient.http.Unirest;
+import io.joshworks.restclient.http.exceptions.RestClientException;
+import io.joshworks.restclient.http.mapper.ObjectMapper;
+import io.joshworks.restclient.http.mapper.ObjectMappers;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +139,7 @@ public class CountryService implements ICountryService {
 					Config.getCountriesImportUrl()).asObject(
 					ImportedCountry[].class);
 			if (response.getStatus() == 200) {
-				ImportedCountry[] data = response.getBody();
+				ImportedCountry[] data = response.body();
 				List<Object> toMerge = new ArrayList<>();
 				Map<String, Country> existingCountries = listAllCountries(
 						securityContext, new CountryFiltering())
@@ -166,7 +170,7 @@ public class CountryService implements ICountryService {
 				}
 				repository.massMerge(toMerge);
 			}
-		} catch (UnirestException e) {
+		} catch (RestClientException e) {
 			logger.log(Level.SEVERE, "unable to get countries", e);
 		}
 		return importCountriesResponse;
@@ -174,7 +178,7 @@ public class CountryService implements ICountryService {
 
 	static {
 		com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-		Unirest.setObjectMapper(new ObjectMapper() {
+		ObjectMappers.register(MediaType.WILDCARD_TYPE,new ObjectMapper() {
 			@Override
 			public <T> T readValue(String value, Class<T> valueType) {
 				try {
