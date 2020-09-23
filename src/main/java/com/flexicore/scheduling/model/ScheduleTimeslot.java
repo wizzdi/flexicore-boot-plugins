@@ -14,10 +14,10 @@ public class ScheduleTimeslot extends Baseclass {
 
 	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime startTime; // the explicit time for TS start
-	private String timeStartZoneId;
+	private String startTimeOffsetId;
 	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime endTime; // the explicit time for TS to end
-	private String timeEndZoneId;
+	private String endTimeOffsetId;
 
 	private TimeOfTheDayName startTimeOfTheDayName; // alternate implicit start
 													// time, for example sunRize
@@ -169,22 +169,21 @@ public class ScheduleTimeslot extends Baseclass {
 		return this;
 	}
 
-	public String getTimeStartZoneId() {
-		return timeStartZoneId;
+	public String getStartTimeOffsetId() {
+		return startTimeOffsetId;
 	}
 
-	public <T extends ScheduleTimeslot> T setTimeStartZoneId(
-			String timeStartZoneId) {
-		this.timeStartZoneId = timeStartZoneId;
+	public <T extends ScheduleTimeslot> T setStartTimeOffsetId(String startTimeOffsetId) {
+		this.startTimeOffsetId = startTimeOffsetId;
 		return (T) this;
 	}
 
-	public String getTimeEndZoneId() {
-		return timeEndZoneId;
+	public String getEndTimeOffsetId() {
+		return endTimeOffsetId;
 	}
 
-	public <T extends ScheduleTimeslot> T setTimeEndZoneId(String timeEndZoneId) {
-		this.timeEndZoneId = timeEndZoneId;
+	public <T extends ScheduleTimeslot> T setEndTimeOffsetId(String endTimeOffsetId) {
+		this.endTimeOffsetId = endTimeOffsetId;
 		return (T) this;
 	}
 }

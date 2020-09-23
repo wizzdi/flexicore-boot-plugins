@@ -1,5 +1,6 @@
 package com.flexicore.scheduling.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.security.SecurityContext;
@@ -25,6 +26,7 @@ public class ScheduleToAction extends Baselink {
 		return (Schedule) super.getLeftside();
 	}
 
+	@JsonIgnore
 	public void setLeftside(Schedule leftside) {
 		super.setLeftside(leftside);
 	}
@@ -41,6 +43,7 @@ public class ScheduleToAction extends Baselink {
 		return (ScheduleAction) super.getRightside();
 	}
 
+	@JsonIgnore
 	public void setRightside(ScheduleAction rightside) {
 		super.setRightside(rightside);
 	}
