@@ -315,12 +315,14 @@ public class SchedulingService implements ISchedulingService {
 		}
 		if (createTimeslot.getTimeOfTheDayStart() != null && !createTimeslot.getTimeOfTheDayStart().equals(scheduleTimeslot.getStartTime())) {
 				scheduleTimeslot.setStartTime(createTimeslot.getTimeOfTheDayStart());
+				scheduleTimeslot.setStartTimeOffsetId(createTimeslot.getTimeOfTheDayStart().getOffset().getId());
 				scheduleTimeslot.setStartTimeOfTheDayName(null);
 				update = true;
 		}
 
 		if (createTimeslot.getTimeOfTheDayEnd() != null && !createTimeslot.getTimeOfTheDayEnd().equals(scheduleTimeslot.getEndTime())) {
 			scheduleTimeslot.setEndTime(createTimeslot.getTimeOfTheDayEnd());
+			scheduleTimeslot.setEndTimeOffsetId(createTimeslot.getTimeOfTheDayEnd().getOffset().getId());
 			scheduleTimeslot.setEndTimeOfTheDayName(null);
 			update = true;
 		}

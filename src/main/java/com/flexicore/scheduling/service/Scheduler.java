@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.time.DayOfWeek;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -155,14 +156,14 @@ public class Scheduler implements Runnable {
 
 		OffsetTime nowTime = now.toOffsetTime();
 
-		OffsetTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().toOffsetTime() : null;
+		OffsetTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().withOffsetSameInstant(ZoneOffset.of(timeslot.getStartTimeOffsetId())).toOffsetTime() : null;
 		if (timeslot.getStartTimeOfTheDayName() != null) {
 			start = schedulingService.getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
 		}
 		start = start != null ? start.plus(timeslot.getStartMillisOffset(),
 				ChronoUnit.MILLIS) : null;
 
-		OffsetTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().toOffsetTime() : null;
+		OffsetTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().withOffsetSameInstant(ZoneOffset.of(timeslot.getEndTimeOffsetId())).toOffsetTime() : null;
 		if (timeslot.getEndTimeOfTheDayName() != null) {
 			end = schedulingService.getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
