@@ -5,6 +5,8 @@
     <persistence-unit name="primary">
 
         <class>com.flexicore.category.model.Category</class>
+        <class>com.flexicore.category.model.CategoryFilter</class>
+        <class>com.flexicore.category.model.CategoryNameFiltering</class>
         <class>com.flexicore.category.model.CategoryIdFiltering</class>
         <class>com.flexicore.category.model.CategoryToBaseClass</class>
         <class>com.flexicore.category.model.CategoryToClazz</class>
