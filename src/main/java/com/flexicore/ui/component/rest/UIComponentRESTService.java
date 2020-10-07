@@ -39,6 +39,7 @@ public class UIComponentRESTService implements RestServicePlugin {
 
 
     @Autowired
+    @PluginInfo(version = 1)
     private UIComponentService uiPluginService;
 
 

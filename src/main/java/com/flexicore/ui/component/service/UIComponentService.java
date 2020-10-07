@@ -16,12 +16,13 @@ import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentRegistrationContainer;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.BadRequestException;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
 public class UIComponentService implements ServicePlugin {
 
     @Autowired
+    @PluginInfo(version = 1)
     private UIComponentRepository uiPluginRepository;
 
     @Autowired
@@ -40,10 +42,8 @@ public class UIComponentService implements ServicePlugin {
     @Autowired
     private PermissionGroupService permissionGroupService;
 
-   private Logger logger = Logger.getLogger(getClass().getCanonicalName());
+   private static final Logger logger = LoggerFactory.getLogger(UIComponentService.class);
 
-    @Autowired
-    private FileResourceService fileResourceService;
 
 
 
