@@ -33,9 +33,6 @@ public class LicenseRequestToProduct extends LicenseRequestToEntity {
 		return (LicensingProduct) super.getLicensingEntity();
 	}
 
-	public <T extends LicenseRequestToEntity> T setLicensingEntity(LicensingProduct licensingEntity) {
-		return super.setLicensingEntity(licensingEntity);
-	}
 
 	@Override
 	public <T extends LicenseRequestToEntity> T setLicensingEntity(LicensingEntity licensingEntity) {
