@@ -16,6 +16,7 @@ import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentRegistrationContainer;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
 import com.google.common.collect.Lists;
+import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
  * Created by Asaf on 12/07/2017.
  */
 @PluginInfo(version = 1)
+@Extension
 @Component
 public class UIComponentService implements ServicePlugin {
 

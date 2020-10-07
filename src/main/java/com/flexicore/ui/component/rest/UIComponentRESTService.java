@@ -19,6 +19,7 @@ import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.component.service.UIComponentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ import java.util.List;
 @OperationsInside
 @Protected
 @Tag(name = "UI Components")
+@Extension
 public class UIComponentRESTService implements RestServicePlugin {
 
 

@@ -7,6 +7,7 @@ import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.model.UIComponent_;
+import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.TypedQuery;
@@ -24,6 +25,7 @@ import java.util.Set;
  * Created by Asaf on 12/07/2017.
  */
 @Component
+@Extension
 @PluginInfo(version = 1)
 public class UIComponentRepository extends AbstractRepositoryPlugin implements ServicePlugin {
 
