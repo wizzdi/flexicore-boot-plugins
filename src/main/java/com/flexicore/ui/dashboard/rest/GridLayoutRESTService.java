@@ -46,6 +46,7 @@ public class GridLayoutRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			GridLayoutFiltering gridLayoutFiltering,
 			@Context SecurityContext securityContext) {
+		service.validate(gridLayoutFiltering, securityContext);
 		return service.getAllGridLayout(gridLayoutFiltering, securityContext);
 
 	}

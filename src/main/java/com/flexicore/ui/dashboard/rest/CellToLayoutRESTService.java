@@ -46,6 +46,7 @@ public class CellToLayoutRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CellToLayoutFiltering cellToLayoutFiltering,
 			@Context SecurityContext securityContext) {
+		service.validate(cellToLayoutFiltering,securityContext);
 		return service.getAllCellToLayout(cellToLayoutFiltering, securityContext);
 
 	}

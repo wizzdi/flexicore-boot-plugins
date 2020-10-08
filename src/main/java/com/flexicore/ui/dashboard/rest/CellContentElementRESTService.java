@@ -46,6 +46,7 @@ public class CellContentElementRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			CellContentElementFiltering cellContentElementFiltering,
 			@Context SecurityContext securityContext) {
+		service.validate(cellContentElementFiltering, securityContext);
 		return service.getAllCellContentElement(cellContentElementFiltering, securityContext);
 
 	}

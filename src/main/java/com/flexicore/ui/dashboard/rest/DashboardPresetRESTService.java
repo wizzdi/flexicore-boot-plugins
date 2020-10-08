@@ -47,6 +47,7 @@ public class DashboardPresetRESTService implements RestServicePlugin {
 			@HeaderParam("authenticationKey") String authenticationKey,
 			DashboardPresetFiltering dashboardPresetFiltering,
 			@Context SecurityContext securityContext) {
+		service.validate(dashboardPresetFiltering,securityContext);
 		return service.getAllDashboardPreset(dashboardPresetFiltering, securityContext);
 
 	}
