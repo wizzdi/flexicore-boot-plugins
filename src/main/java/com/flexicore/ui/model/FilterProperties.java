@@ -9,6 +9,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class FilterProperties extends Baseclass {
 
+    private String filterPath;
     private boolean externalize;
     @ManyToOne(targetEntity = GridPreset.class)
     private GridPreset gridPreset;
@@ -36,6 +37,15 @@ public class FilterProperties extends Baseclass {
 
     public <T extends FilterProperties> T setGridPreset(GridPreset gridPreset) {
         this.gridPreset = gridPreset;
+        return (T) this;
+    }
+
+    public String getFilterPath() {
+        return filterPath;
+    }
+
+    public <T extends FilterProperties> T setFilterPath(String filterPath) {
+        this.filterPath = filterPath;
         return (T) this;
     }
 }

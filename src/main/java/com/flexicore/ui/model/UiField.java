@@ -1,7 +1,7 @@
 package com.flexicore.ui.model;
 
+import com.flexicore.category.model.Category;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Category;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
