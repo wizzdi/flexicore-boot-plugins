@@ -23,12 +23,12 @@ import java.util.List;
 
 public class Category extends Baseclass {
 
-	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="leftside")
+	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="category")
 	@JsonIgnore
 	private List<CategoryToBaseClass> categoryToBaseclass =new ArrayList<>();
 
 	@JsonIgnore
-	@OneToMany(targetEntity = CategoryToClazz.class,mappedBy="leftside")
+	@OneToMany(targetEntity = CategoryToClazz.class,mappedBy="category")
 	private List<CategoryToClazz> clazzes=new ArrayList<>();
 	
 
