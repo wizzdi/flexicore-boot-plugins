@@ -12,6 +12,7 @@ import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.request.TreeCreate;
 import com.flexicore.ui.tree.request.TreeFilter;
 import com.flexicore.ui.tree.request.TreeUpdate;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ import java.util.Set;
 
 
 @PluginInfo(version = 1)
+@Extension
 @Component
 public class TreeService implements ServicePlugin {
 

@@ -13,6 +13,7 @@ import com.flexicore.ui.tree.model.TreeNodeToUser;
 import com.flexicore.ui.tree.request.*;
 import com.flexicore.ui.tree.response.SaveTreeNodeStatusResponse;
 import com.flexicore.ui.tree.response.TreeNodeStatusResponse;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 
 @PluginInfo(version = 1)
+@Extension
 @Component
 public class TreeNodeToUserService implements ServicePlugin {
 

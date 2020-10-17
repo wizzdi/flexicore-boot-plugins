@@ -10,6 +10,7 @@ import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.tree.model.*;
 import com.flexicore.ui.tree.request.TreeFilter;
 import com.flexicore.ui.tree.request.TreeNodeFilter;
+import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.criteria.*;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 
 @Component
+@Extension
 @PluginInfo(version = 1)
 public class TreeNodeRepository extends AbstractRepositoryPlugin implements ServicePlugin {
 

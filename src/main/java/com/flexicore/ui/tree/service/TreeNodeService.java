@@ -12,6 +12,7 @@ import com.flexicore.service.BaseclassNewService;
 import com.flexicore.ui.tree.data.TreeNodeRepository;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.request.*;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 
 
 @PluginInfo(version = 1)
+@Extension
 @Component
 public class TreeNodeService implements ServicePlugin {
 
     @Autowired
+    @PluginInfo(version = 1)
     private TreeNodeRepository treeNodeRepository;
 
     @Autowired

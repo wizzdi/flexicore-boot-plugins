@@ -20,6 +20,7 @@ import com.flexicore.ui.tree.request.TreeNodeUpdate;
 import com.flexicore.ui.tree.service.TreeNodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,8 @@ import javax.ws.rs.core.Context;
 @Component
 @OperationsInside
 @Protected
+@Extension
+@PluginInfo(version = 1)
 @Tag(name = "TreeNode")
 public class TreeNodeRESTService implements RestServicePlugin {
 

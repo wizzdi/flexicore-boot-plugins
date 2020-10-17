@@ -26,6 +26,7 @@ import com.flexicore.ui.tree.service.TreeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,8 @@ import java.util.stream.Collectors;
 @Component
 @OperationsInside
 @Protected
+@Extension
+@PluginInfo(version = 1)
 @Tag(name = "TreeToUser")
 public class TreeToUserRESTService implements RestServicePlugin {
 
