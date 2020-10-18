@@ -1,6 +1,5 @@
 package com.flexicore.scheduling.interfaces;
 
-import com.flexicore.interfaces.InitPlugin;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.scheduling.containers.request.CreateScheduling;
 import com.flexicore.scheduling.containers.request.CreateSchedulingAction;

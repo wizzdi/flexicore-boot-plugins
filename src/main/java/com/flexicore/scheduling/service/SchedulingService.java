@@ -7,7 +7,6 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Operation;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.User;
-import com.flexicore.model.auditing.AuditingJob;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
@@ -16,10 +15,10 @@ import com.flexicore.scheduling.interfaces.ISchedulingService;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.service.AuditingService;
 import com.flexicore.service.DynamicInvokersService;
 import com.flexicore.service.SecurityService;
 import com.flexicore.service.UserService;
+import com.wizzdi.audit.model.AuditingJob;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
@@ -27,6 +26,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +62,7 @@ public class SchedulingService implements ISchedulingService {
 	private SecurityService securityService;
 
 	@Autowired
-	private AuditingService auditingService;
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@Autowired
 	private DynamicInvokersService dynamicInvokersService;
@@ -89,7 +89,7 @@ public class SchedulingService implements ISchedulingService {
 	public SecurityContext verifyLoggedIn(String userToken) {
 		String opId = Baseclass.generateUUIDFromString(Read.class
 				.getCanonicalName());
-		return securityService.getSecurityContext(userToken, null, opId);
+		return securityService.getSecurityContext(userToken, opId);
 	}
 
 	public Schedule createSchedule(SecurityContext securityContext,
@@ -483,14 +483,12 @@ public class SchedulingService implements ISchedulingService {
 		long timeTaken = System.currentTimeMillis() - start;
 		SecurityContext securityContextForAuditing = getSecurityContextForAuditing(
 				securityContext, scheduleAction);
-		auditingService.addAuditingJob(new AuditingJob()
+		applicationEventPublisher.publishEvent(new AuditingJob()
 				.setDateOccured(Date.from(Instant.now()))
 				.setResponse(response)
 				.setTimeTaken(timeTaken)
 				.setSecurityContext(securityContextForAuditing)
-				.setInvocationContext(
-						new SchduelingInvocationContext(new Object[]{
-								scheduleAction, securityContext}))
+				.setParameters(Arrays.asList(scheduleAction, securityContext))
 				.setAuditingType(SchedulingAuditTypes.SCHEDULING.name())
 				.setFailed(failed));
 	}
