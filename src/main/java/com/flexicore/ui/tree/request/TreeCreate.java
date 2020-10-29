@@ -30,4 +30,8 @@ public class TreeCreate extends BaseclassCreate {
         return this;
     }
 
+    @Override
+    public boolean supportingDynamic() {
+        return true;
+    }
 }

@@ -5,10 +5,10 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.FileResource;
-import com.flexicore.model.Presenter;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.service.BaseclassNewService;
+import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.tree.data.TreeNodeRepository;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.request.*;
@@ -58,9 +58,9 @@ public class TreeNodeService implements ServicePlugin {
         treeNodeCreate.setDynamicExecution(dynamicExecution);
 
         String presenterId = treeNodeCreate.getPresenterId();
-        Presenter presenter= presenterId !=null?getByIdOrNull(presenterId,Presenter.class,null,securityContext):null;
+        Preset presenter= presenterId !=null?getByIdOrNull(presenterId, Preset.class,null,securityContext):null;
         if(presenter==null && presenterId !=null){
-            throw new BadRequestException("No Presenter With id "+ presenterId);
+            throw new BadRequestException("No Preset With id "+ presenterId);
         }
         treeNodeCreate.setPresenter(presenter);
 

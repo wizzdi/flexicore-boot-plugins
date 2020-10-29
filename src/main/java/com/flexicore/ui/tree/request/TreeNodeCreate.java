@@ -2,9 +2,9 @@ package com.flexicore.ui.tree.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.FileResource;
-import com.flexicore.model.Presenter;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.request.BaseclassCreate;
+import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.tree.model.TreeNode;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -25,7 +25,7 @@ public class TreeNodeCreate extends BaseclassCreate {
     private Boolean inMap;
     private String presenterId;
     @JsonIgnore
-    private Presenter presenter;
+    private Preset presenter;
     private String iconId;
     @JsonIgnore
     private FileResource icon;
@@ -138,11 +138,11 @@ public class TreeNodeCreate extends BaseclassCreate {
     }
 
     @JsonIgnore
-    public Presenter getPresenter() {
+    public Preset getPresenter() {
         return presenter;
     }
 
-    public <T extends TreeNodeCreate> T setPresenter(Presenter presenter) {
+    public <T extends TreeNodeCreate> T setPresenter(Preset presenter) {
         this.presenter = presenter;
         return (T) this;
     }
@@ -164,5 +164,10 @@ public class TreeNodeCreate extends BaseclassCreate {
     public <T extends TreeNodeCreate> T setIcon(FileResource icon) {
         this.icon = icon;
         return (T) this;
+    }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
     }
 }

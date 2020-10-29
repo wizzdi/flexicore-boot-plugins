@@ -9,20 +9,13 @@ package com.flexicore.ui.tree.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.annotations.Protected;
 import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RESTService;
 import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.model.FileResource;
-import com.flexicore.model.Presenter;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.ui.tree.model.Tree;
-import com.flexicore.ui.tree.model.TreeNode;
-import com.flexicore.ui.tree.request.*;
+import com.flexicore.ui.tree.request.SaveTreeNodeStatusRequest;
+import com.flexicore.ui.tree.request.TreeNodeStatusRequest;
 import com.flexicore.ui.tree.response.SaveTreeNodeStatusResponse;
 import com.flexicore.ui.tree.response.TreeNodeStatusResponse;
 import com.flexicore.ui.tree.service.TreeNodeToUserService;
-import com.flexicore.ui.tree.service.TreeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,10 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Path("plugins/treeToUser")
 @RequestScoped

@@ -36,4 +36,9 @@ public class TreeNodeFilter extends FilteringInformationHolder {
         this.parents = parents;
         return (T) this;
     }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
+    }
 }
