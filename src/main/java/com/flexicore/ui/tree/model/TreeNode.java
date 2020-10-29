@@ -3,9 +3,9 @@ package com.flexicore.ui.tree.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.FileResource;
-import com.flexicore.model.Presenter;
 import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.security.SecurityContext;
+import com.flexicore.ui.model.Preset;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public class TreeNode extends Baseclass {
     private boolean invisible;
     private boolean allowFilteringEditing;
     private boolean inMap;
-    @ManyToOne(targetEntity = Presenter.class)
-    private Presenter presenter;
+    @ManyToOne(targetEntity = Preset.class)
+    private Preset presenter;
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource icon;
 
@@ -130,12 +130,12 @@ public class TreeNode extends Baseclass {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = Presenter.class)
-    public Presenter getPresenter() {
+    @ManyToOne(targetEntity = Preset.class)
+    public Preset getPresenter() {
         return presenter;
     }
 
-    public <T extends TreeNode> T setPresenter(Presenter presenter) {
+    public <T extends TreeNode> T setPresenter(Preset presenter) {
         this.presenter = presenter;
         return (T) this;
     }

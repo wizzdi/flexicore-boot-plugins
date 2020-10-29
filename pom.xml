@@ -6,7 +6,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>tree-model</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <distributionManagement>
         <repository>
             <id>flexicore-local</id>
@@ -17,7 +17,7 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <version.eclipselink>2.7.7</version.eclipselink>
-        <flexicore-api.version>4.0.21-SNAPSHOT</flexicore-api.version>
+        <flexicore-api.version>4.2.0</flexicore-api.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <pf4j-spring.version>0.6.0</pf4j-spring.version>
         <jackson.version>2.11.0</jackson.version>
@@ -73,6 +73,12 @@
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-api</artifactId>
             <version>${flexicore-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-ui-model</artifactId>
+            <version>3.1.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
