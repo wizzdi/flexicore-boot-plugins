@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 @Entity
 public class IndividualCustomer extends Customer{
 
-    private String externalId;
+
 
     public IndividualCustomer() {
     }
@@ -16,12 +16,4 @@ public class IndividualCustomer extends Customer{
         super(name, securityContext);
     }
 
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public <T extends IndividualCustomer> T setExternalId(String externalId) {
-        this.externalId = externalId;
-        return (T) this;
-    }
 }

@@ -11,7 +11,6 @@ public class OrganizationalCustomer extends Customer{
     @ManyToOne(targetEntity = Organization.class)
     private Organization organization;
 
-    private String vat;
 
     public OrganizationalCustomer() {
     }
@@ -30,12 +29,4 @@ public class OrganizationalCustomer extends Customer{
         return (T) this;
     }
 
-    public String getVat() {
-        return vat;
-    }
-
-    public <T extends OrganizationalCustomer> T setVat(String vat) {
-        this.vat = vat;
-        return (T) this;
-    }
 }
