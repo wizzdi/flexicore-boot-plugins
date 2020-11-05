@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.wizzdi</groupId>
   <artifactId>flexicore-territories-service</artifactId>
-  <version>3.3.2</version>
+  <version>3.3.3</version>
   <distributionManagement>
     <repository>
       <id>flexicore-local</id>
@@ -11,7 +11,7 @@
     </repository>
   </distributionManagement>
   <properties>
-    <flexicore-api.version>4.0.14</flexicore-api.version>
+    <flexicore-api.version>4.2.1</flexicore-api.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <version.compiler.plugin>3.3</version.compiler.plugin>
     <version.jackson>2.11.0</version.jackson>

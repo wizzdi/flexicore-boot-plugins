@@ -2,20 +2,17 @@ package com.flexicore.territories.config;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.events.PluginsLoadedEvent;
-import com.flexicore.interfaces.InitPlugin;
-
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.territories.*;
 import com.flexicore.service.BaseclassService;
 import com.flexicore.territories.request.*;
 import org.pf4j.Extension;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @PluginInfo(version = 1)
 @Extension
