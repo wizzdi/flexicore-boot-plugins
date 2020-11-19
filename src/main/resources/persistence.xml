@@ -12,6 +12,7 @@
         <class>com.flexicore.ui.dashboard.model.GridLayout</class>
         <class>com.flexicore.model.dynamic.DynamicExecution</class>
         <class>com.flexicore.ui.dashboard.model.GraphTemplate</class>
+        <class>com.flexicore.model.FileResource</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
