@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>ui-component-model</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>ui-component-model</name>
     <description>FlexiCore model plugin , manages ui components</description>
     <url>https://wizzdi.com</url>
@@ -54,7 +54,7 @@
         <connection>scm:git:git://wizzdi/ui-component-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/ui-component-model.git</developerConnection>
         <url>https://github.com/wizzdi/ui-component-model</url>
-        <tag>ui-component-model-1.0.0</tag>
+        <tag>ui-component-model-${version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
