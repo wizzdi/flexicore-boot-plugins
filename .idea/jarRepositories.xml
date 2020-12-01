@@ -9,6 +9,11 @@
     <remote-repository>
       <option name="id" value="flexicore-local" />
       <option name="name" value="flexicore-local" />
+      <option name="url" value="https://artifactory.wizzdi.com/artifactory/flexicore-local" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="flexicore-local" />
+      <option name="name" value="flexicore-local" />
       <option name="url" value="http://138.201.191.203:8083/artifactory/flexicore-local" />
     </remote-repository>
     <remote-repository>
