@@ -3,7 +3,6 @@ package com.flexicore.organization.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.TimedLink;
-import com.flexicore.product.model.Product;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.CascadeType;

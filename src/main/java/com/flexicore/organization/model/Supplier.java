@@ -1,16 +1,15 @@
 package com.flexicore.organization.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class Supplier extends Organization {
+
+	@ManyToOne(targetEntity = SupplierApi.class)
+	private SupplierApi supplierApi;
 
 	public Supplier() {
 	}
@@ -19,24 +18,6 @@ public class Supplier extends Organization {
 		super(name, securityContext);
 	}
 
-	@OneToMany(targetEntity = SupplierToProduct.class, mappedBy = "leftside")
-	@JsonIgnore
-	private List<SupplierToProduct> supplierToProducts = new ArrayList<>();
-
-	@ManyToOne(targetEntity = SupplierApi.class)
-	private SupplierApi supplierApi;
-
-	@OneToMany(targetEntity = SupplierToProduct.class, mappedBy = "leftside")
-	@JsonIgnore
-	public List<SupplierToProduct> getSupplierToProducts() {
-		return supplierToProducts;
-	}
-
-	public Supplier setSupplierToProducts(
-			List<SupplierToProduct> supplierToProducts) {
-		this.supplierToProducts = supplierToProducts;
-		return this;
-	}
 
 	@ManyToOne(targetEntity = SupplierApi.class)
 	public SupplierApi getSupplierApi() {
