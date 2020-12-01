@@ -54,7 +54,7 @@
         <connection>scm:git:git://bitbucket.org/flexi-core/organization-model.git</connection>
         <developerConnection>scm:git:asafbennatan@bitbucket.org/flexi-core/organization-model.git</developerConnection>
         <url>https://bitbucket.org/flexi-core/organization-model</url>
-        <tag>organization-model-{version}</tag>
+        <tag>organization-model-${version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
