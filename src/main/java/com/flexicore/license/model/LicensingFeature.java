@@ -16,10 +16,6 @@ import javax.persistence.ManyToOne;
 @Entity
 
 public class LicensingFeature extends LicensingEntity {
-	private static LicensingFeature s_Singleton=new LicensingFeature();
-	public  static LicensingFeature s() {return s_Singleton;}
-
-
 
 
 	@ManyToOne(targetEntity = LicensingProduct.class)

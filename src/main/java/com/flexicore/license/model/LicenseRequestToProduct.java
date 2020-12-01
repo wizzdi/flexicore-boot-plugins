@@ -17,8 +17,6 @@ import javax.persistence.ManyToOne;
 @Entity
 
 public class LicenseRequestToProduct extends LicenseRequestToEntity {
-	private static LicenseRequestToProduct s_Singleton=new LicenseRequestToProduct();
-	public  static LicenseRequestToProduct s() {return s_Singleton;}
 
 	public LicenseRequestToProduct() {
 	}

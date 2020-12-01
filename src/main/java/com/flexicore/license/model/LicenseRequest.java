@@ -21,8 +21,6 @@ import java.util.List;
 @Entity
 
 public class LicenseRequest extends Baseclass {
-	private static LicenseRequest s_Singleton=new LicenseRequest();
-	public  static LicenseRequest s() {return s_Singleton;}
 
 	@Lob
 	private String macAddress;

@@ -16,8 +16,7 @@ import javax.persistence.Entity;
 @Entity
 
 public class LicenseRequestToQuantityFeature extends LicenseRequestToFeature {
-	private static LicenseRequestToQuantityFeature s_Singleton=new LicenseRequestToQuantityFeature();
-	public  static LicenseRequestToQuantityFeature s() {return s_Singleton;}
+
 
 	private int quantityLimit;
 

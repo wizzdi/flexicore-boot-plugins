@@ -19,9 +19,6 @@ import java.util.List;
 @Entity
 
 public class LicensingProduct extends LicensingEntity {
-	private static LicensingProduct s_Singleton=new LicensingProduct();
-	public  static LicensingProduct s() {return s_Singleton;}
-
 
 	@OneToMany(targetEntity = LicensingFeature.class,mappedBy = "product")
 	@JsonIgnore
