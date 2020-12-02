@@ -21,6 +21,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="flexicore-ui-model" options="-proc:none" />
+      <module name="flexicore-ui-model-migrate" options="" />
     </option>
   </component>
 </project>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-ui-model</artifactId>
-    <version>3.1.4</version>
+    <version>3.1.4-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore model plugin , adds dynamic ui support</description>
     <url>https://wizzdi.com</url>
