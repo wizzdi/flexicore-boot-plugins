@@ -2,6 +2,7 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
+import com.flexicore.audit.model.AuditingJob;
 import com.flexicore.events.PluginsLoadedEvent;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Operation;
@@ -18,7 +19,6 @@ import com.flexicore.security.SecurityContext;
 import com.flexicore.service.DynamicInvokersService;
 import com.flexicore.service.SecurityService;
 import com.flexicore.service.UserService;
-import com.wizzdi.audit.model.AuditingJob;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
