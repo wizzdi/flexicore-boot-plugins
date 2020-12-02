@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>scheduling-service</artifactId>
-    <version>1.3.6</version>
+    <version>1.3.7-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore service plugin , scheduling support</description>
     <url>https://wizzdi.com</url>
@@ -54,7 +54,7 @@
         <connection>scm:git:git://wizzdi/scheduling-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/scheduling-service.git</developerConnection>
         <url>https://github.com/wizzdi/scheduling-service</url>
-        <tag>scheduling-service-1.3.6</tag>
+        <tag>scheduling-service-{version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
