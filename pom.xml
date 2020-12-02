@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>dashboard-model</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore model plugin , manages ui dashboards</description>
     <url>https://wizzdi.com</url>
@@ -54,7 +54,7 @@
         <connection>scm:git:git://wizzdi/dashboard-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/dashboard-model.git</developerConnection>
         <url>https://github.com/wizzdi/dashboard-model</url>
-        <tag>dashboard-model-1.1.0</tag>
+        <tag>dashboard-model-{version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
