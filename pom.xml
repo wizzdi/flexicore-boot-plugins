@@ -10,8 +10,8 @@
 
     <licenses>
         <license>
-            <name>Proprietary , free to use up to 10 organizations</name>
-            <url>https://www.eulatemplate.com/download.php?lang=en&amp;token=VK3jL9cz7sz1jM1SdNO842tqnFFN40QF#</url>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -271,12 +271,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-
-                    <includes>
-                        <include>README</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
