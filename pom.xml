@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>billing-service</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore service plugin , manages billing</description>
     <url>https://wizzdi.com</url>
@@ -70,7 +70,7 @@
         <connection>scm:git:git://wizzdi/billing-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/billing-service.git</developerConnection>
         <url>https://github.com/wizzdi/billing-service</url>
-        <tag>billing-service-1.0.0</tag>
+        <tag>billing-service-{version}</tag>
     </scm>
     <dependencies>
         <dependency>
