@@ -5,6 +5,7 @@ import com.flexicore.model.FileResource;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -13,7 +14,7 @@ public class CustomerDocument extends Baseclass {
     @OneToOne(targetEntity = FileResource.class)
     private FileResource fileResource;
 
-    @OneToOne(targetEntity = Customer.class)
+    @ManyToOne(targetEntity = Customer.class)
     private Customer customer;
 
 
@@ -35,7 +36,7 @@ public class CustomerDocument extends Baseclass {
         return (T) this;
     }
 
-    @OneToOne(targetEntity = Customer.class)
+    @ManyToOne(targetEntity = Customer.class)
     public Customer getCustomer() {
         return customer;
     }

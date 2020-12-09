@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.security.SecurityContext;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,9 @@ import java.util.List;
 public class Customer extends Baseclass {
 
 	private String externalId;
+
+	@Column(columnDefinition = "timestamp with time zone")
+	private OffsetDateTime lastLogin;
 
 	@JsonIgnore
 	@OneToMany(targetEntity = CustomerDocument.class,mappedBy = "customer")
@@ -58,6 +63,16 @@ public class Customer extends Baseclass {
 
 	public <T extends Customer> T setExternalId(String externalId) {
 		this.externalId = externalId;
+		return (T) this;
+	}
+
+	@Column(columnDefinition = "timestamp with time zone")
+	public OffsetDateTime getLastLogin() {
+		return lastLogin;
+	}
+
+	public <T extends Customer> T setLastLogin(OffsetDateTime lastUsed) {
+		this.lastLogin = lastUsed;
 		return (T) this;
 	}
 }
