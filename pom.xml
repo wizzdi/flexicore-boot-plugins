@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>dashboard-service</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.1.1</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore service plugin , manages ui dashboards</description>
     <url>https://wizzdi.com</url>
@@ -55,7 +55,7 @@
         <connection>scm:git:git://wizzdi/dashboard-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/dashboard-service.git</developerConnection>
         <url>https://github.com/wizzdi/dashboard-service</url>
-        <tag>dashboard-service-{version}</tag>
+        <tag>dashboard-service-1.1.1</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
