@@ -121,14 +121,14 @@ public class DataMapperService implements ServicePlugin {
 		baseclassNewService.validate(createDataMapper, securityContext);
 		String cellToLayoutId=createDataMapper.getCellToLayoutId();
 		CellToLayout cellToLayout=cellToLayoutId!=null?getByIdOrNull(cellToLayoutId, CellToLayout.class,null,securityContext):null;
-		if(cellToLayout==null){
+		if(cellToLayout==null&&cellToLayoutId!=null){
 			throw new BadRequestException("No CellToLayout with id "+cellToLayoutId);
 		}
 		createDataMapper.setCellToLayout(cellToLayout);
 
 		String cellContentElementId=createDataMapper.getCellContentElementId();
 		CellContentElement cellContentElement=cellContentElementId!=null?getByIdOrNull(cellContentElementId, CellContentElement.class,null,securityContext):null;
-		if(cellContentElement==null){
+		if(cellContentElement==null&&cellContentElementId!=null){
 			throw new BadRequestException("No CellContentElement with id "+cellContentElementId);
 		}
 		createDataMapper.setCellContentElement(cellContentElement);
@@ -136,7 +136,7 @@ public class DataMapperService implements ServicePlugin {
 
 		String dynamicExecutionId=createDataMapper.getDynamicExecutionId();
 		DynamicExecution dynamicExecution=dynamicExecutionId!=null?getByIdOrNull(dynamicExecutionId, DynamicExecution.class,null,securityContext):null;
-		if(dynamicExecution==null){
+		if(dynamicExecution==null&&dynamicExecutionId!=null){
 			throw new BadRequestException("No DynamicExecution with id "+dynamicExecutionId);
 		}
 		createDataMapper.setDynamicExecution(dynamicExecution);
