@@ -54,7 +54,7 @@
         <connection>scm:git:git://wizzdi/organization-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/organization-model.git</developerConnection>
         <url>https://github.com/wizzdi/organization-model</url>
-        <tag>organization-model-2.1.1</tag>
+        <tag>organization-model-{version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
