@@ -20,6 +20,7 @@
         <class>com.flexicore.ui.model.MapPreset</class>
         <class>com.flexicore.category.model.Category</class>
         <class>com.flexicore.model.dynamic.DynamicExecution</class>
+        <class>com.flexicore.ui.model.PresetToPreset</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
