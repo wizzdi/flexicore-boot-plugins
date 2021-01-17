@@ -1,7 +1,7 @@
 package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
+import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
@@ -15,9 +15,16 @@ public class PresetToPreset extends Baseclass {
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset childPreset;
 	@Lob
-	private String sourcePath;
+	private String parentPath;
 	@Lob
-	private String targetPath;
+	private String childPath;
+
+	public PresetToPreset() {
+	}
+
+	public PresetToPreset(String name, SecurityContext securityContext) {
+		super(name, securityContext);
+	}
 
 	@ManyToOne(targetEntity = Preset.class)
 	public Preset getParentPreset() {
@@ -40,22 +47,22 @@ public class PresetToPreset extends Baseclass {
 	}
 
 	@Lob
-	public String getSourcePath() {
-		return sourcePath;
+	public String getParentPath() {
+		return parentPath;
 	}
 
-	public <T extends PresetToPreset> T setSourcePath(String sourcePath) {
-		this.sourcePath = sourcePath;
+	public <T extends PresetToPreset> T setParentPath(String sourcePath) {
+		this.parentPath = sourcePath;
 		return (T) this;
 	}
 
 	@Lob
-	public String getTargetPath() {
-		return targetPath;
+	public String getChildPath() {
+		return childPath;
 	}
 
-	public <T extends PresetToPreset> T setTargetPath(String targetPath) {
-		this.targetPath = targetPath;
+	public <T extends PresetToPreset> T setChildPath(String targetPath) {
+		this.childPath = targetPath;
 		return (T) this;
 	}
 }
