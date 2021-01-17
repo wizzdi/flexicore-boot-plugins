@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-ui-model</artifactId>
-    <version>3.1.5-SNAPSHOT</version>
+    <version>3.1.5</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore model plugin , adds dynamic ui support</description>
     <url>https://wizzdi.com</url>
@@ -54,7 +54,7 @@
         <connection>scm:git:git://wizzdi/flexicore-ui-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/flexicore-ui-model.git</developerConnection>
         <url>https://github.com/wizzdi/flexicore-ui-model</url>
-        <tag>flexicore-ui-model-{version}</tag>
+        <tag>flexicore-ui-model-3.1.5</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
