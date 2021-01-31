@@ -4,7 +4,6 @@ import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentRegistrationContainer;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
-import com.flexicore.init.FlexiCoreApplication;
 import com.flexicore.model.PermissionGroup;
 import com.flexicore.model.User;
 import com.flexicore.request.AuthenticationRequest;
