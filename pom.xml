@@ -17,10 +17,10 @@
         </license>
     </licenses>
     <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+
         <version.eclipselink>2.7.7</version.eclipselink>
-        <flexicore-api.version>4.2.2</flexicore-api.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
         <pf4j-spring.version>0.6.0</pf4j-spring.version>
         <jackson.version>2.11.0</jackson.version>
     </properties>
@@ -105,10 +105,11 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-api</artifactId>
-            <version>${flexicore-api.version}</version>
+            <artifactId>flexicore-base-model</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2</artifactId>
