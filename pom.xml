@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-ui-model</artifactId>
-    <version>3.1.6-SNAPSHOT</version>
+    <version>3.2.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore model plugin , adds dynamic ui support</description>
     <url>https://wizzdi.com</url>
@@ -19,7 +19,6 @@
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <version.eclipselink>2.7.7</version.eclipselink>
-        <flexicore-api.version>4.2.2</flexicore-api.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <pf4j-spring.version>0.6.0</pf4j-spring.version>
         <jackson.version>2.11.0</jackson.version>
@@ -76,6 +75,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-base-model</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>${version.eclipselink}</version>
@@ -108,12 +113,6 @@
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>${version.eclipselink}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-api</artifactId>
-            <version>${flexicore-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -239,14 +238,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

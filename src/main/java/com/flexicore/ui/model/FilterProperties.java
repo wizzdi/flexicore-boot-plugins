@@ -11,8 +11,8 @@ public class FilterProperties extends Baseclass {
 
     private String filterPath;
     private boolean externalize;
-    @ManyToOne(targetEntity = GridPreset.class)
-    private GridPreset gridPreset;
+    @ManyToOne(targetEntity = Baseclass.class)
+    private Baseclass relatedBaseclass;
 
     public FilterProperties() {
     }
@@ -30,13 +30,13 @@ public class FilterProperties extends Baseclass {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = GridPreset.class)
-    public GridPreset getGridPreset() {
-        return gridPreset;
+    @ManyToOne(targetEntity = Baseclass.class)
+    public Baseclass getRelatedBaseclass() {
+        return relatedBaseclass;
     }
 
-    public <T extends FilterProperties> T setGridPreset(GridPreset gridPreset) {
-        this.gridPreset = gridPreset;
+    public <T extends FilterProperties> T setRelatedBaseclass(Baseclass gridPreset) {
+        this.relatedBaseclass = gridPreset;
         return (T) this;
     }
 

@@ -1,8 +1,7 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.model.dynamic.DynamicInvoker;
 import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
