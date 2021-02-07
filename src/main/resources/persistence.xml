@@ -10,7 +10,7 @@
         <class>com.flexicore.ui.dashboard.model.DataMapper</class>
         <class>com.flexicore.ui.dashboard.model.GridLayoutCell</class>
         <class>com.flexicore.ui.dashboard.model.GridLayout</class>
-        <class>com.flexicore.model.dynamic.DynamicExecution</class>
+        <class>com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution</class>
         <class>com.flexicore.ui.dashboard.model.GraphTemplate</class>
         <class>com.flexicore.model.FileResource</class>
 

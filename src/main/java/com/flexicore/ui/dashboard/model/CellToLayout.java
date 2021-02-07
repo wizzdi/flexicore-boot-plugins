@@ -2,7 +2,6 @@ package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
