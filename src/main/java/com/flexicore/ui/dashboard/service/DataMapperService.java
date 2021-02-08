@@ -4,17 +4,17 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.service.BaseclassNewService;
 import com.flexicore.ui.dashboard.data.DataMapperRepository;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
-import com.flexicore.ui.dashboard.model.GridLayout;
 import com.flexicore.ui.dashboard.model.DataMapper;
 import com.flexicore.ui.dashboard.request.DataMapperCreate;
 import com.flexicore.ui.dashboard.request.DataMapperFiltering;
 import com.flexicore.ui.dashboard.request.DataMapperUpdate;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,9 @@ public class DataMapperService implements ServicePlugin {
 
 	@Autowired
 	private BaseclassNewService baseclassNewService;
+
+	@Autowired
+	private DynamicExecutionService dynamicExecutionService;
 
 	public DataMapper updateDataMapper(DataMapperUpdate dataMapperUpdate, SecurityContext securityContext) {
 		if (DataMapperUpdateNoMerge(dataMapperUpdate,
@@ -135,7 +138,7 @@ public class DataMapperService implements ServicePlugin {
 
 
 		String dynamicExecutionId=createDataMapper.getDynamicExecutionId();
-		DynamicExecution dynamicExecution=dynamicExecutionId!=null?getByIdOrNull(dynamicExecutionId, DynamicExecution.class,null,securityContext):null;
+		DynamicExecution dynamicExecution=dynamicExecutionId!=null?dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class,securityContext):null;
 		if(dynamicExecution==null&&dynamicExecutionId!=null){
 			throw new BadRequestException("No DynamicExecution with id "+dynamicExecutionId);
 		}
@@ -168,7 +171,7 @@ public class DataMapperService implements ServicePlugin {
 
 
 		Set<String> dynamicExecutionIds=dataMapperFiltering.getDynamicExecutionIds();
-		Map<String, DynamicExecution> dynamicExecutionMap=dynamicExecutionIds.isEmpty()?new HashMap<>():dataMapperRepository.listByIds(DynamicExecution.class,dynamicExecutionIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String, DynamicExecution> dynamicExecutionMap=dynamicExecutionIds.isEmpty()?new HashMap<>():dynamicExecutionService.listByIds(dynamicExecutionIds,DynamicExecution.class,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		dynamicExecutionIds.removeAll(dynamicExecutionMap.keySet());
 		if(!dynamicExecutionIds.isEmpty()){
 			throw new BadRequestException("No DynamicExecution with ids "+dynamicExecutionIds);

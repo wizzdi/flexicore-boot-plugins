@@ -3,8 +3,7 @@ package com.flexicore.ui.dashboard.data;
 import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.interfaces.AbstractRepositoryPlugin;
 import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.model.dynamic.DynamicExecution_;
+
 import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.dashboard.model.*;
 import com.flexicore.ui.dashboard.request.CellToLayoutFiltering;

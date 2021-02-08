@@ -2,9 +2,9 @@ package com.flexicore.ui.dashboard.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.FilteringInformationHolder;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 import java.util.HashSet;
 import java.util.List;

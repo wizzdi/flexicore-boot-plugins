@@ -1,13 +1,10 @@
 package com.flexicore.ui.dashboard.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.FileResource;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.request.BaseclassCreate;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
-
-import javax.persistence.ManyToOne;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 public class DataMapperCreate extends BaseclassCreate {
     private String cellToLayoutId;
@@ -96,5 +93,10 @@ public class DataMapperCreate extends BaseclassCreate {
     public <T extends DataMapperCreate> T setStaticData(String staticData) {
         this.staticData = staticData;
         return (T) this;
+    }
+
+    @Override
+    public boolean supportingDynamic() {
+        return true;
     }
 }
