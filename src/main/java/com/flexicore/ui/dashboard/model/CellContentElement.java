@@ -1,17 +1,22 @@
 package com.flexicore.ui.dashboard.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.converters.JsonConverter;
 import com.flexicore.model.Baseclass;
 import com.flexicore.security.SecurityContext;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class CellContentElement extends Baseclass {
+
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = JsonConverter.class)
+    private Map<String, Object> jsonNode;
 
     @ManyToOne(targetEntity = CellContent.class)
     private CellContent cellContent;
@@ -47,6 +52,23 @@ public class CellContentElement extends Baseclass {
 
     public <T extends CellContentElement> T setDataMappers(List<DataMapper> dataMappers) {
         this.dataMappers = dataMappers;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = JsonConverter.class)
+    public Map<String, Object> getJsonNode() {
+        return jsonNode;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return jsonNode;
+    }
+
+    public <T extends Baseclass> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
         return (T) this;
     }
 }
