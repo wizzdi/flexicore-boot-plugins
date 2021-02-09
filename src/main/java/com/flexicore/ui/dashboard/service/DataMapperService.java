@@ -76,6 +76,23 @@ public class DataMapperService implements ServicePlugin {
 			dataMapper.setStaticData(dataMapperCreate.getStaticData());
 			update=true;
 		}
+		if (dataMapperCreate.any() != null && !dataMapperCreate.any().isEmpty()) {
+			Map<String, Object> jsonNode = dataMapper.getJsonNode();
+			if (jsonNode == null) {
+				dataMapper.setJsonNode(dataMapperCreate.any());
+				update = true;
+			} else {
+				for (Map.Entry<String, Object> entry : dataMapperCreate.any().entrySet()) {
+					String key = entry.getKey();
+					Object newVal = entry.getValue();
+					Object val = jsonNode.get(key);
+					if (newVal != null && !newVal.equals(val)) {
+						jsonNode.put(key, newVal);
+						update = true;
+					}
+				}
+			}
+		}
 
 		return update;
 	}

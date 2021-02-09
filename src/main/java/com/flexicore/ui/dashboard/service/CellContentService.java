@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @PluginInfo(version = 1)
 @Extension
@@ -43,7 +44,23 @@ public class CellContentService implements ServicePlugin {
 
 	public boolean CellContentUpdateNoMerge(CellContentCreate cellContentCreate, CellContent cellContent) {
 		boolean update = baseclassNewService.updateBaseclassNoMerge(cellContentCreate, cellContent);
-
+		if (cellContentCreate.any() != null && !cellContentCreate.any().isEmpty()) {
+			Map<String, Object> jsonNode = cellContent.getJsonNode();
+			if (jsonNode == null) {
+				cellContent.setJsonNode(cellContentCreate.any());
+				update = true;
+			} else {
+				for (Map.Entry<String, Object> entry : cellContentCreate.any().entrySet()) {
+					String key = entry.getKey();
+					Object newVal = entry.getValue();
+					Object val = jsonNode.get(key);
+					if (newVal != null && !newVal.equals(val)) {
+						jsonNode.put(key, newVal);
+						update = true;
+					}
+				}
+			}
+		}
 		return update;
 	}
 

@@ -52,6 +52,23 @@ public class CellContentElementService implements ServicePlugin {
 			cellContentElement.setCellContent(cellContentElementCreate.getCellContent());
 			update=true;
 		}
+		if (cellContentElementCreate.any() != null && !cellContentElementCreate.any().isEmpty()) {
+			Map<String, Object> jsonNode = cellContentElement.getJsonNode();
+			if (jsonNode == null) {
+				cellContentElement.setJsonNode(cellContentElementCreate.any());
+				update = true;
+			} else {
+				for (Map.Entry<String, Object> entry : cellContentElementCreate.any().entrySet()) {
+					String key = entry.getKey();
+					Object newVal = entry.getValue();
+					Object val = jsonNode.get(key);
+					if (newVal != null && !newVal.equals(val)) {
+						jsonNode.put(key, newVal);
+						update = true;
+					}
+				}
+			}
+		}
 
 
 
