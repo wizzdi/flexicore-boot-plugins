@@ -1,5 +1,6 @@
 package com.flexicore.territories.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.Country;
@@ -48,6 +49,8 @@ public class CountryService implements Plugin {
 	private RestTemplate restTemplate;
 	@Value("${flexicore.territories.countriesImportUrl:https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json}")
 	private String countriesImportUrl;
+	@Autowired
+	private ObjectMapper objectMapper;
 
 
 	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
@@ -128,24 +131,30 @@ public class CountryService implements Plugin {
 			ImportCountriesRequest addressImportRequest) {
 		ImportCountriesResponse importCountriesResponse = new ImportCountriesResponse();
 
-		ResponseEntity<ImportedCountry[]> response = restTemplate.getForEntity(countriesImportUrl, ImportedCountry[].class);
+		ResponseEntity<String> response = restTemplate.getForEntity(countriesImportUrl, String.class);
 		if (response.getStatusCode().is2xxSuccessful()) {
-			ImportedCountry[] importedCountries = response.getBody();
-			List<Object> toMerge = new ArrayList<>();
-			Map<String, Country> existingCountries = listAllCountries(securityContextBase, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
-			for (ImportedCountry importedCountry : importedCountries) {
-				if (existingCountries.get(importedCountry.getCode()) == null) {
-					CountryCreate creationContainer = new CountryCreate().setCountryCode(importedCountry.getCode()).setName(importedCountry.getName());
-					Country country = createCountryNoMerge(creationContainer, securityContextBase);
-					existingCountries.put(country.getCountryCode(), country);
-					toMerge.add(country);
-					importCountriesResponse.setCreatedCountries(importCountriesResponse.getCreatedCountries() + 1);
+			try {
+				String body = response.getBody();
+				ImportedCountry[] importedCountries = objectMapper.readValue(body, ImportedCountry[].class);
+				List<Object> toMerge = new ArrayList<>();
+				Map<String, Country> existingCountries = listAllCountries(securityContextBase, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
+				for (ImportedCountry importedCountry : importedCountries) {
+					if (existingCountries.get(importedCountry.getCode()) == null) {
+						CountryCreate creationContainer = new CountryCreate().setCountryCode(importedCountry.getCode()).setName(importedCountry.getName());
+						Country country = createCountryNoMerge(creationContainer, securityContextBase);
+						existingCountries.put(country.getCountryCode(), country);
+						toMerge.add(country);
+						importCountriesResponse.setCreatedCountries(importCountriesResponse.getCreatedCountries() + 1);
 
-				} else {
-					importCountriesResponse.setExistingCountries(importCountriesResponse.getExistingCountries() + 1);
+					} else {
+						importCountriesResponse.setExistingCountries(importCountriesResponse.getExistingCountries() + 1);
+					}
 				}
+				repository.massMerge(toMerge);
 			}
-			repository.massMerge(toMerge);
+			catch (Exception e){
+				logger.error("failed getting countries",e);
+			}
 		}
 
 		return importCountriesResponse;

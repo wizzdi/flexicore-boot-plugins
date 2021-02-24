@@ -2,6 +2,7 @@ package com.flexicore.territories;
 
 import com.flexicore.model.territories.*;
 import com.flexicore.territories.app.App;
+import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.*;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.junit.jupiter.api.*;
@@ -174,6 +175,21 @@ public class AddressControllerTest {
         Assertions.assertEquals(200, addressResponse.getStatusCodeValue());
         address = addressResponse.getBody();
         assertAddress(request, address);
+
+    }
+
+    @Test
+    @Order(3)
+    public void testImportAddresses(){
+        String name = UUID.randomUUID().toString();
+        AddressImportRequest request = new AddressImportRequest()
+                .setUrl("https://data.gov.il/dataset/321/resource/d04feead-6431-427f-81bc-d6a24151c1fb/download/d04feead-6431-427f-81bc-d6a24151c1fb.xml");
+
+        ResponseEntity<AddressImportResponse> addressResponse = this.restTemplate.exchange("/plugins/address/importAddresses",HttpMethod.POST, new HttpEntity<>(request), AddressImportResponse.class);
+        Assertions.assertEquals(200, addressResponse.getStatusCodeValue());
+        AddressImportResponse importResponse = addressResponse.getBody();
+        Assertions.assertNotNull(importResponse);
+        Assertions.assertTrue(importResponse.getCreatedStreet() > 0);
 
     }
 

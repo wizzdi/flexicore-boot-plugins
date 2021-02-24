@@ -48,7 +48,7 @@ public class AddressRESTService implements Plugin {
 	public AddressImportResponse importAddresses(
 			@RequestHeader("authenticationKey") String authenticationKey,
 			@RequestBody AddressImportRequest addressImportRequest,
-			SecurityContextBase securityContextBase) {
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		return service.importAddresses(securityContextBase, addressImportRequest);
 	}
 
