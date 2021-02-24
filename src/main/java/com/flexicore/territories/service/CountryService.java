@@ -1,94 +1,90 @@
 package com.flexicore.territories.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.Basic;
 import com.flexicore.model.territories.Country;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
-import com.flexicore.territories.config.Config;
+import com.flexicore.model.territories.Country_;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.territories.data.CountryRepository;
-import com.flexicore.territories.interfaces.ICountryService;
 import com.flexicore.territories.reponse.ImportCountriesResponse;
 import com.flexicore.territories.reponse.ImportedCountry;
-import com.flexicore.territories.request.CountryCreationContainer;
-import com.flexicore.territories.request.CountryFiltering;
-import com.flexicore.territories.request.CountryUpdateContainer;
+import com.flexicore.territories.request.CountryCreate;
+import com.flexicore.territories.request.CountryFilter;
+import com.flexicore.territories.request.CountryUpdate;
 import com.flexicore.territories.request.ImportCountriesRequest;
+import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BasicService;
+import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
-
-import java.io.IOException;
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import io.joshworks.restclient.http.HttpResponse;
-import io.joshworks.restclient.http.MediaType;
-import io.joshworks.restclient.http.Unirest;
-import io.joshworks.restclient.http.exceptions.RestClientException;
-import io.joshworks.restclient.http.mapper.ObjectMapper;
-import io.joshworks.restclient.http.mapper.ObjectMappers;
-import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @PluginInfo(version = 1)
 @Extension
 @Component
-public class CountryService implements ICountryService {
+public class CountryService implements Plugin {
+
+	private static final Logger logger = LoggerFactory.getLogger(CountryService.class);
 
 	@PluginInfo(version = 1)
 	@Autowired
 	private CountryRepository repository;
 	@Autowired
-	private BaseclassNewService baseclassNewService;
-
+	private BasicService basicService;
 	@Autowired
-	private Logger logger;
+	private RestTemplate restTemplate;
+	@Value("${flexicore.territories.countriesImportUrl:https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json}")
+	private String countriesImportUrl;
 
-	@Override
-	public <T extends Baseclass> T getByIdOrNull(java.lang.String id,
-			Class<T> c, List<String> batch, SecurityContext securityContext) {
-		return repository.getByIdOrNull(id, c, batch, securityContext);
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	@Override
-	public void deleteCountry(String countryid, SecurityContext securityContext) {
-		Country country = getByIdOrNull(countryid, Country.class, null,
-				securityContext);
+	public void deleteCountry(String countryid, SecurityContextBase securityContextBase) {
+		Country country = getByIdOrNull(countryid, Country.class, Country_.security, securityContextBase);
 		repository.remove(country);
 	}
 
-	@Override
-	public List<Country> listAllCountries(SecurityContext securityContext,
-			CountryFiltering filtering) {
 
-		return repository.listAllCountries(securityContext, filtering);
+	public List<Country> listAllCountries(SecurityContextBase securityContextBase,
+										  CountryFilter filtering) {
+
+		return repository.listAllCountries(securityContextBase, filtering);
 	}
 
-	@Override
-	public PaginationResponse<Country> getAllCountries(
-			SecurityContext securityContext, CountryFiltering filtering) {
 
-		List<Country> list = repository.listAllCountries(securityContext,
+	public PaginationResponse<Country> getAllCountries(
+			SecurityContextBase securityContextBase, CountryFilter filtering) {
+
+		List<Country> list = repository.listAllCountries(securityContextBase,
 				filtering);
-		long count = repository.countAllCountries(securityContext, filtering);
+		long count = repository.countAllCountries(securityContextBase, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	@Override
-	public void validate(CountryFiltering filtering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(filtering, securityContext);
+
+	public void validate(CountryFilter filtering,
+						 SecurityContextBase securityContextBase) {
+		basicService.validate(filtering, securityContextBase);
 	}
 
-	@Override
-	public Country updateCountry(CountryUpdateContainer updateContainer,
-			com.flexicore.security.SecurityContext securityContext) {
+
+	public Country updateCountry(CountryUpdate updateContainer,
+								 com.flexicore.security.SecurityContextBase securityContextBase) {
 		Country country = updateContainer.getCountry();
 		if (updateCountryNoMerge(country, updateContainer)) {
 			repository.merge(country);
@@ -97,31 +93,29 @@ public class CountryService implements ICountryService {
 		return country;
 	}
 
-	@Override
-	public Country createCountry(CountryCreationContainer creationContainer,
-			com.flexicore.security.SecurityContext securityContext) {
-		Country country = createCountryNoMerge(creationContainer,
-				securityContext);
-		repository.merge(country);
+
+	public Country createCountry(CountryCreate creationContainer,
+								 com.flexicore.security.SecurityContextBase securityContextBase) {
+		Country country = createCountryNoMerge(creationContainer, securityContextBase);
+		Baseclass security = new Baseclass(creationContainer.getName(), securityContextBase);
+		country.setSecurity(security);
+		repository.massMerge(Arrays.asList(country, security));
 		return country;
 	}
 
 	private Country createCountryNoMerge(
-			CountryCreationContainer creationContainer,
-			SecurityContext securityContext) {
-		Country country = new Country(creationContainer.getName(),
-				securityContext);
+			CountryCreate creationContainer,
+			SecurityContextBase securityContextBase) {
+		Country country = new Country().setId(Baseclass.getBase64ID());
 		updateCountryNoMerge(country, creationContainer);
 		return country;
 	}
 
 	private boolean updateCountryNoMerge(Country country,
-			CountryCreationContainer creationContainer) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(
+										 CountryCreate creationContainer) {
+		boolean update = basicService.updateBasicNoMerge(
 				creationContainer, country);
-		if (creationContainer.getCountryCode() != null
-				&& !creationContainer.getCountryCode().equals(
-						country.getCountryCode())) {
+		if (creationContainer.getCountryCode() != null && !creationContainer.getCountryCode().equals(country.getCountryCode())) {
 			country.setCountryCode(creationContainer.getCountryCode());
 			update = true;
 		}
@@ -130,74 +124,31 @@ public class CountryService implements ICountryService {
 	}
 
 	public ImportCountriesResponse importCountries(
-			SecurityContext securityContext,
+			SecurityContextBase securityContextBase,
 			ImportCountriesRequest addressImportRequest) {
 		ImportCountriesResponse importCountriesResponse = new ImportCountriesResponse();
-		try {
 
-			HttpResponse<ImportedCountry[]> response = Unirest.get(
-					Config.getCountriesImportUrl()).asObject(
-					ImportedCountry[].class);
-			if (response.getStatus() == 200) {
-				ImportedCountry[] data = response.body();
-				List<Object> toMerge = new ArrayList<>();
-				Map<String, Country> existingCountries = listAllCountries(
-						securityContext, new CountryFiltering())
-						.parallelStream()
-						.filter(f -> f.getCountryCode() != null)
-						.collect(
-								Collectors.toMap(f -> f.getCountryCode(),
-										f -> f, (a, b) -> a));
-				for (ImportedCountry datum : data) {
-					if (existingCountries.get(datum.getCode()) == null) {
-						CountryCreationContainer creationContainer = new CountryCreationContainer()
-								.setCountryCode(datum.getCode()).setName(
-										datum.getName());
-						Country country = createCountryNoMerge(
-								creationContainer, securityContext);
-						existingCountries
-								.put(country.getCountryCode(), country);
-						toMerge.add(country);
-						importCountriesResponse
-								.setCreatedCountries(importCountriesResponse
-										.getCreatedCountries() + 1);
+		ResponseEntity<ImportedCountry[]> response = restTemplate.getForEntity(countriesImportUrl, ImportedCountry[].class);
+		if (response.getStatusCode().is2xxSuccessful()) {
+			ImportedCountry[] importedCountries = response.getBody();
+			List<Object> toMerge = new ArrayList<>();
+			Map<String, Country> existingCountries = listAllCountries(securityContextBase, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
+			for (ImportedCountry importedCountry : importedCountries) {
+				if (existingCountries.get(importedCountry.getCode()) == null) {
+					CountryCreate creationContainer = new CountryCreate().setCountryCode(importedCountry.getCode()).setName(importedCountry.getName());
+					Country country = createCountryNoMerge(creationContainer, securityContextBase);
+					existingCountries.put(country.getCountryCode(), country);
+					toMerge.add(country);
+					importCountriesResponse.setCreatedCountries(importCountriesResponse.getCreatedCountries() + 1);
 
-					} else {
-						importCountriesResponse
-								.setExistingCountries(importCountriesResponse
-										.getExistingCountries() + 1);
-					}
+				} else {
+					importCountriesResponse.setExistingCountries(importCountriesResponse.getExistingCountries() + 1);
 				}
-				repository.massMerge(toMerge);
 			}
-		} catch (RestClientException e) {
-			logger.log(Level.SEVERE, "unable to get countries", e);
+			repository.massMerge(toMerge);
 		}
+
 		return importCountriesResponse;
 	}
 
-	static {
-		com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-		ObjectMappers.register(MediaType.WILDCARD_TYPE,new ObjectMapper() {
-			@Override
-			public <T> T readValue(String value, Class<T> valueType) {
-				try {
-					return objectMapper.readValue(value, valueType);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-
-			@Override
-			public String writeValue(Object value) {
-				try {
-					return objectMapper.writeValueAsString(value);
-				} catch (JsonProcessingException e) {
-					e.printStackTrace();
-				}
-				return null;
-			}
-		});
-	}
 }

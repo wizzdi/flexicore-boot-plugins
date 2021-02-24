@@ -1,67 +1,64 @@
 package com.flexicore.territories.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.model.territories.Country;
-import com.flexicore.model.territories.State;
-import com.flexicore.service.BaseclassNewService;
-import com.flexicore.territories.data.CityRepository;
-
-import javax.ws.rs.BadRequestException;
-
 import com.flexicore.model.Baseclass;
-import com.flexicore.territories.request.CityFiltering;
-import com.flexicore.territories.interfaces.ICityService;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.model.territories.City;
-import com.flexicore.territories.request.CityUpdateContainer;
-import com.flexicore.territories.request.CityCreationContainer;
+import com.flexicore.model.Basic;
+import com.flexicore.model.territories.*;
+import com.flexicore.security.SecurityContextBase;
+import com.flexicore.territories.data.CityRepository;
+import com.flexicore.territories.request.CityCreate;
+import com.flexicore.territories.request.CityFilter;
+import com.flexicore.territories.request.CityUpdate;
+import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
+import javax.persistence.metamodel.SingularAttribute;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @PluginInfo(version = 1)
 @Extension
 @Component
-public class CityService implements ICityService {
+public class CityService implements Plugin {
+
+	private static final Logger logger= LoggerFactory.getLogger(CityService.class);
 
 	@PluginInfo(version = 1)
 	@Autowired
 	private CityRepository repository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
-	@Autowired
-	private Logger logger;
+	private BasicService basicService;
 
-	@Override
-	public <T extends Baseclass> T getByIdOrNull(java.lang.String id,
-			Class<T> c, List<String> batch, SecurityContext securityContext) {
-		return repository.getByIdOrNull(id, c, batch, securityContext);
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	@Override
-	public List<City> listAllCities(SecurityContext securityContext,
-			CityFiltering filtering) {
-		return repository.listAllCities(securityContext, filtering);
+	
+	public List<City> listAllCities(SecurityContextBase securityContextBase,
+			CityFilter filtering) {
+		return repository.listAllCities(securityContextBase, filtering);
 	}
 
-	@Override
+	
 	public PaginationResponse<City> getAllCities(
-			SecurityContext securityContext, CityFiltering filtering) {
-		List<City> list = repository.listAllCities(securityContext, filtering);
-		long count = repository.countAllCities(securityContext, filtering);
+			SecurityContextBase securityContextBase, CityFilter filtering) {
+		List<City> list = repository.listAllCities(securityContextBase, filtering);
+		long count = repository.countAllCities(securityContextBase, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	@Override
-	public City updateCity(CityUpdateContainer updateContainer,
-			com.flexicore.security.SecurityContext securityContext) {
+	
+	public City updateCity(CityUpdate updateContainer,
+						   com.flexicore.security.SecurityContextBase securityContextBase) {
 		City city = updateContainer.getCity();
 		if (updateCityNoMerge(updateContainer, city)) {
 			repository.merge(city);
@@ -69,85 +66,77 @@ public class CityService implements ICityService {
 		return city;
 	}
 
-	public void validate(CityCreationContainer creationContainer,
-			SecurityContext securityContext) {
-		baseclassNewService.validateCreate(creationContainer, securityContext);
+	public void validate(CityCreate creationContainer,
+						 SecurityContextBase securityContextBase) {
+		basicService.validate(creationContainer, securityContextBase);
 		String countryId = creationContainer.getCountryId();
-		Country country = countryId != null ? getByIdOrNull(countryId,
-				Country.class, null, securityContext) : null;
-		if (country == null) {
-			throw new BadRequestException("no Country with id " + countryId);
+		Country country = countryId != null ? getByIdOrNull(countryId, Country.class, Country_.security, securityContextBase) : null;
+		if (country == null&& countryId != null) {
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no Country with id " + countryId);
 		}
 		creationContainer.setCountry(country);
 
 		String stateId = creationContainer.getStateId();
-		State state = stateId != null ? getByIdOrNull(stateId, State.class,
-				null, securityContext) : null;
+		State state = stateId != null ? getByIdOrNull(stateId, State.class, State_.security, securityContextBase) : null;
 		if (stateId != null && state == null) {
-			throw new BadRequestException("no State with id " + stateId);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no State with id " + stateId);
 		}
 		creationContainer.setState(state);
 	}
 
-	public void validate(CityFiltering cityFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(cityFiltering, securityContext);
-		Set<String> countriesIds = cityFiltering.getCountriesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
-		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+	public void validate(CityFilter cityFiltering,
+						 SecurityContextBase securityContextBase) {
+		basicService.validate(cityFiltering, securityContextBase);
+		Set<String> countriesIds = cityFiltering.getCountriesIds();
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds, Country_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		countriesIds.removeAll(countryMap.keySet());
 		if(!countriesIds.isEmpty()){
-			throw new BadRequestException("No Countries with ids "+countriesIds);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
 		}
 		cityFiltering.setCountries(new ArrayList<>(countryMap.values()));
 
-		Set<String> stateIds = cityFiltering.getStatesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
-		Map<String, State> stateMa = stateIds.isEmpty()?new HashMap<>():repository.listByIds(State.class,stateIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Set<String> stateIds = cityFiltering.getStatesIds();
+		Map<String, State> stateMa = stateIds.isEmpty()?new HashMap<>():repository.listByIds(State.class,stateIds, State_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		stateIds.removeAll(stateMa.keySet());
 		if(!stateIds.isEmpty()){
-			throw new BadRequestException("No States with ids "+stateIds);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No States with ids "+stateIds);
 		}
 		cityFiltering.setStates(new ArrayList<>(stateMa.values()));
 	}
 
-	@Override
-	public City createCity(CityCreationContainer creationContainer,
-			com.flexicore.security.SecurityContext securityContext) {
-		City city = createCityNoMerge(creationContainer, securityContext);
-		repository.merge(city);
+	
+	public City createCity(CityCreate creationContainer, SecurityContextBase securityContextBase) {
+		City city = createCityNoMerge(creationContainer, securityContextBase);
+		Baseclass baseclass=new Baseclass(creationContainer.getName(),securityContextBase);
+		city.setSecurity(baseclass);
+		repository.massMerge(Arrays.asList(city,baseclass));
 		return city;
 	}
 
-	public City createCityNoMerge(CityCreationContainer creationContainer,
-			SecurityContext securityContext) {
-		City city = new City(creationContainer.getName(), securityContext);
+	public City createCityNoMerge(CityCreate creationContainer,
+								  SecurityContextBase securityContextBase) {
+		City city = new City().setId(Baseclass.getBase64ID());
 		updateCityNoMerge(creationContainer, city);
 		return city;
 	}
 
-	public boolean updateCityNoMerge(CityCreationContainer creationContainer,
-			City city) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(
-				creationContainer, city);
+	public boolean updateCityNoMerge(CityCreate creationContainer,
+									 City city) {
+		boolean update = basicService.updateBasicNoMerge(creationContainer, city);
 		if (city.isSoftDelete()) {
 			city.setSoftDelete(false);
 			update = true;
 		}
-		if (creationContainer.getExternalId() != null
-				&& !creationContainer.getExternalId().equals(
-						city.getExternalId())) {
+		if (creationContainer.getExternalId() != null && !creationContainer.getExternalId().equals(city.getExternalId())) {
 			city.setExternalId(creationContainer.getExternalId());
 			update = true;
 		}
 
-		if (creationContainer.getCountry() != null
-				&& (city.getCountry() == null || !creationContainer
-						.getCountry().getId().equals(city.getCountry().getId()))) {
+		if (creationContainer.getCountry() != null && (city.getCountry() == null || !creationContainer.getCountry().getId().equals(city.getCountry().getId()))) {
 			city.setCountry(creationContainer.getCountry());
 			update = true;
 		}
-		if (creationContainer.getState() != null
-				&& (city.getState() == null || !creationContainer.getState()
-						.getId().equals(city.getState().getId()))) {
+		if (creationContainer.getState() != null && (city.getState() == null || !creationContainer.getState().getId().equals(city.getState().getId()))) {
 			city.setState(creationContainer.getState());
 			update = true;
 		}
@@ -155,9 +144,9 @@ public class CityService implements ICityService {
 
 	}
 
-	@Override
-	public void deleteCity(String cityid, SecurityContext securityContext) {
-		City city = getByIdOrNull(cityid, City.class, null, securityContext);
+	
+	public void deleteCity(String cityid, SecurityContextBase securityContextBase) {
+		City city = getByIdOrNull(cityid, City.class, City_.security, securityContextBase);
 		repository.remove(city);
 	}
 }

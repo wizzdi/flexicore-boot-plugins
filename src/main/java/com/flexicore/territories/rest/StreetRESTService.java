@@ -1,121 +1,77 @@
 package com.flexicore.territories.rest;
 
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.annotations.ProtectedREST;
-
-import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.OperationsInside;
-import javax.interceptor.Interceptors;
-import com.flexicore.interfaces.RestServicePlugin;
-import javax.ws.rs.Path;
-
 import com.flexicore.model.territories.City;
-import com.flexicore.territories.service.StreetService;
-import com.flexicore.security.SecurityContext;
-import java.util.List;
-
-import com.flexicore.territories.request.StreetFiltering;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.HeaderParam;
-import io.swagger.v3.oas.annotations.Operation;
-import com.flexicore.annotations.IOperation;
-import javax.ws.rs.core.Context;
+import com.flexicore.model.territories.City_;
 import com.flexicore.model.territories.Street;
-import com.flexicore.territories.request.StreetUpdateContainer;
-import javax.ws.rs.BadRequestException;
-import com.flexicore.territories.request.StreetCreationContainer;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.PathParam;
+import com.flexicore.model.territories.Street_;
+import com.flexicore.security.SecurityContextBase;
+import com.flexicore.territories.request.StreetCreate;
+import com.flexicore.territories.request.StreetFilter;
+import com.flexicore.territories.request.StreetUpdate;
+import com.flexicore.territories.service.StreetService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
-@PluginInfo(version = 1)
 @OperationsInside
-@ProtectedREST
-@Path("plugins/Street")
-@Tag(name = "Street")
+@RequestMapping("/plugins/street")
 @Extension
-@Component
-public class StreetRESTService implements RestServicePlugin {
+@RestController
+public class StreetRESTService implements Plugin {
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private StreetService service;
 
-	@POST
-	@Produces("application/json")
-	@Operation(summary = "listAllStreets", description = "Lists all Streets Filtered")
-	@IOperation(Name = "listAllStreets", Description = "Lists all Streets Filtered")
-	@Path("listAllStreets")
-	public List<Street> listAllStreets(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StreetFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering, securityContext);
-		return service.listAllStreets(securityContext, filtering);
-	}
 
-	@POST
-	@Produces("application/json")
-	@Operation(summary = "getAllStreets", description = "Lists all Streets Filtered")
-	@IOperation(Name = "getAllStreets", Description = "Lists all Streets Filtered")
-	@Path("getAllStreets")
+	@PostMapping("/getAllStreets")
 	public PaginationResponse<Street> getAllStreets(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StreetFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering, securityContext);
-		return service.getAllStreets(securityContext, filtering);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StreetFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.validate(filtering, securityContextBase);
+		return service.getAllStreets(securityContextBase, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateStreet")
-	@Operation(summary = "updateStreet", description = "Updates Street")
-	@IOperation(Name = "updateStreet", Description = "Updates Street")
+
+	@PutMapping("/updateStreet")
 	public Street updateStreet(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StreetUpdateContainer updateContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StreetUpdate updateContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		Street street = service.getByIdOrNull(updateContainer.getId(),
-				Street.class, null, securityContext);
+				Street.class, Street_.security, securityContextBase);
 		if (street == null) {
-			throw new BadRequestException("no Street with id "
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no Street with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setStreet(street);
-		service.validate(updateContainer, securityContext);
-		return service.updateStreet(updateContainer, securityContext);
+		service.validate(updateContainer, securityContextBase);
+		return service.updateStreet(updateContainer, securityContextBase);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createStreet")
-	@Operation(summary = "createStreet", description = "Creates Street")
-	@IOperation(Name = "createStreet", Description = "Creates Street")
+	@PostMapping("/createStreet")
 	public Street createStreet(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StreetCreationContainer creationContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StreetCreate creationContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		City city = service.getByIdOrNull(creationContainer.getCityId(),
-				City.class, null, securityContext);
+				City.class, City_.security, securityContextBase);
 		if (city == null) {
-			throw new BadRequestException("no City with id "
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no City with id "
 					+ creationContainer.getCityId());
 		}
 		creationContainer.setCity(city);
-		return service.createStreet(creationContainer, securityContext);
+		return service.createStreet(creationContainer, securityContextBase);
 	}
 
-	@DELETE
-	@Operation(summary = "deleteStreet", description = "Deletes Street")
-	@IOperation(Name = "deleteStreet", Description = "Deletes Street")
-	@Path("deleteStreet/{id}")
+	@DeleteMapping("/deleteStreet/{id}")
 	public void deleteStreet(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			@PathParam("id") String id, @Context SecurityContext securityContext) {
-		service.deleteStreet(id, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.deleteStreet(id, securityContextBase);
 	}
 }

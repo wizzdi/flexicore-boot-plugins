@@ -2,9 +2,9 @@ package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.territories.Country;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class StateCreate extends BaseclassCreate {
+public class StateCreate extends BasicCreate {
 
 	private String externalId;
 
@@ -16,8 +16,9 @@ public class StateCreate extends BaseclassCreate {
 		return countryId;
 	}
 
-	public void setCountryId(String countryId) {
+	public <T extends StateCreate> T setCountryId(String countryId) {
 		this.countryId = countryId;
+		return (T) this;
 	}
 
 	@JsonIgnore

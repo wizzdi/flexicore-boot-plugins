@@ -1,125 +1,68 @@
 package com.flexicore.territories.rest;
 
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.annotations.ProtectedREST;
-
-import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.OperationsInside;
-
-import javax.interceptor.Interceptors;
-
-import com.flexicore.interfaces.RestServicePlugin;
-
-import javax.ws.rs.Path;
-
-import com.flexicore.territories.service.CityService;
-
-import com.flexicore.security.SecurityContext;
-
-import java.util.List;
-
-import com.flexicore.territories.request.CityFiltering;
-
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.HeaderParam;
-
-import io.swagger.v3.oas.annotations.Operation;
-import com.flexicore.annotations.IOperation;
-
-import javax.ws.rs.core.Context;
-
 import com.flexicore.model.territories.City;
-import com.flexicore.territories.request.CityUpdateContainer;
-
-import javax.ws.rs.BadRequestException;
-
-import com.flexicore.territories.request.CityCreationContainer;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.PathParam;
+import com.flexicore.model.territories.City_;
+import com.flexicore.security.SecurityContextBase;
+import com.flexicore.territories.request.CityCreate;
+import com.flexicore.territories.request.CityFilter;
+import com.flexicore.territories.request.CityUpdate;
+import com.flexicore.territories.service.CityService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
-@PluginInfo(version = 1)
 @OperationsInside
-@ProtectedREST
-@Path("plugins/City")
-@Tag(name = "City")
+@RequestMapping("/plugins/city")
 @Extension
-@Component
-public class CityRESTService implements RestServicePlugin {
+@RestController
+public class CityRESTService implements Plugin {
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private CityService service;
 
-	@POST
-	@Produces("application/json")
-	@Operation(summary = "listAllCities", description = "Lists all Cities Filtered")
-	@IOperation(Name = "listAllCities", Description = "Lists all Cities Filtered")
-	@Path("listAllCities")
-	public List<City> listAllCities(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CityFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering, securityContext);
-		return service.listAllCities(securityContext, filtering);
-	}
 
-	@POST
-	@Produces("application/json")
-	@Operation(summary = "getAllCities", description = "Lists all Cities Filtered")
-	@IOperation(Name = "getAllCities", Description = "Lists all Cities Filtered")
-	@Path("getAllCities")
+
+	@PostMapping("/getAllCities")
 	public PaginationResponse<City> getAllCities(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CityFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering, securityContext);
-		return service.getAllCities(securityContext, filtering);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CityFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.validate(filtering, securityContextBase);
+		return service.getAllCities(securityContextBase, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateCity")
-	@Operation(summary = "updateCity", description = "Updates City")
-	@IOperation(Name = "updateCity", Description = "Updates City")
+	@PutMapping("/updateCity")
 	public City updateCity(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CityUpdateContainer updateContainer,
-			@Context SecurityContext securityContext) {
-		City city = service.getByIdOrNull(updateContainer.getId(), City.class,
-				null, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CityUpdate updateContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		City city = service.getByIdOrNull(updateContainer.getId(), City.class, City_.security, securityContextBase);
 		if (city == null) {
-			throw new BadRequestException("no City with id "
-					+ updateContainer.getId());
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no City with id " + updateContainer.getId());
 		}
 		updateContainer.setCity(city);
-		service.validate(updateContainer, securityContext);
-		return service.updateCity(updateContainer, securityContext);
+		service.validate(updateContainer, securityContextBase);
+		return service.updateCity(updateContainer, securityContextBase);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createCity")
-	@Operation(summary = "createCity", description = "Creates City")
-	@IOperation(Name = "createCity", Description = "Creates City")
+	@PostMapping("/createCity")
 	public City createCity(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CityCreationContainer creationContainer,
-			@Context SecurityContext securityContext) {
-		service.validate(creationContainer, securityContext);
-		return service.createCity(creationContainer, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CityCreate creationContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.validate(creationContainer, securityContextBase);
+		return service.createCity(creationContainer, securityContextBase);
 	}
 
-	@DELETE
-	@Operation(summary = "deleteCity", description = "Deletes City")
-	@IOperation(Name = "deleteCity", Description = "Deletes City")
-	@Path("deleteCity/{id}")
+
+	@DeleteMapping("deleteCity/{id}")
 	public void deleteCity(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			@PathParam("id") String id, @Context SecurityContext securityContext) {
-		service.deleteCity(id, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.deleteCity(id, securityContextBase);
 	}
 }

@@ -1,67 +1,64 @@
 package com.flexicore.territories.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.territories.City;
+import com.flexicore.model.Basic;
 import com.flexicore.model.territories.Country;
+import com.flexicore.model.territories.Country_;
 import com.flexicore.model.territories.State;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.model.territories.State_;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.territories.data.StateRepository;
-import com.flexicore.territories.interfaces.IStateService;
 import com.flexicore.territories.request.StateCreate;
-import com.flexicore.territories.request.StateFiltering;
+import com.flexicore.territories.request.StateFilter;
 import com.flexicore.territories.request.StateUpdate;
-
-import javax.ws.rs.BadRequestException;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
+import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
+import javax.persistence.metamodel.SingularAttribute;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @PluginInfo(version = 1)
 @Extension
 @Component
-public class StateService implements IStateService {
+public class StateService implements Plugin {
 
 	@PluginInfo(version = 1)
 	@Autowired
 	private StateRepository repository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService basicService;
 
-	@Autowired
-	private Logger logger;
-
-	@Override
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-			List<String> batch, SecurityContext securityContext) {
-		return repository.getByIdOrNull(id, c, batch, securityContext);
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	@Override
-	public List<State> listAllStates(SecurityContext securityContext,
-			StateFiltering filtering) {
-		return repository.listAllStates(securityContext, filtering);
+	
+	public List<State> listAllStates(SecurityContextBase securityContextBase,
+			StateFilter filtering) {
+		return repository.listAllStates(securityContextBase, filtering);
 
 	}
 
-	@Override
+	
 	public PaginationResponse<State> getAllStates(
-			SecurityContext securityContext, StateFiltering filtering) {
-		List<State> list = repository.listAllStates(securityContext, filtering);
-		long count = repository.countAllStates(securityContext, filtering);
+			SecurityContextBase securityContextBase, StateFilter filtering) {
+		List<State> list = repository.listAllStates(securityContextBase, filtering);
+		long count = repository.countAllStates(securityContextBase, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	@Override
+	
 	public State updateState(StateUpdate updateContainer,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContextBase) {
 		State state = updateContainer.getState();
 		if (updateStateNoMerge(state, updateContainer)) {
 			repository.merge(state);
@@ -70,32 +67,31 @@ public class StateService implements IStateService {
 	}
 
 	public void validate(StateCreate stateCreate,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContextBase) {
 		String countryId = stateCreate.getCountryId();
-		Country country = countryId != null ? getByIdOrNull(countryId,
-				Country.class, null, securityContext) : null;
+		Country country = countryId != null ? getByIdOrNull(countryId, Country.class, Country_.security, securityContextBase) : null;
 		if (country == null && countryId != null) {
-			throw new BadRequestException("no Country with id " + countryId);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no Country with id " + countryId);
 		}
 		stateCreate.setCountry(country);
 	}
 
-	public void validate(StateFiltering stateFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(stateFiltering, securityContext);
-		Set<String> countriesIds = stateFiltering.getCountriesIds().stream().map(f->f.getId()).collect(Collectors.toSet());
-		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+	public void validate(StateFilter stateFiltering,
+						 SecurityContextBase securityContextBase) {
+		basicService.validate(stateFiltering, securityContextBase);
+		Set<String> countriesIds = stateFiltering.getCountriesIds();
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds, Country_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		countriesIds.removeAll(countryMap.keySet());
 		if(!countriesIds.isEmpty()){
-			throw new BadRequestException("No Countries with ids "+countriesIds);
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
 		}
 		stateFiltering.setCountries(new ArrayList<>(countryMap.values()));
 
 	}
 
 	public State createStateNoMerge(StateCreate stateCreate,
-			SecurityContext securityContext) {
-		State state = new State(stateCreate.getName(), securityContext);
+			SecurityContextBase securityContextBase) {
+		State state = new State().setId(Baseclass.getBase64ID());
 		updateStateNoMerge(state, stateCreate);
 		return state;
 
@@ -103,20 +99,16 @@ public class StateService implements IStateService {
 
 	public boolean updateStateNoMerge(State state, StateCreate stateCreate) {
 
-		boolean update = baseclassNewService.updateBaseclassNoMerge(
-				stateCreate, state);
+		boolean update = basicService.updateBasicNoMerge(stateCreate, state);
 		if (state.isSoftDelete()) {
 			state.setSoftDelete(false);
 			update = true;
 		}
-		if (stateCreate.getExternalId() != null
-				&& !stateCreate.getExternalId().equals(state.getExternalId())) {
+		if (stateCreate.getExternalId() != null && !stateCreate.getExternalId().equals(state.getExternalId())) {
 			state.setExternalId(stateCreate.getExternalId());
 			update = true;
 		}
-		if (stateCreate.getCountry() != null
-				&& (state.getCountry() == null || !stateCreate.getCountry()
-						.getId().equals(state.getCountry().getId()))) {
+		if (stateCreate.getCountry() != null && (state.getCountry() == null || !stateCreate.getCountry().getId().equals(state.getCountry().getId()))) {
 			state.setCountry(stateCreate.getCountry());
 			update = true;
 		}
@@ -124,17 +116,19 @@ public class StateService implements IStateService {
 
 	}
 
-	@Override
+	
 	public State createState(StateCreate creationContainer,
-			SecurityContext securityContext) {
-		State state = createStateNoMerge(creationContainer, securityContext);
-		repository.merge(state);
+			SecurityContextBase securityContextBase) {
+		State state = createStateNoMerge(creationContainer, securityContextBase);
+		Baseclass security=new Baseclass(creationContainer.getName(),securityContextBase);
+		state.setSecurity(security);
+		repository.massMerge(Arrays.asList(state,security));
 		return state;
 	}
 
-	@Override
-	public void deleteState(String stateid, SecurityContext securityContext) {
-		State state = getByIdOrNull(stateid, State.class, null, securityContext);
+	
+	public void deleteState(String stateid, SecurityContextBase securityContextBase) {
+		State state = getByIdOrNull(stateid, State.class, State_.security, securityContextBase);
 		repository.remove(state);
 	}
 }

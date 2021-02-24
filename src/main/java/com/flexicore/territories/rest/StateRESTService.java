@@ -1,83 +1,60 @@
 package com.flexicore.territories.rest;
 
-import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
 import com.flexicore.model.territories.State;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.territories.State_;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.territories.request.StateCreate;
-import com.flexicore.territories.request.StateFiltering;
+import com.flexicore.territories.request.StateFilter;
 import com.flexicore.territories.request.StateUpdate;
 import com.flexicore.territories.service.StateService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import java.util.List;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
-@PluginInfo(version = 1)
 @OperationsInside
-@ProtectedREST
-@Path("plugins/State")
-@Tag(name = "State")
+@RequestMapping("/plugins/state")
 @Extension
-@Component
-public class StateRESTService implements RestServicePlugin {
+@RestController
+public class StateRESTService implements Plugin {
 
-	@PluginInfo(version = 1)
 	@Autowired
 	private StateService service;
 
-	@POST
-	@Produces("application/json")
-	@Operation(summary = "getAllStates", description = "Lists all States Filtered")
-	@IOperation(Name = "getAllStates", Description = "Lists all States Filtered")
-	@Path("getAllStates")
+	@PostMapping("/getAllStates")
 	public PaginationResponse<State> getAllStates(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StateFiltering filtering, @Context SecurityContext securityContext) {
-		service.validate(filtering, securityContext);
-		return service.getAllStates(securityContext, filtering);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StateFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.validate(filtering, securityContextBase);
+		return service.getAllStates(securityContextBase, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateState")
-	@Operation(summary = "updateState", description = "Updates State")
-	@IOperation(Name = "updateState", Description = "Updates State")
+	@PutMapping("/updateState")
 	public State updateState(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StateUpdate updateContainer,
-			@Context SecurityContext securityContext) {
-		State state = service.getByIdOrNull(updateContainer.getId(),
-				State.class, null, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StateUpdate updateContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		State state = service.getByIdOrNull(updateContainer.getId(), State.class, State_.security, securityContextBase);
 		if (state == null) {
-			throw new BadRequestException("no State with id "
-					+ updateContainer.getId());
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no State with id " + updateContainer.getId());
 		}
 		updateContainer.setState(state);
-		service.validate(updateContainer, securityContext);
-		return service.updateState(updateContainer, securityContext);
+		service.validate(updateContainer, securityContextBase);
+		return service.updateState(updateContainer, securityContextBase);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createState")
-	@Operation(summary = "createState", description = "Creates State")
-	@IOperation(Name = "createState", Description = "Creates State")
+
+	@PostMapping("/createState")
 	public State createState(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			StateCreate creationContainer,
-			@Context SecurityContext securityContext) {
-		service.validate(creationContainer, securityContext);
-		return service.createState(creationContainer, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody StateCreate creationContainer,
+			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+		service.validate(creationContainer, securityContextBase);
+		return service.createState(creationContainer, securityContextBase);
 	}
 
 }

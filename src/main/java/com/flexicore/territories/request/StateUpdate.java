@@ -13,8 +13,9 @@ public class StateUpdate extends StateCreate {
 		return id;
 	}
 
-	public void setId(String id) {
+	public <T extends StateUpdate> T setId(String id) {
 		this.id = id;
+		return (T) this;
 	}
 
 	@JsonIgnore
@@ -22,8 +23,8 @@ public class StateUpdate extends StateCreate {
 		return State;
 	}
 
-	public void setState(State State) {
-		this.State = State;
+	public <T extends StateUpdate> T setState(com.flexicore.model.territories.State state) {
+		State = state;
+		return (T) this;
 	}
-
 }

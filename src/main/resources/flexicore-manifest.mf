@@ -1,3 +1,0 @@
-uuid=${project.groupId}.${project.artifactId}
-version=${project.version}
-provides=com.flexicore.territories.interfaces.IAddressService,com.flexicore.territories.interfaces.INeighbourhoodService,com.flexicore.territories.interfaces.IStreetService,com.flexicore.territories.interfaces.IStateService,com.flexicore.territories.interfaces.ICountryService,com.flexicore.territories.interfaces.ICityService

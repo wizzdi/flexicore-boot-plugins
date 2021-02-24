@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-territories-service</artifactId>
-    <version>3.3.4-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <name>flexicore-territories-service</name>
     <description>flexicore territories service manages cities,countries etc</description>
     <url>https://wizzdi.com</url>
@@ -16,14 +16,13 @@
         </license>
     </licenses>
     <properties>
-        <flexicore-api.version>4.2.1</flexicore-api.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <pf4j-spring.version>0.7.0</pf4j-spring.version>
         <version.compiler.plugin>3.3</version.compiler.plugin>
         <version.jackson>2.11.0</version.jackson>
         <version.eclipselink>2.7.7</version.eclipselink>
-        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <pf4j-spring.version>0.6.0</pf4j-spring.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
@@ -69,93 +68,104 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
-            <version>${version.jackson}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-territories-model</artifactId>
-            <version>2.2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.joshworks.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>1.8.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>8.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${version.jackson}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa</artifactId>
-            <version>${version.eclipselink}</version>
+            <version>3.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-api</artifactId>
-            <version>${flexicore-api.version}</version>
+            <artifactId>flexicore-boot</artifactId>
+            <version>1.0.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.0.8</version>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-web</artifactId>
+            <version>1.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-security-model</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-data-jpa</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-security-service</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.pf4j</groupId>
             <artifactId>pf4j-spring</artifactId>
             <version>${pf4j-spring.version}</version>
-            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>log4j</artifactId>
+                    <groupId>log4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-undertow</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-test-helper</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>flexicore-local</id>
-            <name>flexicore-local</name>
-            <url>https://artifactory.wizzdi.com/artifactory/flexicore-local</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>flexicore-local</id>
-            <name>flexicore-local</name>
-            <url>https://artifactory.wizzdi.com/artifactory/flexicore-local</url>
-        </pluginRepository>
-    </pluginRepositories>
+
     <build>
         <resources>
             <resource>
