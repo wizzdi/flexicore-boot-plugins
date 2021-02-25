@@ -110,22 +110,22 @@ public class CellToLayoutService implements ServicePlugin {
 			SecurityContext securityContext) {
 		baseclassNewService.validate(createCellToLayout, securityContext);
 		String dashboardPresetId=createCellToLayout.getDashboardPresetId();
-		DashboardPreset gridPreset=dashboardPresetId!=null?getByIdOrNull(dashboardPresetId,DashboardPreset.class,null,securityContext):null;
-		if(gridPreset==null){
+		DashboardPreset dashboardPreset=dashboardPresetId!=null?getByIdOrNull(dashboardPresetId,DashboardPreset.class,null,securityContext):null;
+		if(dashboardPreset==null&&dashboardPresetId!=null){
 			throw new BadRequestException("No DashboardPreset with id "+dashboardPresetId);
 		}
-		createCellToLayout.setDashboardPreset(gridPreset);
+		createCellToLayout.setDashboardPreset(dashboardPreset);
 
 		String cellContentId=createCellToLayout.getCellContentId();
 		CellContent cellContent=cellContentId!=null?getByIdOrNull(cellContentId, CellContent.class,null,securityContext):null;
-		if(cellContent==null){
+		if(cellContent==null&&cellContentId!=null){
 			throw new BadRequestException("No CellContent with id "+cellContentId);
 		}
 		createCellToLayout.setCellContent(cellContent);
 
 		String gridLayoutCellId=createCellToLayout.getGridLayoutCellId();
 		GridLayoutCell gridLayoutCell=gridLayoutCellId!=null?getByIdOrNull(gridLayoutCellId, GridLayoutCell.class,null,securityContext):null;
-		if(gridLayoutCell==null){
+		if(gridLayoutCell==null&&gridLayoutCellId!=null){
 			throw new BadRequestException("No GridLayoutCell with id "+gridLayoutCellId);
 		}
 		createCellToLayout.setGridLayoutCell(gridLayoutCell);
