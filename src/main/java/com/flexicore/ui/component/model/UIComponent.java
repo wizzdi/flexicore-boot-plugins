@@ -8,7 +8,7 @@ package com.flexicore.ui.component.model;
 
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.Entity;
 
@@ -19,7 +19,7 @@ public class UIComponent extends Baseclass {
 	public UIComponent() {
 	}
 
-	public UIComponent(String name, SecurityContext securityContext) {
+	public UIComponent(String name, SecurityContextBase securityContext) {
 		super(name, securityContext);
 	}
 
