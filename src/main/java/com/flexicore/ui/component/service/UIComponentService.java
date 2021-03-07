@@ -8,7 +8,6 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.PermissionGroup;
 import com.flexicore.request.PermissionGroupsFilter;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.service.FileResourceService;
 import com.flexicore.service.PermissionGroupService;
 import com.flexicore.service.SecurityService;
 import com.flexicore.ui.component.data.UIComponentRepository;
@@ -37,7 +36,7 @@ public class UIComponentService implements ServicePlugin {
 
     @Autowired
     @PluginInfo(version = 1)
-    private UIComponentRepository uiPluginRepository;
+    private UIComponentRepository uiComponentRepository;
 
     @Autowired
     private SecurityService securityService;
@@ -56,7 +55,7 @@ public class UIComponentService implements ServicePlugin {
         Map<String,UIComponentRegistrationContainer> externalIds=componentsToRegister.stream().collect(Collectors.toMap(f->f.getExternalId(),f->f,(a,b)->a));
         List<UIComponent> existing=new ArrayList<>();
         for (List<String> externalIdsBatch : Lists.partition(new ArrayList<>(externalIds.keySet()), 50)) {
-            existing.addAll(uiPluginRepository.getExistingUIComponentsByIds(new HashSet<>(externalIdsBatch)));
+            existing.addAll(uiComponentRepository.getExistingUIComponentsByIds(new HashSet<>(externalIdsBatch)));
         }
         Set<String> groupExternalIds=componentsToRegister.stream().filter(f->f.getGroups()!=null).map(f->f.getGroups().split(",")).flatMap(Stream::of).collect(Collectors.toSet());
         Map<String, PermissionGroup> permissionGroupMap=groupExternalIds.isEmpty()?new HashMap<>():permissionGroupService.listPermissionGroups(new PermissionGroupsFilter().setExternalIds(groupExternalIds),null).stream().collect(Collectors.toMap(f->f.getExternalId(),f->f,(a,b)->a));
@@ -64,7 +63,7 @@ public class UIComponentService implements ServicePlugin {
 
         List<UIComponent> accessible=new ArrayList<>();
         for (List<String> idsBatch : Lists.partition(existing.stream().map(f->f.getId()).collect(Collectors.toList()),50)) {
-            accessible.addAll(uiPluginRepository.listByIds(UIComponent.class,new HashSet<>(idsBatch),securityContext));
+            accessible.addAll(uiComponentRepository.listByIds(UIComponent.class,new HashSet<>(idsBatch),securityContext));
         }
 
         List<UIComponentRegistrationContainer> componentsToCreate=externalIds.values().parallelStream().collect(Collectors.toList());
@@ -113,7 +112,7 @@ public class UIComponentService implements ServicePlugin {
         }
 
 
-        uiPluginRepository.massMerge(toMerge);
+        uiComponentRepository.massMerge(toMerge);
         for (Map.Entry<String, List<Baseclass>> stringListEntry : permissionGroupExternalIdToUIComponent.entrySet()) {
             PermissionGroup permissionGroup=permissionGroupMap.get(stringListEntry.getKey());
             List<Baseclass> baseclasses=stringListEntry.getValue();

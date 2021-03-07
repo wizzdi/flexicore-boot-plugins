@@ -113,13 +113,13 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-base-model</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-base-service</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
