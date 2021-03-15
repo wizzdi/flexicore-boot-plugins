@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 @Extension
 @Configuration
 @EnableTransactionManagement
-public class Config implements Plugin {
+public class TerritoriesConfig implements Plugin {
 
 	@Bean
 	public RestTemplate restTemplate(){
