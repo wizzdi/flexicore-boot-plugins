@@ -1,8 +1,8 @@
 package com.flexicore.billing.request;
 
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class CurrencyCreate extends BaseclassCreate {
+public class CurrencyCreate extends BasicCreate {
 
 
 }

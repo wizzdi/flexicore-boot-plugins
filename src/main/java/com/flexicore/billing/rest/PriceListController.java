@@ -2,80 +2,85 @@ package com.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
+
 import com.flexicore.billing.model.PriceList;
+import com.flexicore.billing.model.PriceList_;
 import com.flexicore.billing.request.PriceListCreate;
 import com.flexicore.billing.request.PriceListFiltering;
 import com.flexicore.billing.request.PriceListUpdate;
 import com.flexicore.billing.service.PriceListService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/PriceList")
-@RequestScoped
+
+@RequestMapping("/plugins/PriceList")
+
 @Tag(name = "PriceList")
 @Extension
-@Component
-public class PriceListRESTService implements RestServicePlugin {
+@RestController
+public class PriceListController implements Plugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+		@Autowired
 	private PriceListService service;
 
-	@POST
-	@Produces("application/json")
+
+
 	@Operation(summary = "getAllPriceLists", description = "Lists all PriceLists")
 	@IOperation(Name = "getAllPriceLists", Description = "Lists all PriceLists")
-	@Path("getAllPriceLists")
+	@PostMapping("/getAllPriceLists")
 	public PaginationResponse<PriceList> getAllPriceLists(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PriceListFiltering filtering, @Context SecurityContext securityContext) {
+
+			@RequestBody PriceListFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllPriceLists(securityContext, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createPriceList")
+
+
+	@PostMapping("/createPriceList")
 	@Operation(summary = "createPriceList", description = "Creates PriceList")
 	@IOperation(Name = "createPriceList", Description = "Creates PriceList")
 	public PriceList createPriceList(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PriceListCreate creationContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody 	PriceListCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createPriceList(creationContainer, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updatePriceList")
+
+
+	@PutMapping("/updatePriceList")
 	@Operation(summary = "updatePriceList", description = "Updates PriceList")
 	@IOperation(Name = "updatePriceList", Description = "Updates PriceList")
 	public PriceList updatePriceList(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PriceListUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody PriceListUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		PriceList priceList = service.getByIdOrNull(updateContainer.getId(),
-				PriceList.class, null, securityContext);
+				PriceList.class, PriceList_.security, securityContext);
 		if (priceList == null) {
-			throw new BadRequestException("no PriceList with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no PriceList with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setPriceList(priceList);

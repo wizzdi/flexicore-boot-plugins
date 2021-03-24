@@ -3,13 +3,16 @@ package com.flexicore.billing.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.ContractItem;
 import com.flexicore.billing.model.Invoice;
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class InvoiceItemFiltering extends FilteringInformationHolder {
+public class InvoiceItemFiltering extends PaginationFilter {
+private BasicPropertiesFilter basicPropertiesFilter;
 
     private Set<String> invoiceIds=new HashSet<>();
     @JsonIgnore
@@ -18,6 +21,15 @@ public class InvoiceItemFiltering extends FilteringInformationHolder {
     private Set<String> contractItemIds=new HashSet<>();
     @JsonIgnore
     private List<ContractItem> contractItems;
+
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends InvoiceItemFiltering> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
 
     public Set<String> getInvoiceIds() {
         return invoiceIds;

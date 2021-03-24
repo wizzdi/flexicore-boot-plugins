@@ -2,80 +2,86 @@ package com.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
+
 import com.flexicore.billing.model.PaymentMethodType;
+import com.flexicore.billing.model.PaymentMethodType_;
+import com.flexicore.billing.model.PriceList_;
 import com.flexicore.billing.request.PaymentMethodTypeCreate;
 import com.flexicore.billing.request.PaymentMethodTypeFiltering;
 import com.flexicore.billing.request.PaymentMethodTypeUpdate;
 import com.flexicore.billing.service.PaymentMethodTypeService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/PaymentMethodType")
-@RequestScoped
+
+@RequestMapping("/plugins/PaymentMethodType")
+
 @Tag(name = "PaymentMethodType")
 @Extension
-@Component
-public class PaymentMethodTypeRESTService implements RestServicePlugin {
+@RestController
+public class PaymentMethodTypeController implements Plugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+		@Autowired
 	private PaymentMethodTypeService service;
 
-	@POST
-	@Produces("application/json")
+
+
 	@Operation(summary = "getAllPaymentMethodTypes", description = "Lists all PaymentMethodTypes")
 	@IOperation(Name = "getAllPaymentMethodTypes", Description = "Lists all PaymentMethodTypes")
-	@Path("getAllPaymentMethodTypes")
+	@PostMapping("/getAllPaymentMethodTypes")
 	public PaginationResponse<PaymentMethodType> getAllPaymentMethodTypes(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PaymentMethodTypeFiltering filtering, @Context SecurityContext securityContext) {
+
+			@RequestBody PaymentMethodTypeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllPaymentMethodTypes(securityContext, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createPaymentMethodType")
+
+
+	@PostMapping("/createPaymentMethodType")
 	@Operation(summary = "createPaymentMethodType", description = "Creates PaymentMethodType")
 	@IOperation(Name = "createPaymentMethodType", Description = "Creates PaymentMethodType")
 	public PaymentMethodType createPaymentMethodType(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PaymentMethodTypeCreate creationContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody PaymentMethodTypeCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createPaymentMethodType(creationContainer, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updatePaymentMethodType")
+
+
+	@PutMapping("/updatePaymentMethodType")
 	@Operation(summary = "updatePaymentMethodType", description = "Updates PaymentMethodType")
 	@IOperation(Name = "updatePaymentMethodType", Description = "Updates PaymentMethodType")
 	public PaymentMethodType updatePaymentMethodType(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			PaymentMethodTypeUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody PaymentMethodTypeUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		PaymentMethodType paymentMethodType = service.getByIdOrNull(updateContainer.getId(),
-				PaymentMethodType.class, null, securityContext);
+				PaymentMethodType.class, PaymentMethodType_.security, securityContext);
 		if (paymentMethodType == null) {
-			throw new BadRequestException("no PaymentMethodType with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no PaymentMethodType with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setPaymentMethodType(paymentMethodType);

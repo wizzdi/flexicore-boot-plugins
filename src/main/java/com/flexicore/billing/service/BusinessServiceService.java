@@ -1,82 +1,117 @@
 package com.flexicore.billing.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
+
 import com.flexicore.billing.data.BusinessServiceRepository;
 import com.flexicore.billing.model.BusinessService;
 import com.flexicore.billing.request.BusinessServiceCreate;
 import com.flexicore.billing.request.BusinessServiceFiltering;
 import com.flexicore.billing.request.BusinessServiceUpdate;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+import com.flexicore.model.Basic;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
+
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
 
-@PluginInfo(version = 1)
 @Extension
 @Component
-@Primary
-public class BusinessServiceService implements ServicePlugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+public class BusinessServiceService implements Plugin {
+
+		@Autowired
 	private BusinessServiceRepository repository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService basicService;
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-                                                 List<String> batch, SecurityContext securityContext) {
-		return repository.getByIdOrNull(id, c, batch, securityContext);
-	}
-
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids,
-                                                   SecurityContext securityContext) {
+public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
 		return repository.listByIds(c, ids, securityContext);
 	}
 
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return repository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return repository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return repository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		repository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		repository.massMerge(toMerge);
+	}
+
 	public void validateFiltering(BusinessServiceFiltering filtering,
-								  SecurityContext securityContext) {
-		baseclassNewService.validateFilter(filtering, securityContext);
+								  SecurityContextBase securityContext) {
+		basicService.validate(filtering, securityContext);
 	}
 
 	public PaginationResponse<BusinessService> getAllBusinessServices(
-			SecurityContext securityContext, BusinessServiceFiltering filtering) {
+			SecurityContextBase securityContext, BusinessServiceFiltering filtering) {
 		List<BusinessService> list = repository.getAllBusinessServices(securityContext, filtering);
 		long count = repository.countAllBusinessServices(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	public BusinessService createBusinessService(BusinessServiceCreate creationContainer,
-												 SecurityContext securityContext) {
+												 SecurityContextBase securityContext) {
 		BusinessService businessService = createBusinessServiceNoMerge(creationContainer, securityContext);
 		repository.merge(businessService);
 		return businessService;
 	}
 
 	private BusinessService createBusinessServiceNoMerge(BusinessServiceCreate creationContainer,
-                                       SecurityContext securityContext) {
-		BusinessService businessService = new BusinessService(creationContainer.getName(),securityContext);
+                                       SecurityContextBase securityContext) {
+		BusinessService businessService = new BusinessService();
+		businessService.setId(Baseclass.getBase64ID());
 		updateBusinessServiceNoMerge(businessService, creationContainer);
+		BaseclassService.createSecurityObjectNoMerge(businessService,securityContext);
 		return businessService;
 	}
 
 	private boolean updateBusinessServiceNoMerge(BusinessService businessService,
 			BusinessServiceCreate creationContainer) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(creationContainer, businessService);
+		boolean update = basicService.updateBasicNoMerge(creationContainer, businessService);
 
 		return update;
 	}
 
 	public BusinessService updateBusinessService(BusinessServiceUpdate updateContainer,
-												 SecurityContext securityContext) {
+												 SecurityContextBase securityContext) {
 		BusinessService businessService = updateContainer.getBusinessService();
 		if (updateBusinessServiceNoMerge(businessService, updateContainer)) {
 			repository.merge(businessService);
@@ -85,7 +120,7 @@ public class BusinessServiceService implements ServicePlugin {
 	}
 
 	public void validate(BusinessServiceCreate creationContainer,
-                         SecurityContext securityContext) {
-		baseclassNewService.validate(creationContainer, securityContext);
+                         SecurityContextBase securityContext) {
+		basicService.validate(creationContainer, securityContext);
 	}
 }

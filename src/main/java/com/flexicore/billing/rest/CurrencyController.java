@@ -2,80 +2,86 @@ package com.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
 import com.flexicore.billing.model.Currency;
+import com.flexicore.billing.model.Currency_;
 import com.flexicore.billing.request.CurrencyCreate;
 import com.flexicore.billing.request.CurrencyFiltering;
 import com.flexicore.billing.request.CurrencyUpdate;
 import com.flexicore.billing.service.CurrencyService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+
+
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/Currency")
-@RequestScoped
+
+@RequestMapping("/plugins/Currency")
+
 @Tag(name = "Currency")
 @Extension
-@Component
-public class CurrencyRESTService implements RestServicePlugin {
+@RestController
+public class CurrencyController implements Plugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+		@Autowired
 	private CurrencyService service;
 
-	@POST
-	@Produces("application/json")
+
+
 	@Operation(summary = "getAllCurrencies", description = "Lists all Currencies")
 	@IOperation(Name = "getAllCurrencies", Description = "Lists all Currencies")
-	@Path("getAllCurrencies")
+	@PostMapping("/getAllCurrencies")
 	public PaginationResponse<Currency> getAllCurrencies(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CurrencyFiltering filtering, @Context SecurityContext securityContext) {
+
+			@RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllCurrencies(securityContext, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createCurrency")
+
+
+	@PostMapping("/createCurrency")
 	@Operation(summary = "createCurrency", description = "Creates Currency")
 	@IOperation(Name = "createCurrency", Description = "Creates Currency")
 	public Currency createCurrency(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CurrencyCreate creationContainer,
-			@Context SecurityContext securityContext) {
+			@RequestBody CurrencyCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createCurrency(creationContainer, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateCurrency")
+
+
+	@PutMapping("/updateCurrency")
 	@Operation(summary = "updateCurrency", description = "Updates Currency")
 	@IOperation(Name = "updateCurrency", Description = "Updates Currency")
 	public Currency updateCurrency(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CurrencyUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody CurrencyUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		Currency currency = service.getByIdOrNull(updateContainer.getId(),
-				Currency.class, null, securityContext);
+				Currency.class, Currency_.security, securityContext);
 		if (currency == null) {
-			throw new BadRequestException("no Currency with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Currency with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setCurrency(currency);

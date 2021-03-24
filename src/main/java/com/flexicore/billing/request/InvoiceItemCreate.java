@@ -3,10 +3,10 @@ package com.flexicore.billing.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.ContractItem;
 import com.flexicore.billing.model.Invoice;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
 
-public class InvoiceItemCreate extends BaseclassCreate {
+public class InvoiceItemCreate extends BasicCreate {
 
     private String invoiceId;
     @JsonIgnore

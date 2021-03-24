@@ -3,10 +3,10 @@ package com.flexicore.billing.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.PaymentMethodType;
 import com.flexicore.organization.model.Customer;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
 
-public class PaymentMethodCreate extends BaseclassCreate {
+public class PaymentMethodCreate extends BasicCreate {
 
     private String customerId;
     @JsonIgnore

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.BusinessService;
 import com.flexicore.billing.model.Currency;
 import com.flexicore.billing.model.PriceList;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
 
-public class PriceListToServiceCreate extends BaseclassCreate {
+public class PriceListToServiceCreate extends BasicCreate {
 
     private String priceListId;
     @JsonIgnore

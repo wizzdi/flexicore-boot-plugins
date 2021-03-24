@@ -1,13 +1,23 @@
 package com.flexicore.billing.request;
 
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
 import java.util.Set;
 
-public class PaymentMethodTypeFiltering extends FilteringInformationHolder {
+public class PaymentMethodTypeFiltering extends PaginationFilter {
+private BasicPropertiesFilter basicPropertiesFilter;
 
     private Set<String> canonicalClassNames;
 
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends PaymentMethodTypeFiltering> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
 
     public Set<String> getCanonicalClassNames() {
         return canonicalClassNames;

@@ -2,80 +2,76 @@ package com.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+import com.flexicore.billing.model.BusinessService;
+import com.flexicore.billing.model.BusinessService_;
 import com.flexicore.billing.request.BusinessServiceCreate;
 import com.flexicore.billing.request.BusinessServiceFiltering;
 import com.flexicore.billing.request.BusinessServiceUpdate;
 import com.flexicore.billing.service.BusinessServiceService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.billing.model.BusinessService;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
 @OperationsInside
-@ProtectedREST
-@Path("plugins/BusinessService")
-@RequestScoped
+
+@RequestMapping("/plugins/BusinessService")
+
 @Tag(name = "BusinessService")
 @Extension
-@Component
-public class BusinessServiceRESTService implements RestServicePlugin {
+@RestController
+public class BusinessServiceController implements Plugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+		@Autowired
 	private BusinessServiceService service;
 
-	@POST
-	@Produces("application/json")
+
+
 	@Operation(summary = "getAllBusinessServices", description = "Lists all BusinessServices")
 	@IOperation(Name = "getAllBusinessServices", Description = "Lists all BusinessServices")
-	@Path("getAllBusinessServices")
+	@PostMapping("/getAllBusinessServices")
 	public PaginationResponse<BusinessService> getAllBusinessServices(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			BusinessServiceFiltering filtering, @Context SecurityContext securityContext) {
+
+			@RequestBody BusinessServiceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllBusinessServices(securityContext, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createBusinessService")
+
+
+	@PostMapping("/createBusinessService")
 	@Operation(summary = "createBusinessService", description = "Creates BusinessService")
 	@IOperation(Name = "createBusinessService", Description = "Creates BusinessService")
 	public BusinessService createBusinessService(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			BusinessServiceCreate creationContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody BusinessServiceCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createBusinessService(creationContainer, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateBusinessService")
+
+
+	@PutMapping("/updateBusinessService")
 	@Operation(summary = "updateBusinessService", description = "Updates BusinessService")
 	@IOperation(Name = "updateBusinessService", Description = "Updates BusinessService")
 	public BusinessService updateBusinessService(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			BusinessServiceUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody BusinessServiceUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		BusinessService businessService = service.getByIdOrNull(updateContainer.getId(),
-				BusinessService.class, null, securityContext);
+				BusinessService.class, BusinessService_.security, securityContext);
 		if (businessService == null) {
-			throw new BadRequestException("no BusinessService with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no BusinessService with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setBusinessService(businessService);

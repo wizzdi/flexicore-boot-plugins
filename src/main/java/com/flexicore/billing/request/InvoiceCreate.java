@@ -2,9 +2,9 @@ package com.flexicore.billing.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.PaymentMethod;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class InvoiceCreate extends BaseclassCreate {
+public class InvoiceCreate extends BasicCreate {
 
     private String usedPaymentMethodId;
     @JsonIgnore

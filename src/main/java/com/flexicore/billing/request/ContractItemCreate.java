@@ -5,12 +5,12 @@ import com.flexicore.billing.model.BusinessService;
 import com.flexicore.billing.model.Contract;
 import com.flexicore.billing.model.Currency;
 import com.flexicore.billing.model.PriceListToService;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
 
 import java.time.OffsetDateTime;
 
-public class ContractItemCreate extends BaseclassCreate {
+public class ContractItemCreate extends BasicCreate {
 
 
     private String priceListToServiceId;

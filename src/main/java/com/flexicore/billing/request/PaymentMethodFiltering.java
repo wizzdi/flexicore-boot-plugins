@@ -2,14 +2,16 @@ package com.flexicore.billing.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.PaymentMethodType;
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.flexicore.organization.model.Customer;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class PaymentMethodFiltering extends FilteringInformationHolder {
+public class PaymentMethodFiltering extends PaginationFilter {
+private BasicPropertiesFilter basicPropertiesFilter;
 
     private Set<String> paymentMethodTypeIds=new HashSet<>();
     @JsonIgnore
@@ -18,6 +20,15 @@ public class PaymentMethodFiltering extends FilteringInformationHolder {
     @JsonIgnore
     private List<Customer> customers;
     private Boolean active;
+
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends PaymentMethodFiltering> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
 
     public Set<String> getPaymentMethodTypeIds() {
         return paymentMethodTypeIds;

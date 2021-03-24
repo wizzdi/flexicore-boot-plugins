@@ -2,80 +2,85 @@ package com.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
+
 import com.flexicore.billing.model.ContractItem;
+import com.flexicore.billing.model.ContractItem_;
 import com.flexicore.billing.request.ContractItemCreate;
 import com.flexicore.billing.request.ContractItemFiltering;
 import com.flexicore.billing.request.ContractItemUpdate;
 import com.flexicore.billing.service.ContractItemService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/ContractItem")
-@RequestScoped
+
+@RequestMapping("/plugins/ContractItem")
+
 @Tag(name = "ContractItem")
 @Extension
-@Component
-public class ContractItemRESTService implements RestServicePlugin {
+@RestController
+public class ContractItemController implements Plugin {
 
-	@PluginInfo(version = 1)
-	@Autowired
+		@Autowired
 	private ContractItemService service;
 
-	@POST
-	@Produces("application/json")
+
+
 	@Operation(summary = "getAllContractItems", description = "Lists all ContractItems")
 	@IOperation(Name = "getAllContractItems", Description = "Lists all ContractItems")
-	@Path("getAllContractItems")
+	@PostMapping("/getAllContractItems")
 	public PaginationResponse<ContractItem> getAllContractItems(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			ContractItemFiltering filtering, @Context SecurityContext securityContext) {
+
+			@RequestBody ContractItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllContractItems(securityContext, filtering);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createContractItem")
+
+
+	@PostMapping("/createContractItem")
 	@Operation(summary = "createContractItem", description = "Creates ContractItem")
 	@IOperation(Name = "createContractItem", Description = "Creates ContractItem")
 	public ContractItem createContractItem(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			ContractItemCreate creationContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody ContractItemCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createContractItem(creationContainer, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/updateContractItem")
+
+
+	@PutMapping("/updateContractItem")
 	@Operation(summary = "updateContractItem", description = "Updates ContractItem")
 	@IOperation(Name = "updateContractItem", Description = "Updates ContractItem")
 	public ContractItem updateContractItem(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			ContractItemUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+
+			@RequestBody ContractItemUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		ContractItem contractItem = service.getByIdOrNull(updateContainer.getId(),
-				ContractItem.class, null, securityContext);
+				ContractItem.class, ContractItem_.security, securityContext);
 		if (contractItem == null) {
-			throw new BadRequestException("no ContractItem with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ContractItem with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setContractItem(contractItem);

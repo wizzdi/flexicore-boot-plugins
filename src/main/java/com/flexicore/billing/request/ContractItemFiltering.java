@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.billing.model.BusinessService;
 import com.flexicore.billing.model.Contract;
 import com.flexicore.billing.model.PriceListToService;
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ContractItemFiltering extends FilteringInformationHolder {
+public class ContractItemFiltering extends PaginationFilter {
+private BasicPropertiesFilter basicPropertiesFilter;
 
     private Set<String> businessServiceIds=new HashSet<>();
     @JsonIgnore
@@ -25,6 +27,14 @@ public class ContractItemFiltering extends FilteringInformationHolder {
     @JsonIgnore
     private List<Contract> contracts;
 
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends ContractItemFiltering> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
 
     public Set<String> getBusinessServiceIds() {
         return businessServiceIds;

@@ -1,8 +1,8 @@
 package com.flexicore.billing.request;
 
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class PaymentMethodTypeCreate extends BaseclassCreate {
+public class PaymentMethodTypeCreate extends BasicCreate {
 
     private String canonicalClassName;
 
