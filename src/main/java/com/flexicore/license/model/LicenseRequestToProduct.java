@@ -6,7 +6,6 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -21,9 +20,6 @@ public class LicenseRequestToProduct extends LicenseRequestToEntity {
 	public LicenseRequestToProduct() {
 	}
 
-	public LicenseRequestToProduct(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@Override
 	@ManyToOne(targetEntity = LicensingProduct.class)

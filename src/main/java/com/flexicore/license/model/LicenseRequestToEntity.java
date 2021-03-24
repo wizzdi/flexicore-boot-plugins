@@ -6,9 +6,8 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.model.Baseclass;
 
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,15 +19,12 @@ import java.time.OffsetDateTime;
 
 @Entity
 
-public class LicenseRequestToEntity extends Baseclass {
+public class LicenseRequestToEntity extends SecuredBasic {
 
 
 	public LicenseRequestToEntity() {
 	}
 
-	public LicenseRequestToEntity(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@Column(columnDefinition = "timestamp with time zone")
 	private OffsetDateTime granted;

@@ -6,7 +6,6 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -21,12 +20,8 @@ public class LicensingFeature extends LicensingEntity {
 	@ManyToOne(targetEntity = LicensingProduct.class)
 	private LicensingProduct product;
 
-	public LicensingFeature(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	public LicensingFeature() {
-		// TODO Auto-generated constructor stub
 	}
 
 

@@ -7,10 +7,11 @@
 package com.flexicore.license.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.FileResource;
-import com.flexicore.model.Tenant;
-import com.flexicore.security.SecurityContext;
+
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.SecurityTenant;
+import com.wizzdi.flexicore.file.model.FileResource;
+
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 @Entity
 
-public class LicenseRequest extends Baseclass {
+public class LicenseRequest extends SecuredBasic {
 
 	@Lob
 	private String macAddress;
@@ -40,17 +41,13 @@ public class LicenseRequest extends Baseclass {
 	private List<LicenseRequestToEntity> requestToEntity =new ArrayList<>();
 
 
-	@ManyToOne(targetEntity = Tenant.class)
-	private Tenant licensedTenant;
+	@ManyToOne(targetEntity = SecurityTenant.class)
+	private SecurityTenant licensedTenant;
 
 
 	public LicenseRequest() {
-		// TODO Auto-generated constructor stub
 	}
 
-	public LicenseRequest(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@Lob
 	public String getMacAddress() {
@@ -106,12 +103,12 @@ public class LicenseRequest extends Baseclass {
 		return (T) this;
 	}
 
-	@ManyToOne(targetEntity = Tenant.class)
-	public Tenant getLicensedTenant() {
+	@ManyToOne(targetEntity = SecurityTenant.class)
+	public SecurityTenant getLicensedTenant() {
 		return licensedTenant;
 	}
 
-	public void setLicensedTenant(Tenant licensedTenant) {
+	public void setLicensedTenant(SecurityTenant licensedTenant) {
 		this.licensedTenant = licensedTenant;
 	}
 

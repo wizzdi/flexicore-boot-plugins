@@ -6,8 +6,9 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+
+
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 
@@ -15,17 +16,13 @@ import javax.persistence.Entity;
 @SuppressWarnings("serial")
 
 @Entity
-public class  LicensingEntity extends Baseclass {
+public class  LicensingEntity extends SecuredBasic {
 
 
 	private String canonicalName;
 
-	public LicensingEntity(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	public LicensingEntity() {
-		// TODO Auto-generated constructor stub
 	}
 
 

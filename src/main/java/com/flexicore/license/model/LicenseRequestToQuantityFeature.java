@@ -6,7 +6,6 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
@@ -23,9 +22,6 @@ public class LicenseRequestToQuantityFeature extends LicenseRequestToFeature {
 	public LicenseRequestToQuantityFeature() {
 	}
 
-	public LicenseRequestToQuantityFeature(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	public int getQuantityLimit() {
 		return quantityLimit;

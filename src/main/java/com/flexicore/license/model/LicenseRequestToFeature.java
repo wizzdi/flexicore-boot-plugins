@@ -6,7 +6,6 @@
  ******************************************************************************/
 package com.flexicore.license.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -20,10 +19,6 @@ public class LicenseRequestToFeature extends LicenseRequestToEntity {
 
 
 	public LicenseRequestToFeature() {
-	}
-
-	public LicenseRequestToFeature(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 

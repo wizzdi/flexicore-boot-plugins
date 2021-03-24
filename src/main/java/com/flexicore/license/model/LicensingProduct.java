@@ -8,14 +8,12 @@ package com.flexicore.license.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("serial")
 @Entity
 
 public class LicensingProduct extends LicensingEntity {
@@ -25,12 +23,8 @@ public class LicensingProduct extends LicensingEntity {
 	private List<LicensingFeature> licensingFeatures= new ArrayList<>();
 
 	public LicensingProduct() {
-		// TODO Auto-generated constructor stub
 	}
 
-	public LicensingProduct(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@OneToMany(targetEntity = LicensingFeature.class,mappedBy = "product")
 	@JsonIgnore
