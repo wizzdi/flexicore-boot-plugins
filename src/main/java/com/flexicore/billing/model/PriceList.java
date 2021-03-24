@@ -1,17 +1,14 @@
 package com.flexicore.billing.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+
 
 import javax.persistence.Entity;
 
 @Entity
-public class PriceList extends Baseclass {
+public class PriceList extends SecuredBasic {
 
     public PriceList() {
     }
 
-    public PriceList(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 }

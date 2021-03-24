@@ -1,20 +1,16 @@
 package com.flexicore.billing.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+
 
 import javax.persistence.Entity;
 
 @Entity
-public class PaymentMethodType extends Baseclass {
+public class PaymentMethodType extends SecuredBasic {
 
     private String canonicalClassName;
 
     public PaymentMethodType() {
-    }
-
-    public PaymentMethodType(String name, SecurityContext securityContext) {
-        super(name, securityContext);
     }
 
     public String getCanonicalClassName() {

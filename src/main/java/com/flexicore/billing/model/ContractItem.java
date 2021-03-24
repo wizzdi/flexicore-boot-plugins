@@ -1,7 +1,7 @@
 package com.flexicore.billing.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import java.time.OffsetDateTime;
 
 @Entity
-public class ContractItem extends Baseclass {
+public class ContractItem extends SecuredBasic {
 
     @ManyToOne(targetEntity = PriceListToService.class)
     private PriceListToService priceListToService;
@@ -28,9 +28,6 @@ public class ContractItem extends Baseclass {
     public ContractItem() {
     }
 
-    public ContractItem(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @ManyToOne(targetEntity = PriceListToService.class)
     public PriceListToService getPriceListToService() {

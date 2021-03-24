@@ -1,13 +1,13 @@
 package com.flexicore.billing.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class PriceListToService extends Baseclass {
+public class PriceListToService extends SecuredBasic {
 
     @ManyToOne(targetEntity = PriceList.class)
     private PriceList priceList;
@@ -18,10 +18,6 @@ public class PriceListToService extends Baseclass {
     private Currency currency;
 
     public PriceListToService() {
-    }
-
-    public PriceListToService(String name, SecurityContext securityContext) {
-        super(name, securityContext);
     }
 
     @ManyToOne(targetEntity = PriceList.class)

@@ -1,13 +1,13 @@
 package com.flexicore.billing.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class InvoiceItem extends Baseclass {
+public class InvoiceItem extends SecuredBasic {
 
     @ManyToOne(targetEntity = Invoice.class)
     private Invoice invoice;
@@ -17,9 +17,6 @@ public class InvoiceItem extends Baseclass {
     public InvoiceItem() {
     }
 
-    public InvoiceItem(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @ManyToOne(targetEntity = Invoice.class)
     public Invoice getInvoice() {

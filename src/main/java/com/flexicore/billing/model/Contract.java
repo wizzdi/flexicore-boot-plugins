@@ -1,9 +1,8 @@
 package com.flexicore.billing.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.organization.model.Customer;
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Contract extends Baseclass {
+public class Contract extends SecuredBasic {
 
     @JsonIgnore
     @OneToMany(targetEntity = ContractItem.class,mappedBy = "contract")
@@ -23,9 +22,6 @@ public class Contract extends Baseclass {
     public Contract() {
     }
 
-    public Contract(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @JsonIgnore
     @OneToMany(targetEntity = ContractItem.class,mappedBy = "contract")

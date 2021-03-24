@@ -17,6 +17,8 @@
         <class>com.flexicore.billing.model.PriceListToService</class>
         <class>com.flexicore.model.Baseclass</class>
         <class>com.flexicore.organization.model.Customer</class>
+        <class>com.flexicore.model.Basic</class>
+        <class>com.flexicore.model.SecuredBasic</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
