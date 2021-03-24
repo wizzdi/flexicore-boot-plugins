@@ -1,7 +1,6 @@
 package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -11,26 +10,19 @@ import java.util.List;
 @Entity
 public class SalesPerson extends Employee {
 
-	public SalesPerson() {
-	}
 
-	public SalesPerson(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
-
-	@OneToMany(targetEntity = SalesPersonToRegion.class, mappedBy = "leftside")
+	@OneToMany(targetEntity = SalesPersonToRegion.class, mappedBy = "salesPerson")
 	@JsonIgnore
 	private List<SalesPersonToRegion> salesPersonToRegions = new ArrayList<>();
 
-	@OneToMany(targetEntity = SalesPersonToRegion.class, mappedBy = "leftside")
+	@OneToMany(targetEntity = SalesPersonToRegion.class, mappedBy = "salesPerson")
 	@JsonIgnore
 	public List<SalesPersonToRegion> getSalesPersonToRegions() {
 		return salesPersonToRegions;
 	}
 
-	public SalesPerson setSalesPersonToRegions(
-			List<SalesPersonToRegion> salesPersonToRegions) {
+	public <T extends SalesPerson> T setSalesPersonToRegions(List<SalesPersonToRegion> salesPersonToRegions) {
 		this.salesPersonToRegions = salesPersonToRegions;
-		return this;
+		return (T) this;
 	}
 }

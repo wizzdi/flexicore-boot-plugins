@@ -1,20 +1,13 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.User;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Employee extends User {
+public class Employee extends SecuredBasic {
 
-	public Employee() {
-	}
-
-	public Employee(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@ManyToOne(targetEntity = Organization.class)
 	private Organization organization;

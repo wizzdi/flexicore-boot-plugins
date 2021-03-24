@@ -2,8 +2,9 @@ package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.model.territories.Address;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -14,14 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Organization extends Baseclass {
+public class Organization extends SecuredBasic {
 
-	public Organization() {
-	}
-
-	public Organization(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@ManyToOne(targetEntity = Address.class)
 	private Address mainAddress;

@@ -1,25 +1,20 @@
 package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class IndustryToCustomer extends Baseclass {
+public class IndustryToCustomer extends SecuredBasic {
 
     @ManyToOne(targetEntity = Industry.class)
     private Industry industry;
     @ManyToOne(targetEntity = Customer.class)
     private Customer customer;
 
-    public IndustryToCustomer() {
-    }
-
-    public IndustryToCustomer(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @ManyToOne(targetEntity = Industry.class)
     public Industry getIndustry() {

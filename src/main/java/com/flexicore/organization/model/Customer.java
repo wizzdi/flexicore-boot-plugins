@@ -2,7 +2,8 @@ package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Customer extends Baseclass {
+public class Customer extends SecuredBasic {
 
 	private String externalId;
 
@@ -26,13 +27,6 @@ public class Customer extends Baseclass {
 	@JsonIgnore
 	@OneToMany(targetEntity = IndustryToCustomer.class,mappedBy = "customer")
 	private List<IndustryToCustomer> industryToCustomers=new ArrayList<>();
-
-	public Customer() {
-	}
-
-	public Customer(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 
 	@JsonIgnore

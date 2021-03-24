@@ -1,15 +1,14 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.FileResource;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.wizzdi.flexicore.file.model.FileResource;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
-public class CustomerDocument extends Baseclass {
+public class CustomerDocument extends SecuredBasic {
 
     @OneToOne(targetEntity = FileResource.class)
     private FileResource fileResource;
@@ -17,13 +16,6 @@ public class CustomerDocument extends Baseclass {
     @ManyToOne(targetEntity = Customer.class)
     private Customer customer;
 
-
-    public CustomerDocument() {
-    }
-
-    public CustomerDocument(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @OneToOne(targetEntity = FileResource.class)
 

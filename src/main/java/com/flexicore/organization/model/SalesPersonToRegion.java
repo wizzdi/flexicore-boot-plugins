@@ -1,56 +1,36 @@
 package com.flexicore.organization.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.TimedLink;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class SalesPersonToRegion extends TimedLink {
+public class SalesPersonToRegion extends SecuredBasic {
 
-	public SalesPersonToRegion() {
+
+	@ManyToOne(targetEntity = SalesPerson.class)
+	private SalesPerson salesPerson;
+	@ManyToOne(targetEntity = SalesRegion.class)
+	private SalesRegion salesRegion;
+
+	@ManyToOne(targetEntity = SalesPerson.class)
+	public SalesPerson getSalesPerson() {
+		return salesPerson;
 	}
 
-	public SalesPersonToRegion(String name, SecurityContext securityContext) {
-		super(name, securityContext);
+	public <T extends SalesPersonToRegion> T setSalesPerson(SalesPerson salesPerson) {
+		this.salesPerson = salesPerson;
+		return (T) this;
 	}
 
-	@Override
-	@ManyToOne(targetEntity = SalesPerson.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public SalesPerson getLeftside() {
-		return (SalesPerson) super.getLeftside();
+	@ManyToOne(targetEntity = SalesRegion.class)
+	public SalesRegion getSalesRegion() {
+		return salesRegion;
 	}
 
-	@JsonIgnore
-	public void setLeftside(SalesPerson leftside) {
-		super.setLeftside(leftside);
+	public <T extends SalesPersonToRegion> T setSalesRegion(SalesRegion salesRegion) {
+		this.salesRegion = salesRegion;
+		return (T) this;
 	}
-
-	@Override
-	public void setLeftside(Baseclass leftside) {
-		super.setLeftside(leftside);
-	}
-
-	@Override
-	@ManyToOne(targetEntity = SalesRegion.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public SalesRegion getRightside() {
-		return (SalesRegion) super.getRightside();
-	}
-
-	@JsonIgnore
-	public void setRightside(SalesRegion rightside) {
-		super.setRightside(rightside);
-	}
-
-	@Override
-	public void setRightside(Baseclass rightside) {
-		super.setRightside(rightside);
-	}
-
 }

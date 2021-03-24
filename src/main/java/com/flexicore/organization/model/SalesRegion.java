@@ -1,17 +1,11 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.Entity;
 
 @Entity
-public class SalesRegion extends Baseclass {
+public class SalesRegion extends SecuredBasic {
 
-	public SalesRegion() {
-	}
-
-	public SalesRegion(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 }

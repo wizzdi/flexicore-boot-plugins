@@ -1,19 +1,13 @@
 package com.flexicore.organization.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.security.SecurityContextBase;
 
 import javax.persistence.Entity;
 
 @Entity
-public class SupplierApi extends Baseclass {
-
-	public SupplierApi() {
-	}
-
-	public SupplierApi(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
+public class SupplierApi extends SecuredBasic {
 
 	private String implementorCanonicalName;
 

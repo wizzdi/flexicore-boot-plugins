@@ -7,11 +7,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="organization-model-migrate" />
-        <module name="organization-model" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="organization-model-migrate" target="1.8" />
+      <module name="organization-model" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

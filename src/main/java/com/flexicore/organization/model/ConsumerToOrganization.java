@@ -1,56 +1,35 @@
 package com.flexicore.organization.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ConsumerToOrganization extends Baselink {
+public class ConsumerToOrganization extends SecuredBasic {
 
-	public ConsumerToOrganization() {
+	@ManyToOne(targetEntity = Consumer.class)
+	private Consumer consumer;
+	@ManyToOne(targetEntity = Organization.class)
+	private Organization organization;
+
+	@ManyToOne(targetEntity = Consumer.class)
+	public Consumer getConsumer() {
+		return consumer;
 	}
 
-	public ConsumerToOrganization(String name, SecurityContext securityContext) {
-		super(name, securityContext);
+	public <T extends ConsumerToOrganization> T setConsumer(Consumer consumer) {
+		this.consumer = consumer;
+		return (T) this;
 	}
 
-	@Override
-	@ManyToOne(targetEntity = Consumer.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public Consumer getLeftside() {
-		return (Consumer) super.getLeftside();
+	@ManyToOne(targetEntity = Organization.class)
+	public Organization getOrganization() {
+		return organization;
 	}
 
-	@JsonIgnore
-	public void setLeftside(Consumer leftside) {
-		super.setLeftside(leftside);
+	public <T extends ConsumerToOrganization> T setOrganization(Organization organization) {
+		this.organization = organization;
+		return (T) this;
 	}
-
-	@Override
-	public void setLeftside(Baseclass leftside) {
-		super.setLeftside(leftside);
-	}
-
-	@Override
-	@ManyToOne(targetEntity = Organization.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public Organization getRightside() {
-		return (Organization) super.getRightside();
-	}
-
-	@JsonIgnore
-	public void setRightside(Organization rightside) {
-		super.setRightside(rightside);
-	}
-
-	@Override
-	public void setRightside(Baseclass rightside) {
-		super.setRightside(rightside);
-	}
-
 }
