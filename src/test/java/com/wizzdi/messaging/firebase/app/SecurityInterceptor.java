@@ -1,6 +1,7 @@
 package com.wizzdi.messaging.firebase.app;
 
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.messaging.model.ChatUser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +27,8 @@ public class SecurityInterceptor implements HandlerInterceptor, InitializingBean
 	@Lazy
 	private SecurityContextBase<?,?,?,?> securityContextBase;
 
-	private static final AtomicReference<SecurityContextBase> ref=new AtomicReference<>(null);
+	private static final AtomicReference<ChatUserSecurityContext> ref=new AtomicReference<>(null);
+
 
 
 	@Override
@@ -40,10 +42,12 @@ public class SecurityInterceptor implements HandlerInterceptor, InitializingBean
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		ref.set(securityContextBase);
+		ref.set(new ChatUserSecurityContext(securityContextBase));
 	}
 
-	public static void setSecurityContext(SecurityContextBase securityContext){
-		ref.set(securityContext);
+
+	public static void setChatUser(ChatUser chatUser){
+		ref.get().setChatUser(chatUser);
+
 	}
 }
