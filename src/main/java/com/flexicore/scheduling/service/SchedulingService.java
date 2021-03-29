@@ -8,7 +8,6 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Operation;
 import com.flexicore.model.QueryInformationHolder;
 import com.flexicore.model.User;
-import com.flexicore.model.dynamic.DynamicExecution;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.data.SchedulingRepository;
@@ -16,9 +15,12 @@ import com.flexicore.scheduling.interfaces.ISchedulingService;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.security.RunningUser;
 import com.flexicore.security.SecurityContext;
-import com.flexicore.service.DynamicInvokersService;
 import com.flexicore.service.SecurityService;
 import com.flexicore.service.UserService;
+import com.flexicore.service.impl.DynamicInvokersService;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteDynamicExecution;
+import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.SolarTime;
@@ -65,7 +67,8 @@ public class SchedulingService implements ISchedulingService {
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	@Autowired
-	private DynamicInvokersService dynamicInvokersService;
+	private DynamicExecutionService dynamicExecutionService;
+
 
 	private static AtomicBoolean init = new AtomicBoolean(false);
 	private static Scheduler scheduler;
@@ -454,10 +457,7 @@ public class SchedulingService implements ISchedulingService {
 				DynamicExecution dynamicExecution = scheduleAction
 						.getDynamicExecution();
 				if (dynamicExecution != null) {
-					response = dynamicInvokersService.executeInvoker(
-							dynamicInvokersService.getExecuteInvokerRequest(
-									dynamicExecution, securityContext),
-							securityContext);
+					response = dynamicExecutionService.executeDynamicExecution(new ExecuteDynamicExecution().setDynamicExecution(dynamicExecution),securityContext);
 				} else {
 					logger.warn("Schedule Action "
 							+ scheduleAction.getName() + "("
@@ -614,8 +614,7 @@ public class SchedulingService implements ISchedulingService {
 			SecurityContext securityContext) {
 		String dynamicExecutionId = createScheduling.getDynamicExecutionId();
 		DynamicExecution dynamicExecution = dynamicExecutionId != null
-				? getByIdOrNull(dynamicExecutionId, DynamicExecution.class,
-						null, securityContext) : null;
+				? dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, securityContext) : null;
 		if (dynamicExecution == null && dynamicExecutionId != null) {
 			throw new BadRequestException("No Dynamic Execution With id "
 					+ dynamicExecutionId);

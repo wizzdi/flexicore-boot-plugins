@@ -1,7 +1,7 @@
 package com.flexicore.scheduling.containers.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.dynamic.DynamicExecution;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 public class CreateSchedulingAction {
 

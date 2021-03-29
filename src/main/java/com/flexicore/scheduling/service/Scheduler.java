@@ -1,5 +1,6 @@
 package com.flexicore.scheduling.service;
 
+import com.flexicore.model.User;
 import com.flexicore.scheduling.init.Config;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
@@ -69,7 +70,7 @@ public class Scheduler implements Runnable {
 					}
 					for (Map.Entry<String, List<ScheduleToAction>> entry : filteredActions) {
 						Schedule schedule = entry.getValue().get(0).getLeftside();
-						SecurityContext scheduleSecurityContext=securityService.getUserSecurityContext(schedule.getCreator());
+						SecurityContext scheduleSecurityContext=securityService.getUserSecurityContext((User) schedule.getCreator());
 						List<ScheduleTimeslot> timeslots = timeSlotsMap.get(schedule.getId());
 						if (timeslots == null) {
 							logger.debug("no timeslots for schedule "+schedule.getName() +"("+schedule.getId()+")");
