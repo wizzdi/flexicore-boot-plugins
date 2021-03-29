@@ -138,7 +138,7 @@ public class EncryptionService implements Plugin {
         }
     }
 
-    static class HybridEncryptImpl implements EncryptingKey{
+    public static class HybridEncryptImpl implements EncryptingKey{
         private KeysetHandle keysetHandle;
 
         public HybridEncryptImpl(KeysetHandle aead) {
@@ -157,7 +157,7 @@ public class EncryptionService implements Plugin {
     }
 
 
-    interface EncryptingKey{
+    public interface EncryptingKey{
 
         byte[] encrypt(byte[] plaintext, byte[] associatedData) throws GeneralSecurityException;
 
