@@ -2,9 +2,8 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.model.dynamic.ExecutionParametersHolder;
 import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 import javax.persistence.*;
 import java.util.ArrayList;
