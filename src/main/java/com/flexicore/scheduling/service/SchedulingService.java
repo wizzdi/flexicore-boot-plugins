@@ -4,10 +4,7 @@ import com.flexicore.annotations.plugins.PluginInfo;
 import com.flexicore.annotations.rest.Read;
 import com.flexicore.audit.model.AuditingJob;
 import com.flexicore.events.PluginsLoadedEvent;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Operation;
-import com.flexicore.model.QueryInformationHolder;
-import com.flexicore.model.User;
+import com.flexicore.model.*;
 import com.flexicore.scheduling.containers.request.*;
 import com.flexicore.scheduling.containers.response.ExecuteScheduleResponse;
 import com.flexicore.scheduling.data.SchedulingRepository;
@@ -614,7 +611,7 @@ public class SchedulingService implements ISchedulingService {
 			SecurityContext securityContext) {
 		String dynamicExecutionId = createScheduling.getDynamicExecutionId();
 		DynamicExecution dynamicExecution = dynamicExecutionId != null
-				? dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, securityContext) : null;
+				? dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, SecuredBasic_.security, securityContext) : null;
 		if (dynamicExecution == null && dynamicExecutionId != null) {
 			throw new BadRequestException("No Dynamic Execution With id "
 					+ dynamicExecutionId);
