@@ -54,8 +54,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:3.0.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot:1.0.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot-starter-web:1.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot:1.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-web:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-json:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.0" level="project" />
@@ -65,7 +64,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.35" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-web:5.2.6.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-webmvc:5.2.6.RELEASE" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-security-model:1.0.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot-starter-web:1.0.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-security-model:1.0.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot-starter-data-jpa:1.0.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-jta-atomikos:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atomikos:transactions-jms:4.0.6" level="project" />
@@ -99,7 +99,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-orm:5.2.6.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-tx:5.2.6.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework:spring-aspects:5.2.6.RELEASE" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-security-service:1.0.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-security-service:1.0.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.pf4j:pf4j-spring:0.7.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.pf4j:pf4j:3.5.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />

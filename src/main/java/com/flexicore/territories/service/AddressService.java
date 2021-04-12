@@ -11,6 +11,7 @@ import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -79,7 +80,7 @@ public class AddressService implements Plugin {
 		Map<String, Street> streetMap = streetIds.isEmpty() ? new HashMap<>() : repository.listByIds(Street.class, streetIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		streetIds.removeAll(streetMap.keySet());
 		if (!streetIds.isEmpty()) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "No Street with ids " + streetIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Street with ids " + streetIds);
 		}
 		addressFiltering.setStreets(new ArrayList<>(streetMap.values()));
 
@@ -93,7 +94,7 @@ public class AddressService implements Plugin {
 		Street street = streetId != null ? getByIdOrNull(streetId,
 				Street.class, Street_.security, securityContextBase) : null;
 		if (street == null && streetId != null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "no Street with id " + streetId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Street with id " + streetId);
 		}
 		addressCreationContainer.setStreet(street);
 
@@ -101,7 +102,7 @@ public class AddressService implements Plugin {
 		Neighbourhood neighbourhood = neighbourhoodId != null ? getByIdOrNull(neighbourhoodId,
 				Neighbourhood.class, Neighbourhood_.security, securityContextBase) : null;
 		if (neighbourhood == null && neighbourhoodId != null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "no Neighbourhood with id " + neighbourhoodId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Neighbourhood with id " + neighbourhoodId);
 		}
 		addressCreationContainer.setNeighbourhood(neighbourhood);
 
@@ -161,9 +162,7 @@ public class AddressService implements Plugin {
 	public Address createAddress(AddressCreate creationContainer,
 								 SecurityContextBase securityContextBase) {
 		Address address = createAddressNoMerge(creationContainer, securityContextBase);
-		Baseclass security = new Baseclass(creationContainer.getName(), securityContextBase);
-		address.setSecurity(security);
-		repository.massMerge(Arrays.asList(address, security));
+		repository.merge(address);
 		return address;
 	}
 
@@ -173,7 +172,7 @@ public class AddressService implements Plugin {
 			SecurityContextBase securityContextBase) {
 
 		Address address = new Address().setId(Baseclass.getBase64ID());
-		;
+		BaseclassService.createSecurityObjectNoMerge(address,securityContextBase);
 		updateAddressNoMerge(address, creationContainer);
 		return address;
 	}

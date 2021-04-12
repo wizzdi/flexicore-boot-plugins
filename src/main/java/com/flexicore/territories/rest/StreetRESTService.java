@@ -12,12 +12,13 @@ import com.flexicore.territories.request.StreetUpdate;
 import com.flexicore.territories.service.StreetService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 @OperationsInside
 @RequestMapping("/plugins/street")
@@ -30,49 +31,56 @@ public class StreetRESTService implements Plugin {
 	private StreetService service;
 
 
+	@Operation(description = "get all streets",summary = "get all streets")
+
 	@PostMapping("/getAllStreets")
 	public PaginationResponse<Street> getAllStreets(
-			@RequestHeader("authenticationKey") String authenticationKey,
-			@RequestBody StreetFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+			
+			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody StreetFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		service.validate(filtering, securityContextBase);
 		return service.getAllStreets(securityContextBase, filtering);
 	}
 
 
+	@Operation(description = "update street",summary = "update street")
+
 	@PutMapping("/updateStreet")
 	public Street updateStreet(
-			@RequestHeader("authenticationKey") String authenticationKey,
-			@RequestBody StreetUpdate updateContainer,
+			
+			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody StreetUpdate updateContainer,
 			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		Street street = service.getByIdOrNull(updateContainer.getId(),
 				Street.class, Street_.security, securityContextBase);
 		if (street == null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no Street with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Street with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setStreet(street);
 		service.validate(updateContainer, securityContextBase);
 		return service.updateStreet(updateContainer, securityContextBase);
 	}
+	@Operation(description = "create street",summary = "create street")
 
 	@PostMapping("/createStreet")
 	public Street createStreet(
-			@RequestHeader("authenticationKey") String authenticationKey,
-			@RequestBody StreetCreate creationContainer,
+			
+			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody StreetCreate creationContainer,
 			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		City city = service.getByIdOrNull(creationContainer.getCityId(),
 				City.class, City_.security, securityContextBase);
 		if (city == null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no City with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no City with id "
 					+ creationContainer.getCityId());
 		}
 		creationContainer.setCity(city);
 		return service.createStreet(creationContainer, securityContextBase);
 	}
 
+	@Operation(description = "delete street",summary = "delete street")
+
 	@DeleteMapping("/deleteStreet/{id}")
 	public void deleteStreet(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
 		service.deleteStreet(id, securityContextBase);
 	}

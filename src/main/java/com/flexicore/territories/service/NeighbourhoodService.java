@@ -13,12 +13,13 @@ import com.flexicore.territories.request.NeighbourhoodUpdate;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.*;
@@ -54,7 +55,7 @@ public class NeighbourhoodService implements Plugin {
 		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds, City_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		citiesIds.removeAll(cityMap.keySet());
 		if(!citiesIds.isEmpty()){
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No Cities with ids "+citiesIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Cities with ids "+citiesIds);
 		}
 		neighbourhoodFiltering.setCities(new ArrayList<>(cityMap.values()));
 	}
@@ -66,7 +67,7 @@ public class NeighbourhoodService implements Plugin {
 		String cityId = neighbourhoodCreationContainer.getCityId();
 		City city = cityId!=null?getByIdOrNull(cityId, City.class, City_.security, securityContextBase):null;
 		if (city == null&&cityId!=null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no City with id " + cityId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no City with id " + cityId);
 		}
 		neighbourhoodCreationContainer.setCity(city);
 	}
@@ -107,9 +108,7 @@ public class NeighbourhoodService implements Plugin {
 			NeighbourhoodCreate creationContainer,
 			SecurityContextBase securityContextBase) {
 		Neighbourhood neighbourhood = createNeighbourhoodNoMerge(creationContainer, securityContextBase);
-		Baseclass security=new Baseclass(creationContainer.getName(),securityContextBase);
-		neighbourhood.setSecurity(security);
-		repository.massMerge(Arrays.asList(neighbourhood,security));
+		repository.merge(neighbourhood);
 		return neighbourhood;
 	}
 
@@ -119,6 +118,7 @@ public class NeighbourhoodService implements Plugin {
 			SecurityContextBase securityContextBase) {
 
 		Neighbourhood neighbourhood = new Neighbourhood().setId(Baseclass.getBase64ID());
+		BaseclassService.createSecurityObjectNoMerge(neighbourhood,securityContextBase);
 		updateNeighbourhoodNoMerge(neighbourhood, creationContainer);
 		return neighbourhood;
 	}

@@ -11,6 +11,7 @@ import com.flexicore.territories.request.CityUpdate;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.*;
@@ -72,14 +73,14 @@ public class CityService implements Plugin {
 		String countryId = creationContainer.getCountryId();
 		Country country = countryId != null ? getByIdOrNull(countryId, Country.class, Country_.security, securityContextBase) : null;
 		if (country == null&& countryId != null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no Country with id " + countryId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Country with id " + countryId);
 		}
 		creationContainer.setCountry(country);
 
 		String stateId = creationContainer.getStateId();
 		State state = stateId != null ? getByIdOrNull(stateId, State.class, State_.security, securityContextBase) : null;
 		if (stateId != null && state == null) {
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"no State with id " + stateId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no State with id " + stateId);
 		}
 		creationContainer.setState(state);
 	}
@@ -91,7 +92,7 @@ public class CityService implements Plugin {
 		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds, Country_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		countriesIds.removeAll(countryMap.keySet());
 		if(!countriesIds.isEmpty()){
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
 		}
 		cityFiltering.setCountries(new ArrayList<>(countryMap.values()));
 
@@ -99,7 +100,7 @@ public class CityService implements Plugin {
 		Map<String, State> stateMa = stateIds.isEmpty()?new HashMap<>():repository.listByIds(State.class,stateIds, State_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		stateIds.removeAll(stateMa.keySet());
 		if(!stateIds.isEmpty()){
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,"No States with ids "+stateIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No States with ids "+stateIds);
 		}
 		cityFiltering.setStates(new ArrayList<>(stateMa.values()));
 	}
@@ -107,15 +108,15 @@ public class CityService implements Plugin {
 	
 	public City createCity(CityCreate creationContainer, SecurityContextBase securityContextBase) {
 		City city = createCityNoMerge(creationContainer, securityContextBase);
-		Baseclass baseclass=new Baseclass(creationContainer.getName(),securityContextBase);
-		city.setSecurity(baseclass);
-		repository.massMerge(Arrays.asList(city,baseclass));
+
+		repository.merge(city);
 		return city;
 	}
 
 	public City createCityNoMerge(CityCreate creationContainer,
 								  SecurityContextBase securityContextBase) {
 		City city = new City().setId(Baseclass.getBase64ID());
+		BaseclassService.createSecurityObjectNoMerge(city,securityContextBase);
 		updateCityNoMerge(creationContainer, city);
 		return city;
 	}

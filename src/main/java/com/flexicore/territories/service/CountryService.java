@@ -16,6 +16,7 @@ import com.flexicore.territories.request.ImportCountriesRequest;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -100,9 +101,7 @@ public class CountryService implements Plugin {
 	public Country createCountry(CountryCreate creationContainer,
 								 com.flexicore.security.SecurityContextBase securityContextBase) {
 		Country country = createCountryNoMerge(creationContainer, securityContextBase);
-		Baseclass security = new Baseclass(creationContainer.getName(), securityContextBase);
-		country.setSecurity(security);
-		repository.massMerge(Arrays.asList(country, security));
+		repository.merge(country);
 		return country;
 	}
 
@@ -110,6 +109,7 @@ public class CountryService implements Plugin {
 			CountryCreate creationContainer,
 			SecurityContextBase securityContextBase) {
 		Country country = new Country().setId(Baseclass.getBase64ID());
+		BaseclassService.createSecurityObjectNoMerge(country,securityContextBase);
 		updateCountryNoMerge(country, creationContainer);
 		return country;
 	}
