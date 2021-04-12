@@ -10,6 +10,7 @@ import com.flexicore.territories.request.NeighbourhoodUpdate;
 import com.flexicore.territories.service.NeighbourhoodService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.client.HttpClientErrorException;
 
 @RequestMapping("/plugins/neighbourhood")
 @OperationsInside
+@Tag(name = "Neighbourhood")
 @Extension
 @RestController
 public class NeighbourhoodRESTService implements Plugin {

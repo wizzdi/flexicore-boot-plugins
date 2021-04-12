@@ -13,6 +13,7 @@ import com.flexicore.territories.request.AddressUpdate;
 import com.flexicore.territories.service.AddressService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @OperationsInside
 @Extension
 @RestController
+@Tag(name = "Address")
 @RequestMapping("/plugins/address")
 public class AddressRESTService implements Plugin {
 
