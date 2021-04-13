@@ -41,6 +41,7 @@ public class Category extends Baseclass {
 	}
 
 	@JsonIgnore
+	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="category")
 	public List<CategoryToBaseClass> getCategoryToBaseclass() {
 		return categoryToBaseclass;
 	}
@@ -52,6 +53,8 @@ public class Category extends Baseclass {
 
 
 	@JsonIgnore
+	@OneToMany(targetEntity = CategoryToClazz.class,mappedBy="category")
+
 	public List<CategoryToClazz> getClazzes() {
 		return clazzes;
 	}
