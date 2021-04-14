@@ -68,6 +68,17 @@ return query.getSingleResult();
 			preds.add(join.get(PaymentMethod_.id).in(ids));
 		}
 
+		if(filtering.isUnpaid()){
+			Join<T,InvoiceItem> join=r.join(Invoice_.invoiceItems);
+			preds.add(join.get(InvoiceItem_.datePaid).isNull());
+		}
+
+		if(filtering.isAutomatic()){
+			Join<T,Contract> join=r.join(Invoice_.contract);
+			preds.add(join.get(Contract_.automaticPaymentMethod).isNotNull());
+		}
+
+
 	}
 
 

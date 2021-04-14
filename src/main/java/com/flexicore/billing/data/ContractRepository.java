@@ -2,6 +2,8 @@ package com.flexicore.billing.data;
 
 
 import com.flexicore.billing.model.Contract;
+import com.flexicore.billing.model.Contract_;
+import com.flexicore.billing.model.Invoice;
 import com.flexicore.billing.request.ContractFiltering;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
@@ -26,78 +28,87 @@ import java.util.Set;
 @Extension
 @Component
 public class ContractRepository implements Plugin {
-	@PersistenceContext
-	private EntityManager em;
-	@Autowired
-	private SecuredBasicRepository securedBasicRepository;
+    @PersistenceContext
+    private EntityManager em;
+    @Autowired
+    private SecuredBasicRepository securedBasicRepository;
 
-	public List<Contract> getAllContracts(SecurityContextBase securityContext,
-										  ContractFiltering filtering) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Contract> q = cb.createQuery(Contract.class);
-		Root<Contract> r = q.from(Contract.class);
-		List<Predicate> preds = new ArrayList<>();
-		addContractPredicates(filtering, cb, q, r, preds, securityContext);
-		q.select(r).where(preds.toArray(Predicate[]::new));
-		TypedQuery<Contract> query = em.createQuery(q);
-		BasicRepository.addPagination(filtering, query);
-		return query.getResultList();
-	}
+    public List<Contract> getAllContracts(SecurityContextBase securityContext,
+                                          ContractFiltering filtering) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Contract> q = cb.createQuery(Contract.class);
+        Root<Contract> r = q.from(Contract.class);
+        List<Predicate> preds = new ArrayList<>();
+        addContractPredicates(filtering, cb, q, r, preds, securityContext);
+        q.select(r).where(preds.toArray(Predicate[]::new));
+        TypedQuery<Contract> query = em.createQuery(q);
+        BasicRepository.addPagination(filtering, query);
+        return query.getResultList();
+    }
 
-	public long countAllContracts(SecurityContextBase securityContext,
-								  ContractFiltering filtering) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<Long> q = cb.createQuery(Long.class);
-		Root<Contract> r = q.from(Contract.class);
-		List<Predicate> preds = new ArrayList<>();
-		addContractPredicates(filtering, cb, q, r, preds, securityContext);
-		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
-		TypedQuery<Long> query = em.createQuery(q);
-		return query.getSingleResult();
-	}
+    public long countAllContracts(SecurityContextBase securityContext,
+                                  ContractFiltering filtering) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> q = cb.createQuery(Long.class);
+        Root<Contract> r = q.from(Contract.class);
+        List<Predicate> preds = new ArrayList<>();
+        addContractPredicates(filtering, cb, q, r, preds, securityContext);
+        q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
+        TypedQuery<Long> query = em.createQuery(q);
+        return query.getSingleResult();
+    }
 
-	public <T extends Contract> void addContractPredicates(ContractFiltering filtering,
-												  CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+    public <T extends Contract> void addContractPredicates(ContractFiltering filtering,
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
 
-securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb,q,r,preds,securityContext);
-	}
+        securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+        if(filtering.getNextChargeDate()!=null){
+            if(filtering.getNextChargeDate().getStart()!=null){
+                preds.add(cb.greaterThanOrEqualTo(r.get(Contract_.nextChargeDate),filtering.getNextChargeDate().getStart()));
+            }
+
+            if(filtering.getNextChargeDate().getEnd()!=null){
+                preds.add(cb.lessThanOrEqualTo(r.get(Contract_.nextChargeDate),filtering.getNextChargeDate().getEnd()));
+            }
+        }
+    }
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return securedBasicRepository.listByIds(c, ids, securityContext);
-	}
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+        return securedBasicRepository.listByIds(c, ids, securityContext);
+    }
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
-		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
-	}
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+        return securedBasicRepository.getByIdOrNull(id, c, securityContext);
+    }
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
-	}
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+    }
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
-	}
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+    }
 
-	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
-		return securedBasicRepository.findByIds(c, ids, idAttribute);
-	}
+    public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+        return securedBasicRepository.findByIds(c, ids, idAttribute);
+    }
 
-	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
-		return securedBasicRepository.findByIds(c, requested);
-	}
+    public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+        return securedBasicRepository.findByIds(c, requested);
+    }
 
-	public <T> T findByIdOrNull(Class<T> type, String id) {
-		return securedBasicRepository.findByIdOrNull(type, id);
-	}
+    public <T> T findByIdOrNull(Class<T> type, String id) {
+        return securedBasicRepository.findByIdOrNull(type, id);
+    }
 
-	@Transactional
-	public void merge(Object base) {
-		securedBasicRepository.merge(base);
-	}
+    @Transactional
+    public void merge(Object base) {
+        securedBasicRepository.merge(base);
+    }
 
-	@Transactional
-	public void massMerge(List<?> toMerge) {
-		securedBasicRepository.massMerge(toMerge);
-	}
+    @Transactional
+    public void massMerge(List<?> toMerge) {
+        securedBasicRepository.massMerge(toMerge);
+    }
 }

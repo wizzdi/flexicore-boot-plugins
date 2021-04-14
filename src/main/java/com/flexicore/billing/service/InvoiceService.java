@@ -34,114 +34,129 @@ import java.util.stream.Collectors;
 
 public class InvoiceService implements Plugin {
 
-		@Autowired
-	private InvoiceRepository repository;
+    @Autowired
+    private InvoiceRepository repository;
 
-	@Autowired
-	private BasicService basicService;
+    @Autowired
+    private BasicService basicService;
 
-public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+        return repository.listByIds(c, ids, securityContext);
+    }
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, securityContext);
-	}
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+        return repository.getByIdOrNull(id, c, securityContext);
+    }
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
-	}
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+    }
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
-	}
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return repository.listByIds(c, ids, baseclassAttribute, securityContext);
+    }
 
-	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
-		return repository.findByIds(c, ids, idAttribute);
-	}
+    public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+        return repository.findByIds(c, ids, idAttribute);
+    }
 
-	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
-		return repository.findByIds(c, requested);
-	}
+    public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+        return repository.findByIds(c, requested);
+    }
 
-	public <T> T findByIdOrNull(Class<T> type, String id) {
-		return repository.findByIdOrNull(type, id);
-	}
+    public <T> T findByIdOrNull(Class<T> type, String id) {
+        return repository.findByIdOrNull(type, id);
+    }
 
-	@Transactional
-	public void merge(Object base) {
-		repository.merge(base);
-	}
+    @Transactional
+    public void merge(Object base) {
+        repository.merge(base);
+    }
 
-	@Transactional
-	public void massMerge(List<?> toMerge) {
-		repository.massMerge(toMerge);
-	}
+    @Transactional
+    public void massMerge(List<?> toMerge) {
+        repository.massMerge(toMerge);
+    }
 
-	public void validateFiltering(InvoiceFiltering filtering,
-								  SecurityContextBase securityContext) {
-		basicService.validate(filtering, securityContext);
-		Set<String> paymentMethodIds = filtering.getPaymentMethodIds();
-		Map<String, PaymentMethod> paymentMethodMap = paymentMethodIds.isEmpty() ? new HashMap<>() : listByIds(PaymentMethod.class, paymentMethodIds, PaymentMethod_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-		paymentMethodIds.removeAll(paymentMethodMap.keySet());
-		if (!paymentMethodIds.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No PaymentMethod with ids " + paymentMethodIds);
-		}
-		filtering.setPaymentMethods(new ArrayList<>(paymentMethodMap.values()));
-	}
+    public void validateFiltering(InvoiceFiltering filtering,
+                                  SecurityContextBase securityContext) {
+        basicService.validate(filtering, securityContext);
+        Set<String> paymentMethodIds = filtering.getPaymentMethodIds();
+        Map<String, PaymentMethod> paymentMethodMap = paymentMethodIds.isEmpty() ? new HashMap<>() : listByIds(PaymentMethod.class, paymentMethodIds, PaymentMethod_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        paymentMethodIds.removeAll(paymentMethodMap.keySet());
+        if (!paymentMethodIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PaymentMethod with ids " + paymentMethodIds);
+        }
+        filtering.setPaymentMethods(new ArrayList<>(paymentMethodMap.values()));
+    }
 
-	public PaginationResponse<Invoice> getAllInvoices(
-			SecurityContextBase securityContext, InvoiceFiltering filtering) {
-		List<Invoice> list = repository.getAllInvoices(securityContext, filtering);
-		long count = repository.countAllInvoices(securityContext, filtering);
-		return new PaginationResponse<>(list, filtering, count);
+    public PaginationResponse<Invoice> getAllInvoices(
+            SecurityContextBase securityContext, InvoiceFiltering filtering) {
+        List<Invoice> list = listAllInvoices(securityContext, filtering);
+        long count = repository.countAllInvoices(securityContext, filtering);
+        return new PaginationResponse<>(list, filtering, count);
+    }
+
+	public List<Invoice> listAllInvoices(SecurityContextBase securityContext, InvoiceFiltering filtering) {
+		return repository.getAllInvoices(securityContext, filtering);
 	}
 
 	public Invoice createInvoice(InvoiceCreate creationContainer,
-												 SecurityContextBase securityContext) {
-		Invoice invoice = createInvoiceNoMerge(creationContainer, securityContext);
-		repository.merge(invoice);
-		return invoice;
-	}
+                                 SecurityContextBase securityContext) {
+        Invoice invoice = createInvoiceNoMerge(creationContainer, securityContext);
+        repository.merge(invoice);
+        return invoice;
+    }
 
-	private Invoice createInvoiceNoMerge(InvoiceCreate creationContainer,
-                                       SecurityContextBase securityContext) {
-		Invoice invoice = new Invoice();
-		invoice.setId(Baseclass.getBase64ID());
+    public Invoice createInvoiceNoMerge(InvoiceCreate creationContainer,
+                                        SecurityContextBase securityContext) {
+        Invoice invoice = new Invoice();
+        invoice.setId(Baseclass.getBase64ID());
 
-		updateInvoiceNoMerge(invoice, creationContainer);
-		BaseclassService.createSecurityObjectNoMerge(invoice,securityContext);
+        updateInvoiceNoMerge(invoice, creationContainer);
+        BaseclassService.createSecurityObjectNoMerge(invoice, securityContext);
 
-		return invoice;
-	}
+        return invoice;
+    }
 
-	private boolean updateInvoiceNoMerge(Invoice invoice, InvoiceCreate creationContainer) {
-		boolean update = basicService.updateBasicNoMerge(creationContainer, invoice);
-		if (creationContainer.getUsedPaymentMethod() != null && (invoice.getUsedPaymentMethod() == null || !creationContainer.getUsedPaymentMethod().getId().equals(invoice.getUsedPaymentMethod().getId()))) {
-			invoice.setUsedPaymentMethod(creationContainer.getUsedPaymentMethod());
-			update = true;
-		}
-		return update;
-	}
+    private boolean updateInvoiceNoMerge(Invoice invoice, InvoiceCreate creationContainer) {
+        boolean update = basicService.updateBasicNoMerge(creationContainer, invoice);
+        if (creationContainer.getUsedPaymentMethod() != null && (invoice.getUsedPaymentMethod() == null || !creationContainer.getUsedPaymentMethod().getId().equals(invoice.getUsedPaymentMethod().getId()))) {
+            invoice.setUsedPaymentMethod(creationContainer.getUsedPaymentMethod());
+            update = true;
+        }
 
-	public Invoice updateInvoice(InvoiceUpdate updateContainer,
-												 SecurityContextBase securityContext) {
-		Invoice invoice = updateContainer.getInvoice();
-		if (updateInvoiceNoMerge(invoice, updateContainer)) {
-			repository.merge(invoice);
-		}
-		return invoice;
-	}
+        if (creationContainer.getContract() != null && (invoice.getContract() == null || !creationContainer.getContract().getId().equals(invoice.getContract().getId()))) {
+            invoice.setContract(creationContainer.getContract());
+            update = true;
+        }
 
-	public void validate(InvoiceCreate creationContainer,
+        if (creationContainer.getInvoiceDate() != null && !creationContainer.getInvoiceDate().equals(invoice.getInvoiceDate())) {
+            invoice.setInvoiceDate(creationContainer.getInvoiceDate());
+            update = true;
+        }
+
+        return update;
+    }
+
+    public Invoice updateInvoice(InvoiceUpdate updateContainer,
+                                 SecurityContextBase securityContext) {
+        Invoice invoice = updateContainer.getInvoice();
+        if (updateInvoiceNoMerge(invoice, updateContainer)) {
+            repository.merge(invoice);
+        }
+        return invoice;
+    }
+
+    public void validate(InvoiceCreate creationContainer,
                          SecurityContextBase securityContext) {
-		basicService.validate(creationContainer, securityContext);
-		String usedPaymentMethodId = creationContainer.getUsedPaymentMethodId();
-		PaymentMethod paymentMethod = usedPaymentMethodId == null ? null : getByIdOrNull(usedPaymentMethodId, PaymentMethod.class, null, securityContext);
-		if (paymentMethod == null && usedPaymentMethodId != null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No PaymentMethod with id " + usedPaymentMethodId);
-		}
-		creationContainer.setUsedPaymentMethod(paymentMethod);
-		
-	}
+        basicService.validate(creationContainer, securityContext);
+        String usedPaymentMethodId = creationContainer.getUsedPaymentMethodId();
+        PaymentMethod paymentMethod = usedPaymentMethodId == null ? null : getByIdOrNull(usedPaymentMethodId, PaymentMethod.class, null, securityContext);
+        if (paymentMethod == null && usedPaymentMethodId != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PaymentMethod with id " + usedPaymentMethodId);
+        }
+        creationContainer.setUsedPaymentMethod(paymentMethod);
+
+    }
 }

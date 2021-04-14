@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Set;
 
 public class InvoiceItemFiltering extends PaginationFilter {
-private BasicPropertiesFilter basicPropertiesFilter;
+    private BasicPropertiesFilter basicPropertiesFilter;
 
-    private Set<String> invoiceIds=new HashSet<>();
+    private Set<String> invoiceIds = new HashSet<>();
     @JsonIgnore
     private List<Invoice> invoices;
 
-    private Set<String> contractItemIds=new HashSet<>();
+    private Set<String> contractItemIds = new HashSet<>();
     @JsonIgnore
     private List<ContractItem> contractItems;
 

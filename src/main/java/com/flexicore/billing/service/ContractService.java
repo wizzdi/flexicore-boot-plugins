@@ -79,9 +79,13 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 
 	public PaginationResponse<Contract> getAllContracts(
 			SecurityContextBase securityContext, ContractFiltering filtering) {
-		List<Contract> list = repository.getAllContracts(securityContext, filtering);
+		List<Contract> list = listAllContracts(securityContext, filtering);
 		long count = repository.countAllContracts(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
+	}
+
+	public List<Contract> listAllContracts(SecurityContextBase securityContext, ContractFiltering filtering) {
+		return repository.getAllContracts(securityContext, filtering);
 	}
 
 	public Contract createContract(ContractCreate creationContainer,

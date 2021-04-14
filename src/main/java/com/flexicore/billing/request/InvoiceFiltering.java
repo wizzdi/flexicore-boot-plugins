@@ -15,6 +15,8 @@ private BasicPropertiesFilter basicPropertiesFilter;
     private Set<String> paymentMethodIds=new HashSet<>();
     @JsonIgnore
     private List<PaymentMethod> paymentMethods;
+    private boolean unpaid;
+    private boolean automatic;
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
         return basicPropertiesFilter;
@@ -41,6 +43,24 @@ private BasicPropertiesFilter basicPropertiesFilter;
 
     public <T extends InvoiceFiltering> T setPaymentMethods(List<PaymentMethod> paymentMethods) {
         this.paymentMethods = paymentMethods;
+        return (T) this;
+    }
+
+    public boolean isUnpaid() {
+        return unpaid;
+    }
+
+    public <T extends InvoiceFiltering> T setUnpaid(boolean unpaid) {
+        this.unpaid = unpaid;
+        return (T) this;
+    }
+
+    public boolean isAutomatic() {
+        return automatic;
+    }
+
+    public <T extends InvoiceFiltering> T setAutomatic(boolean automatic) {
+        this.automatic = automatic;
         return (T) this;
     }
 }

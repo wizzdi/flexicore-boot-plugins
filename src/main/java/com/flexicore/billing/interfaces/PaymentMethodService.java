@@ -6,4 +6,6 @@ import com.flexicore.billing.response.PayResponse;
 public interface PaymentMethodService {
 
     PayResponse pay(PayRequest payRequest);
+
+    boolean canHandle(PayRequest payRequest);
 }
