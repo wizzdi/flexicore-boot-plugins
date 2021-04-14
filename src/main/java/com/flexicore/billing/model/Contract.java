@@ -7,6 +7,7 @@ import com.flexicore.organization.model.Customer;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,9 @@ public class Contract extends SecuredBasic {
     private List<ContractItem> contractItems=new ArrayList<>();
     @ManyToOne(targetEntity = Customer.class)
     private Customer customer;
+    @ManyToOne(targetEntity = PaymentMethod.class)
+    private PaymentMethod automaticPaymentMethod;
+    private OffsetDateTime nextChargeDate;
 
     public Contract() {
     }
@@ -41,6 +45,25 @@ public class Contract extends SecuredBasic {
 
     public <T extends Contract> T setCustomer(Customer customer) {
         this.customer = customer;
+        return (T) this;
+    }
+
+    @ManyToOne(targetEntity = PaymentMethod.class)
+    public PaymentMethod getAutomaticPaymentMethod() {
+        return automaticPaymentMethod;
+    }
+
+    public <T extends Contract> T setAutomaticPaymentMethod(PaymentMethod automaticPaymentMethod) {
+        this.automaticPaymentMethod = automaticPaymentMethod;
+        return (T) this;
+    }
+
+    public OffsetDateTime getNextChargeDate() {
+        return nextChargeDate;
+    }
+
+    public <T extends Contract> T setNextChargeDate(OffsetDateTime firstChargeDate) {
+        this.nextChargeDate = firstChargeDate;
         return (T) this;
     }
 }
