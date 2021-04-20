@@ -69,15 +69,13 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 	}
 
 	@Transactional
-	public void merge(Object o) {
-		em.merge(o);
+	public void merge(Object base) {
+		baseclassRepository.merge(base);
 	}
 
 	@Transactional
-	public void massMerge(List<Object> list) {
-		for (Object o : list) {
-			em.merge(o);
-		}
+	public void massMerge(List<?> toMerge) {
+		baseclassRepository.massMerge(toMerge);
 	}
 
 	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {

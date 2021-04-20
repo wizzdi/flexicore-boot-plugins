@@ -12,12 +12,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 
 @Configuration
 @Extension
+@EnableTransactionManagement(proxyTargetClass = true)
 public class FirebaseConfig implements Plugin {
 
 	@Value("${wizzdi.messaging.connectors.firebase.credentials.path}")
