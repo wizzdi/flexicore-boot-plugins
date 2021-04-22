@@ -135,4 +135,11 @@ public class UserProfileService implements Plugin {
         }
         return userProfile;
     }
+
+    public void validateCreate(UserProfileCreate userProfileCreate, SecurityContextBase securityContext) {
+        validate(userProfileCreate,securityContext);
+        if(userProfileCreate.getSecurityUser()==null){
+            userProfileCreate.setSecurityUser(securityContext.getUser());
+        }
+    }
 }

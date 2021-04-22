@@ -30,7 +30,7 @@ public class UserProfileController implements Plugin {
 	@PostMapping("/createUserProfile")
 	@Operation(description = "creates UserProfile",summary = "creates UserProfile")
 	public UserProfile createUserProfile(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody UserProfileCreate userProfileCreate, @RequestAttribute SecurityContextBase securityContext){
-		userProfileService.validate(userProfileCreate,securityContext);
+		userProfileService.validateCreate(userProfileCreate,securityContext);
 		return userProfileService.createUserProfile(userProfileCreate,securityContext);
 	}
 
