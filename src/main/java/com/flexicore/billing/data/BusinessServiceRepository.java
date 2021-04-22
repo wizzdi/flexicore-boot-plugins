@@ -2,6 +2,7 @@ package com.flexicore.billing.data;
 
 
 import com.flexicore.billing.model.BusinessService;
+import com.flexicore.billing.model.BusinessService_;
 import com.flexicore.billing.request.BusinessServiceFiltering;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
@@ -38,7 +39,7 @@ public class BusinessServiceRepository implements Plugin {
 		Root<BusinessService> r = q.from(BusinessService.class);
 		List<Predicate> preds = new ArrayList<>();
 		addBusinessServicePredicates(filtering, cb,q, r, preds,securityContext);
-		q.select(r).where(preds.toArray(Predicate[]::new));
+		q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.desc(r.get(BusinessService_.name)));
 		TypedQuery<BusinessService> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering, query);
 		return query.getResultList();

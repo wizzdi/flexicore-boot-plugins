@@ -236,7 +236,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${artifactId}</Plugin-Id>
                                         <Plugin-Version>${version}</Plugin-Version>
-                                        <!--suppress UnresolvedMavenProperty --><Plugin-Dependencies>organization-service@&gt;=${organization-service.version}</Plugin-Dependencies></manifestEntries>
+                                        <!--suppress UnresolvedMavenProperty --><Plugin-Dependencies>organization-service@&gt;=2.9.9</Plugin-Dependencies></manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
