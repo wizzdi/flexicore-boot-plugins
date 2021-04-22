@@ -272,9 +272,9 @@
             </plugin>
         </plugins>
     </build>
-    <userProfiles>
+    <profiles>
         <!-- GPG Signature on release -->
-        <userProfile>
+        <profile>
             <id>release-sign-artifacts</id>
             <activation>
                 <property>
@@ -300,7 +300,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </userProfile>
-    </userProfiles>
+        </profile>
+    </profiles>
 
 </project>
