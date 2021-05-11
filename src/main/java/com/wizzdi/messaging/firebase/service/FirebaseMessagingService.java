@@ -21,6 +21,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,14 @@ import java.util.stream.Collectors;
 @Extension
 public class FirebaseMessagingService implements Plugin {
 
+	private static final DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ISO_DATE_TIME;
 	private static final Logger logger= LoggerFactory.getLogger(FirebaseMessagingService.class);
 	public static final String FROM_NAME = "fromName";
 	public static final String FROM_ID = "fromId";
+	public static final String CHAT_ID = "chatID";
+	public static final String MESSAGE_ID = "messageId";
+	public static final String TIME = "time";
+
 	@Autowired
 	private ChatToChatUserService chatToChatUserService;
 	@Autowired
@@ -58,6 +64,10 @@ public class FirebaseMessagingService implements Plugin {
 			Map<String, String> stringProps = message.getOther().entrySet().stream().filter(f -> f.getValue() instanceof String).collect(Collectors.toMap(f -> f.getKey(), f -> (String) f.getValue()));
 			stringProps.put(FROM_NAME,sender.getName());
 			stringProps.put(FROM_ID,sender.getId());
+			stringProps.put(CHAT_ID,chat.getId());
+			stringProps.put(MESSAGE_ID,message.getId());
+			stringProps.put(TIME,dateTimeFormatter.format(message.getUpdateDate()));
+
 			MulticastMessage fbMessage = MulticastMessage
 					.builder()
 					.addAllTokens(tokens)
