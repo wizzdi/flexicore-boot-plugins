@@ -32,8 +32,8 @@ public class BusinessServiceRepository implements Plugin {
 	@Autowired
 	private SecuredBasicRepository securedBasicRepository;
 
-	public List<BusinessService> getAllBusinessServices(SecurityContextBase securityContext,
-														BusinessServiceFiltering filtering) {
+	public List<BusinessService> listAllBusinessServices(SecurityContextBase securityContext,
+														 BusinessServiceFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<BusinessService> q = cb.createQuery(BusinessService.class);
 		Root<BusinessService> r = q.from(BusinessService.class);

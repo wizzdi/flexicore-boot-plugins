@@ -20,15 +20,8 @@ import org.springframework.stereotype.Component;
 
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-
 
 
 @OperationsInside
@@ -40,52 +33,52 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class CurrencyController implements Plugin {
 
-		@Autowired
-	private CurrencyService service;
+    @Autowired
+    private CurrencyService service;
 
 
+    @Operation(summary = "getAllCurrencies", description = "Lists all Currencies")
+    @IOperation(Name = "getAllCurrencies", Description = "Lists all Currencies")
+    @PostMapping("/getAllCurrencies")
+    public PaginationResponse<Currency> getAllCurrencies(
 
-	@Operation(summary = "getAllCurrencies", description = "Lists all Currencies")
-	@IOperation(Name = "getAllCurrencies", Description = "Lists all Currencies")
-	@PostMapping("/getAllCurrencies")
-	public PaginationResponse<Currency> getAllCurrencies(
-
-			@RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
-		service.validateFiltering(filtering, securityContext);
-		return service.getAllCurrencies(securityContext, filtering);
-	}
-
-
-
-	@PostMapping("/createCurrency")
-	@Operation(summary = "createCurrency", description = "Creates Currency")
-	@IOperation(Name = "createCurrency", Description = "Creates Currency")
-	public Currency createCurrency(
-			@RequestBody CurrencyCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
-		service.validate(creationContainer, securityContext);
-
-		return service.createCurrency(creationContainer, securityContext);
-	}
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+        service.validateFiltering(filtering, securityContext);
+        return service.getAllCurrencies(securityContext, filtering);
+    }
 
 
+    @PostMapping("/createCurrency")
+    @Operation(summary = "createCurrency", description = "Creates Currency")
+    @IOperation(Name = "createCurrency", Description = "Creates Currency")
+    public Currency createCurrency(
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody CurrencyCreate creationContainer,
+            @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(creationContainer, securityContext);
 
-	@PutMapping("/updateCurrency")
-	@Operation(summary = "updateCurrency", description = "Updates Currency")
-	@IOperation(Name = "updateCurrency", Description = "Updates Currency")
-	public Currency updateCurrency(
+        return service.createCurrency(creationContainer, securityContext);
+    }
 
-			@RequestBody CurrencyUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
-		service.validate(updateContainer, securityContext);
-		Currency currency = service.getByIdOrNull(updateContainer.getId(),
-				Currency.class, Currency_.security, securityContext);
-		if (currency == null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Currency with id "
-					+ updateContainer.getId());
-		}
-		updateContainer.setCurrency(currency);
 
-		return service.updateCurrency(updateContainer, securityContext);
-	}
+    @PutMapping("/updateCurrency")
+    @Operation(summary = "updateCurrency", description = "Updates Currency")
+    @IOperation(Name = "updateCurrency", Description = "Updates Currency")
+    public Currency updateCurrency(
+
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody CurrencyUpdate updateContainer,
+            @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(updateContainer, securityContext);
+        Currency currency = service.getByIdOrNull(updateContainer.getId(),
+                Currency.class, Currency_.security, securityContext);
+        if (currency == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Currency with id "
+                    + updateContainer.getId());
+        }
+        updateContainer.setCurrency(currency);
+
+        return service.updateCurrency(updateContainer, securityContext);
+    }
 }

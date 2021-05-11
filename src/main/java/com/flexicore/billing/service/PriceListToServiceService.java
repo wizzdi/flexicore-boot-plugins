@@ -169,21 +169,21 @@ public class PriceListToServiceService implements Plugin {
         basicService.validate(creationContainer, securityContext);
 
         String currencyId = creationContainer.getCurrencyId();
-        Currency currency = currencyId == null ? null : getByIdOrNull(currencyId, Currency.class, null, securityContext);
+        Currency currency = currencyId == null ? null : getByIdOrNull(currencyId, Currency.class, Currency_.security, securityContext);
         if (currency == null && currencyId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Currency with id " + currencyId);
         }
         creationContainer.setCurrency(currency);
 
         String businessServiceId = creationContainer.getBusinessServiceId();
-        BusinessService businessService = businessServiceId == null ? null : getByIdOrNull(businessServiceId, BusinessService.class, null, securityContext);
+        BusinessService businessService = businessServiceId == null ? null : getByIdOrNull(businessServiceId, BusinessService.class, BusinessService_.security, securityContext);
         if (businessService == null && businessServiceId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No BusinessService with id " + businessServiceId);
         }
         creationContainer.setBusinessService(businessService);
 
         String priceListId = creationContainer.getPriceListId();
-        PriceList priceList = priceListId == null ? null : getByIdOrNull(priceListId, PriceList.class, null, securityContext);
+        PriceList priceList = priceListId == null ? null : getByIdOrNull(priceListId, PriceList.class, PriceList_.security, securityContext);
         if (priceList == null && priceListId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No PriceList with id " + priceListId);
         }

@@ -29,53 +29,53 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class BusinessServiceController implements Plugin {
 
-		@Autowired
-	private BusinessServiceService service;
+    @Autowired
+    private BusinessServiceService service;
 
 
+    @Operation(summary = "getAllBusinessServices", description = "Lists all BusinessServices")
+    @IOperation(Name = "getAllBusinessServices", Description = "Lists all BusinessServices")
+    @PostMapping("/getAllBusinessServices")
+    public PaginationResponse<BusinessService> getAllBusinessServices(
 
-	@Operation(summary = "getAllBusinessServices", description = "Lists all BusinessServices")
-	@IOperation(Name = "getAllBusinessServices", Description = "Lists all BusinessServices")
-	@PostMapping("/getAllBusinessServices")
-	public PaginationResponse<BusinessService> getAllBusinessServices(
-
-			@RequestBody BusinessServiceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
-		service.validateFiltering(filtering, securityContext);
-		return service.getAllBusinessServices(securityContext, filtering);
-	}
-
-
-
-	@PostMapping("/createBusinessService")
-	@Operation(summary = "createBusinessService", description = "Creates BusinessService")
-	@IOperation(Name = "createBusinessService", Description = "Creates BusinessService")
-	public BusinessService createBusinessService(
-
-			@RequestBody BusinessServiceCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
-		service.validate(creationContainer, securityContext);
-
-		return service.createBusinessService(creationContainer, securityContext);
-	}
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody BusinessServiceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+        service.validateFiltering(filtering, securityContext);
+        return service.getAllBusinessServices(securityContext, filtering);
+    }
 
 
+    @PostMapping("/createBusinessService")
+    @Operation(summary = "createBusinessService", description = "Creates BusinessService")
+    @IOperation(Name = "createBusinessService", Description = "Creates BusinessService")
+    public BusinessService createBusinessService(
 
-	@PutMapping("/updateBusinessService")
-	@Operation(summary = "updateBusinessService", description = "Updates BusinessService")
-	@IOperation(Name = "updateBusinessService", Description = "Updates BusinessService")
-	public BusinessService updateBusinessService(
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody BusinessServiceCreate creationContainer,
+            @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(creationContainer, securityContext);
 
-			@RequestBody BusinessServiceUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
-		service.validate(updateContainer, securityContext);
-		BusinessService businessService = service.getByIdOrNull(updateContainer.getId(),
-				BusinessService.class, BusinessService_.security, securityContext);
-		if (businessService == null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no BusinessService with id "
-					+ updateContainer.getId());
-		}
-		updateContainer.setBusinessService(businessService);
+        return service.createBusinessService(creationContainer, securityContext);
+    }
 
-		return service.updateBusinessService(updateContainer, securityContext);
-	}
+
+    @PutMapping("/updateBusinessService")
+    @Operation(summary = "updateBusinessService", description = "Updates BusinessService")
+    @IOperation(Name = "updateBusinessService", Description = "Updates BusinessService")
+    public BusinessService updateBusinessService(
+
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody BusinessServiceUpdate updateContainer,
+            @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(updateContainer, securityContext);
+        BusinessService businessService = service.getByIdOrNull(updateContainer.getId(),
+                BusinessService.class, BusinessService_.security, securityContext);
+        if (businessService == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no BusinessService with id "
+                    + updateContainer.getId());
+        }
+        updateContainer.setBusinessService(businessService);
+
+        return service.updateBusinessService(updateContainer, securityContext);
+    }
 }
