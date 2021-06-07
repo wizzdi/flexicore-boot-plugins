@@ -19,7 +19,6 @@
         <class>com.flexicore.ui.model.FilterProperties</class>
         <class>com.flexicore.ui.model.MapPreset</class>
         <class>com.flexicore.category.model.Category</class>
-        <class>com.flexicore.model.dynamic.DynamicExecution</class>
         <class>com.flexicore.ui.model.PresetToPreset</class>
 
 
