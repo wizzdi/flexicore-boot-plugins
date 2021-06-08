@@ -1,6 +1,6 @@
 package com.flexicore.category.request;
 
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
-public class CategoryToClazzFilter extends FilteringInformationHolder {
+public class CategoryToClazzFilter extends PaginationFilter {
 }

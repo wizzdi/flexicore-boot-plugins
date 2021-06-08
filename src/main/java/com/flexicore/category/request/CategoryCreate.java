@@ -1,6 +1,6 @@
 package com.flexicore.category.request;
 
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class CategoryCreate extends BaseclassCreate {
+public class CategoryCreate extends BasicCreate {
 }

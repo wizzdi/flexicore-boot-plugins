@@ -1,76 +1,81 @@
 package com.flexicore.category.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
+
 import com.flexicore.category.model.CategoryToBaseClass;
 import com.flexicore.category.request.CategoryToBaseclassCreate;
 import com.flexicore.category.request.CategoryToBaseclassFilter;
 import com.flexicore.category.request.CategoryToBaseclassUpdate;
 import com.flexicore.category.service.CategoryToBaseclassService;
 
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+
+
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/CategoryToBaseclass")
+@RestController
+@RequestMapping("plugins/CategoryToBaseclass")
 @Tag(name = "CategoryToBaseclass")
 @Extension
 @Component
-public class CategoryToBaseclassRESTService implements RestServicePlugin {
+public class CategoryToBaseclassController implements Plugin {
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private CategoryToBaseclassService service;
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getAllCategoryToBaseclass", description = "Lists all CategoryToBaseclass")
-	@Path("getAllCategoryToBaseclass")
+	@PostMapping("getAllCategoryToBaseclass")
 	public PaginationResponse<CategoryToBaseClass> getAllCategoryToBaseclass(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToBaseclassFilter filtering,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToBaseclassFilter filtering,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filtering, securityContext);
 		return service.getAllCategoryToBaseclass(filtering, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createCategoryToBaseclass")
+	
+	
+	@PostMapping("/createCategoryToBaseclass")
 	@Operation(summary = "createCategoryToBaseclass", description = "Creates CategoryToBaseclass")
 	public CategoryToBaseClass createCategoryToBaseclass(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToBaseclassCreate creationContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToBaseclassCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 
 		service.validate(creationContainer, securityContext);
 
 		return service.createCategoryToBaseclass(creationContainer, securityContext);
 	}
 
-	@PUT
-	@Produces("application/json")
-	@Path("/updateCategoryToBaseclass")
+	
+	
+	@PutMapping("/updateCategoryToBaseclass")
 	@Operation(summary = "updateCategoryToBaseclass", description = "Updates CategoryToBaseclass")
 	public CategoryToBaseClass updateCategoryToBaseclass(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToBaseclassUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToBaseclassUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		CategoryToBaseClass CategoryToBaseclass = service.getByIdOrNull(updateContainer.getId(), CategoryToBaseClass.class, null, securityContext);
 		if (CategoryToBaseclass == null) {
-			throw new BadRequestException("no CategoryToBaseclass with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no CategoryToBaseclass with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setCategoryToBaseClass(CategoryToBaseclass);

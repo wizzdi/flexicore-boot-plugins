@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.category.model.Category;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Clazz;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class CategoryToClazzCreate extends BaseclassCreate {
+public class CategoryToClazzCreate extends BasicCreate {
 
     private String categoryId;
     @JsonIgnore

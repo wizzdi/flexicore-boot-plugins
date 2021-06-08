@@ -1,75 +1,80 @@
 package com.flexicore.category.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
+
+
 import com.flexicore.category.model.CategoryToClazz;
 import com.flexicore.category.request.CategoryToClazzCreate;
 import com.flexicore.category.request.CategoryToClazzFilter;
 import com.flexicore.category.request.CategoryToClazzUpdate;
 import com.flexicore.category.service.CategoryToClazzService;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.flexicore.security.SecurityContextBase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
-@PluginInfo(version = 1)
+
+
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/CategoryToClazz")
+@RestController
+@RequestMapping("plugins/CategoryToClazz")
 @Tag(name = "CategoryToClazz")
 @Extension
 @Component
-public class CategoryToClazzRESTService implements RestServicePlugin {
+public class CategoryToClazzController implements Plugin {
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private CategoryToClazzService service;
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getAllCategoryToClazz", description = "Lists all CategoryToClazz")
-	@Path("getAllCategoryToClazz")
+	@PostMapping("getAllCategoryToClazz")
 	public PaginationResponse<CategoryToClazz> getAllCategoryToClazz(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToClazzFilter filtering,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToClazzFilter filtering,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filtering, securityContext);
 		return service.getAllCategoryToClazz(filtering, securityContext);
 	}
 
-	@POST
-	@Produces("application/json")
-	@Path("/createCategoryToClazz")
+	
+	
+	@PostMapping("/createCategoryToClazz")
 	@Operation(summary = "createCategoryToClazz", description = "Creates CategoryToClazz")
 	public CategoryToClazz createCategoryToClazz(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToClazzCreate creationContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToClazzCreate creationContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 
 		service.validate(creationContainer, securityContext);
 
 		return service.createCategoryToClazz(creationContainer, securityContext);
 	}
 
-	@PUT
-	@Produces("application/json")
-	@Path("/updateCategoryToClazz")
+	
+	
+	@PutMapping("/updateCategoryToClazz")
 	@Operation(summary = "updateCategoryToClazz", description = "Updates CategoryToClazz")
 	public CategoryToClazz updateCategoryToClazz(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			CategoryToClazzUpdate updateContainer,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,
+			@RequestBody CategoryToClazzUpdate updateContainer,
+			@RequestAttribute SecurityContextBase securityContext) {
 		CategoryToClazz CategoryToClazz = service.getByIdOrNull(updateContainer.getId(), CategoryToClazz.class, null, securityContext);
 		if (CategoryToClazz == null) {
-			throw new BadRequestException("no CategoryToClazz with id "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no CategoryToClazz with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setCategoryToClazz(CategoryToClazz);

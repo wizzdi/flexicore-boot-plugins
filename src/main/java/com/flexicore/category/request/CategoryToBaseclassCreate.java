@@ -1,11 +1,11 @@
 package com.flexicore.category.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
 import com.flexicore.category.model.Category;
-import com.flexicore.request.BaseclassCreate;
+import com.flexicore.model.Baseclass;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class CategoryToBaseclassCreate extends BaseclassCreate {
+public class CategoryToBaseclassCreate extends BasicCreate {
 
     private String categoryId;
     @JsonIgnore

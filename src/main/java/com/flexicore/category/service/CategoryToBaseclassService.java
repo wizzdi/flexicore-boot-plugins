@@ -6,64 +6,70 @@
  ******************************************************************************/
 package com.flexicore.category.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
+
 import com.flexicore.category.data.CategoryToBaseclassRepository;
-import com.flexicore.category.model.CategoryFilter;
 import com.flexicore.category.model.CategoryToBaseClass;
-import com.flexicore.category.request.CategoryCreate;
 import com.flexicore.category.request.CategoryToBaseclassCreate;
 import com.flexicore.category.request.CategoryToBaseclassFilter;
 import com.flexicore.category.request.CategoryToBaseclassUpdate;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.model.Basic;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Extension
-@PluginInfo(version = 1)
+
 @Component
-public class CategoryToBaseclassService implements ServicePlugin {
+public class CategoryToBaseclassService implements Plugin {
 
     @Autowired
-    private BaseclassNewService baseclassNewService;
+    private BasicService basicService;
 
     @Autowired
-    @PluginInfo(version = 1)
+    
     private CategoryToBaseclassRepository categoryToBaseclassRepository;
 
-    public PaginationResponse<CategoryToBaseClass> getAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContext securityContext) {
+    public PaginationResponse<CategoryToBaseClass> getAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContextBase securityContext) {
         List<CategoryToBaseClass> categoryToBaseClasses=listAllCategoryToBaseclass(categoryToBaseclassFilter,securityContext);
         long count= categoryToBaseclassRepository.countAllCategoryToBaseclass(categoryToBaseclassFilter,securityContext);
         return new PaginationResponse<>(categoryToBaseClasses,categoryToBaseclassFilter,count);
     }
 
 
-    public List<CategoryToBaseClass> listAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContext securityContext) {
+    public List<CategoryToBaseClass> listAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContextBase securityContext) {
         return categoryToBaseclassRepository.listAllCategoryToBaseclass(categoryToBaseclassFilter,securityContext);
     }
 
 
-    public CategoryToBaseClass createCategoryToBaseclassNoMerge(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContext securityContext) {
-        CategoryToBaseClass categoryToBaseClass=new CategoryToBaseClass(categoryToBaseclassCreate.getName(),securityContext);
+    public CategoryToBaseClass createCategoryToBaseclassNoMerge(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContextBase securityContext) {
+        CategoryToBaseClass categoryToBaseClass=new CategoryToBaseClass();
+        categoryToBaseClass.setId(UUID.randomUUID().toString());
         updateCategoryToBaseclassNoMerge(categoryToBaseclassCreate,categoryToBaseClass);
+        BaseclassService.createSecurityObjectNoMerge(categoryToBaseClass,securityContext);
         return categoryToBaseClass;
     }
 
 
-    public CategoryToBaseClass createCategoryToBaseclass(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContext securityContext) {
+    public CategoryToBaseClass createCategoryToBaseclass(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContextBase securityContext) {
         CategoryToBaseClass categoryToBaseClass=createCategoryToBaseclassNoMerge(categoryToBaseclassCreate,securityContext);
         categoryToBaseclassRepository.merge(categoryToBaseClass);
         return categoryToBaseClass;
     }
 
 
-    public CategoryToBaseClass updateCategoryToBaseclass(CategoryToBaseclassUpdate categoryToBaseclassUpdate, SecurityContext securityContext) {
+    public CategoryToBaseClass updateCategoryToBaseclass(CategoryToBaseclassUpdate categoryToBaseclassUpdate, SecurityContextBase securityContext) {
         CategoryToBaseClass categoryToBaseClass=categoryToBaseclassUpdate.getCategoryToBaseClass();
         if(updateCategoryToBaseclassNoMerge(categoryToBaseclassUpdate,categoryToBaseClass)){
             categoryToBaseclassRepository.merge(categoryToBaseClass);
@@ -73,7 +79,7 @@ public class CategoryToBaseclassService implements ServicePlugin {
 
 
     public boolean updateCategoryToBaseclassNoMerge(CategoryToBaseclassCreate categoryToBaseclassCreate, CategoryToBaseClass categoryToBaseClass) {
-        boolean update=baseclassNewService.updateBaseclassNoMerge(categoryToBaseclassCreate,categoryToBaseClass);
+        boolean update= basicService.updateBasicNoMerge(categoryToBaseclassCreate,categoryToBaseClass);
         if(categoryToBaseclassCreate.getCategory()!=null && (categoryToBaseClass.getCategory()==null||!categoryToBaseclassCreate.getCategory().getId().equals(categoryToBaseClass.getCategory().getId()))){
             categoryToBaseClass.setCategory(categoryToBaseclassCreate.getCategory());
             update=true;
@@ -85,16 +91,50 @@ public class CategoryToBaseclassService implements ServicePlugin {
         return update;
     }
 
-    public void validate(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContext securityContext) {
-        baseclassNewService.validate(categoryToBaseclassCreate, securityContext);
+    public void validate(CategoryToBaseclassCreate categoryToBaseclassCreate, SecurityContextBase securityContext) {
+        basicService.validate(categoryToBaseclassCreate, securityContext);
     }
 
-    public void validate(CategoryToBaseclassFilter filtering, SecurityContext securityContext) {
+    public void validate(CategoryToBaseclassFilter filtering, SecurityContextBase securityContext) {
 
-        baseclassNewService.validateFilter(filtering, securityContext);
+        basicService.validate(filtering, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, List<String> batchString, SecurityContext securityContext) {
-        return categoryToBaseclassRepository.getByIdOrNull(id, c, batchString, securityContext);
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+        return categoryToBaseclassRepository.listByIds(c, ids, securityContext);
+    }
+
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+        return categoryToBaseclassRepository.getByIdOrNull(id, c, securityContext);
+    }
+
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return categoryToBaseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+    }
+
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+        return categoryToBaseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+    }
+
+    public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+        return categoryToBaseclassRepository.findByIds(c, ids, idAttribute);
+    }
+
+    public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+        return categoryToBaseclassRepository.findByIds(c, requested);
+    }
+
+    public <T> T findByIdOrNull(Class<T> type, String id) {
+        return categoryToBaseclassRepository.findByIdOrNull(type, id);
+    }
+
+    @Transactional
+    public void merge(Object base) {
+        categoryToBaseclassRepository.merge(base);
+    }
+
+    @Transactional
+    public void massMerge(List<?> toMerge) {
+        categoryToBaseclassRepository.massMerge(toMerge);
     }
 }
