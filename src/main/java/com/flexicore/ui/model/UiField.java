@@ -2,7 +2,6 @@ package com.flexicore.ui.model;
 
 import com.flexicore.category.model.Category;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -11,10 +10,6 @@ import javax.persistence.ManyToOne;
 public class UiField extends Baseclass {
 
 	public UiField() {
-	}
-
-	public UiField(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 	private int priority;

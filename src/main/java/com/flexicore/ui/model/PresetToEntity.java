@@ -1,26 +1,26 @@
 package com.flexicore.ui.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class PresetToEntity extends Baselink {
+public class PresetToEntity extends SecuredBasic {
+
+	@ManyToOne(targetEntity = Preset.class)
+	private Preset preset;
+	@ManyToOne(targetEntity = Baseclass.class)
+	private Baseclass entity;
+	private int priority;
+	private boolean enabled;
 
 	public PresetToEntity() {
 	}
 
-	public PresetToEntity(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
-	private int priority;
-	private boolean enabled;
+
 
 	public int getPriority() {
 		return priority;
@@ -40,21 +40,23 @@ public class PresetToEntity extends Baselink {
 		return (T) this;
 	}
 
-	@Override
-	@ManyToOne(targetEntity = Preset.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public Preset getLeftside() {
-		return (Preset) super.getLeftside();
+	@ManyToOne(targetEntity = Preset.class)
+	public Preset getPreset() {
+		return preset;
 	}
 
-	@JsonIgnore
-	public void setLeftside(Preset leftside) {
-		super.setLeftside(leftside);
+	public <T extends PresetToEntity> T setPreset(Preset preset) {
+		this.preset = preset;
+		return (T) this;
 	}
 
-	@Override
-	public void setLeftside(Baseclass leftside) {
-		super.setLeftside(leftside);
+	@ManyToOne(targetEntity = Baseclass.class)
+	public Baseclass getEntity() {
+		return entity;
 	}
 
+	public <T extends PresetToEntity> T setEntity(Baseclass entity) {
+		this.entity = entity;
+		return (T) this;
+	}
 }

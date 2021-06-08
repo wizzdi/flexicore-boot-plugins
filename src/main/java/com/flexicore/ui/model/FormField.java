@@ -1,6 +1,5 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
@@ -8,10 +7,6 @@ import javax.persistence.Entity;
 public class FormField extends UiField {
 
 	public FormField() {
-	}
-
-	public FormField(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 	private boolean editable;

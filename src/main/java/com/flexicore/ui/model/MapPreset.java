@@ -1,22 +1,17 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.security.SecurityContext;
-
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 
 @Entity
 public class MapPreset extends Preset {
 
+	private double latCenter;
+	private double lonCenter;
+
 	public MapPreset() {
 	}
 
-	public MapPreset(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
-	private double latCenter;
-	private double lonCenter;
 
 	public double getLatCenter() {
 		return latCenter;

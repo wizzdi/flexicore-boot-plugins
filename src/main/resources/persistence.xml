@@ -20,6 +20,8 @@
         <class>com.flexicore.ui.model.MapPreset</class>
         <class>com.flexicore.category.model.Category</class>
         <class>com.flexicore.ui.model.PresetToPreset</class>
+        <class>com.flexicore.model.Role</class>
+        <class>com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

@@ -1,7 +1,5 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.security.SecurityContext;
-
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
@@ -9,10 +7,6 @@ import javax.persistence.Lob;
 public class ConfigurationPreset extends Preset {
 
 	public ConfigurationPreset() {
-	}
-
-	public ConfigurationPreset(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 	@Lob

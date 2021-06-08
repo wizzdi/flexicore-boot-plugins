@@ -1,6 +1,5 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.security.SecurityContext;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 import javax.persistence.Entity;
@@ -19,10 +18,6 @@ public class GridPreset extends Preset {
 
 
 	public GridPreset() {
-	}
-
-	public GridPreset(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 

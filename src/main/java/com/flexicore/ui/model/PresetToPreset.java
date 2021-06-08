@@ -1,14 +1,13 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class PresetToPreset extends Baseclass {
+public class PresetToPreset extends SecuredBasic {
 
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset parentPreset;
@@ -22,9 +21,6 @@ public class PresetToPreset extends Baseclass {
 	public PresetToPreset() {
 	}
 
-	public PresetToPreset(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@ManyToOne(targetEntity = Preset.class)
 	public Preset getParentPreset() {

@@ -1,6 +1,5 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
 
@@ -8,10 +7,6 @@ import javax.persistence.Entity;
 public class TableColumn extends UiField {
 
 	public TableColumn() {
-	}
-
-	public TableColumn(String name, SecurityContext securityContext) {
-		super(name, securityContext);
 	}
 
 	private boolean sortable;

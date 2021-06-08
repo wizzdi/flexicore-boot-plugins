@@ -1,13 +1,13 @@
 package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class FilterProperties extends Baseclass {
+public class FilterProperties extends SecuredBasic {
 
     private String filterPath;
     private boolean externalize;
@@ -17,9 +17,6 @@ public class FilterProperties extends Baseclass {
     public FilterProperties() {
     }
 
-    public FilterProperties(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     public boolean isExternalize() {
         return externalize;
