@@ -7,10 +7,7 @@
 package com.flexicore.category.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -21,7 +18,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 @Entity
 
-public class Category extends Baseclass {
+public class Category extends SecuredBasic {
 
 	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="category")
 	@JsonIgnore
@@ -30,15 +27,7 @@ public class Category extends Baseclass {
 	@JsonIgnore
 	@OneToMany(targetEntity = CategoryToClazz.class,mappedBy="category")
 	private List<CategoryToClazz> clazzes=new ArrayList<>();
-	
 
-	public Category() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public Category(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@JsonIgnore
 	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="category")

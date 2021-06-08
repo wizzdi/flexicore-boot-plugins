@@ -7,21 +7,15 @@
 package com.flexicore.category.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @SuppressWarnings("serial")
 @Entity
-public class CategoryToBaseClass extends Baseclass {
+public class CategoryToBaseClass extends SecuredBasic {
 
-	public CategoryToBaseClass() {
-	}
-
-	public CategoryToBaseClass(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@ManyToOne(targetEntity = Category.class)
 	private Category category;
