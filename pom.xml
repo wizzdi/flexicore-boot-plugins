@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>category-model</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>category-model</name>
     <description>FlexiCore service plugin , manages categories</description>
     <url>https://wizzdi.com</url>
@@ -233,11 +233,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
-                <configuration>
-                    <javadocExecutable>C:\Program Files\AdoptOpenJDK\jdk-8.0.212.03-hotspot\bin\javadoc.exe
-                    </javadocExecutable>
-                    <javadocVersion>1.8.0</javadocVersion>
-                </configuration>
             </plugin>
         </plugins>
     </build>
