@@ -56,7 +56,7 @@ public class CategoryRepository implements Plugin {
         Root<Category> r = q.from(Category.class);
         List<Predicate> preds = new ArrayList<>();
         addCategoriesPredicates(categoryFilter, r, q, cb, preds,securityContext);
-        q.select(r).where(preds.toArray(new Predicate[0]));
+        q.select(r).where(preds.toArray(new Predicate[0])).orderBy();
         TypedQuery<Category> query=em.createQuery(q);
         BasicRepository.addPagination(categoryFilter,query);
         return query.getResultList();
