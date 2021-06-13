@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>category-model</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <name>category-model</name>
     <description>FlexiCore service plugin , manages categories</description>
     <url>https://wizzdi.com</url>
@@ -50,7 +50,7 @@
         <connection>scm:git:git://wizzdi/category-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/category-model.git</developerConnection>
         <url>https://github.com/wizzdi/category-model</url>
-        <tag>category-model-2.0.0</tag>
+        <tag>category-model-${version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
