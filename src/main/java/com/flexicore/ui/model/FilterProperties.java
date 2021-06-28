@@ -1,6 +1,5 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
@@ -11,8 +10,8 @@ public class FilterProperties extends SecuredBasic {
 
     private String filterPath;
     private boolean externalize;
-    @ManyToOne(targetEntity = Baseclass.class)
-    private Baseclass relatedBaseclass;
+    @ManyToOne(targetEntity = Preset.class)
+    private Preset relatedBaseclass;
 
     public FilterProperties() {
     }
@@ -27,12 +26,12 @@ public class FilterProperties extends SecuredBasic {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = Baseclass.class)
-    public Baseclass getRelatedBaseclass() {
+    @ManyToOne(targetEntity = Preset.class)
+    public Preset getRelatedBaseclass() {
         return relatedBaseclass;
     }
 
-    public <T extends FilterProperties> T setRelatedBaseclass(Baseclass gridPreset) {
+    public <T extends FilterProperties> T setRelatedBaseclass(Preset gridPreset) {
         this.relatedBaseclass = gridPreset;
         return (T) this;
     }

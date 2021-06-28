@@ -17,6 +17,7 @@ public class PresetToPreset extends SecuredBasic {
 	private String parentPath;
 	@Lob
 	private String childPath;
+	private int ordinal;
 
 	public PresetToPreset() {
 	}
@@ -59,6 +60,15 @@ public class PresetToPreset extends SecuredBasic {
 
 	public <T extends PresetToPreset> T setChildPath(String targetPath) {
 		this.childPath = targetPath;
+		return (T) this;
+	}
+
+	public int getOrdinal() {
+		return ordinal;
+	}
+
+	public <T extends PresetToPreset> T setOrdinal(int ordinal) {
+		this.ordinal = ordinal;
 		return (T) this;
 	}
 }
