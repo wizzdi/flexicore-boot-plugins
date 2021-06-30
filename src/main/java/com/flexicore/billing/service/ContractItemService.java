@@ -2,11 +2,12 @@ package com.flexicore.billing.service;
 
 
 import com.flexicore.billing.data.ContractItemRepository;
+import com.flexicore.billing.interfaces.PaymentMethodService;
 import com.flexicore.billing.model.*;
 import com.flexicore.billing.model.Currency;
-import com.flexicore.billing.request.ContractItemCreate;
-import com.flexicore.billing.request.ContractItemFiltering;
-import com.flexicore.billing.request.ContractItemUpdate;
+import com.flexicore.billing.request.*;
+import com.flexicore.billing.response.ActivateContractItemResponse;
+import com.flexicore.billing.response.ActivateContractItemsResponse;
 import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -16,6 +17,7 @@ import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
@@ -40,6 +42,9 @@ public class ContractItemService implements Plugin {
 
     @Autowired
     private BasicService basicService;
+
+    @Autowired
+    private ObjectProvider<com.flexicore.billing.interfaces.PaymentMethodService> paymentMethodServices;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -180,7 +185,15 @@ public class ContractItemService implements Plugin {
         return contractItem;
     }
 
-    public void validate(ContractItemCreate creationContainer, SecurityContextBase securityContext) {
+    public void validate(ActivateContractItemsRequest activateContractItemsRequest, SecurityContextBase securityContext) {
+        if(activateContractItemsRequest.getContractItemFiltering()==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"contractItemFiltering must be provided");
+        }
+        validateFiltering(activateContractItemsRequest.getContractItemFiltering(),securityContext);
+    }
+
+
+        public void validate(ContractItemCreate creationContainer, SecurityContextBase securityContext) {
         basicService.validate(creationContainer, securityContext);
         String contractId = creationContainer.getContractId();
         Contract contract = contractId == null ? null : getByIdOrNull(contractId, Contract.class, null, securityContext);
@@ -209,5 +222,18 @@ public class ContractItemService implements Plugin {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PriceListToService with id " + priceListToServiceId);
         }
         creationContainer.setPriceListToService(priceListToService);
+    }
+
+    public ActivateContractItemsResponse activateContractItems(ActivateContractItemsRequest activateContractItemsRequest, SecurityContextBase securityContext) {
+
+        List<ContractItem> contractItems=listAllContractItems(securityContext, activateContractItemsRequest.getContractItemFiltering());
+        List<com.flexicore.billing.interfaces.PaymentMethodService> paymentMethodServices = this.paymentMethodServices.stream().collect(Collectors.toList());
+        List<ActivateContractItemResponse> activateContractItemResponses=new ArrayList<>();
+        for (ContractItem contractItem : contractItems) {
+             paymentMethodServices.stream().filter(f -> f.isType(contractItem.getContract().getAutomaticPaymentMethod().getPaymentMethodType()))
+                     .findFirst().map(f->f.activateContractItem(new ActivateContractItemRequest().setContractItem(contractItem))).ifPresent(activateContractItemResponses::add);
+
+        }
+        return new ActivateContractItemsResponse().setActivateContractItemResponse(activateContractItemResponses);
     }
 }

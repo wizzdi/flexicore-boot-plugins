@@ -136,6 +136,10 @@ public class InvoiceItemService implements Plugin {
             invoiceItem.setInvoice(creationContainer.getInvoice());
             update = true;
         }
+        if (creationContainer.getPayment() != null && (invoiceItem.getPayment() == null || !creationContainer.getPayment().getId().equals(invoiceItem.getPayment().getId()))) {
+            invoiceItem.setPayment(creationContainer.getPayment());
+            update = true;
+        }
         return update;
     }
 
@@ -164,6 +168,14 @@ public class InvoiceItemService implements Plugin {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Invoice with id " + invoiceId);
         }
         creationContainer.setInvoice(invoice);
+
+        String paymentId = creationContainer.getPaymentId();
+        Payment payment = paymentId == null ? null : getByIdOrNull(paymentId, Payment.class, null, securityContext);
+        if (payment == null && paymentId != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Payment with id " + paymentId);
+        }
+        creationContainer.setPayment(payment);
+
 
     }
 }

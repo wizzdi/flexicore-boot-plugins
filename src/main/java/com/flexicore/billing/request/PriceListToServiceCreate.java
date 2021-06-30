@@ -1,9 +1,7 @@
 package com.flexicore.billing.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.billing.model.BusinessService;
-import com.flexicore.billing.model.Currency;
-import com.flexicore.billing.model.PriceList;
+import com.flexicore.billing.model.*;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
 
@@ -19,6 +17,10 @@ public class PriceListToServiceCreate extends BasicCreate {
     private String currencyId;
     @JsonIgnore
     private Currency currency;
+    private PaymentType paymentType;
+    private BillingCycleGranularity billingCycleGranularity;
+    private Integer billingCycleInterval;
+    private Integer totalCycles;
 
     public String getPriceListId() {
         return priceListId;
@@ -83,6 +85,42 @@ public class PriceListToServiceCreate extends BasicCreate {
 
     public <T extends PriceListToServiceCreate> T setCurrency(Currency currency) {
         this.currency = currency;
+        return (T) this;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public <T extends PriceListToServiceCreate> T setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+        return (T) this;
+    }
+
+    public BillingCycleGranularity getBillingCycleGranularity() {
+        return billingCycleGranularity;
+    }
+
+    public <T extends PriceListToServiceCreate> T setBillingCycleGranularity(BillingCycleGranularity billingCycleGranularity) {
+        this.billingCycleGranularity = billingCycleGranularity;
+        return (T) this;
+    }
+
+    public Integer getBillingCycleInterval() {
+        return billingCycleInterval;
+    }
+
+    public <T extends PriceListToServiceCreate> T setBillingCycleInterval(Integer billingCycleInterval) {
+        this.billingCycleInterval = billingCycleInterval;
+        return (T) this;
+    }
+
+    public Integer getTotalCycles() {
+        return totalCycles;
+    }
+
+    public <T extends PriceListToServiceCreate> T setTotalCycles(Integer totalCycles) {
+        this.totalCycles = totalCycles;
         return (T) this;
     }
 }

@@ -79,9 +79,13 @@ public class PaymentMethodTypeService implements Plugin {
 
     public PaginationResponse<PaymentMethodType> getAllPaymentMethodTypes(
             SecurityContextBase securityContext, PaymentMethodTypeFiltering filtering) {
-        List<PaymentMethodType> list = repository.getAllPaymentMethodTypes(securityContext, filtering);
+        List<PaymentMethodType> list = listAllPaymentMethodTypes(securityContext, filtering);
         long count = repository.countAllPaymentMethodTypes(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
+    }
+
+    public List<PaymentMethodType> listAllPaymentMethodTypes(SecurityContextBase securityContext, PaymentMethodTypeFiltering filtering) {
+        return repository.getAllPaymentMethodTypes(securityContext, filtering);
     }
 
     public PaymentMethodType createPaymentMethodType(PaymentMethodTypeCreate creationContainer,

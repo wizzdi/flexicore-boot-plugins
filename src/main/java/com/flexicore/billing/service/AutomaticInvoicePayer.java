@@ -3,11 +3,10 @@ package com.flexicore.billing.service;
 
 import com.flexicore.billing.interfaces.PaymentMethodService;
 import com.flexicore.billing.model.*;
-import com.flexicore.billing.request.ContractItemFiltering;
 import com.flexicore.billing.request.InvoiceFiltering;
 import com.flexicore.billing.request.InvoiceItemFiltering;
-import com.flexicore.billing.request.PayRequest;
-import com.flexicore.billing.response.PayResponse;
+import com.flexicore.billing.request.CreditCustomerRequest;
+import com.flexicore.billing.response.CreditCustomerResponse;
 import com.flexicore.billing.response.PayStatus;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -60,22 +59,17 @@ public class AutomaticInvoicePayer implements Plugin {
                         Currency currency=currencyMap.get(invoiceByCurrencyEntry.getKey());
                         List<InvoiceItem> invoiceItemsForCurrency=invoiceByCurrencyEntry.getValue();
                         long sum = invoiceItemsForCurrency.stream().mapToLong(f -> f.getContractItem().getPriceListToService().getPrice()).sum();
-                        PayRequest payRequest=new PayRequest()
+                        CreditCustomerRequest creditCustomerRequest =new CreditCustomerRequest()
                                 .setInvoiceItem(invoiceItemsForCurrency)
                                 .setInvoice(invoice)
                                 .setCents(sum)
                                 .setCurrency(currency)
                                 .setPaymentMethod(invoice.getContract().getAutomaticPaymentMethod());
-                        paymentMethodServices.stream().filter(f->f.canHandle(payRequest)).findFirst().ifPresent(f->{
-                            PayResponse pay = f.pay(payRequest);
-                            if(PayStatus.COMPLETE.equals(pay.getPayStatus())){
-                                for (InvoiceItem invoiceItem : invoiceItemsForCurrency) {
-                                    invoiceItem.setPaymentReference(pay.getTransactionId());
-                                    invoiceItem.setDatePaid(OffsetDateTime.now());
-                                    toMerge.add(invoiceItem);
-                                }
-                            }
-                        });
+                        paymentMethodServices.stream()
+                                .filter(f->f.isType(creditCustomerRequest.getPaymentMethod().getPaymentMethodType()))
+                                .findFirst()
+                                .map(f->f.creditCustomer(creditCustomerRequest))
+                                .ifPresent(f-> logger.info("credit customer response: "+f));
 
                     }
                     count++;

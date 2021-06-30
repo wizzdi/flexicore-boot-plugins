@@ -4,6 +4,8 @@ import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
+import java.util.Set;
+
 public class ContractFiltering extends PaginationFilter {
     private BasicPropertiesFilter basicPropertiesFilter;
     private DateFilter nextChargeDate;
@@ -25,4 +27,5 @@ public class ContractFiltering extends PaginationFilter {
         this.nextChargeDate = nextChargeDate;
         return (T) this;
     }
+
 }

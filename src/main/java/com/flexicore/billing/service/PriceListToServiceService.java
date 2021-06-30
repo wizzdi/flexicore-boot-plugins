@@ -106,9 +106,13 @@ public class PriceListToServiceService implements Plugin {
 
     public PaginationResponse<PriceListToService> getAllPriceListToServices(
             SecurityContextBase securityContext, PriceListToServiceFiltering filtering) {
-        List<PriceListToService> list = repository.getAllPriceListToServices(securityContext, filtering);
+        List<PriceListToService> list = listAllPriceListToServices(securityContext, filtering);
         long count = repository.countAllPriceListToServices(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
+    }
+
+    public List<PriceListToService> listAllPriceListToServices(SecurityContextBase securityContext, PriceListToServiceFiltering filtering) {
+        return repository.getAllPriceListToServices(securityContext, filtering);
     }
 
     public PriceListToService createPriceListToService(PriceListToServiceCreate creationContainer,
@@ -151,7 +155,22 @@ public class PriceListToServiceService implements Plugin {
             priceListToService.setPrice(creationContainer.getPrice());
             update = true;
         }
-
+        if (creationContainer.getBillingCycleGranularity() != null && !creationContainer.getBillingCycleGranularity().equals(priceListToService.getBillingCycleGranularity())) {
+            priceListToService.setBillingCycleGranularity(creationContainer.getBillingCycleGranularity());
+            update = true;
+        }
+        if (creationContainer.getPaymentType() != null && !creationContainer.getPaymentType().equals(priceListToService.getPaymentType())) {
+            priceListToService.setPaymentType(creationContainer.getPaymentType());
+            update = true;
+        }
+        if (creationContainer.getTotalCycles() != null && !creationContainer.getTotalCycles().equals(priceListToService.getTotalCycles())) {
+            priceListToService.setTotalCycles(creationContainer.getTotalCycles());
+            update = true;
+        }
+        if (creationContainer.getBillingCycleInterval() != null && !creationContainer.getBillingCycleInterval().equals(priceListToService.getBillingCycleInterval())) {
+            priceListToService.setBillingCycleInterval(creationContainer.getBillingCycleInterval());
+            update = true;
+        }
         return update;
     }
 

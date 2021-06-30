@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Set;
 
 public class InvoiceFiltering extends PaginationFilter {
-private BasicPropertiesFilter basicPropertiesFilter;
+    private BasicPropertiesFilter basicPropertiesFilter;
 
-    private Set<String> paymentMethodIds=new HashSet<>();
-    @JsonIgnore
-    private List<PaymentMethod> paymentMethods;
     private boolean unpaid;
-    private boolean automatic;
+    private Boolean automatic;
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
         return basicPropertiesFilter;
@@ -27,33 +24,6 @@ private BasicPropertiesFilter basicPropertiesFilter;
         return (T) this;
     }
 
-    public Set<String> getPaymentMethodIds() {
-        return paymentMethodIds;
-    }
-
-    public <T extends InvoiceFiltering> T setPaymentMethodIds(Set<String> paymentMethodIds) {
-        this.paymentMethodIds = paymentMethodIds;
-        return (T) this;
-    }
-
-    @JsonIgnore
-    public List<PaymentMethod> getPaymentMethods() {
-        return paymentMethods;
-    }
-
-    public <T extends InvoiceFiltering> T setPaymentMethods(List<PaymentMethod> paymentMethods) {
-        this.paymentMethods = paymentMethods;
-        return (T) this;
-    }
-
-    public boolean isUnpaid() {
-        return unpaid;
-    }
-
-    public <T extends InvoiceFiltering> T setUnpaid(boolean unpaid) {
-        this.unpaid = unpaid;
-        return (T) this;
-    }
 
     public boolean isAutomatic() {
         return automatic;
@@ -61,6 +31,15 @@ private BasicPropertiesFilter basicPropertiesFilter;
 
     public <T extends InvoiceFiltering> T setAutomatic(boolean automatic) {
         this.automatic = automatic;
+        return (T) this;
+    }
+
+    public Boolean isUnpaid() {
+        return unpaid;
+    }
+
+    public <T extends InvoiceFiltering> T setUnpaid(Boolean unpaid) {
+        this.unpaid = unpaid;
         return (T) this;
     }
 }

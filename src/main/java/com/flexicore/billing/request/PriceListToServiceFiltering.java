@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Set;
 
 public class PriceListToServiceFiltering extends PaginationFilter {
-private BasicPropertiesFilter basicPropertiesFilter;
+    private BasicPropertiesFilter basicPropertiesFilter;
 
-    private Set<String> priceListIds=new HashSet<>();
+    private Set<String> priceListIds = new HashSet<>();
     @JsonIgnore
     private List<PriceList> priceLists;
-    private Set<String> businessServiceIds=new HashSet<>();
+    private Set<String> businessServiceIds = new HashSet<>();
     @JsonIgnore
     private List<BusinessService> businessServices;
-    private Set<String> currencyIds=new HashSet<>();
+    private Set<String> currencyIds = new HashSet<>();
     @JsonIgnore
     private List<Currency> currencies;
 

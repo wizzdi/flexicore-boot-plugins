@@ -10,9 +10,7 @@ import java.time.OffsetDateTime;
 
 public class InvoiceCreate extends BasicCreate {
 
-    private String usedPaymentMethodId;
-    @JsonIgnore
-    private PaymentMethod usedPaymentMethod;
+
     @JsonIgnore
     private Customer customer;
     @JsonIgnore
@@ -20,24 +18,6 @@ public class InvoiceCreate extends BasicCreate {
     @JsonIgnore
     private OffsetDateTime invoiceDate;
 
-    public String getUsedPaymentMethodId() {
-        return usedPaymentMethodId;
-    }
-
-    public <T extends InvoiceCreate> T setUsedPaymentMethodId(String usedPaymentMethodId) {
-        this.usedPaymentMethodId = usedPaymentMethodId;
-        return (T) this;
-    }
-
-    @JsonIgnore
-    public PaymentMethod getUsedPaymentMethod() {
-        return usedPaymentMethod;
-    }
-
-    public <T extends InvoiceCreate> T setUsedPaymentMethod(PaymentMethod usedPaymentMethod) {
-        this.usedPaymentMethod = usedPaymentMethod;
-        return (T) this;
-    }
 
     @JsonIgnore
     public Customer getCustomer() {

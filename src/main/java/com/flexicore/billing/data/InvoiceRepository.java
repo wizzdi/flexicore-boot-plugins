@@ -62,20 +62,14 @@ return query.getSingleResult();
 		securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb,q,r,preds,securityContext);
 
 
-		if (filtering.getPaymentMethods() != null && !filtering.getPaymentMethods().isEmpty()) {
-			Set<String> ids = filtering.getPaymentMethods().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-			Join<T, PaymentMethod> join = r.join(Invoice_.usedPaymentMethod);
-			preds.add(join.get(PaymentMethod_.id).in(ids));
-		}
-
-		if(filtering.isUnpaid()){
-			Join<T,InvoiceItem> join=r.join(Invoice_.invoiceItems);
-			preds.add(join.get(InvoiceItem_.datePaid).isNull());
-		}
-
 		if(filtering.isAutomatic()){
 			Join<T,Contract> join=r.join(Invoice_.contract);
 			preds.add(join.get(Contract_.automaticPaymentMethod).isNotNull());
+		}
+		if(filtering.isUnpaid()!=null){
+			Join<T,InvoiceItem> join=r.join(Invoice_.invoiceItems);
+			Path<Payment> paymentPath = join.get(InvoiceItem_.payment);
+			preds.add(filtering.isUnpaid()?paymentPath.isNull():paymentPath.isNotNull());
 		}
 
 

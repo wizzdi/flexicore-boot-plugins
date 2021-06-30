@@ -6,9 +6,11 @@ import com.flexicore.annotations.OperationsInside;
 
 import com.flexicore.billing.model.ContractItem;
 import com.flexicore.billing.model.ContractItem_;
+import com.flexicore.billing.request.ActivateContractItemsRequest;
 import com.flexicore.billing.request.ContractItemCreate;
 import com.flexicore.billing.request.ContractItemFiltering;
 import com.flexicore.billing.request.ContractItemUpdate;
+import com.flexicore.billing.response.ActivateContractItemsResponse;
 import com.flexicore.billing.service.ContractItemService;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -34,6 +36,19 @@ public class ContractItemController implements Plugin {
 
     @Autowired
     private ContractItemService service;
+
+    @PostMapping("/activateContractItems")
+    @Operation(summary = "activateContractItems", description = "activateContractItems")
+    @IOperation(Name = "activateContractItems", Description = "activateContractItems")
+    public ActivateContractItemsResponse activateContractItems(
+
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody ActivateContractItemsRequest activateContractItemsRequest,
+            @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(activateContractItemsRequest, securityContext);
+
+        return service.activateContractItems(activateContractItemsRequest, securityContext);
+    }
 
 
     @Operation(summary = "getAllContractItems", description = "Lists all ContractItems")

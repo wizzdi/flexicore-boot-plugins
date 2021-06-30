@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Set;
 
 public class ContractItemFiltering extends PaginationFilter {
-private BasicPropertiesFilter basicPropertiesFilter;
+    private BasicPropertiesFilter basicPropertiesFilter;
 
-    private Set<String> businessServiceIds=new HashSet<>();
+    private Set<String> businessServiceIds = new HashSet<>();
     @JsonIgnore
     private List<BusinessService> businessServices;
 
-    private Set<String> priceListToServiceIds=new HashSet<>();
+    private Set<String> priceListToServiceIds = new HashSet<>();
     @JsonIgnore
     private List<PriceListToService> priceListToService;
 
 
-    private Set<String> contractIds=new HashSet<>();
+    private Set<String> contractIds = new HashSet<>();
     @JsonIgnore
     private List<Contract> contracts;
 
@@ -92,4 +92,5 @@ private BasicPropertiesFilter basicPropertiesFilter;
         this.contracts = contracts;
         return (T) this;
     }
+
 }

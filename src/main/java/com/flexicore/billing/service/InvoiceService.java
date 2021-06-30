@@ -81,13 +81,7 @@ public class InvoiceService implements Plugin {
     public void validateFiltering(InvoiceFiltering filtering,
                                   SecurityContextBase securityContext) {
         basicService.validate(filtering, securityContext);
-        Set<String> paymentMethodIds = filtering.getPaymentMethodIds();
-        Map<String, PaymentMethod> paymentMethodMap = paymentMethodIds.isEmpty() ? new HashMap<>() : listByIds(PaymentMethod.class, paymentMethodIds, PaymentMethod_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        paymentMethodIds.removeAll(paymentMethodMap.keySet());
-        if (!paymentMethodIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PaymentMethod with ids " + paymentMethodIds);
-        }
-        filtering.setPaymentMethods(new ArrayList<>(paymentMethodMap.values()));
+
     }
 
     public PaginationResponse<Invoice> getAllInvoices(
@@ -121,11 +115,6 @@ public class InvoiceService implements Plugin {
 
     private boolean updateInvoiceNoMerge(Invoice invoice, InvoiceCreate creationContainer) {
         boolean update = basicService.updateBasicNoMerge(creationContainer, invoice);
-        if (creationContainer.getUsedPaymentMethod() != null && (invoice.getUsedPaymentMethod() == null || !creationContainer.getUsedPaymentMethod().getId().equals(invoice.getUsedPaymentMethod().getId()))) {
-            invoice.setUsedPaymentMethod(creationContainer.getUsedPaymentMethod());
-            update = true;
-        }
-
         if (creationContainer.getContract() != null && (invoice.getContract() == null || !creationContainer.getContract().getId().equals(invoice.getContract().getId()))) {
             invoice.setContract(creationContainer.getContract());
             update = true;
@@ -151,12 +140,7 @@ public class InvoiceService implements Plugin {
     public void validate(InvoiceCreate creationContainer,
                          SecurityContextBase securityContext) {
         basicService.validate(creationContainer, securityContext);
-        String usedPaymentMethodId = creationContainer.getUsedPaymentMethodId();
-        PaymentMethod paymentMethod = usedPaymentMethodId == null ? null : getByIdOrNull(usedPaymentMethodId, PaymentMethod.class, null, securityContext);
-        if (paymentMethod == null && usedPaymentMethodId != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PaymentMethod with id " + usedPaymentMethodId);
-        }
-        creationContainer.setUsedPaymentMethod(paymentMethod);
+
 
     }
 }

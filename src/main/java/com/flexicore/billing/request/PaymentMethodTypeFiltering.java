@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.Set;
 
 public class PaymentMethodTypeFiltering extends PaginationFilter {
-private BasicPropertiesFilter basicPropertiesFilter;
+    private BasicPropertiesFilter basicPropertiesFilter;
 
     private Set<String> canonicalClassNames;
 
