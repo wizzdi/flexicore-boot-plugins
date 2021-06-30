@@ -16,6 +16,10 @@ public class PriceListToService extends SecuredBasic {
     private long price;
     @ManyToOne(targetEntity = Currency.class)
     private Currency currency;
+    private PaymentType paymentType;
+    private BillingCycleGranularity billingCycleGranularity;
+    private int billingCycleInterval;
+    private int totalCycles;
 
     public PriceListToService() {
     }
@@ -56,6 +60,42 @@ public class PriceListToService extends SecuredBasic {
 
     public <T extends PriceListToService> T setCurrency(Currency currency) {
         this.currency = currency;
+        return (T) this;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
+    }
+
+    public <T extends PriceListToService> T setPaymentType(PaymentType paymentType) {
+        this.paymentType = paymentType;
+        return (T) this;
+    }
+
+    public BillingCycleGranularity getBillingCycleGranularity() {
+        return billingCycleGranularity;
+    }
+
+    public <T extends PriceListToService> T setBillingCycleGranularity(BillingCycleGranularity billingCycleGranularity) {
+        this.billingCycleGranularity = billingCycleGranularity;
+        return (T) this;
+    }
+
+    public int getBillingCycleInterval() {
+        return billingCycleInterval;
+    }
+
+    public <T extends PriceListToService> T setBillingCycleInterval(int billingCycleInterval) {
+        this.billingCycleInterval = billingCycleInterval;
+        return (T) this;
+    }
+
+    public int getTotalCycles() {
+        return totalCycles;
+    }
+
+    public <T extends PriceListToService> T setTotalCycles(int totalCycles) {
+        this.totalCycles = totalCycles;
         return (T) this;
     }
 }
