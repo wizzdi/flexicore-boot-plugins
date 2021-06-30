@@ -15,6 +15,7 @@
         <class>com.flexicore.billing.model.PaymentMethodType</class>
         <class>com.flexicore.billing.model.PriceList</class>
         <class>com.flexicore.billing.model.PriceListToService</class>
+        <class>com.flexicore.billing.model.Payment</class>
         <class>com.flexicore.model.Baseclass</class>
         <class>com.flexicore.organization.model.Customer</class>
         <class>com.flexicore.model.Basic</class>

@@ -5,6 +5,8 @@ import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import java.lang.annotation.Target;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -14,8 +16,9 @@ public class InvoiceItem extends SecuredBasic {
     private Invoice invoice;
     @ManyToOne(targetEntity = ContractItem.class)
     private ContractItem contractItem;
-    private OffsetDateTime datePaid;
-    private String paymentReference;
+    @ManyToOne(targetEntity = Payment.class)
+    private Payment payment;
+
 
     public InvoiceItem() {
     }
@@ -41,21 +44,13 @@ public class InvoiceItem extends SecuredBasic {
         return (T) this;
     }
 
-    public OffsetDateTime getDatePaid() {
-        return datePaid;
+    @ManyToOne(targetEntity = Payment.class)
+    public Payment getPayment() {
+        return payment;
     }
 
-    public <T extends InvoiceItem> T setDatePaid(OffsetDateTime datePayed) {
-        this.datePaid = datePayed;
-        return (T) this;
-    }
-
-    public String getPaymentReference() {
-        return paymentReference;
-    }
-
-    public <T extends InvoiceItem> T setPaymentReference(String paymentReference) {
-        this.paymentReference = paymentReference;
+    public <T extends InvoiceItem> T setPayment(Payment payment) {
+        this.payment = payment;
         return (T) this;
     }
 }

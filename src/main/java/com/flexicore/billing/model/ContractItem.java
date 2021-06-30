@@ -24,6 +24,8 @@ public class ContractItem extends SecuredBasic {
     private OffsetDateTime validFrom;
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime validTo;
+    private ContractItemStatus contractItemStatus;
+    private String externalId;
 
     public ContractItem() {
     }
@@ -93,6 +95,24 @@ public class ContractItem extends SecuredBasic {
 
     public <T extends ContractItem> T setValidTo(OffsetDateTime validTo) {
         this.validTo = validTo;
+        return (T) this;
+    }
+
+    public ContractItemStatus getContractItemStatus() {
+        return contractItemStatus;
+    }
+
+    public <T extends ContractItem> T setContractItemStatus(ContractItemStatus contractItemStatus) {
+        this.contractItemStatus = contractItemStatus;
+        return (T) this;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends ContractItem> T setExternalId(String externalId) {
+        this.externalId = externalId;
         return (T) this;
     }
 }

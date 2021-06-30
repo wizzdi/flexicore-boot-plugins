@@ -15,8 +15,7 @@ import java.util.List;
 @Entity
 public class Invoice extends SecuredBasic {
 
-    @ManyToOne(targetEntity = PaymentMethod.class)
-    private PaymentMethod usedPaymentMethod;
+
     @JsonIgnore
     @OneToMany(targetEntity = InvoiceItem.class,mappedBy = "invoice")
     private List<InvoiceItem> invoiceItems=new ArrayList<>();
@@ -39,15 +38,6 @@ public class Invoice extends SecuredBasic {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = PaymentMethod.class)
-    public PaymentMethod getUsedPaymentMethod() {
-        return usedPaymentMethod;
-    }
-
-    public <T extends Invoice> T setUsedPaymentMethod(PaymentMethod usedPaymentMethod) {
-        this.usedPaymentMethod = usedPaymentMethod;
-        return (T) this;
-    }
 
 
     public OffsetDateTime getInvoiceDate() {
