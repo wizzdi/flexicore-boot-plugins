@@ -17,7 +17,7 @@ import java.util.Map;
 @Entity
 public class CellContent extends SecuredBasic {
 
-    @Column(columnDefinition = "jsonb")
+   
     @Convert(converter = JsonConverter.class)
     @DynamicColumnDefinition
     private Map<String, Object> jsonNode;
@@ -43,7 +43,7 @@ public class CellContent extends SecuredBasic {
     }
 
     @JsonIgnore
-    @Column(columnDefinition = "jsonb")
+   
     @Convert(converter = JsonConverter.class)
     @DynamicColumnDefinition
     public Map<String, Object> getJsonNode() {
@@ -59,4 +59,6 @@ public class CellContent extends SecuredBasic {
         this.jsonNode = jsonNode;
         return (T) this;
     }
+    
+    
 }

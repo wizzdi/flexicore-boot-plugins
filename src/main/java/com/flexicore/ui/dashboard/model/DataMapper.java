@@ -19,7 +19,7 @@ import java.util.Map;
 public class DataMapper extends SecuredBasic {
 
     @DynamicColumnDefinition
-    @Column(columnDefinition = "jsonb")
+   
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> jsonNode;
 
@@ -86,7 +86,7 @@ public class DataMapper extends SecuredBasic {
 
     @DynamicColumnDefinition
     @JsonIgnore
-    @Column(columnDefinition = "jsonb")
+   
     @Convert(converter = JsonConverter.class)
     public Map<String, Object> getJsonNode() {
         return jsonNode;

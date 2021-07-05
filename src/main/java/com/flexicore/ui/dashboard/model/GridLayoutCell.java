@@ -1,16 +1,17 @@
 package com.flexicore.ui.dashboard.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecuredBasic;
 import com.flexicore.security.SecurityContext;
+import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class GridLayoutCell extends SecuredBasic {
@@ -23,6 +24,11 @@ public class GridLayoutCell extends SecuredBasic {
     @JsonIgnore
     @OneToMany(targetEntity = CellToLayout.class)
     private List<CellToLayout> cellToLayouts=new ArrayList<>();
+
+    @Convert(converter = JsonConverter.class)
+    @DynamicColumnDefinition
+    private Map<String, Object> jsonNode;
+
 
     public GridLayoutCell() {
         super();
@@ -56,6 +62,23 @@ public class GridLayoutCell extends SecuredBasic {
 
     public <T extends GridLayoutCell> T setCellToLayouts(List<CellToLayout> cellToLayouts) {
         this.cellToLayouts = cellToLayouts;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    @Convert(converter = JsonConverter.class)
+    @DynamicColumnDefinition
+    public Map<String, Object> getJsonNode() {
+        return jsonNode;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return jsonNode;
+    }
+
+    public <T extends SecuredBasic> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
         return (T) this;
     }
 
