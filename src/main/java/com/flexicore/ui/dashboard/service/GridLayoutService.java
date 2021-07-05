@@ -1,15 +1,18 @@
 package com.flexicore.ui.dashboard.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+
+import com.flexicore.model.Basic;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GridLayoutRepository;
 import com.flexicore.ui.dashboard.model.GridLayout;
 import com.flexicore.ui.dashboard.request.GridLayoutCreate;
-import com.flexicore.ui.dashboard.request.GridLayoutFiltering;
+import com.flexicore.ui.dashboard.request.GridLayoutFilter;
 import com.flexicore.ui.dashboard.request.GridLayoutUpdate;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -17,25 +20,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.BadRequestException;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
-@PluginInfo(version = 1)
+import javax.persistence.metamodel.SingularAttribute;
+import java.util.*;
+
+
 @Extension
 @Component
-public class GridLayoutService implements ServicePlugin {
+public class GridLayoutService implements Plugin {
 
 	private static final Logger logger= LoggerFactory.getLogger(GridLayoutService.class);
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private GridLayoutRepository gridLayoutRepository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService  baseclassNewService;
 
-	public GridLayout updateGridLayout(GridLayoutUpdate gridLayoutUpdate, SecurityContext securityContext) {
+	public GridLayout updateGridLayout(GridLayoutUpdate gridLayoutUpdate, SecurityContextBase securityContext) {
 		if (GridLayoutUpdateNoMerge(gridLayoutUpdate,
 				gridLayoutUpdate.getGridLayout())) {
 			gridLayoutRepository.merge(gridLayoutUpdate.getGridLayout());
@@ -44,26 +48,26 @@ public class GridLayoutService implements ServicePlugin {
 	}
 
 	public boolean GridLayoutUpdateNoMerge(GridLayoutCreate gridLayoutCreate, GridLayout gridLayout) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(gridLayoutCreate, gridLayout);
+		boolean update = baseclassNewService.updateBasicNoMerge(gridLayoutCreate, gridLayout);
+		Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(gridLayoutCreate.any(), gridLayout.any());
+		if (map != null) {
+			gridLayout.setJsonNode(map);
+			update = true;
+		}
 
 		return update;
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-												 List<String> batchString, SecurityContext securityContext) {
-		return gridLayoutRepository.getByIdOrNull(id, c, batchString,
-				securityContext);
-	}
 
 	public List<GridLayout> listAllGridLayout(
-			GridLayoutFiltering gridLayoutFiltering,
-			SecurityContext securityContext) {
-		return gridLayoutRepository.listAllGridLayout(gridLayoutFiltering,
+			GridLayoutFilter gridLayoutFilter,
+			SecurityContextBase securityContext) {
+		return gridLayoutRepository.listAllGridLayout(gridLayoutFilter,
 				securityContext);
 	}
 
 	public GridLayout createGridLayout(GridLayoutCreate createGridLayout,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		GridLayout gridLayout = createGridLayoutNoMerge(createGridLayout,
 				securityContext);
 		gridLayoutRepository.merge(gridLayout);
@@ -72,32 +76,72 @@ public class GridLayoutService implements ServicePlugin {
 	}
 
 	public GridLayout createGridLayoutNoMerge(
-			GridLayoutCreate createGridLayout, SecurityContext securityContext) {
-		GridLayout gridLayout = new GridLayout(createGridLayout.getName(), securityContext);
+			GridLayoutCreate createGridLayout, SecurityContextBase securityContext) {
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.setId(UUID.randomUUID().toString());
 		GridLayoutUpdateNoMerge(createGridLayout, gridLayout);
+		BaseclassService.createSecurityObjectNoMerge(gridLayout,securityContext);
 		return gridLayout;
 	}
 
 	public PaginationResponse<GridLayout> getAllGridLayout(
-			GridLayoutFiltering gridLayoutFiltering,
-			SecurityContext securityContext) {
-		List<GridLayout> list = listAllGridLayout(gridLayoutFiltering,
+			GridLayoutFilter gridLayoutFilter,
+			SecurityContextBase securityContext) {
+		List<GridLayout> list = listAllGridLayout(gridLayoutFilter,
 				securityContext);
 		long count = gridLayoutRepository.countAllGridLayout(
-				gridLayoutFiltering, securityContext);
-		return new PaginationResponse<>(list, gridLayoutFiltering, count);
+				gridLayoutFilter, securityContext);
+		return new PaginationResponse<>(list, gridLayoutFilter, count);
 	}
 
 	public void validate(GridLayoutCreate createGridLayout,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createGridLayout, securityContext);
 
 	}
 
-	public void validate(GridLayoutFiltering gridLayoutFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(gridLayoutFiltering, securityContext);
+	public void validate(GridLayoutFilter gridLayoutFilter,
+						 SecurityContextBase securityContext) {
+		baseclassNewService.validate(gridLayoutFilter, securityContext);
 
 	}
 
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return gridLayoutRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return gridLayoutRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return gridLayoutRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return gridLayoutRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return gridLayoutRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return gridLayoutRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return gridLayoutRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		gridLayoutRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		gridLayoutRepository.massMerge(toMerge);
+	}
 }

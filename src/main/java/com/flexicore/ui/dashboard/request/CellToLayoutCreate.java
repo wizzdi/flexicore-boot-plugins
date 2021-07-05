@@ -1,14 +1,14 @@
 package com.flexicore.ui.dashboard.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.request.BaseclassCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.model.DashboardPreset;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
 
 
 
-public class CellToLayoutCreate extends BaseclassCreate {
+public class CellToLayoutCreate extends BasicCreate{
 
     private String gridLayoutCellId;
     @JsonIgnore

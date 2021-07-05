@@ -3,38 +3,40 @@ package com.flexicore.ui.dashboard.request;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.flexicore.ui.dashboard.model.GridLayout;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class GridLayoutCellCreate extends BasicCreate{
+public class GridLayoutCellFilter extends PaginationFilter {
 
+    private Set<String> gridLayoutIds=new HashSet<>();
 
-    private String gridLayoutId;
     @JsonIgnore
-    private GridLayout gridLayout;
+    private List<GridLayout> gridLayouts;
 
 
-    public String getGridLayoutId() {
-        return gridLayoutId;
+    public Set<String> getGridLayoutIds() {
+        return gridLayoutIds;
     }
 
-    public <T extends GridLayoutCellCreate> T setGridLayoutId(String gridLayoutId) {
-        this.gridLayoutId = gridLayoutId;
+    public <T extends GridLayoutCellFilter> T setGridLayoutIds(Set<String> gridLayoutIds) {
+        this.gridLayoutIds = gridLayoutIds;
         return (T) this;
     }
 
     @JsonIgnore
-    public GridLayout getGridLayout() {
-        return gridLayout;
+    public List<GridLayout> getGridLayouts() {
+        return gridLayouts;
     }
 
-    public <T extends GridLayoutCellCreate> T setGridLayout(GridLayout gridLayout) {
-        this.gridLayout = gridLayout;
+    public <T extends GridLayoutCellFilter> T setGridLayouts(List<GridLayout> gridLayouts) {
+        this.gridLayouts = gridLayouts;
         return (T) this;
     }
-
 
    private Map<String, Object> jsonNode;
 
@@ -53,7 +55,7 @@ public class GridLayoutCellCreate extends BasicCreate{
         jsonNode.put(key, value);
     }
 
-    public <T extends GridLayoutCellCreate> T setJsonNode(Map<String, Object> jsonNode) {
+    public <T extends GridLayoutCellFilter> T setJsonNode(Map<String, Object> jsonNode) {
         this.jsonNode = jsonNode;
         return (T) this;
     }

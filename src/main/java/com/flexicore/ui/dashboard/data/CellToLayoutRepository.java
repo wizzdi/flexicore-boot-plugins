@@ -1,56 +1,70 @@
 package com.flexicore.ui.dashboard.data;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.interfaces.AbstractRepositoryPlugin;
-import com.flexicore.model.QueryInformationHolder;
+import com.flexicore.model.Baseclass;
+import com.flexicore.model.Basic;
+import com.wizzdi.flexicore.security.data.BasicRepository;
+import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
+import javax.persistence.metamodel.SingularAttribute;
 
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+
 import com.flexicore.ui.dashboard.model.*;
-import com.flexicore.ui.dashboard.request.CellToLayoutFiltering;
+import com.flexicore.ui.dashboard.request.CellToLayoutFilter;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@PluginInfo(version = 1)
+
 @Extension
 @Component
-public class CellToLayoutRepository extends AbstractRepositoryPlugin {
+public class CellToLayoutRepository implements Plugin{
+@PersistenceContext
+private EntityManager em;
+@Autowired
+private SecuredBasicRepository securedBasicRepository;
 
-	public List<CellToLayout> listAllCellToLayout(CellToLayoutFiltering cellToLayoutFiltering,
-														SecurityContext securityContext) {
+	public List<CellToLayout> listAllCellToLayout(CellToLayoutFilter cellToLayoutFilter,
+                                                  SecurityContextBase securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<CellToLayout> q = cb.createQuery(CellToLayout.class);
 		Root<CellToLayout> r = q.from(CellToLayout.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCellToLayoutPredicates(preds, cb, r, cellToLayoutFiltering);
-		QueryInformationHolder<CellToLayout> queryInformationHolder = new QueryInformationHolder<>(
-				cellToLayoutFiltering, CellToLayout.class, securityContext);
-		return getAllFiltered(queryInformationHolder, preds, cb, q, r);
+		addCellToLayoutPredicates(preds, cb,q, r, cellToLayoutFilter,securityContext);
+  q.select(r).where(preds.toArray(new Predicate[0]));
+        TypedQuery<CellToLayout> query = em.createQuery(q);
+        BasicRepository.addPagination(cellToLayoutFilter, query);
+        return query.getResultList();
 	}
 
-	private void addCellToLayoutPredicates(List<Predicate> preds, CriteriaBuilder cb,
-			Root<CellToLayout> r, CellToLayoutFiltering cellToLayoutFiltering) {
+	public <T extends CellToLayout> void addCellToLayoutPredicates(List<Predicate> preds, CriteriaBuilder cb,
+                                                                   CommonAbstractCriteria q, From<?,T> r, CellToLayoutFilter cellToLayoutFilter, SecurityContextBase securityContext) {
 
-		if(cellToLayoutFiltering.getCellContents()!=null &&!cellToLayoutFiltering.getCellContents().isEmpty()){
-			Set<String> ids=cellToLayoutFiltering.getCellContents().stream().map(f->f.getId()).collect(Collectors.toSet());
-			Join<CellToLayout, CellContent> join=r.join(CellToLayout_.cellContent);
+		if(cellToLayoutFilter.getCellContents()!=null &&!cellToLayoutFilter.getCellContents().isEmpty()){
+			Set<String> ids= cellToLayoutFilter.getCellContents().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<T, CellContent> join=r.join(CellToLayout_.cellContent);
 			preds.add(join.get(CellContent_.id).in(ids));
 		}
 
-		if(cellToLayoutFiltering.getDashboardPresets()!=null &&!cellToLayoutFiltering.getDashboardPresets().isEmpty()){
-			Set<String> ids=cellToLayoutFiltering.getDashboardPresets().stream().map(f->f.getId()).collect(Collectors.toSet());
-			Join<CellToLayout, DashboardPreset> join=r.join(CellToLayout_.dashboardPreset);
+		if(cellToLayoutFilter.getDashboardPresets()!=null &&!cellToLayoutFilter.getDashboardPresets().isEmpty()){
+			Set<String> ids= cellToLayoutFilter.getDashboardPresets().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<T, DashboardPreset> join=r.join(CellToLayout_.dashboardPreset);
 			preds.add(join.get(DashboardPreset_.id).in(ids));
 		}
 
-		if(cellToLayoutFiltering.getGridLayoutCells()!=null &&!cellToLayoutFiltering.getGridLayoutCells().isEmpty()){
-			Set<String> ids=cellToLayoutFiltering.getGridLayoutCells().stream().map(f->f.getId()).collect(Collectors.toSet());
-			Join<CellToLayout, GridLayoutCell> join=r.join(CellToLayout_.gridLayoutCell);
+		if(cellToLayoutFilter.getGridLayoutCells()!=null &&!cellToLayoutFilter.getGridLayoutCells().isEmpty()){
+			Set<String> ids= cellToLayoutFilter.getGridLayoutCells().stream().map(f->f.getId()).collect(Collectors.toSet());
+			Join<T, GridLayoutCell> join=r.join(CellToLayout_.gridLayoutCell);
 			preds.add(join.get(GridLayoutCell_.id).in(ids));
 		}
 
@@ -58,15 +72,54 @@ public class CellToLayoutRepository extends AbstractRepositoryPlugin {
 
 	}
 
-	public long countAllCellToLayout(CellToLayoutFiltering cellToLayoutFiltering,
-			SecurityContext securityContext) {
+	public long countAllCellToLayout(CellToLayoutFilter cellToLayoutFilter,
+                                     SecurityContextBase securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<CellToLayout> r = q.from(CellToLayout.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCellToLayoutPredicates(preds, cb, r, cellToLayoutFiltering);
-		QueryInformationHolder<CellToLayout> queryInformationHolder = new QueryInformationHolder<>(
-				cellToLayoutFiltering, CellToLayout.class, securityContext);
-		return countAllFiltered(queryInformationHolder, preds, cb, q, r);
+		addCellToLayoutPredicates(preds, cb,q, r, cellToLayoutFilter,securityContext);
+       q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
+        TypedQuery<Long> query = em.createQuery(q);
+        return query.getSingleResult();
+	}
+
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return securedBasicRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return securedBasicRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return securedBasicRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return securedBasicRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		securedBasicRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		securedBasicRepository.massMerge(toMerge);
 	}
 }

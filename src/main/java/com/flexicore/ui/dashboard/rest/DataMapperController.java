@@ -1,67 +1,66 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.DataMapper;
 import com.flexicore.ui.dashboard.request.DataMapperCreate;
-import com.flexicore.ui.dashboard.request.DataMapperFiltering;
+import com.flexicore.ui.dashboard.request.DataMapperFilter;
 import com.flexicore.ui.dashboard.request.DataMapperUpdate;
 import com.flexicore.ui.dashboard.service.DataMapperService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
 /**
  * Created by Asaf on 04/06/2017.
  */
 
-@PluginInfo(version = 1)
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/DataMapper")
+@RestController
+@RequestMapping("plugins/DataMapper")
 @Tag(name = "DataMapper")
 @Tag(name = "Presets")
 @Extension
 @Component
-public class DataMapperRESTService implements RestServicePlugin {
+public class DataMapperController implements Plugin {
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private DataMapperService service;
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getAllDataMapper", description = "returns all DataMapper")
-	@Path("getAllDataMapper")
+	@PostMapping("getAllDataMapper")
 	public PaginationResponse<DataMapper> getAllDataMapper(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			DataMapperFiltering dataMapperFiltering,
-			@Context SecurityContext securityContext) {
-		service.validate(dataMapperFiltering, securityContext);
-		return service.getAllDataMapper(dataMapperFiltering, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			DataMapperFilter dataMapperFilter,
+			@RequestAttribute SecurityContextBase securityContext) {
+		service.validate(dataMapperFilter, securityContext);
+		return service.getAllDataMapper(dataMapperFilter, securityContext);
 
 	}
 
-	@PUT
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "updateDataMapper", description = "Updates Dashbaord")
-	@Path("updateDataMapper")
+	@PutMapping("updateDataMapper")
 	public DataMapper updateDataMapper(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			DataMapperUpdate updateDataMapper, @Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			DataMapperUpdate updateDataMapper, @RequestAttribute SecurityContextBase securityContext) {
 		DataMapper dataMapper = updateDataMapper.getId() != null ? service.getByIdOrNull(
 				updateDataMapper.getId(), DataMapper.class, null, securityContext) : null;
 		if (dataMapper == null) {
-			throw new BadRequestException("no ui field with id  "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateDataMapper.getId());
 		}
 		updateDataMapper.setDataMapper(dataMapper);
@@ -71,13 +70,13 @@ public class DataMapperRESTService implements RestServicePlugin {
 
 	}
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "createDataMapper", description = "Creates DataMapper ")
-	@Path("createDataMapper")
+	@PostMapping("createDataMapper")
 	public DataMapper createDataMapper(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			DataMapperCreate createDataMapper, @Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			DataMapperCreate createDataMapper, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createDataMapper, securityContext);
 		return service.createDataMapper(createDataMapper, securityContext);
 

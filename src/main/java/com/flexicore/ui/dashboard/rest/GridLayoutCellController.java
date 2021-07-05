@@ -1,67 +1,66 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.ProtectedREST;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
 import com.flexicore.ui.dashboard.request.GridLayoutCellCreate;
-import com.flexicore.ui.dashboard.request.GridLayoutCellFiltering;
+import com.flexicore.ui.dashboard.request.GridLayoutCellFilter;
 import com.flexicore.ui.dashboard.request.GridLayoutCellUpdate;
 import com.flexicore.ui.dashboard.service.GridLayoutCellService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 
 /**
  * Created by Asaf on 04/06/2017.
  */
 
-@PluginInfo(version = 1)
+
 @OperationsInside
-@ProtectedREST
-@Path("plugins/GridLayoutCell")
+@RestController
+@RequestMapping("plugins/GridLayoutCell")
 @Tag(name = "GridLayoutCell")
 @Tag(name = "Presets")
 @Extension
 @Component
-public class GridLayoutCellRESTService implements RestServicePlugin {
+public class GridLayoutCellController implements Plugin {
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private GridLayoutCellService service;
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getAllGridLayoutCell", description = "returns all GridLayoutCell")
-	@Path("getAllGridLayoutCell")
+	@PostMapping("getAllGridLayoutCell")
 	public PaginationResponse<GridLayoutCell> getAllGridLayoutCell(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			GridLayoutCellFiltering gridLayoutCellFiltering,
-			@Context SecurityContext securityContext) {
-		service.validate(gridLayoutCellFiltering, securityContext);
-		return service.getAllGridLayoutCell(gridLayoutCellFiltering, securityContext);
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			GridLayoutCellFilter gridLayoutCellFilter,
+			@RequestAttribute SecurityContextBase securityContext) {
+		service.validate(gridLayoutCellFilter, securityContext);
+		return service.getAllGridLayoutCell(gridLayoutCellFilter, securityContext);
 
 	}
 
-	@PUT
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "updateGridLayoutCell", description = "Updates Dashbaord")
-	@Path("updateGridLayoutCell")
+	@PutMapping("updateGridLayoutCell")
 	public GridLayoutCell updateGridLayoutCell(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			GridLayoutCellUpdate updateGridLayoutCell, @Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			GridLayoutCellUpdate updateGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
 		GridLayoutCell gridLayoutCell = updateGridLayoutCell.getId() != null ? service.getByIdOrNull(
 				updateGridLayoutCell.getId(), GridLayoutCell.class, null, securityContext) : null;
 		if (gridLayoutCell == null) {
-			throw new BadRequestException("no ui field with id  "
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGridLayoutCell.getId());
 		}
 		updateGridLayoutCell.setGridLayoutCell(gridLayoutCell);
@@ -71,13 +70,13 @@ public class GridLayoutCellRESTService implements RestServicePlugin {
 
 	}
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "createGridLayoutCell", description = "Creates GridLayoutCell ")
-	@Path("createGridLayoutCell")
+	@PostMapping("createGridLayoutCell")
 	public GridLayoutCell createGridLayoutCell(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			GridLayoutCellCreate createGridLayoutCell, @Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			GridLayoutCellCreate createGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createGridLayoutCell, securityContext);
 		return service.createGridLayoutCell(createGridLayoutCell, securityContext);
 

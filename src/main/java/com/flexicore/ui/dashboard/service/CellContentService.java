@@ -1,11 +1,14 @@
 package com.flexicore.ui.dashboard.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+
+import com.flexicore.model.Basic;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.CellContentRepository;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.request.CellContentCreate;
@@ -16,25 +19,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-@PluginInfo(version = 1)
+
 @Extension
 @Component
-public class CellContentService implements ServicePlugin {
+public class CellContentService implements Plugin {
 
 	private static final Logger logger= LoggerFactory.getLogger(CellContentService.class);
 
-	@PluginInfo(version = 1)
+
 	@Autowired
 	private CellContentRepository cellContentRepository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService  baseclassNewService;
 
-	public CellContent updateCellContent(CellContentUpdate cellContentUpdate, SecurityContext securityContext) {
+	public CellContent updateCellContent(CellContentUpdate cellContentUpdate, SecurityContextBase securityContext) {
 		if (CellContentUpdateNoMerge(cellContentUpdate,
 				cellContentUpdate.getCellContent())) {
 			cellContentRepository.merge(cellContentUpdate.getCellContent());
@@ -43,42 +50,25 @@ public class CellContentService implements ServicePlugin {
 	}
 
 	public boolean CellContentUpdateNoMerge(CellContentCreate cellContentCreate, CellContent cellContent) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(cellContentCreate, cellContent);
-		if (cellContentCreate.any() != null && !cellContentCreate.any().isEmpty()) {
-			Map<String, Object> jsonNode = cellContent.getJsonNode();
-			if (jsonNode == null) {
-				cellContent.setJsonNode(cellContentCreate.any());
-				update = true;
-			} else {
-				for (Map.Entry<String, Object> entry : cellContentCreate.any().entrySet()) {
-					String key = entry.getKey();
-					Object newVal = entry.getValue();
-					Object val = jsonNode.get(key);
-					if (newVal != null && !newVal.equals(val)) {
-						jsonNode.put(key, newVal);
-						update = true;
-					}
-				}
-			}
+		boolean update = baseclassNewService.updateBasicNoMerge(cellContentCreate, cellContent);
+		Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(cellContentCreate.any(), cellContent.any());
+		if (map != null) {
+			cellContent.setJsonNode(map);
+			update = true;
 		}
 		return update;
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-												 List<String> batchString, SecurityContext securityContext) {
-		return cellContentRepository.getByIdOrNull(id, c, batchString,
-				securityContext);
-	}
 
 	public List<CellContent> listAllCellContent(
 			CellContentFiltering cellContentFiltering,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		return cellContentRepository.listAllCellContent(cellContentFiltering,
 				securityContext);
 	}
 
 	public CellContent createCellContent(CellContentCreate createCellContent,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		CellContent cellContent = createCellContentNoMerge(createCellContent,
 				securityContext);
 		cellContentRepository.merge(cellContent);
@@ -87,15 +77,17 @@ public class CellContentService implements ServicePlugin {
 	}
 
 	public CellContent createCellContentNoMerge(
-			CellContentCreate createCellContent, SecurityContext securityContext) {
-		CellContent cellContent = new CellContent(createCellContent.getName(), securityContext);
+			CellContentCreate createCellContent, SecurityContextBase securityContext) {
+		CellContent cellContent = new CellContent();
+		cellContent.setId(UUID.randomUUID().toString());
 		CellContentUpdateNoMerge(createCellContent, cellContent);
+		BaseclassService.createSecurityObjectNoMerge(cellContent,securityContext);
 		return cellContent;
 	}
 
 	public PaginationResponse<CellContent> getAllCellContent(
 			CellContentFiltering cellContentFiltering,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		List<CellContent> list = listAllCellContent(cellContentFiltering,
 				securityContext);
 		long count = cellContentRepository.countAllCellContent(
@@ -104,15 +96,52 @@ public class CellContentService implements ServicePlugin {
 	}
 
 	public void validate(CellContentCreate createCellContent,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createCellContent, securityContext);
 
 	}
 
 	public void validate(CellContentFiltering cellContentFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(cellContentFiltering, securityContext);
+			SecurityContextBase securityContext) {
+		baseclassNewService.validate(cellContentFiltering, securityContext);
 
 	}
 
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return cellContentRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return cellContentRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return cellContentRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return cellContentRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return cellContentRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return cellContentRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return cellContentRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		cellContentRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		cellContentRepository.massMerge(toMerge);
+	}
 }

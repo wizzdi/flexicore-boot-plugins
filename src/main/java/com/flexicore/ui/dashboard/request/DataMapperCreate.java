@@ -1,12 +1,17 @@
 package com.flexicore.ui.dashboard.request;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.request.BaseclassCreate;
+import com.flexicore.ui.request.PresetCreate;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
-public class DataMapperCreate extends BaseclassCreate {
+import java.util.Map;
+
+public class DataMapperCreate extends BasicCreate{
     private String cellToLayoutId;
     @JsonIgnore
     private CellToLayout cellToLayout;
@@ -95,8 +100,25 @@ public class DataMapperCreate extends BaseclassCreate {
         return (T) this;
     }
 
-    @Override
-    public boolean supportingDynamic() {
-        return true;
+   private Map<String, Object> jsonNode;
+
+    @JsonIgnore
+    public Map<String, Object> getJsonNode() {
+        return this.jsonNode;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return this.jsonNode;
+    }
+
+    @JsonAnySetter
+    public void add(String key, Object value) {
+        jsonNode.put(key, value);
+    }
+
+    public <T extends DataMapperCreate> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
+        return (T) this;
     }
 }

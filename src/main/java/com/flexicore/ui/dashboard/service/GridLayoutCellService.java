@@ -1,16 +1,20 @@
 package com.flexicore.ui.dashboard.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+
+import com.flexicore.model.Basic;
+import com.flexicore.model.SecuredBasic_;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GridLayoutCellRepository;
 import com.flexicore.ui.dashboard.model.GridLayout;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
 import com.flexicore.ui.dashboard.request.GridLayoutCellCreate;
-import com.flexicore.ui.dashboard.request.GridLayoutCellFiltering;
+import com.flexicore.ui.dashboard.request.GridLayoutCellFilter;
 import com.flexicore.ui.dashboard.request.GridLayoutCellUpdate;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -18,25 +22,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.BadRequestException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@PluginInfo(version = 1)
+
 @Extension
 @Component
-public class GridLayoutCellService implements ServicePlugin {
+public class GridLayoutCellService implements Plugin {
 
 	private static final Logger logger= LoggerFactory.getLogger(GridLayoutCellService.class);
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private GridLayoutCellRepository gridLayoutCellRepository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService  baseclassNewService;
 
-	public GridLayoutCell updateGridLayoutCell(GridLayoutCellUpdate gridLayoutCellUpdate, SecurityContext securityContext) {
+	public GridLayoutCell updateGridLayoutCell(GridLayoutCellUpdate gridLayoutCellUpdate, SecurityContextBase securityContext) {
 		if (GridLayoutCellUpdateNoMerge(gridLayoutCellUpdate,
 				gridLayoutCellUpdate.getGridLayoutCell())) {
 			gridLayoutCellRepository.merge(gridLayoutCellUpdate.getGridLayoutCell());
@@ -45,31 +53,31 @@ public class GridLayoutCellService implements ServicePlugin {
 	}
 
 	public boolean GridLayoutCellUpdateNoMerge(GridLayoutCellCreate gridLayoutCellCreate, GridLayoutCell gridLayoutCell) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(gridLayoutCellCreate, gridLayoutCell);
+		boolean update = baseclassNewService.updateBasicNoMerge(gridLayoutCellCreate, gridLayoutCell);
 
 		if(gridLayoutCellCreate.getGridLayout()!=null&&(gridLayoutCell.getGridLayout()==null||!gridLayoutCellCreate.getGridLayout().getId().equals(gridLayoutCell.getGridLayout().getId()))){
 			gridLayoutCell.setGridLayout(gridLayoutCellCreate.getGridLayout());
 			update=true;
 		}
+		Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(gridLayoutCellCreate.any(), gridLayoutCell.any());
+		if (map != null) {
+			gridLayoutCell.setJsonNode(map);
+			update = true;
+		}
 
 		return update;
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-												 List<String> batchString, SecurityContext securityContext) {
-		return gridLayoutCellRepository.getByIdOrNull(id, c, batchString,
-				securityContext);
-	}
 
 	public List<GridLayoutCell> listAllGridLayoutCell(
-			GridLayoutCellFiltering gridLayoutCellFiltering,
-			SecurityContext securityContext) {
-		return gridLayoutCellRepository.listAllGridLayoutCell(gridLayoutCellFiltering,
+			GridLayoutCellFilter gridLayoutCellFilter,
+			SecurityContextBase securityContext) {
+		return gridLayoutCellRepository.listAllGridLayoutCell(gridLayoutCellFilter,
 				securityContext);
 	}
 
 	public GridLayoutCell createGridLayoutCell(GridLayoutCellCreate createGridLayoutCell,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		GridLayoutCell gridLayoutCell = createGridLayoutCellNoMerge(createGridLayoutCell,
 				securityContext);
 		gridLayoutCellRepository.merge(gridLayoutCell);
@@ -78,46 +86,86 @@ public class GridLayoutCellService implements ServicePlugin {
 	}
 
 	public GridLayoutCell createGridLayoutCellNoMerge(
-			GridLayoutCellCreate createGridLayoutCell, SecurityContext securityContext) {
-		GridLayoutCell gridLayoutCell = new GridLayoutCell(createGridLayoutCell.getName(), securityContext);
+			GridLayoutCellCreate createGridLayoutCell, SecurityContextBase securityContext) {
+		GridLayoutCell gridLayoutCell = new GridLayoutCell();
+		gridLayoutCell.setId(UUID.randomUUID().toString());
 		GridLayoutCellUpdateNoMerge(createGridLayoutCell, gridLayoutCell);
+		BaseclassService.createSecurityObjectNoMerge(gridLayoutCell,securityContext);
 		return gridLayoutCell;
 	}
 
 	public PaginationResponse<GridLayoutCell> getAllGridLayoutCell(
-			GridLayoutCellFiltering gridLayoutCellFiltering,
-			SecurityContext securityContext) {
-		List<GridLayoutCell> list = listAllGridLayoutCell(gridLayoutCellFiltering,
+			GridLayoutCellFilter gridLayoutCellFilter,
+			SecurityContextBase securityContext) {
+		List<GridLayoutCell> list = listAllGridLayoutCell(gridLayoutCellFilter,
 				securityContext);
 		long count = gridLayoutCellRepository.countAllGridLayoutCell(
-				gridLayoutCellFiltering, securityContext);
-		return new PaginationResponse<>(list, gridLayoutCellFiltering, count);
+				gridLayoutCellFilter, securityContext);
+		return new PaginationResponse<>(list, gridLayoutCellFilter, count);
 	}
 
 	public void validate(GridLayoutCellCreate createGridLayoutCell,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createGridLayoutCell, securityContext);
 		String gridLayoutId=createGridLayoutCell.getGridLayoutId();
 		GridLayout dynamicExecution=gridLayoutId!=null?getByIdOrNull(gridLayoutId, GridLayout.class,null,securityContext):null;
 		if(dynamicExecution==null){
-			throw new BadRequestException("No GridLayout with id "+gridLayoutId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with id "+gridLayoutId);
 		}
 		createGridLayoutCell.setGridLayout(dynamicExecution);
 
 	}
 
-	public void validate(GridLayoutCellFiltering gridLayoutCellFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(gridLayoutCellFiltering, securityContext);
+	public void validate(GridLayoutCellFilter gridLayoutCellFilter,
+						 SecurityContextBase securityContext) {
+		baseclassNewService.validate(gridLayoutCellFilter, securityContext);
 
-		Set<String> gridLayoutIds=gridLayoutCellFiltering.getGridLayoutIds();
-		Map<String, GridLayout> dashboardPresetMap=gridLayoutIds.isEmpty()?new HashMap<>():gridLayoutCellRepository.listByIds(GridLayout.class,gridLayoutIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Set<String> gridLayoutIds= gridLayoutCellFilter.getGridLayoutIds();
+		Map<String, GridLayout> dashboardPresetMap=gridLayoutIds.isEmpty()?new HashMap<>():gridLayoutCellRepository.listByIds(GridLayout.class,gridLayoutIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		gridLayoutIds.removeAll(dashboardPresetMap.keySet());
 		if(!gridLayoutIds.isEmpty()){
-			throw new BadRequestException("No GridLayout with ids "+gridLayoutIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with ids "+gridLayoutIds);
 		}
-		gridLayoutCellFiltering.setGridLayouts(new ArrayList<>(dashboardPresetMap.values()));
+		gridLayoutCellFilter.setGridLayouts(new ArrayList<>(dashboardPresetMap.values()));
 
 	}
 
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return gridLayoutCellRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return gridLayoutCellRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return gridLayoutCellRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return gridLayoutCellRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return gridLayoutCellRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return gridLayoutCellRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return gridLayoutCellRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		gridLayoutCellRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		gridLayoutCellRepository.massMerge(toMerge);
+	}
 }

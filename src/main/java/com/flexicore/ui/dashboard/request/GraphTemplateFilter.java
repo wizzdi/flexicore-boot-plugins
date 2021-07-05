@@ -7,7 +7,8 @@ import com.wizzdi.flexicore.security.request.PaginationFilter;
 
 import java.util.Map;
 
-public class CellContentFiltering extends PaginationFilter {
+public class GraphTemplateFilter extends PaginationFilter {
+
 
    private Map<String, Object> jsonNode;
 
@@ -26,7 +27,7 @@ public class CellContentFiltering extends PaginationFilter {
         jsonNode.put(key, value);
     }
 
-    public <T extends CellContentFiltering> T setJsonNode(Map<String, Object> jsonNode) {
+    public <T extends GraphTemplateFilter> T setJsonNode(Map<String, Object> jsonNode) {
         this.jsonNode = jsonNode;
         return (T) this;
     }

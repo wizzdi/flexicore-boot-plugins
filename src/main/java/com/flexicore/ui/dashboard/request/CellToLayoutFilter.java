@@ -1,7 +1,7 @@
 package com.flexicore.ui.dashboard.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.model.DashboardPreset;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CellToLayoutFiltering extends FilteringInformationHolder {
+public class CellToLayoutFilter extends PaginationFilter {
 
     private Set<String> gridLayoutCellIds=new HashSet<>();
     @JsonIgnore
@@ -23,7 +23,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
     private List<DashboardPreset> dashboardPresets;
 
 
-    public CellToLayoutFiltering() {
+    public CellToLayoutFilter() {
     }
 
 
@@ -31,7 +31,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return gridLayoutCellIds;
     }
 
-    public <T extends CellToLayoutFiltering> T setGridLayoutCellIds(Set<String> gridLayoutCellIds) {
+    public <T extends CellToLayoutFilter> T setGridLayoutCellIds(Set<String> gridLayoutCellIds) {
         this.gridLayoutCellIds = gridLayoutCellIds;
         return (T) this;
     }
@@ -41,7 +41,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return gridLayoutCells;
     }
 
-    public <T extends CellToLayoutFiltering> T setGridLayoutCells(List<GridLayoutCell> gridLayoutCells) {
+    public <T extends CellToLayoutFilter> T setGridLayoutCells(List<GridLayoutCell> gridLayoutCells) {
         this.gridLayoutCells = gridLayoutCells;
         return (T) this;
     }
@@ -50,7 +50,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return cellContentIds;
     }
 
-    public <T extends CellToLayoutFiltering> T setCellContentIds(Set<String> cellContentIds) {
+    public <T extends CellToLayoutFilter> T setCellContentIds(Set<String> cellContentIds) {
         this.cellContentIds = cellContentIds;
         return (T) this;
     }
@@ -60,7 +60,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return cellContents;
     }
 
-    public <T extends CellToLayoutFiltering> T setCellContents(List<CellContent> cellContents) {
+    public <T extends CellToLayoutFilter> T setCellContents(List<CellContent> cellContents) {
         this.cellContents = cellContents;
         return (T) this;
     }
@@ -69,7 +69,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return dashboardPresetIds;
     }
 
-    public <T extends CellToLayoutFiltering> T setDashboardPresetIds(Set<String> dashboardPresetIds) {
+    public <T extends CellToLayoutFilter> T setDashboardPresetIds(Set<String> dashboardPresetIds) {
         this.dashboardPresetIds = dashboardPresetIds;
         return (T) this;
     }
@@ -79,7 +79,7 @@ public class CellToLayoutFiltering extends FilteringInformationHolder {
         return dashboardPresets;
     }
 
-    public <T extends CellToLayoutFiltering> T setDashboardPresets(List<DashboardPreset> dashboardPresets) {
+    public <T extends CellToLayoutFilter> T setDashboardPresets(List<DashboardPreset> dashboardPresets) {
         this.dashboardPresets = dashboardPresets;
         return (T) this;
     }

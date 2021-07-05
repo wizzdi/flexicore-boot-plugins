@@ -1,17 +1,21 @@
 package com.flexicore.ui.dashboard.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+
+import com.flexicore.model.Basic;
+import com.flexicore.model.SecuredBasic_;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.DataMapperRepository;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.flexicore.ui.dashboard.model.DataMapper;
 import com.flexicore.ui.dashboard.request.DataMapperCreate;
-import com.flexicore.ui.dashboard.request.DataMapperFiltering;
+import com.flexicore.ui.dashboard.request.DataMapperFilter;
 import com.flexicore.ui.dashboard.request.DataMapperUpdate;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
@@ -21,28 +25,32 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.BadRequestException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
+import javax.persistence.metamodel.SingularAttribute;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@PluginInfo(version = 1)
+
 @Extension
 @Component
-public class DataMapperService implements ServicePlugin {
+public class DataMapperService implements Plugin {
 
 	private static final Logger logger= LoggerFactory.getLogger(DataMapperService.class);
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private DataMapperRepository dataMapperRepository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService  baseclassNewService;
 
 	@Autowired
 	private DynamicExecutionService dynamicExecutionService;
 
-	public DataMapper updateDataMapper(DataMapperUpdate dataMapperUpdate, SecurityContext securityContext) {
+	public DataMapper updateDataMapper(DataMapperUpdate dataMapperUpdate, SecurityContextBase securityContext) {
 		if (DataMapperUpdateNoMerge(dataMapperUpdate,
 				dataMapperUpdate.getDataMapper())) {
 			dataMapperRepository.merge(dataMapperUpdate.getDataMapper());
@@ -51,7 +59,7 @@ public class DataMapperService implements ServicePlugin {
 	}
 
 	public boolean DataMapperUpdateNoMerge(DataMapperCreate dataMapperCreate, DataMapper dataMapper) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(dataMapperCreate, dataMapper);
+		boolean update = baseclassNewService.updateBasicNoMerge(dataMapperCreate, dataMapper);
 
 		if(dataMapperCreate.getCellContentElement()!=null&&(dataMapper.getCellContentElement()==null||!dataMapperCreate.getCellContentElement().getId().equals(dataMapper.getCellContentElement().getId()))){
 			dataMapper.setCellContentElement(dataMapperCreate.getCellContentElement());
@@ -76,42 +84,24 @@ public class DataMapperService implements ServicePlugin {
 			dataMapper.setStaticData(dataMapperCreate.getStaticData());
 			update=true;
 		}
-		if (dataMapperCreate.any() != null && !dataMapperCreate.any().isEmpty()) {
-			Map<String, Object> jsonNode = dataMapper.getJsonNode();
-			if (jsonNode == null) {
-				dataMapper.setJsonNode(dataMapperCreate.any());
-				update = true;
-			} else {
-				for (Map.Entry<String, Object> entry : dataMapperCreate.any().entrySet()) {
-					String key = entry.getKey();
-					Object newVal = entry.getValue();
-					Object val = jsonNode.get(key);
-					if (newVal != null && !newVal.equals(val)) {
-						jsonNode.put(key, newVal);
-						update = true;
-					}
-				}
-			}
-		}
 
+		Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(dataMapperCreate.any(), dataMapper.any());
+		if (map != null) {
+			dataMapper.setJsonNode(map);
+			update = true;
+		}
 		return update;
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-												 List<String> batchString, SecurityContext securityContext) {
-		return dataMapperRepository.getByIdOrNull(id, c, batchString,
-				securityContext);
-	}
-
 	public List<DataMapper> listAllDataMapper(
-			DataMapperFiltering dataMapperFiltering,
-			SecurityContext securityContext) {
-		return dataMapperRepository.listAllDataMapper(dataMapperFiltering,
+			DataMapperFilter dataMapperFilter,
+			SecurityContextBase securityContext) {
+		return dataMapperRepository.listAllDataMapper(dataMapperFilter,
 				securityContext);
 	}
 
 	public DataMapper createDataMapper(DataMapperCreate createDataMapper,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		DataMapper dataMapper = createDataMapperNoMerge(createDataMapper,
 				securityContext);
 		dataMapperRepository.merge(dataMapper);
@@ -120,44 +110,46 @@ public class DataMapperService implements ServicePlugin {
 	}
 
 	public DataMapper createDataMapperNoMerge(
-			DataMapperCreate createDataMapper, SecurityContext securityContext) {
-		DataMapper dataMapper = new DataMapper(createDataMapper.getName(), securityContext);
+			DataMapperCreate createDataMapper, SecurityContextBase securityContext) {
+		DataMapper dataMapper = new DataMapper();
+		dataMapper.setId(UUID.randomUUID().toString());
 		DataMapperUpdateNoMerge(createDataMapper, dataMapper);
+		BaseclassService.createSecurityObjectNoMerge(dataMapper,securityContext);
 		return dataMapper;
 	}
 
 	public PaginationResponse<DataMapper> getAllDataMapper(
-			DataMapperFiltering dataMapperFiltering,
-			SecurityContext securityContext) {
-		List<DataMapper> list = listAllDataMapper(dataMapperFiltering,
+			DataMapperFilter dataMapperFilter,
+			SecurityContextBase securityContext) {
+		List<DataMapper> list = listAllDataMapper(dataMapperFilter,
 				securityContext);
 		long count = dataMapperRepository.countAllDataMapper(
-				dataMapperFiltering, securityContext);
-		return new PaginationResponse<>(list, dataMapperFiltering, count);
+				dataMapperFilter, securityContext);
+		return new PaginationResponse<>(list, dataMapperFilter, count);
 	}
 
 	public void validate(DataMapperCreate createDataMapper,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createDataMapper, securityContext);
 		String cellToLayoutId=createDataMapper.getCellToLayoutId();
 		CellToLayout cellToLayout=cellToLayoutId!=null?getByIdOrNull(cellToLayoutId, CellToLayout.class,null,securityContext):null;
 		if(cellToLayout==null&&cellToLayoutId!=null){
-			throw new BadRequestException("No CellToLayout with id "+cellToLayoutId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellToLayout with id "+cellToLayoutId);
 		}
 		createDataMapper.setCellToLayout(cellToLayout);
 
 		String cellContentElementId=createDataMapper.getCellContentElementId();
 		CellContentElement cellContentElement=cellContentElementId!=null?getByIdOrNull(cellContentElementId, CellContentElement.class,null,securityContext):null;
 		if(cellContentElement==null&&cellContentElementId!=null){
-			throw new BadRequestException("No CellContentElement with id "+cellContentElementId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContentElement with id "+cellContentElementId);
 		}
 		createDataMapper.setCellContentElement(cellContentElement);
 
 
 		String dynamicExecutionId=createDataMapper.getDynamicExecutionId();
-		DynamicExecution dynamicExecution=dynamicExecutionId!=null?dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class,securityContext):null;
+		DynamicExecution dynamicExecution=dynamicExecutionId!=null?dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, SecuredBasic_.security,securityContext):null;
 		if(dynamicExecution==null&&dynamicExecutionId!=null){
-			throw new BadRequestException("No DynamicExecution with id "+dynamicExecutionId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No DynamicExecution with id "+dynamicExecutionId);
 		}
 		createDataMapper.setDynamicExecution(dynamicExecution);
 
@@ -165,39 +157,77 @@ public class DataMapperService implements ServicePlugin {
 
 	}
 
-	public void validate(DataMapperFiltering dataMapperFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(dataMapperFiltering, securityContext);
+	public void validate(DataMapperFilter dataMapperFilter,
+						 SecurityContextBase securityContext) {
+		baseclassNewService.validate(dataMapperFilter, securityContext);
 
-		Set<String> cellToLayoutIds=dataMapperFiltering.getCellToLayoutIds();
-		Map<String, CellToLayout> cellToLayoutMap=cellToLayoutIds.isEmpty()?new HashMap<>():dataMapperRepository.listByIds(CellToLayout.class,cellToLayoutIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Set<String> cellToLayoutIds= dataMapperFilter.getCellToLayoutIds();
+		Map<String, CellToLayout> cellToLayoutMap=cellToLayoutIds.isEmpty()?new HashMap<>():dataMapperRepository.listByIds(CellToLayout.class,cellToLayoutIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		cellToLayoutIds.removeAll(cellToLayoutMap.keySet());
 		if(!cellToLayoutIds.isEmpty()){
-			throw new BadRequestException("No CellToLayout with ids "+cellToLayoutIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellToLayout with ids "+cellToLayoutIds);
 		}
-		dataMapperFiltering.setCellToLayouts(new ArrayList<>(cellToLayoutMap.values()));
+		dataMapperFilter.setCellToLayouts(new ArrayList<>(cellToLayoutMap.values()));
 
 
-		Set<String> cellContentElementIds=dataMapperFiltering.getCellContentElementIds();
-		Map<String, CellContentElement> cellContentElementMap=cellContentElementIds.isEmpty()?new HashMap<>():dataMapperRepository.listByIds(CellContentElement.class,cellContentElementIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Set<String> cellContentElementIds= dataMapperFilter.getCellContentElementIds();
+		Map<String, CellContentElement> cellContentElementMap=cellContentElementIds.isEmpty()?new HashMap<>():dataMapperRepository.listByIds(CellContentElement.class,cellContentElementIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		cellContentElementIds.removeAll(cellContentElementMap.keySet());
 		if(!cellContentElementIds.isEmpty()){
-			throw new BadRequestException("No CellContentElement with ids "+cellContentElementIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContentElement with ids "+cellContentElementIds);
 		}
-		dataMapperFiltering.setCellContentElements(new ArrayList<>(cellContentElementMap.values()));
+		dataMapperFilter.setCellContentElements(new ArrayList<>(cellContentElementMap.values()));
 
 
-		Set<String> dynamicExecutionIds=dataMapperFiltering.getDynamicExecutionIds();
-		Map<String, DynamicExecution> dynamicExecutionMap=dynamicExecutionIds.isEmpty()?new HashMap<>():dynamicExecutionService.listByIds(dynamicExecutionIds,DynamicExecution.class,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Set<String> dynamicExecutionIds= dataMapperFilter.getDynamicExecutionIds();
+		Map<String, DynamicExecution> dynamicExecutionMap=dynamicExecutionIds.isEmpty()?new HashMap<>():dynamicExecutionService.listByIds(DynamicExecution.class,dynamicExecutionIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		dynamicExecutionIds.removeAll(dynamicExecutionMap.keySet());
 		if(!dynamicExecutionIds.isEmpty()){
-			throw new BadRequestException("No DynamicExecution with ids "+dynamicExecutionIds);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No DynamicExecution with ids "+dynamicExecutionIds);
 		}
-		dataMapperFiltering.setDynamicExecutions(new ArrayList<>(dynamicExecutionMap.values()));
+		dataMapperFilter.setDynamicExecutions(new ArrayList<>(dynamicExecutionMap.values()));
 
 
 
 
 	}
 
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return dataMapperRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return dataMapperRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return dataMapperRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return dataMapperRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return dataMapperRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return dataMapperRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return dataMapperRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		dataMapperRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		dataMapperRepository.massMerge(toMerge);
+	}
 }

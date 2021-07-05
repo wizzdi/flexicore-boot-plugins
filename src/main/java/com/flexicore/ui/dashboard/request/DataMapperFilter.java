@@ -1,7 +1,7 @@
 package com.flexicore.ui.dashboard.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class DataMapperFiltering extends FilteringInformationHolder {
+public class DataMapperFilter extends PaginationFilter {
 
     private Set<String> cellToLayoutIds=new HashSet<>();
     @JsonIgnore
@@ -26,7 +26,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return cellToLayoutIds;
     }
 
-    public <T extends DataMapperFiltering> T setCellToLayoutIds(Set<String> cellToLayoutIds) {
+    public <T extends DataMapperFilter> T setCellToLayoutIds(Set<String> cellToLayoutIds) {
         this.cellToLayoutIds = cellToLayoutIds;
         return (T) this;
     }
@@ -35,7 +35,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return dynamicExecutionIds;
     }
 
-    public <T extends DataMapperFiltering> T setDynamicExecutionIds(Set<String> dynamicExecutionIds) {
+    public <T extends DataMapperFilter> T setDynamicExecutionIds(Set<String> dynamicExecutionIds) {
         this.dynamicExecutionIds = dynamicExecutionIds;
         return (T) this;
     }
@@ -44,7 +44,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return cellContentElementIds;
     }
 
-    public <T extends DataMapperFiltering> T setCellContentElementIds(Set<String> cellContentElementIds) {
+    public <T extends DataMapperFilter> T setCellContentElementIds(Set<String> cellContentElementIds) {
         this.cellContentElementIds = cellContentElementIds;
         return (T) this;
     }
@@ -54,7 +54,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return cellToLayouts;
     }
 
-    public <T extends DataMapperFiltering> T setCellToLayouts(List<CellToLayout> cellToLayouts) {
+    public <T extends DataMapperFilter> T setCellToLayouts(List<CellToLayout> cellToLayouts) {
         this.cellToLayouts = cellToLayouts;
         return (T) this;
     }
@@ -64,7 +64,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return dynamicExecutions;
     }
 
-    public <T extends DataMapperFiltering> T setDynamicExecutions(List<DynamicExecution> dynamicExecutions) {
+    public <T extends DataMapperFilter> T setDynamicExecutions(List<DynamicExecution> dynamicExecutions) {
         this.dynamicExecutions = dynamicExecutions;
         return (T) this;
     }
@@ -74,7 +74,7 @@ public class DataMapperFiltering extends FilteringInformationHolder {
         return cellContentElements;
     }
 
-    public <T extends DataMapperFiltering> T setCellContentElements(List<CellContentElement> cellContentElements) {
+    public <T extends DataMapperFilter> T setCellContentElements(List<CellContentElement> cellContentElements) {
         this.cellContentElements = cellContentElements;
         return (T) this;
     }

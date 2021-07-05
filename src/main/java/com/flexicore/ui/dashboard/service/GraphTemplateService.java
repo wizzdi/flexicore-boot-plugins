@@ -1,17 +1,20 @@
 package com.flexicore.ui.dashboard.service;
 
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.ServicePlugin;
+
+import com.flexicore.model.Basic;
+import com.flexicore.model.SecuredBasic_;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
+import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.FileResource;
-import com.flexicore.security.SecurityContext;
-import com.flexicore.service.BaseclassNewService;
+import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GraphTemplateRepository;
-import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.model.GraphTemplate;
 import com.flexicore.ui.dashboard.request.GraphTemplateCreate;
-import com.flexicore.ui.dashboard.request.GraphTemplateFiltering;
+import com.flexicore.ui.dashboard.request.GraphTemplateFilter;
 import com.flexicore.ui.dashboard.request.GraphTemplateUpdate;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -19,25 +22,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.BadRequestException;
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
-@PluginInfo(version = 1)
+import javax.persistence.metamodel.SingularAttribute;
+import java.util.*;
+
+
 @Extension
 @Component
-public class GraphTemplateService implements ServicePlugin {
+public class GraphTemplateService implements Plugin {
 
 	private static final Logger logger= LoggerFactory.getLogger(GraphTemplateService.class);
 
-	@PluginInfo(version = 1)
+	
 	@Autowired
 	private GraphTemplateRepository graphTemplateRepository;
 
 	@Autowired
-	private BaseclassNewService baseclassNewService;
+	private BasicService  baseclassNewService;
 
-	public GraphTemplate updateGraphTemplate(GraphTemplateUpdate graphTemplateUpdate, SecurityContext securityContext) {
+	public GraphTemplate updateGraphTemplate(GraphTemplateUpdate graphTemplateUpdate, SecurityContextBase securityContext) {
 		if (GraphTemplateUpdateNoMerge(graphTemplateUpdate,
 				graphTemplateUpdate.getGraphTemplate())) {
 			graphTemplateRepository.merge(graphTemplateUpdate.getGraphTemplate());
@@ -46,7 +52,7 @@ public class GraphTemplateService implements ServicePlugin {
 	}
 
 	public boolean GraphTemplateUpdateNoMerge(GraphTemplateCreate graphTemplateCreate, GraphTemplate graphTemplate) {
-		boolean update = baseclassNewService.updateBaseclassNoMerge(graphTemplateCreate, graphTemplate);
+		boolean update = baseclassNewService.updateBasicNoMerge(graphTemplateCreate, graphTemplate);
 
 
 		if(graphTemplateCreate.getFileResource()!=null&&(graphTemplate.getFileResource()==null||!graphTemplateCreate.getFileResource().getId().equals(graphTemplate.getFileResource().getId()))){
@@ -54,26 +60,26 @@ public class GraphTemplateService implements ServicePlugin {
 			update=true;
 		}
 
+		Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(graphTemplateCreate.any(), graphTemplate.any());
+		if (map != null) {
+			graphTemplate.setJsonNode(map);
+			update = true;
+		}
+
 
 
 		return update;
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c,
-												 List<String> batchString, SecurityContext securityContext) {
-		return graphTemplateRepository.getByIdOrNull(id, c, batchString,
-				securityContext);
-	}
-
 	public List<GraphTemplate> listAllGraphTemplate(
-			GraphTemplateFiltering graphTemplateFiltering,
-			SecurityContext securityContext) {
-		return graphTemplateRepository.listAllGraphTemplate(graphTemplateFiltering,
+			GraphTemplateFilter graphTemplateFilter,
+			SecurityContextBase securityContext) {
+		return graphTemplateRepository.listAllGraphTemplate(graphTemplateFilter,
 				securityContext);
 	}
 
 	public GraphTemplate createGraphTemplate(GraphTemplateCreate createGraphTemplate,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		GraphTemplate graphTemplate = createGraphTemplateNoMerge(createGraphTemplate,
 				securityContext);
 		graphTemplateRepository.merge(graphTemplate);
@@ -82,39 +88,79 @@ public class GraphTemplateService implements ServicePlugin {
 	}
 
 	public GraphTemplate createGraphTemplateNoMerge(
-			GraphTemplateCreate createGraphTemplate, SecurityContext securityContext) {
-		GraphTemplate graphTemplate = new GraphTemplate(createGraphTemplate.getName(), securityContext);
+			GraphTemplateCreate createGraphTemplate, SecurityContextBase securityContext) {
+		GraphTemplate graphTemplate = new GraphTemplate();
+		graphTemplate.setId(UUID.randomUUID().toString());
 		GraphTemplateUpdateNoMerge(createGraphTemplate, graphTemplate);
+		BaseclassService.createSecurityObjectNoMerge(graphTemplate,securityContext);
 		return graphTemplate;
 	}
 
 	public PaginationResponse<GraphTemplate> getAllGraphTemplate(
-			GraphTemplateFiltering graphTemplateFiltering,
-			SecurityContext securityContext) {
-		List<GraphTemplate> list = listAllGraphTemplate(graphTemplateFiltering,
+			GraphTemplateFilter graphTemplateFilter,
+			SecurityContextBase securityContext) {
+		List<GraphTemplate> list = listAllGraphTemplate(graphTemplateFilter,
 				securityContext);
 		long count = graphTemplateRepository.countAllGraphTemplate(
-				graphTemplateFiltering, securityContext);
-		return new PaginationResponse<>(list, graphTemplateFiltering, count);
+				graphTemplateFilter, securityContext);
+		return new PaginationResponse<>(list, graphTemplateFilter, count);
 	}
 
 	public void validate(GraphTemplateCreate createGraphTemplate,
-			SecurityContext securityContext) {
+			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createGraphTemplate, securityContext);
 		String fileResourceId=createGraphTemplate.getFileResourceId();
-		FileResource cellContent=fileResourceId!=null?getByIdOrNull(fileResourceId, FileResource.class,null,securityContext):null;
+		FileResource cellContent=fileResourceId!=null?getByIdOrNull(fileResourceId, FileResource.class, SecuredBasic_.security,securityContext):null;
 		if(cellContent==null){
-			throw new BadRequestException("No FileResource with id "+fileResourceId);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No FileResource with id "+fileResourceId);
 		}
 		createGraphTemplate.setFileResource(cellContent);
 
 	}
 
-	public void validate(GraphTemplateFiltering graphTemplateFiltering,
-			SecurityContext securityContext) {
-		baseclassNewService.validateFilter(graphTemplateFiltering, securityContext);
+	public void validate(GraphTemplateFilter graphTemplateFilter,
+						 SecurityContextBase securityContext) {
+		baseclassNewService.validate(graphTemplateFilter, securityContext);
 
 
 	}
 
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return graphTemplateRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return graphTemplateRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return graphTemplateRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return graphTemplateRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return graphTemplateRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return graphTemplateRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return graphTemplateRepository.findByIdOrNull(type, id);
+	}
+
+	@Transactional
+	public void merge(Object base) {
+		graphTemplateRepository.merge(base);
+	}
+
+	@Transactional
+	public void massMerge(List<?> toMerge) {
+		graphTemplateRepository.massMerge(toMerge);
+	}
 }
