@@ -12,7 +12,8 @@
         <class>com.flexicore.ui.dashboard.model.GridLayout</class>
         <class>com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution</class>
         <class>com.flexicore.ui.dashboard.model.GraphTemplate</class>
-        <class>com.flexicore.model.FileResource</class>
+        <class>com.wizzdi.flexicore.file.model.FileResource</class>
+        <class>com.flexicore.model.SecuredBasic</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

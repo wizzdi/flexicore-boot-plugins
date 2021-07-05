@@ -23,9 +23,6 @@ public class DashboardPreset extends Preset {
     public DashboardPreset() {
     }
 
-    public DashboardPreset(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
 
     @ManyToOne(targetEntity = GridLayout.class)

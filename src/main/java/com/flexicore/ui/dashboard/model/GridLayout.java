@@ -2,6 +2,7 @@ package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.security.SecurityContext;
 
 import javax.persistence.Entity;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class GridLayout extends Baseclass {
+public class GridLayout extends SecuredBasic {
 
 
 
@@ -21,10 +22,6 @@ public class GridLayout extends Baseclass {
 
     public GridLayout() {
         super();
-    }
-
-    public GridLayout(String name, SecurityContext securityContext) {
-        super(name, securityContext);
     }
 
     @JsonIgnore

@@ -1,14 +1,15 @@
 package com.flexicore.ui.dashboard.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.FileResource;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.security.SecurityContext;
+import com.wizzdi.flexicore.file.model.FileResource;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class GraphTemplate extends Baseclass {
+public class GraphTemplate extends SecuredBasic {
 
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource fileResource;
@@ -16,9 +17,6 @@ public class GraphTemplate extends Baseclass {
     public GraphTemplate() {
     }
 
-    public GraphTemplate(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @ManyToOne(targetEntity = FileResource.class)
     public FileResource getFileResource() {

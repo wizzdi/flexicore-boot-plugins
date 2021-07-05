@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>dashboard-model</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <description>FlexiCore model plugin , manages ui dashboards</description>
     <url>https://wizzdi.com</url>
@@ -20,8 +20,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
         <version.eclipselink>2.7.7</version.eclipselink>
-        <pf4j-spring.version>0.6.0</pf4j-spring.version>
-        <jackson.version>2.11.0</jackson.version>
+        <pf4j-spring.version>0.7.0</pf4j-spring.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
@@ -64,67 +63,41 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>flexicore-boot-dependencies</artifactId>
+                <version>2.0.9</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-annoatations-service</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-ui-model</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>5.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>eclipselink</artifactId>
-            <version>${version.eclipselink}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
-            <version>${version.eclipselink}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>8.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.jpa</artifactId>
-            <version>${version.eclipselink}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.0.8</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.pf4j</groupId>
-            <artifactId>pf4j-spring</artifactId>
-            <version>${pf4j-spring.version}</version>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-data-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-base-model</artifactId>
-            <version>1.0.2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

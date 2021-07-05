@@ -2,9 +2,11 @@ package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.converters.JsonConverter;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.security.SecurityContext;
+import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
 import javax.persistence.Column;
@@ -14,8 +16,9 @@ import javax.persistence.ManyToOne;
 import java.util.Map;
 
 @Entity
-public class DataMapper extends Baseclass {
+public class DataMapper extends SecuredBasic {
 
+    @DynamicColumnDefinition
     @Column(columnDefinition = "jsonb")
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> jsonNode;
@@ -31,10 +34,6 @@ public class DataMapper extends Baseclass {
 
     public DataMapper() {
         super();
-    }
-
-    public DataMapper(String name, SecurityContext securityContext) {
-        super(name, securityContext);
     }
 
     @ManyToOne(targetEntity = CellToLayout.class)
@@ -85,6 +84,7 @@ public class DataMapper extends Baseclass {
         return (T) this;
     }
 
+    @DynamicColumnDefinition
     @JsonIgnore
     @Column(columnDefinition = "jsonb")
     @Convert(converter = JsonConverter.class)
@@ -97,7 +97,7 @@ public class DataMapper extends Baseclass {
         return jsonNode;
     }
 
-    public <T extends Baseclass> T setJsonNode(Map<String, Object> jsonNode) {
+    public <T extends SecuredBasic> T setJsonNode(Map<String, Object> jsonNode) {
         this.jsonNode = jsonNode;
         return (T) this;
     }
