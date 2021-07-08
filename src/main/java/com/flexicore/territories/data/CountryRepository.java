@@ -40,7 +40,7 @@ public class CountryRepository implements Plugin {
 		Root<Country> r = q.from(Country.class);
 		List<Predicate> preds = new ArrayList<>();
 		addCountryPredicate(filtering,q, cb, r, preds,securityContextBase);
-		q.select(r).where(preds.toArray(Predicate[]::new));
+		q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(Country_.name)));
 		TypedQuery<Country> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
 		return query.getResultList();

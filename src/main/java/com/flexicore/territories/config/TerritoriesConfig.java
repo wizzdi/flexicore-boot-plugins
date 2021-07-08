@@ -2,6 +2,7 @@ package com.flexicore.territories.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
@@ -25,5 +26,10 @@ public class TerritoriesConfig implements Plugin {
 		return new ObjectMapper()
 				.registerModule(new JavaTimeModule())
 				.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+	}
+
+	@Bean
+	public XmlMapper xmlMapper(){
+		return new XmlMapper();
 	}
 }

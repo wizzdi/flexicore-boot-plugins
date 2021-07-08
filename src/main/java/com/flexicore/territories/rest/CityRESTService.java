@@ -41,7 +41,6 @@ public class CityRESTService implements Plugin {
 	}
 
 	@Operation(description = "update city",summary = "update city")
-
 	@PutMapping("/updateCity")
 	public City updateCity(
 			

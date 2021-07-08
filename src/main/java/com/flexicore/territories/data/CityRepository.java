@@ -39,7 +39,7 @@ public class CityRepository implements Plugin {
 		Root<City> r = q.from(City.class);
 		List<Predicate> preds = new ArrayList<>();
 		addCityPredicate(filtering,q, cb, r, preds,securityContextBase);
-		q.select(r).where(preds.toArray(Predicate[]::new));
+		q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(City_.name)));
 		TypedQuery<City> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
 		return query.getResultList();
