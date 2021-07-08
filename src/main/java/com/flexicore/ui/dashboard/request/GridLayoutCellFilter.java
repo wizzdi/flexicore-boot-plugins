@@ -6,10 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.flexicore.ui.dashboard.model.GridLayout;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GridLayoutCellFilter extends PaginationFilter {
 
@@ -38,7 +35,7 @@ public class GridLayoutCellFilter extends PaginationFilter {
         return (T) this;
     }
 
-   private Map<String, Object> jsonNode;
+   private Map<String, Object> jsonNode=new HashMap<>();
 
     @JsonIgnore
     public Map<String, Object> getJsonNode() {

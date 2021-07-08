@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.GraphTemplate;
 import com.flexicore.ui.dashboard.request.GraphTemplateCreate;
@@ -58,7 +59,7 @@ public class GraphTemplateController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			GraphTemplateUpdate updateGraphTemplate, @RequestAttribute SecurityContextBase securityContext) {
 		GraphTemplate graphTemplate = updateGraphTemplate.getId() != null ? service.getByIdOrNull(
-				updateGraphTemplate.getId(), GraphTemplate.class, null, securityContext) : null;
+				updateGraphTemplate.getId(), GraphTemplate.class, SecuredBasic_.security, securityContext) : null;
 		if (graphTemplate == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGraphTemplate.getId());

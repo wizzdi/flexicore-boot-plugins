@@ -132,14 +132,14 @@ public class DataMapperService implements Plugin {
 			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createDataMapper, securityContext);
 		String cellToLayoutId=createDataMapper.getCellToLayoutId();
-		CellToLayout cellToLayout=cellToLayoutId!=null?getByIdOrNull(cellToLayoutId, CellToLayout.class,null,securityContext):null;
+		CellToLayout cellToLayout=cellToLayoutId!=null?getByIdOrNull(cellToLayoutId, CellToLayout.class,SecuredBasic_.security,securityContext):null;
 		if(cellToLayout==null&&cellToLayoutId!=null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellToLayout with id "+cellToLayoutId);
 		}
 		createDataMapper.setCellToLayout(cellToLayout);
 
 		String cellContentElementId=createDataMapper.getCellContentElementId();
-		CellContentElement cellContentElement=cellContentElementId!=null?getByIdOrNull(cellContentElementId, CellContentElement.class,null,securityContext):null;
+		CellContentElement cellContentElement=cellContentElementId!=null?getByIdOrNull(cellContentElementId, CellContentElement.class,SecuredBasic_.security,securityContext):null;
 		if(cellContentElement==null&&cellContentElementId!=null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContentElement with id "+cellContentElementId);
 		}

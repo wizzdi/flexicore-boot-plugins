@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.flexicore.ui.dashboard.model.CellContent;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CellContentElementCreate extends BasicCreate{
@@ -13,6 +14,7 @@ public class CellContentElementCreate extends BasicCreate{
     private String cellContentId;
     @JsonIgnore
     private CellContent cellContent;
+    private Map<String, Object> jsonNode=new HashMap<>();
 
     public String getCellContentId() {
         return cellContentId;
@@ -33,7 +35,6 @@ public class CellContentElementCreate extends BasicCreate{
         return (T) this;
     }
 
-   private Map<String, Object> jsonNode;
 
     @JsonIgnore
     public Map<String, Object> getJsonNode() {

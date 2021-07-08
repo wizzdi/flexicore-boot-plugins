@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.flexicore.ui.dashboard.request.CellToLayoutCreate;
@@ -58,7 +59,7 @@ public class CellToLayoutController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			CellToLayoutUpdate updateCellToLayout, @RequestAttribute SecurityContextBase securityContext) {
 		CellToLayout cellToLayout = updateCellToLayout.getId() != null ? service.getByIdOrNull(
-				updateCellToLayout.getId(), CellToLayout.class, null, securityContext) : null;
+				updateCellToLayout.getId(), CellToLayout.class, SecuredBasic_.security, securityContext) : null;
 		if (cellToLayout == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateCellToLayout.getId());

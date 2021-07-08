@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.request.CellContentCreate;
@@ -58,7 +59,7 @@ public class CellContentController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			CellContentUpdate updateCellContent, @RequestAttribute SecurityContextBase securityContext) {
 		CellContent cellContent = updateCellContent.getId() != null ? service.getByIdOrNull(
-				updateCellContent.getId(), CellContent.class, null, securityContext) : null;
+				updateCellContent.getId(), CellContent.class, SecuredBasic_.security, securityContext) : null;
 		if (cellContent == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateCellContent.getId());

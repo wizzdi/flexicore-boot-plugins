@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.DataMapper;
 import com.flexicore.ui.dashboard.request.DataMapperCreate;
@@ -58,7 +59,7 @@ public class DataMapperController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			DataMapperUpdate updateDataMapper, @RequestAttribute SecurityContextBase securityContext) {
 		DataMapper dataMapper = updateDataMapper.getId() != null ? service.getByIdOrNull(
-				updateDataMapper.getId(), DataMapper.class, null, securityContext) : null;
+				updateDataMapper.getId(), DataMapper.class, SecuredBasic_.security, securityContext) : null;
 		if (dataMapper == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateDataMapper.getId());

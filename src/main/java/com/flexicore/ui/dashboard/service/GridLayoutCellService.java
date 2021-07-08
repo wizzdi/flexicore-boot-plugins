@@ -108,7 +108,7 @@ public class GridLayoutCellService implements Plugin {
 			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createGridLayoutCell, securityContext);
 		String gridLayoutId=createGridLayoutCell.getGridLayoutId();
-		GridLayout dynamicExecution=gridLayoutId!=null?getByIdOrNull(gridLayoutId, GridLayout.class,null,securityContext):null;
+		GridLayout dynamicExecution=gridLayoutId!=null?getByIdOrNull(gridLayoutId, GridLayout.class,SecuredBasic_.security,securityContext):null;
 		if(dynamicExecution==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with id "+gridLayoutId);
 		}

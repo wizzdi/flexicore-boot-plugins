@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.flexicore.ui.dashboard.model.GridLayout;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GridLayoutCellCreate extends BasicCreate{
@@ -36,7 +37,7 @@ public class GridLayoutCellCreate extends BasicCreate{
     }
 
 
-   private Map<String, Object> jsonNode;
+   private Map<String, Object> jsonNode=new HashMap<>();
 
     @JsonIgnore
     public Map<String, Object> getJsonNode() {

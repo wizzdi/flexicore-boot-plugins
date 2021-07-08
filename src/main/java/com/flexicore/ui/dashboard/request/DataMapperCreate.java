@@ -9,6 +9,7 @@ import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DataMapperCreate extends BasicCreate{
@@ -100,7 +101,7 @@ public class DataMapperCreate extends BasicCreate{
         return (T) this;
     }
 
-   private Map<String, Object> jsonNode;
+   private Map<String, Object> jsonNode=new HashMap<>();
 
     @JsonIgnore
     public Map<String, Object> getJsonNode() {

@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.DashboardPreset;
 import com.flexicore.ui.dashboard.request.DashboardPresetCreate;
@@ -58,7 +59,7 @@ public class DashboardPresetController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			DashboardPresetUpdate updateDashboardPreset, @RequestAttribute SecurityContextBase securityContext) {
 		DashboardPreset dashboardPreset = updateDashboardPreset.getId() != null ? service.getByIdOrNull(
-				updateDashboardPreset.getId(), DashboardPreset.class, null, securityContext) : null;
+				updateDashboardPreset.getId(), DashboardPreset.class, SecuredBasic_.security, securityContext) : null;
 		if (dashboardPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateDashboardPreset.getId());

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class GraphTemplateCreate extends BasicCreate{
@@ -33,7 +34,7 @@ public class GraphTemplateCreate extends BasicCreate{
         return (T) this;
     }
 
-   private Map<String, Object> jsonNode;
+   private Map<String, Object> jsonNode=new HashMap<>();
 
     @JsonIgnore
     public Map<String, Object> getJsonNode() {

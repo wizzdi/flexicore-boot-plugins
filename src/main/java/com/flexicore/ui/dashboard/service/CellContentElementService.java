@@ -111,7 +111,7 @@ public class CellContentElementService implements Plugin {
 			SecurityContextBase securityContext) {
 		baseclassNewService.validate(createCellContentElement, securityContext);
 		String cellContentId=createCellContentElement.getCellContentId();
-		CellContent cellContent=cellContentId!=null?getByIdOrNull(cellContentId, CellContent.class,null,securityContext):null;
+		CellContent cellContent=cellContentId!=null?getByIdOrNull(cellContentId, CellContent.class,SecuredBasic_.security,securityContext):null;
 		if(cellContent==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContent with id "+cellContentId);
 		}

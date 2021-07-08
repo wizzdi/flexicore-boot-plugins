@@ -1,6 +1,7 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
 import com.flexicore.ui.dashboard.request.GridLayoutCellCreate;
@@ -58,7 +59,7 @@ public class GridLayoutCellController implements Plugin {
 			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
 			GridLayoutCellUpdate updateGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
 		GridLayoutCell gridLayoutCell = updateGridLayoutCell.getId() != null ? service.getByIdOrNull(
-				updateGridLayoutCell.getId(), GridLayoutCell.class, null, securityContext) : null;
+				updateGridLayoutCell.getId(), GridLayoutCell.class, SecuredBasic_.security, securityContext) : null;
 		if (gridLayoutCell == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGridLayoutCell.getId());
