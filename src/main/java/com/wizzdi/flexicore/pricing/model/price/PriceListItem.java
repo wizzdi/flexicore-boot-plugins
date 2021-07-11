@@ -15,13 +15,12 @@ public class PriceListItem extends SecuredBasic {
     @ManyToOne(targetEntity = Price.class)
     private Price price;
 
-
     @ManyToOne(targetEntity = PricedProduct.class)
-    public PricedProduct getProduct() {
+    public PricedProduct getPricedProduct() {
         return pricedProduct;
     }
 
-    public <T extends PriceListItem> T setProduct(PricedProduct pricedProduct) {
+    public <T extends PriceListItem> T setPricedProduct(PricedProduct pricedProduct) {
         this.pricedProduct = pricedProduct;
         return (T) this;
     }

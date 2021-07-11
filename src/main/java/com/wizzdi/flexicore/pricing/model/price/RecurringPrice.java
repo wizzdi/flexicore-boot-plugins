@@ -11,17 +11,18 @@ import java.util.List;
 public class RecurringPrice extends Price {
 
     @JsonIgnore
-    @OneToMany(targetEntity = BillingCycle.class,mappedBy = "recurringPrice")
-    private List<BillingCycle> billingCycles=new ArrayList<>();
+    @OneToMany(targetEntity = RecurringPriceEntry.class,mappedBy = "recurringPrice")
+    private List<RecurringPriceEntry> recurringPriceEntries =new ArrayList<>();
+
 
     @JsonIgnore
-    @OneToMany(targetEntity = BillingCycle.class,mappedBy = "recurringPrice")
-    public List<BillingCycle> getBillingCycles() {
-        return billingCycles;
+    @OneToMany(targetEntity = RecurringPriceEntry.class,mappedBy = "recurringPrice")
+    public List<RecurringPriceEntry> getRecurringPriceEntries() {
+        return recurringPriceEntries;
     }
 
-    public <T extends RecurringPrice> T setBillingCycles(List<BillingCycle> billingCycles) {
-        this.billingCycles = billingCycles;
+    public <T extends RecurringPrice> T setRecurringPriceEntries(List<RecurringPriceEntry> recurringPriceEntries) {
+        this.recurringPriceEntries = recurringPriceEntries;
         return (T) this;
     }
 }

@@ -51,4 +51,14 @@ public class Tier extends SecuredBasic {
         this.pricingScheme = pricingScheme;
         return (T) this;
     }
+
+    @ManyToOne(targetEntity = PricingScheme.class)
+    public PricingScheme getPricingScheme() {
+        return pricingScheme;
+    }
+
+    public <T extends Tier> T setPricingScheme(PricingScheme pricingScheme) {
+        this.pricingScheme = pricingScheme;
+        return (T) this;
+    }
 }
