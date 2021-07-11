@@ -1,4 +1,4 @@
-package com.flexicore.billing.model;
+package com.wizzdi.flexicore.billing.model.payment;
 
 import com.flexicore.model.SecuredBasic;
 import com.flexicore.organization.model.Customer;

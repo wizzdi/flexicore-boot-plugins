@@ -80,6 +80,12 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>pricing-model</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>organization-model</artifactId>
             <version>3.0.0-SNAPSHOT</version>
             <scope>provided</scope>

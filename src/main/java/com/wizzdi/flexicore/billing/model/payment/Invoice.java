@@ -1,10 +1,10 @@
-package com.flexicore.billing.model;
+package com.wizzdi.flexicore.billing.model.payment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
-import com.flexicore.organization.model.Customer;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -19,9 +19,12 @@ public class Invoice extends SecuredBasic {
     @JsonIgnore
     @OneToMany(targetEntity = InvoiceItem.class,mappedBy = "invoice")
     private List<InvoiceItem> invoiceItems=new ArrayList<>();
-    @ManyToOne(targetEntity = Contract.class)
-    private Contract contract;
+
+    @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime invoiceDate;
+    @ManyToOne(targetEntity = Receipt.class)
+    private Receipt receipt;
+    private String invoiceReference;
 
     public Invoice() {
     }
@@ -49,13 +52,22 @@ public class Invoice extends SecuredBasic {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = Contract.class)
-    public Contract getContract() {
-        return contract;
+    @ManyToOne(targetEntity = Receipt.class)
+    public Receipt getReceipt() {
+        return receipt;
     }
 
-    public <T extends Invoice> T setContract(Contract contract) {
-        this.contract = contract;
+    public <T extends Invoice> T setReceipt(Receipt receipt) {
+        this.receipt = receipt;
+        return (T) this;
+    }
+
+    public String getInvoiceReference() {
+        return invoiceReference;
+    }
+
+    public <T extends Invoice> T setInvoiceReference(String externalId) {
+        this.invoiceReference = externalId;
         return (T) this;
     }
 }
