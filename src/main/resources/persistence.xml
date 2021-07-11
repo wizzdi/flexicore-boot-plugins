@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             version="2.1"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="primary">
+
+
+        <class>com.wizzdi.flexicore.pricing.model.product.PricedProduct</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.Currency</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.PriceList</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.PricingScheme</class>
+        <class>com.flexicore.model.Baseclass</class>
+        <class>com.flexicore.organization.model.Customer</class>
+        <class>com.flexicore.model.Basic</class>
+        <class>com.flexicore.model.SecuredBasic</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.Tier</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.Money</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.PriceListItem</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.Price</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.RecurringPrice</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.OneTimePrice</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.BillingCycle</class>
+        <class>com.wizzdi.flexicore.pricing.model.price.Frequency</class>
+
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    </persistence-unit>
+</persistence>
