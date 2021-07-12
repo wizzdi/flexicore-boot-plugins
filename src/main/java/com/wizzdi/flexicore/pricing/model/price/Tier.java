@@ -10,7 +10,7 @@ public class Tier extends SecuredBasic {
     private int startingQuantity;
     private Integer endingQuantity;
     @ManyToOne(targetEntity = Money.class)
-    private Money amount;
+    private Money money;
     @ManyToOne(targetEntity = PricingScheme.class)
     private PricingScheme pricingScheme;
 
@@ -33,12 +33,12 @@ public class Tier extends SecuredBasic {
     }
 
     @ManyToOne(targetEntity = Money.class)
-    public Money getAmount() {
-        return amount;
+    public Money getMoney() {
+        return money;
     }
 
-    public <T extends Tier> T setAmount(Money amount) {
-        this.amount = amount;
+    public <T extends Tier> T setMoney(Money amount) {
+        this.money = amount;
         return (T) this;
     }
 

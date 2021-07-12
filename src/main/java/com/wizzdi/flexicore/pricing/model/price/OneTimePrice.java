@@ -1,7 +1,9 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+@Entity
 public class OneTimePrice extends Price {
 
     @ManyToOne(targetEntity = Frequency.class)
