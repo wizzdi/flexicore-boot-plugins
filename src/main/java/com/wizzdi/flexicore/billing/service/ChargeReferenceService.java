@@ -107,7 +107,7 @@ public class ChargeReferenceService implements Plugin {
         return chargeReference;
     }
 
-    private boolean updateChargeReferenceNoMerge(ChargeReference chargeReference,
+    public boolean updateChargeReferenceNoMerge(ChargeReference chargeReference,
                                         ChargeReferenceCreate chargeReferenceCreate) {
         boolean update = basicService.updateBasicNoMerge(chargeReferenceCreate, chargeReference);
 
