@@ -17,7 +17,7 @@ public class Receipt extends SecuredBasic {
     private String receiptReference;
 
     @JsonIgnore
-    @OneToMany(targetEntity = Invoice.class,mappedBy = "invoice")
+    @OneToMany(targetEntity = Invoice.class,mappedBy = "receipt")
     private List<Invoice> invoices =new ArrayList<>();
 
     @ManyToOne(targetEntity = Payment.class)
@@ -31,7 +31,7 @@ public class Receipt extends SecuredBasic {
     }
 
     @JsonIgnore
-    @OneToMany(targetEntity = Invoice.class,mappedBy = "invoice")
+    @OneToMany(targetEntity = Invoice.class,mappedBy = "receipt")
     public List<Invoice> getInvoices() {
         return invoices;
     }

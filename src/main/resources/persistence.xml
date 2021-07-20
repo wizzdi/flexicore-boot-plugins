@@ -26,7 +26,6 @@
         <class>com.wizzdi.flexicore.pricing.model.price.Price</class>
         <class>com.wizzdi.flexicore.pricing.model.price.RecurringPrice</class>
         <class>com.wizzdi.flexicore.pricing.model.price.OneTimePrice</class>
-        <class>com.wizzdi.flexicore.pricing.model.price.BillingCycle</class>
         <class>com.wizzdi.flexicore.pricing.model.price.Frequency</class>
         <class>com.wizzdi.flexicore.billing.model.billing.ChargeReference</class>
 
