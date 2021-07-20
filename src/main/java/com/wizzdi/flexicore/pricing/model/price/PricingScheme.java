@@ -17,7 +17,7 @@ public class PricingScheme extends SecuredBasic {
     @ManyToOne(targetEntity = Money.class)
     private Money fixedPrice;
     @JsonIgnore
-    @OneToMany(targetEntity = Tier.class, mappedBy = "priceListToService")
+    @OneToMany(targetEntity = Tier.class, mappedBy = "pricingScheme")
     private List<Tier> tiers = new ArrayList<>();
 
     public PricingScheme() {
@@ -32,7 +32,7 @@ public class PricingScheme extends SecuredBasic {
         return (T) this;
     }
 
-    @OneToMany(targetEntity = Tier.class, mappedBy = "priceListToService")
+    @OneToMany(targetEntity = Tier.class, mappedBy = "pricingScheme")
     @JsonIgnore
     public List<Tier> getTiers() {
         return tiers;
