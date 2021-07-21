@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-territories-service</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
     <name>flexicore-territories-service</name>
     <description>flexicore territories service manages cities,countries etc</description>
     <url>https://wizzdi.com</url>
@@ -52,7 +52,7 @@
         <connection>scm:git:git://wizzdi/flexicore-territories-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/flexicore-territories-service.git</developerConnection>
         <url>https://github.com/wizzdi/flexicore-territories-service</url>
-        <tag>flexicore-territories-service-${version}</tag>
+        <tag>flexicore-territories-service-4.0.0</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
