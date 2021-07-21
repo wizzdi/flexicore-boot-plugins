@@ -57,7 +57,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.validation:jakarta.validation-api:2.0.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.12.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.12.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:3.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:3.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot:1.2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-web:2.5.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.springframework.boot:spring-boot-starter-json:2.5.2" level="project" />
