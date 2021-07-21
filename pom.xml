@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>organization-model</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <name>organization-model</name>
     <description>FlexiCore model plugin , managing organizations</description>
     <url>https://wizzdi.com</url>
@@ -52,7 +52,7 @@
         <connection>scm:git:git://wizzdi/organization-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/organization-model.git</developerConnection>
         <url>https://github.com/wizzdi/organization-model</url>
-        <tag>organization-model-{version}</tag>
+        <tag>organization-model-3.0.0</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
