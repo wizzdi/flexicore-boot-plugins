@@ -21,6 +21,10 @@
         <maven.compiler.source>11</maven.compiler.source>
         <version.eclipselink>2.7.7</version.eclipselink>
         <pf4j-spring.version>0.7.0</pf4j-spring.version>
+        <spring-boot-dependencies.version>2.5.2</spring-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>2.1.2</flexicore-boot-dependencies.version>
+        <organization-model.version>3.0.0</organization-model.version>
+        <flexicore-territories-model.version>3.0.0</flexicore-territories-model.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
@@ -59,14 +63,14 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.0.RELEASE</version>
+                <version>${spring-boot-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-boot-dependencies</artifactId>
-                <version>2.0.8</version>
+                <version>${flexicore-boot-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -81,14 +85,14 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>organization-model</artifactId>
-            <version>3.0.0</version>
+            <version>${organization-model.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-territories-model</artifactId>
-            <version>3.0.0</version>
+            <version>${flexicore-territories-model.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -258,11 +262,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
-                <configuration>
-                    <javadocExecutable>C:\Program Files\AdoptOpenJDK\jdk-8.0.212.03-hotspot\bin\javadoc.exe
-                    </javadocExecutable>
-                    <javadocVersion>1.8.0</javadocVersion>
-                </configuration>
             </plugin>
         </plugins>
     </build>
