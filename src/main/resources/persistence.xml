@@ -7,7 +7,11 @@
         <class>com.flexicore.ui.tree.model.Tree</class>
         <class>com.flexicore.ui.tree.model.TreeNode</class>
         <class>com.flexicore.ui.tree.model.TreeNodeToUser</class>
-        <class>com.flexicore.model.dynamic.DynamicExecution</class>
+        <class>com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution</class>
+        <class>com.flexicore.ui.model.Preset</class>
+        <class>com.flexicore.model.SecuredBasic</class>
+        <class>com.flexicore.model.SecurityUser</class>
+        <class>com.wizzdi.flexicore.file.model.FileResource</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

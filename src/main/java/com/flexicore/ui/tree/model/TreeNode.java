@@ -1,18 +1,18 @@
 package com.flexicore.ui.tree.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.FileResource;
-import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 import com.flexicore.ui.model.Preset;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import com.wizzdi.flexicore.file.model.FileResource;
+
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class TreeNode extends Baseclass {
+public class TreeNode extends SecuredBasic {
 
     @ManyToOne(targetEntity = TreeNode.class)
     private TreeNode parent;
@@ -26,12 +26,6 @@ public class TreeNode extends Baseclass {
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource icon;
 
-    public TreeNode() {
-    }
-
-    public TreeNode(String name, SecurityContext securityContext) {
-        super(name, securityContext);
-    }
 
     @ManyToOne(targetEntity = DynamicExecution.class)
     private DynamicExecution dynamicExecution;
@@ -39,7 +33,7 @@ public class TreeNode extends Baseclass {
     @Lob
     private String contextString;
 
-    @OneToMany(targetEntity = TreeNode.class,mappedBy = "parent",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @OneToMany(targetEntity = TreeNode.class,mappedBy = "parent")
     @JsonIgnore
     private List<TreeNode> children=new ArrayList<>();
 
@@ -53,7 +47,7 @@ public class TreeNode extends Baseclass {
         return this;
     }
 
-    @OneToMany(targetEntity = TreeNode.class,mappedBy = "parent",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @OneToMany(targetEntity = TreeNode.class,mappedBy = "parent")
     @JsonIgnore
     public List<TreeNode> getChildren() {
         return children;

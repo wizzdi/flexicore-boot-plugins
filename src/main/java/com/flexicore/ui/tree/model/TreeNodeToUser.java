@@ -6,11 +6,8 @@
  ******************************************************************************/
 package com.flexicore.ui.tree.model;
 
-import com.flexicore.annotations.AnnotatedClazz;
-import com.flexicore.model.Baselink;
-import com.flexicore.model.User;
-import com.flexicore.ui.tree.model.TreeNode;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.SecurityUser;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -19,20 +16,14 @@ import javax.persistence.ManyToOne;
 @SuppressWarnings("serial")
 @Entity
 
-public class TreeNodeToUser extends Baselink {
+public class TreeNodeToUser extends SecuredBasic {
 
 	@ManyToOne(targetEntity = TreeNode.class)
 	private TreeNode treeNode;
-	@ManyToOne(targetEntity = User.class)
-	private User user;
+	@ManyToOne(targetEntity = SecurityUser.class)
+	private SecurityUser user;
 	private boolean nodeOpen;
 
-	public TreeNodeToUser() {
-	}
-
-	public TreeNodeToUser(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	@ManyToOne(targetEntity = TreeNode.class)
 	public TreeNode getTreeNode() {
@@ -44,12 +35,12 @@ public class TreeNodeToUser extends Baselink {
 		return (T) this;
 	}
 
-	@ManyToOne(targetEntity = User.class)
-	public User getUser() {
+	@ManyToOne(targetEntity = SecurityUser.class)
+	public SecurityUser getUser() {
 		return user;
 	}
 
-	public <T extends TreeNodeToUser> T setUser(User user) {
+	public <T extends TreeNodeToUser> T setUser(SecurityUser user) {
 		this.user = user;
 		return (T) this;
 	}
@@ -63,13 +54,4 @@ public class TreeNodeToUser extends Baselink {
 		return (T) this;
 	}
 
-	@Override
-	public TreeNode getLeftside() {
-		return treeNode;
-	}
-
-	@Override
-	public User getRightside() {
-		return user;
-	}
 }
