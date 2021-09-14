@@ -1,15 +1,21 @@
 package com.flexicore.ui.tree.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.flexicore.ui.model.Preset;
+import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class TreeNode extends SecuredBasic {
@@ -29,6 +35,8 @@ public class TreeNode extends SecuredBasic {
 
     @ManyToOne(targetEntity = DynamicExecution.class)
     private DynamicExecution dynamicExecution;
+    @Convert(converter = JsonConverter.class)
+    private Map<String, Object> jsonNode=new HashMap<>();
 
     @Lob
     private String contextString;
@@ -141,6 +149,29 @@ public class TreeNode extends SecuredBasic {
 
     public <T extends TreeNode> T setIcon(FileResource icon) {
         this.icon = icon;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    @DynamicColumnDefinition
+    @Convert(converter = JsonConverter.class)
+    public Map<String, Object> getJsonNode() {
+        return jsonNode;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return jsonNode;
+    }
+
+    @JsonAnySetter
+    public void add(String key, Object value) {
+        jsonNode.put(key, value);
+    }
+
+
+    public <T extends TreeNode> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
         return (T) this;
     }
 }
