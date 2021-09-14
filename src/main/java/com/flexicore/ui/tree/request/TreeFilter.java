@@ -1,11 +1,18 @@
 package com.flexicore.ui.tree.request;
 
-import com.flexicore.model.FilteringInformationHolder;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
-public class TreeFilter extends FilteringInformationHolder {
+public class TreeFilter extends PaginationFilter {
 
-    @Override
-    public boolean supportingDynamic() {
-        return true;
+    private BasicPropertiesFilter basicPropertiesFilter;
+
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends TreeFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
     }
 }

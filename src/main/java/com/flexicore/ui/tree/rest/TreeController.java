@@ -7,67 +7,62 @@
 package com.flexicore.ui.tree.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.Protected;
-
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.data.jsoncontainers.PaginationResponse;
-import com.flexicore.interfaces.RESTService;
-
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.tree.model.Tree;
-import com.flexicore.ui.tree.request.*;
+import com.flexicore.ui.tree.model.Tree_;
+import com.flexicore.ui.tree.request.TreeCreate;
+import com.flexicore.ui.tree.request.TreeFilter;
+import com.flexicore.ui.tree.request.TreeUpdate;
 import com.flexicore.ui.tree.service.TreeService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
+@RequestMapping("plugins/tree")
 
-@Path("plugins/tree")
-@RequestScoped
-@Component
 @OperationsInside
-@Protected
+@RestController
 @Extension
-@PluginInfo(version = 1)
+
 @Tag(name = "Tree")
-public class TreeRESTService implements RestServicePlugin {
+public class TreeController implements Plugin {
 
 	@Autowired
-	@PluginInfo(version = 1)
+	
 	private TreeService service;
 
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getAllTrees", description = "lists all trees")
-	@Path("getAllTrees")
+	@PostMapping("getAllTrees")
 	public PaginationResponse<Tree> getAllTrees(
-			@HeaderParam("authenticationKey") String authenticationKey,
+			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
 			TreeFilter treeFilter,
-			@Context SecurityContext securityContext) {
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeFilter,securityContext);
 
 		return service.getAllTrees(treeFilter, securityContext);
 	}
 
-	@PUT
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "updateTree", description = "update tree by tree ID")
-	@Path("updateTree")
+	@PutMapping("updateTree")
 	public Tree updateTree(
-			@HeaderParam("authenticationKey") String authenticationKey,
+			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Provide treeId, root node ID , tree name , tree description") TreeUpdate updateTree,
-			@Context SecurityContext securityContext) {
-		Tree tree=updateTree.getTreeId()!=null?service.getByIdOrNull(updateTree.getTreeId(),Tree.class,null,securityContext):null;
+			@RequestAttribute SecurityContextBase securityContext) {
+		Tree tree=updateTree.getTreeId()!=null?service.getByIdOrNull(updateTree.getTreeId(),Tree.class, Tree_.security,securityContext):null;
 		if(tree==null){
-			throw new BadRequestException("No Tree with id "+updateTree.getTreeId());
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree with id "+updateTree.getTreeId());
 		}
 		updateTree.setTree(tree);
 		service.validate(updateTree,securityContext);
@@ -76,14 +71,14 @@ public class TreeRESTService implements RestServicePlugin {
 	}
 
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "createTree", description = "create tree, provide tree name , description and root node")
-	@Path("createTree")
+	@PostMapping("createTree")
 	public Tree createTree(
-			@HeaderParam("authenticationKey") String authenticationKey,
+			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Tree name, description, root node ID , root node should be created before the tree is created") TreeCreate treeCreationContainer,
-			@Context SecurityContext securityContext) {
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeCreationContainer,securityContext);
 
 		return service.createTree(treeCreationContainer, securityContext);

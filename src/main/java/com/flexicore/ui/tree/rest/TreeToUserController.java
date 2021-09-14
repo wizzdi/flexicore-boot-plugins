@@ -7,54 +7,44 @@
 package com.flexicore.ui.tree.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.Protected;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.interfaces.RestServicePlugin;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.tree.request.SaveTreeNodeStatusRequest;
 import com.flexicore.ui.tree.request.TreeNodeStatusRequest;
 import com.flexicore.ui.tree.response.SaveTreeNodeStatusResponse;
 import com.flexicore.ui.tree.response.TreeNodeStatusResponse;
 import com.flexicore.ui.tree.service.TreeNodeToUserService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+@RequestMapping("plugins/treeToUser")
 
-@Path("plugins/treeToUser")
-@RequestScoped
-@Component
 @OperationsInside
-@Protected
+@RestController
 @Extension
-@PluginInfo(version = 1)
+
 @Tag(name = "TreeToUser")
-public class TreeToUserRESTService implements RestServicePlugin {
+public class TreeToUserController implements Plugin {
 
 
 	@Autowired
-	@PluginInfo(version = 1)
+	
 	private TreeNodeToUserService service;
 
 
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "saveTreeNodeStatus", description = "save Tree node Status, the TreeNode Status saves the status for the current user and allows a client to show the tree in the same expansion collapsing saved")
-	@Path("saveTreeNodeStatus")
+	@PostMapping("saveTreeNodeStatus")
 	public SaveTreeNodeStatusResponse saveTreeNodeStatus(
-			@HeaderParam("authenticationKey") String authenticationKey,
-			@RequestBody(description = "Stores  a list of NodeID,boolean pairs",required = true) SaveTreeNodeStatusRequest saveTreeNodeStatusRequest,
-			@Context SecurityContext securityContext) {
+			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@RequestBody(description = "Stores  a list of NodeID,boolean pairs") SaveTreeNodeStatusRequest saveTreeNodeStatusRequest,
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(saveTreeNodeStatusRequest,securityContext);
 
 		return service.saveTreeNodeStatus(saveTreeNodeStatusRequest, securityContext);
@@ -62,14 +52,14 @@ public class TreeToUserRESTService implements RestServicePlugin {
 
 
 
-	@POST
-	@Produces("application/json")
+	
+	
 	@Operation(summary = "getTreeNodeStatus", description = "get Tree nodes Status, get the stored values for the list of nodes stored in saveTreeNodeStatus")
-	@Path("getTreeNodeStatus")
+	@PostMapping("getTreeNodeStatus")
 	public TreeNodeStatusResponse getTreeNodeStatus(
-			@HeaderParam("authenticationKey") String authenticationKey,
+			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
 			TreeNodeStatusRequest treeNodeStatusRequest,
-			@Context SecurityContext securityContext) {
+			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeNodeStatusRequest,securityContext);
 
 		return service.getTreeNodeStatus(treeNodeStatusRequest, securityContext);

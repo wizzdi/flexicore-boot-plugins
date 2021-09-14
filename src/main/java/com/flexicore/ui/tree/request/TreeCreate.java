@@ -1,10 +1,17 @@
 package com.flexicore.ui.tree.request;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.request.BaseclassCreate;
 import com.flexicore.ui.tree.model.TreeNode;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class TreeCreate extends BaseclassCreate {
+import java.util.HashMap;
+import java.util.Map;
+
+public class TreeCreate extends BasicCreate {
+
+    private Map<String, Object> jsonNode=new HashMap<>();
 
     private String rootId;
     @JsonIgnore
@@ -30,8 +37,24 @@ public class TreeCreate extends BaseclassCreate {
         return this;
     }
 
-    @Override
-    public boolean supportingDynamic() {
-        return true;
+    @JsonIgnore
+    public Map<String, Object> getJsonNode() {
+        return this.jsonNode;
     }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return this.jsonNode;
+    }
+
+    @JsonAnySetter
+    public void add(String key, Object value) {
+        jsonNode.put(key, value);
+    }
+
+    public <T extends TreeCreate> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
+        return (T) this;
+    }
+
 }

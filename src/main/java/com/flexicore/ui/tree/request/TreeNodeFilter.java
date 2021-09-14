@@ -1,16 +1,18 @@
 package com.flexicore.ui.tree.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.FilteringInformationHolder;
 import com.flexicore.ui.tree.model.TreeNode;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.PaginationFilter;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
-public class TreeNodeFilter extends FilteringInformationHolder {
+public class TreeNodeFilter extends PaginationFilter {
 
+    private BasicPropertiesFilter basicPropertiesFilter;
 
 
     private Set<String> parentId=new HashSet<>();
@@ -37,8 +39,13 @@ public class TreeNodeFilter extends FilteringInformationHolder {
         return (T) this;
     }
 
-    @Override
-    public boolean supportingDynamic() {
-        return true;
+
+    public BasicPropertiesFilter getBasicPropertiesFilter() {
+        return basicPropertiesFilter;
+    }
+
+    public <T extends TreeNodeFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
+        this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
     }
 }

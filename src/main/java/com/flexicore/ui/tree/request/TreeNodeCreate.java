@@ -1,15 +1,20 @@
 package com.flexicore.ui.tree.request;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.FileResource;
-import com.flexicore.model.dynamic.DynamicExecution;
-import com.flexicore.request.BaseclassCreate;
 import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.tree.model.TreeNode;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.request.BasicCreate;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Schema(description = "Describes a treenode to be created or updated")
-public class TreeNodeCreate extends BaseclassCreate {
+public class TreeNodeCreate extends BasicCreate {
 
     private String parentId;
     @JsonIgnore
@@ -29,6 +34,8 @@ public class TreeNodeCreate extends BaseclassCreate {
     private String iconId;
     @JsonIgnore
     private FileResource icon;
+    private Map<String, Object> jsonNode=new HashMap<>();
+
 
 
     @Schema(description = "Parent Node Id , or null ")
@@ -166,8 +173,25 @@ public class TreeNodeCreate extends BaseclassCreate {
         return (T) this;
     }
 
-    @Override
-    public boolean supportingDynamic() {
-        return true;
+    @JsonIgnore
+    public Map<String, Object> getJsonNode() {
+        return this.jsonNode;
     }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return this.jsonNode;
+    }
+
+    @JsonAnySetter
+    public void add(String key, Object value) {
+        jsonNode.put(key, value);
+    }
+
+    public <T extends TreeNodeCreate> T setJsonNode(Map<String, Object> jsonNode) {
+        this.jsonNode = jsonNode;
+        return (T) this;
+    }
+
+
 }
