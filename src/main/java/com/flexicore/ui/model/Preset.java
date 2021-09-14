@@ -1,8 +1,10 @@
 package com.flexicore.ui.model;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
+import com.wizzdi.dynamic.annotations.service.TransformAnnotations;
 import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
@@ -11,16 +13,18 @@ import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Entity
+@TransformAnnotations
 public class Preset extends SecuredBasic {
 
 	private String externalId;
 
 	@Convert(converter = JsonConverter.class)
-	private Map<String, Object> jsonNode;
+	private Map<String, Object> jsonNode=new HashMap<>();
 
 	public Preset() {
 	}
@@ -63,6 +67,12 @@ public class Preset extends SecuredBasic {
 	public Map<String, Object> any() {
 		return jsonNode;
 	}
+
+	@JsonAnySetter
+	public void add(String key, Object value) {
+		jsonNode.put(key, value);
+	}
+
 
 	public <T extends Preset> T setJsonNode(Map<String, Object> jsonNode) {
 		this.jsonNode = jsonNode;
