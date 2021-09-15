@@ -270,7 +270,7 @@
                                         <Plugin-Id>${artifactId}</Plugin-Id>
                                         <Plugin-Version>${version}</Plugin-Version>
                                         <!--suppress UnresolvedMavenProperty -->
-                                        <Plugin-Dependencies>category-service@&gt;=${category-service.version},flexicore-ui-service@&gt;=${flexicore-service.version}
+                                        <Plugin-Dependencies>category-service@&gt;=${category-service.version},flexicore-ui-service@&gt;=4.9.9
                                         </Plugin-Dependencies>
 
                                     </manifestEntries>
