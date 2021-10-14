@@ -77,8 +77,8 @@ public class FirebaseMessagingService implements Plugin {
 
 			BatchResponse batchResponse = firebaseMessaging.sendMulticast(fbMessage);
 			if(batchResponse.getFailureCount()>0){
-				batchResponse.getResponses().stream().map(f->f.getException()).filter(Objects::nonNull).map(f->"error:"+f.getMessage()+" , code: "+f.getMessagingErrorCode()).collect(Collectors.joining(System.lineSeparator()));
-				logger.warn("failed sending "+batchResponse.getFailureCount() +" to Firebase , "+batchResponse.getSuccessCount() +" were sent");
+				String errorString = batchResponse.getResponses().stream().map(f -> f.getException()).filter(Objects::nonNull).map(f -> "error:" + f.getMessage() + " , code: " + f.getMessagingErrorCode()).collect(Collectors.joining(System.lineSeparator()));
+				logger.warn("failed sending "+batchResponse.getFailureCount() +" to Firebase , "+batchResponse.getSuccessCount() +" were sent: "+System.lineSeparator()+errorString);
 			}
 			else{
 
