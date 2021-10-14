@@ -55,10 +55,14 @@ public class FirebaseMessagingService implements Plugin {
 		List<FirebaseEnabledDevice> devices = chatUsers.isEmpty() ? new ArrayList<>() : firebaseEnabledDeviceService.listAllFirebaseEnabledDevices(new FirebaseEnabledDeviceFilter().setChatUsers(new ArrayList<>(chatUsers.values())), null);
 		Set<String> tokens = devices.stream().map(MessageReceiverDevice::getExternalId).filter(Objects::nonNull).collect(Collectors.toSet());
 		if (!tokens.isEmpty()) {
+			String content = message.getContent();
+			if(content==null||content.trim().isEmpty()){
+				content="Empty Message";
+			}
 			Notification notification = Notification
 					.builder()
-					.setTitle(message.getContent())
-					.setBody(message.getContent())
+					.setTitle(content)
+					.setBody(content)
 					.build();
 
 			Map<String, String> stringProps = message.getOther().entrySet().stream().filter(f -> f.getValue() instanceof String).collect(Collectors.toMap(f -> f.getKey(), f -> (String) f.getValue()));
