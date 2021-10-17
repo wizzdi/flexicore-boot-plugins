@@ -1,7 +1,9 @@
 package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.annotations.TypeRetention;
 import com.flexicore.model.territories.City;
+import com.flexicore.model.territories.Street;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
@@ -16,6 +18,7 @@ public class NeighbourhoodFilter extends PaginationFilter {
 	private Set<String> externalIds=new HashSet<>();
 	private Set<String> citiesIds=new HashSet<>();
 	@JsonIgnore
+	@TypeRetention(City.class)
 	private List<City> cities;
 
 

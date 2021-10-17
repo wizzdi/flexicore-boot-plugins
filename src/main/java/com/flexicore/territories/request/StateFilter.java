@@ -1,6 +1,8 @@
 package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.annotations.TypeRetention;
+import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.territories.Country;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
@@ -17,6 +19,7 @@ public class StateFilter extends PaginationFilter {
 	private BasicPropertiesFilter basicPropertiesFilter;
 	private Set<String> countriesIds =new HashSet<>();
 	@JsonIgnore
+	@TypeRetention(Country.class)
 	private List<Country> countries;
 
 

@@ -1,8 +1,10 @@
 package com.flexicore.territories.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.annotations.TypeRetention;
 import com.flexicore.model.territories.Country;
 import com.flexicore.model.territories.State;
+import com.flexicore.model.territories.Street;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
@@ -16,12 +18,14 @@ public class CityFilter extends PaginationFilter {
 	private BasicPropertiesFilter basicPropertiesFilter;
 	private Set<String> countriesIds =new HashSet<>();
 	@JsonIgnore
+	@TypeRetention(Country.class)
 	private List<Country> countries;
 
 
 
 	private Set<String> statesIds =new HashSet<>();
 	@JsonIgnore
+	@TypeRetention(State.class)
 	private List<State> states;
 
 
