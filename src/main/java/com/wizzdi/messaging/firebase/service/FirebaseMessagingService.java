@@ -66,8 +66,10 @@ public class FirebaseMessagingService implements Plugin {
 					.build();
 
 			Map<String, String> stringProps = message.getOther().entrySet().stream().filter(f -> f.getValue() instanceof String).collect(Collectors.toMap(f -> f.getKey(), f -> (String) f.getValue()));
-			stringProps.put(FROM_NAME,sender.getName());
-			stringProps.put(FROM_ID,sender.getId());
+			if(sender!=null){
+				stringProps.put(FROM_NAME,sender.getName());
+				stringProps.put(FROM_ID,sender.getId());
+			}
 			stringProps.put(CHAT_ID,chat.getId());
 			stringProps.put(MESSAGE_ID,message.getId());
 			stringProps.put(TIME,dateTimeFormatter.format(message.getUpdateDate()));
