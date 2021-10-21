@@ -13,4 +13,13 @@ public class ConnectReceived extends IOTMessage{
         this.connectId = connectId;
         return (T) this;
     }
+
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
+    public <T extends ConnectReceived> T setConnectionState(ConnectionState connectionState) {
+        this.connectionState = connectionState;
+        return (T) this;
+    }
 }

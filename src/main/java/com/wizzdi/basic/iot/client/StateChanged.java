@@ -9,6 +9,7 @@ import java.util.Map;
 public class StateChanged extends IOTMessage{
     private String deviceId;
     private final Map<String,Object> otherProperties =new HashMap<>();
+    private String deviceType;
 
 
     public String getDeviceId() {
@@ -28,5 +29,14 @@ public class StateChanged extends IOTMessage{
     @JsonAnySetter
     public void setValue(String key,Object value){
         otherProperties.put(key,value);
+    }
+
+    public String getDeviceType() {
+        return deviceType;
+    }
+
+    public <T extends StateChanged> T setDeviceType(String deviceType) {
+        this.deviceType = deviceType;
+        return (T) this;
     }
 }
