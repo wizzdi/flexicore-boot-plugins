@@ -122,7 +122,7 @@ public class PendingGatewayService implements Plugin {
             pendingGateway.setPublicKey(pendingGatewayCreate.getPublicKey());
             update = true;
         }
-        if (pendingGatewayCreate.getRegisteredGateway() != null &&(pendingGatewayCreate.getRegisteredGateway()==null|| !pendingGatewayCreate.getRegisteredGateway().getId().equals(pendingGateway.getRegisteredGateway().getId()))) {
+        if (pendingGatewayCreate.getRegisteredGateway() != null &&(pendingGateway.getRegisteredGateway()==null|| !pendingGatewayCreate.getRegisteredGateway().getId().equals(pendingGateway.getRegisteredGateway().getId()))) {
             pendingGateway.setRegisteredGateway(pendingGatewayCreate.getRegisteredGateway());
             update = true;
         }

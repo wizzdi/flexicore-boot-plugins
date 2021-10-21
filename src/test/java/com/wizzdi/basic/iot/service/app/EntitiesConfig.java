@@ -6,6 +6,7 @@ import com.flexicore.model.Clazz;
 import com.flexicore.model.security.SecurityPolicy;
 
 import com.wizzdi.basic.iot.model.Gateway;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,6 @@ public class EntitiesConfig {
 
 	@Bean
 	public EntitiesHolder entitiesHolder(){
-		return new EntitiesHolder(new HashSet<>(Arrays.asList(Baseclass.class, Basic.class, SecurityPolicy.class, Gateway.class)));
+		return new EntitiesHolder(new HashSet<>(Arrays.asList(Baseclass.class, Basic.class, SecurityPolicy.class, Gateway.class, JsonConverter.class)));
 	}
 }

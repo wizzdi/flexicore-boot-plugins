@@ -10,6 +10,7 @@ import com.wizzdi.basic.iot.service.request.DeviceTypeCreate;
 import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
 import com.wizzdi.basic.iot.service.request.DeviceTypeUpdate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.metamodel.SingularAttribute;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -131,5 +133,13 @@ public class DeviceTypeService implements Plugin {
     public void validate(DeviceTypeCreate deviceTypeCreate,
                          SecurityContextBase securityContext) {
         basicService.validate(deviceTypeCreate, securityContext);
+    }
+
+    public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContextBase securityContext) {
+        DeviceType deviceType = listAllDeviceTypes(securityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().findFirst().orElse(null);
+        if(deviceType!=null){
+            return deviceType;
+        }
+        return createDeviceType(new DeviceTypeCreate().setName(deviceTypeName),securityContext);
     }
 }
