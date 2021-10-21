@@ -26,7 +26,8 @@ public class ChangeState extends IOTMessage{
     }
 
     @JsonAnySetter
-    public void setValue(String key,Object value){
+    public <T extends ChangeState> T setValue(String key,Object value){
         otherProperties.put(key,value);
+        return (T) this;
     }
 }

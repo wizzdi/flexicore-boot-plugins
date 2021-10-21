@@ -26,9 +26,11 @@ public class StateChanged extends IOTMessage{
         return otherProperties;
     }
 
+
     @JsonAnySetter
-    public void setValue(String key,Object value){
+    public <T extends StateChanged> T setValue(String key,Object value){
         otherProperties.put(key,value);
+        return (T) this;
     }
 
     public String getDeviceType() {
