@@ -1,15 +1,16 @@
 package com.flexicore.ui.component.rest;
 
-import com.flexicore.data.jsoncontainers.PaginationResponse;
+import com.flexicore.model.PermissionGroup;
+
+import com.flexicore.model.PermissionGroupToBaseclass;
 import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentRegistrationContainer;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
-import com.flexicore.model.PermissionGroup;
-import com.flexicore.model.User;
-import com.flexicore.request.AuthenticationRequest;
-import com.flexicore.request.PermissionGroupsFilter;
-import com.flexicore.request.UserCreate;
-import com.flexicore.response.AuthenticationResponse;
+import com.flexicore.ui.component.rest.app.App;
+import com.wizzdi.flexicore.security.request.PermissionGroupFilter;
+import com.wizzdi.flexicore.security.request.PermissionGroupToBaseclassFilter;
+import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.PermissionGroupToBaseclassService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,53 +29,33 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = FlexiCoreApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class UIComponentRESTServiceTest {
+public class UIComponentControllerTest {
 
-
+    private static final String ADMIN = "admin";
+    private static final String USER = "user";
     @Autowired
     private TestRestTemplate restTemplate;
 
     private List<UIComponent> uiComponents;
-    private AtomicReference<String> authenticationKey=new AtomicReference<>(null);
-    private String otherAuthenticationKey;
+    @Autowired
+    private PermissionGroupToBaseclassService permissionGroupToBaseclassService;
+    private final AtomicReference<String> authenticationKey = new AtomicReference<>(null);
 
     @BeforeAll
     private void init() {
-        ResponseEntity<AuthenticationResponse> authenticationResponse = this.restTemplate.postForEntity("/FlexiCore/rest/authenticationNew/login", new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"), AuthenticationResponse.class);
-        authenticationKey.set(authenticationResponse.getBody().getAuthenticationKey());
+        authenticationKey.set(ADMIN);
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()
                             .add("authenticationKey", authenticationKey.get());
                     return execution.execute(request, body);
                 }));
-
-        otherAuthenticationKey = prepareOtherUser();
     }
 
-    private String prepareOtherUser() {
-
-        String name = UUID.randomUUID().toString();
-        String email = name + "@test.com";
-        String lastName = name + "_Last";
-        String password = name + "_pass";
-        String phoneNumber = name + "_phone";
-        UserCreate request = new UserCreate()
-                .setEmail(email)
-                .setLastName(lastName)
-                .setPassword(password)
-                .setPhoneNumber(phoneNumber)
-                .setName(name);
-        ResponseEntity<User> userResponse = this.restTemplate.postForEntity("/FlexiCore/rest/users/createUser", request, User.class);
-        Assertions.assertEquals(200, userResponse.getStatusCodeValue());
-        User user = userResponse.getBody();
-        ResponseEntity<AuthenticationResponse> authenticationResponse = this.restTemplate.postForEntity("/FlexiCore/rest/authenticationNew/login", new AuthenticationRequest().setEmail(email).setPassword(password), AuthenticationResponse.class);
-        return authenticationResponse.getBody().getAuthenticationKey();
-    }
 
     @Test
     @Order(1)
@@ -97,7 +78,7 @@ public class UIComponentRESTServiceTest {
         uiComponentsRegistrationContainer.setComponentsToRegister(uiComponentRegistrationContainers);
         ParameterizedTypeReference<List<UIComponent>> t = new ParameterizedTypeReference<List<UIComponent>>() {
         };
-        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/FlexiCore/rest/uiPlugin/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
+        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/uiComponent/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
 
         Assertions.assertEquals(200, uiComponentResponse.getStatusCodeValue());
         uiComponents = uiComponentResponse.getBody();
@@ -114,12 +95,9 @@ public class UIComponentRESTServiceTest {
         Map<String, UIComponent> uiComponentMap = uiComponents.stream().collect(Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a));
         for (UIComponentRegistrationContainer uiComponentRegistrationContainer : uiComponentRegistrationContainers) {
             UIComponent uiComponent = uiComponentMap.get(uiComponentRegistrationContainer.getExternalId());
-            PermissionGroupsFilter permissionGroupsFilter = new PermissionGroupsFilter().setBaseclasses(Collections.singletonList(uiComponent));
-            ParameterizedTypeReference<PaginationResponse<PermissionGroup>> t = new ParameterizedTypeReference<PaginationResponse<PermissionGroup>>() {
-            };
-            ResponseEntity<PaginationResponse<PermissionGroup>> permissionGroupsResponse = this.restTemplate.exchange("/FlexiCore/rest/permissionGroup/getAllPermissionGroups", HttpMethod.POST, new HttpEntity<>(permissionGroupsFilter), t);
-            Assertions.assertEquals(200, permissionGroupsResponse.getStatusCodeValue());
-            Set<String> actualGroups = permissionGroupsResponse.getBody().getList().stream().map(f -> f.getExternalId()).collect(Collectors.toSet());
+            List<PermissionGroupToBaseclass> permissionGroupToBaseclasses = permissionGroupToBaseclassService.listAllPermissionGroupToBaseclass(new PermissionGroupToBaseclassFilter().setLeftside(Collections.singletonList(uiComponent.getSecurity())), null);
+
+            Set<String> actualGroups = permissionGroupToBaseclasses.stream().map(f -> f.getLeftside().getExternalId()).collect(Collectors.toSet());
             Set<String> expectedGroups = Stream.of(uiComponentRegistrationContainer.getGroups().split(",")).collect(Collectors.toSet());
             Assertions.assertTrue(expectedGroups.containsAll(actualGroups));
             Assertions.assertTrue(actualGroups.containsAll(expectedGroups));
@@ -149,7 +127,7 @@ public class UIComponentRESTServiceTest {
         uiComponentsRegistrationContainer.setComponentsToRegister(uiComponentRegistrationContainers);
         ParameterizedTypeReference<List<UIComponent>> t = new ParameterizedTypeReference<List<UIComponent>>() {
         };
-        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/FlexiCore/rest/uiPlugin/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
+        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/uiComponent/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
 
         Assertions.assertEquals(200, uiComponentResponse.getStatusCodeValue());
         List<UIComponent> uiComponents = uiComponentResponse.getBody();
@@ -165,7 +143,7 @@ public class UIComponentRESTServiceTest {
     @Test
     @Order(3)
     public void testRegistrationAsDifferentUser() {
-        this.authenticationKey.set(this.otherAuthenticationKey);
+        this.authenticationKey.set(USER);
         UIComponentsRegistrationContainer uiComponentsRegistrationContainer = new UIComponentsRegistrationContainer();
         List<UIComponentRegistrationContainer> uiComponentRegistrationContainers = new ArrayList<>();
         Map<String, String> componentToPermissionGroups = new HashMap<>();
@@ -183,7 +161,7 @@ public class UIComponentRESTServiceTest {
         uiComponentsRegistrationContainer.setComponentsToRegister(uiComponentRegistrationContainers);
         ParameterizedTypeReference<List<UIComponent>> t = new ParameterizedTypeReference<List<UIComponent>>() {
         };
-        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/FlexiCore/rest/uiPlugin/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
+        ResponseEntity<List<UIComponent>> uiComponentResponse = this.restTemplate.exchange("/uiComponent/registerAndGetAllowedUIComponents", HttpMethod.POST, new HttpEntity<>(uiComponentsRegistrationContainer), t);
 
         Assertions.assertEquals(200, uiComponentResponse.getStatusCodeValue());
         List<UIComponent> uiComponents = uiComponentResponse.getBody();

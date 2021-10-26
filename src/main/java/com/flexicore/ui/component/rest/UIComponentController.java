@@ -6,56 +6,41 @@
  ******************************************************************************/
 package com.flexicore.ui.component.rest;
 
-import com.flexicore.annotations.IOperation;
-import com.flexicore.annotations.IOperation.Access;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.annotations.Protected;
-import com.flexicore.annotations.plugins.PluginInfo;
-import com.flexicore.interfaces.RestServicePlugin;
+import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
-
-import com.flexicore.security.SecurityContext;
 import com.flexicore.ui.component.service.UIComponentService;
+import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
-import javax.enterprise.context.RequestScoped;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-@Path("/uiPlugin")
-@PluginInfo(version = 1)
-@RequestScoped
-@Component
+@RequestMapping("/uiComponent")
 @OperationsInside
-@Protected
+@RestController
 @Tag(name = "UI Components")
 @Extension
-public class UIComponentRESTService implements RestServicePlugin {
+public class UIComponentController implements Plugin {
 
 
     @Autowired
-    @PluginInfo(version = 1)
+    
     private UIComponentService uiPluginService;
 
 
 
-    @POST
-    @Path("registerAndGetAllowedUIComponents")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @IOperation(access = Access.allow, Name = "registerAndGetAllowedUIComponents", Description = "registers components if not exists and returns allowed", relatedClazzes = {UIComponent.class})
+    @PostMapping("/registerAndGetAllowedUIComponents")
     @Operation(summary = "registerAndGetAllowedUIComponents", description = "registers components if not exists and returns allowed")
 
-    public List<UIComponent> registerAndGetAllowedUIComponents(@HeaderParam("authenticationkey") String authenticationkey,
-                                          UIComponentsRegistrationContainer uiComponentsRegistrationContainer,
-                                         @Context SecurityContext securityContext) {
+    public List<UIComponent> registerAndGetAllowedUIComponents(@RequestHeader("authenticationkey") String authenticationkey,
+                                         @RequestBody UIComponentsRegistrationContainer uiComponentsRegistrationContainer,
+                                                               @RequestAttribute SecurityContextBase securityContext) {
         uiPluginService.validate(uiComponentsRegistrationContainer);
         return uiPluginService.registerAndGetAllowedUIComponents(uiComponentsRegistrationContainer.getComponentsToRegister(),securityContext);
     }

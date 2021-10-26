@@ -1,48 +1,32 @@
-package com.flexicore.ui.component.rest;
+package com.flexicore.ui.component.rest.app;
 
-import com.flexicore.annotations.InheritedComponent;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
-import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
-import com.wizzdi.flexicore.boot.health.annotations.EnableFlexiCoreHealthPlugins;
-import com.wizzdi.flexicore.boot.jaxrs.annotations.EnableFlexiCoreJAXRSPlugins;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import java.util.Arrays;
 
-@SpringBootApplication
-@ComponentScan(basePackages = {"com.flexicore","com.test.init"},includeFilters =@ComponentScan.Filter(InheritedComponent.class))
-@EnableMongoRepositories
-@EnableJpaRepositories(basePackages = {"com.flexicore.data"})
-@EntityScan(basePackages = {"com.flexicore.model"})
-@EnableWebSocket
-@EnableFlexiCoreHealthPlugins
-@EnableFlexiCoreJAXRSPlugins
+@SpringBootApplication(scanBasePackages = "com.flexicore.ui.component")
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins
 @EnableFlexiCoreSecurity
-@EnableDynamicInvokersPlugins
-public class FlexiCoreApplication {
+public class App {
+
 
 
     public static void main(String[] args) {
 
 
-        SpringApplication app = new SpringApplication(FlexiCoreApplication.class);
+        SpringApplication app = new SpringApplication(App.class);
         app.addListeners(new ApplicationPidFileWriter());
         ConfigurableApplicationContext context=app.run(args);
 
