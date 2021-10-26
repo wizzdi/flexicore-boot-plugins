@@ -7,21 +7,14 @@
 package com.flexicore.ui.component.model;
 
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Entity;
 
 @Entity
-public class UIComponent extends Baseclass {
+public class UIComponent extends SecuredBasic {
 
 
-	public UIComponent() {
-	}
-
-	public UIComponent(String name, SecurityContextBase securityContext) {
-		super(name, securityContext);
-	}
 
 	private String externalId;
 
