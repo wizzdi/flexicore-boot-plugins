@@ -96,7 +96,11 @@ public class BasicIOTClient {
     }
 
     public void sendMessage(IOTMessage iotMessage, IOTMessage replyTo) throws JsonProcessingException {
-        sendMessage(iotMessage, replyTo.getMessage().getReplyTo());
+        String replyToTopic = replyTo.getMessage().getReplyTo();
+        if(replyToTopic==null){
+            replyToTopic=replyTo.getId();
+        }
+        sendMessage(iotMessage, replyToTopic);
     }
 
 }
