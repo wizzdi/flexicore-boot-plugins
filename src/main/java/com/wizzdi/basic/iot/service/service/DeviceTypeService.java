@@ -15,6 +15,8 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ import java.util.Set;
 @Component
 
 public class DeviceTypeService implements Plugin {
+
+    private static final Logger logger= LoggerFactory.getLogger(DeviceTypeService.class);
 
     @Autowired
     private DeviceTypeRepository repository;
@@ -138,6 +142,7 @@ public class DeviceTypeService implements Plugin {
     public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContextBase securityContext) {
         DeviceType deviceType = listAllDeviceTypes(securityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().findFirst().orElse(null);
         if(deviceType!=null){
+            logger.info("created device type "+deviceTypeName);
             return deviceType;
         }
         return createDeviceType(new DeviceTypeCreate().setName(deviceTypeName),securityContext);

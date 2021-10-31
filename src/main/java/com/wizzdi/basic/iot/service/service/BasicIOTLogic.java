@@ -36,6 +36,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
+        logger.info("received message "+iotMessage);
         IOTMessage response = onIOTMessageResponse(iotMessage);
         if (response != null) {
             try {
