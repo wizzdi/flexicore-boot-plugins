@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.nats.client.Message;
+import org.springframework.messaging.Message;
 
 import java.time.OffsetDateTime;
 
@@ -13,6 +13,8 @@ public class IOTMessage {
     private OffsetDateTime sentAt;
     @JsonIgnore
     private Message message;
+    private byte[] signature;
+    private String gatewayId;
 
     public String getId() {
         return id;
@@ -40,5 +42,28 @@ public class IOTMessage {
     public <T extends IOTMessage> T setMessage(Message message) {
         this.message = message;
         return (T) this;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+    public <T extends IOTMessage> T setSignature(byte[] signature) {
+        this.signature = signature;
+        return (T) this;
+    }
+
+    public String getGatewayId() {
+        return gatewayId;
+    }
+
+    public <T extends IOTMessage> T setGatewayId(String gatewayId) {
+        this.gatewayId = gatewayId;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public boolean isRequireAuthentication(){
+        return true;
     }
 }

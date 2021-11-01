@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.client;
 
-public interface IOTMessageSubscriber {
+public interface IOTMessageSubscriber<T extends IOTMessage> {
 
-    void onIOTMessage(IOTMessage iotMessage);
+    void onIOTMessage(T iotMessage);
 }

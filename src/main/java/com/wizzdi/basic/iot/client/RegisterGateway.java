@@ -2,7 +2,6 @@ package com.wizzdi.basic.iot.client;
 
 public class RegisterGateway extends IOTMessage{
 
-    private String gatewayId;
     private String publicKey;
 
     public String getPublicKey() {
@@ -14,12 +13,8 @@ public class RegisterGateway extends IOTMessage{
         return (T) this;
     }
 
-    public String getGatewayId() {
-        return gatewayId;
-    }
-
-    public <T extends RegisterGateway> T setGatewayId(String gatewayId) {
-        this.gatewayId = gatewayId;
-        return (T) this;
+    @Override
+    public boolean isRequireAuthentication() {
+        return false;
     }
 }
