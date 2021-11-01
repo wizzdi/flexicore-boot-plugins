@@ -14,9 +14,11 @@ import com.wizzdi.basic.iot.service.service.DeviceTypeService;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
@@ -26,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +45,6 @@ import java.util.concurrent.TimeoutException;
 
 public class FlowTest {
 
-    public static final String GATEWAY_ID = "Test";
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
     @Autowired
@@ -56,16 +59,21 @@ public class FlowTest {
     private DeviceService deviceService;
     @Autowired
     private String jsonSchema;
+    @Autowired
+    private PublicKey clientPublicKey;
+    @Value("${basic.iot.test.id:iot-client}")
+    private String clientId;
 
 
     @Test
     @Order(1)
     public void testRegister() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
         RegisterGateway registerGateway = new RegisterGateway()
-                .setGatewayId(GATEWAY_ID)
-                .setPublicKey("test")
+                .setPublicKey(Base64.encodeBase64String(clientPublicKey.getEncoded()))
+                .setGatewayId(clientId)
+
                 .setId(UUID.randomUUID().toString());
-        RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway, RegisterGatewayReceived.class).get(500, TimeUnit.MILLISECONDS);
+        RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway);
         Assertions.assertNotNull(registerGatewayReceived);
 
 
@@ -75,8 +83,8 @@ public class FlowTest {
     @Test
     @Order(2)
     public void testApproveGateway() {
-        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(GATEWAY_ID))));
-        Assertions.assertTrue(approveResponse.getList().stream().anyMatch(f->f.getRemoteId().equals(GATEWAY_ID)));
+        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
+        Assertions.assertTrue(approveResponse.getList().stream().anyMatch(f->f.getRemoteId().equals(clientId)));
 
     }
 
@@ -85,7 +93,7 @@ public class FlowTest {
     @Test
     @Order(3)
     public void testDeviceStateChanged() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        StateChangedReceived stateChangedReceived = testBasicIOTClient.request(new StateChanged().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30), StateChangedReceived.class).get(500, TimeUnit.MILLISECONDS);
+        StateChangedReceived stateChangedReceived = testBasicIOTClient.request(new StateChanged().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30));
         Assertions.assertNotNull(stateChangedReceived);
         DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
@@ -101,7 +109,7 @@ public class FlowTest {
     @Test
     @Order(4)
     public void testUpdateSchema() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        UpdateStateSchemaReceived updateStateSchemaReceived = testBasicIOTClient.request(new UpdateStateSchema().setDeviceType(DEVICE_TYPE).setVersion(1).setJsonSchema(jsonSchema), UpdateStateSchemaReceived.class).get(500, TimeUnit.MILLISECONDS);
+        UpdateStateSchemaReceived updateStateSchemaReceived = testBasicIOTClient.request(new UpdateStateSchema().setDeviceType(DEVICE_TYPE).setVersion(1).setJsonSchema(jsonSchema));
         Assertions.assertNotNull(updateStateSchemaReceived);
         DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);

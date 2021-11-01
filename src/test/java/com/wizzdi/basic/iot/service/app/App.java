@@ -12,6 +12,7 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.integration.config.EnableIntegration;
 
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ import java.util.Arrays;
 @EnableFlexiCoreRESTPlugins
 @EnableFlexiCoreSecurity
 @EnableDynamicProperties
+@EnableIntegration
 
 public class App {
 

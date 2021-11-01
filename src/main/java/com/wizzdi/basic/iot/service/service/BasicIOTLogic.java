@@ -40,7 +40,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         IOTMessage response = onIOTMessageResponse(iotMessage);
         if (response != null) {
             try {
-                basicIOTClient.sendMessage(response, iotMessage);
+                basicIOTClient.reply(response, iotMessage);
             } catch (JsonProcessingException e) {
                 logger.error("failed sending response message");
             }
