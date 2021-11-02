@@ -68,4 +68,5 @@ public class Device extends Remote {
         this.deviceType = deviceType;
         return (T) this;
     }
+
 }
