@@ -1,8 +1,8 @@
 package com.wizzdi.basic.iot.service.app;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wizzdi.basic.iot.client.BasicIOTClient;
-import com.wizzdi.basic.iot.client.BasicIOTConnection;
+import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -24,7 +24,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Configuration
 public class TestEntities {
@@ -37,6 +41,8 @@ public class TestEntities {
     private String publicKeyPath;
     @Value("${basic.iot.test.id:iot-client}")
     private String clientId;
+    private static final Queue<IOTMessageSubscriber> messageSubscribers=new LinkedBlockingQueue<>();
+
 
 
 
@@ -84,8 +90,11 @@ public class TestEntities {
 
     @Bean
     public BasicIOTClient testBasicIOTClient(PrivateKey clientPrivateKey, ObjectMapper objectMapper) {
-        return new BasicIOTClient(clientId,clientPrivateKey, objectMapper, Collections.emptyList());
+        return new BasicIOTClient(clientId, clientPrivateKey, objectMapper, messageSubscribers);
+
     }
+
+
     @Bean
     public IntegrationFlow clientInputIntegrationFlow(BasicIOTClient testBasicIOTClient, MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient) {
         return IntegrationFlows.from(
@@ -108,6 +117,13 @@ public class TestEntities {
     @Bean
     public String jsonSchema() throws IOException {
         return IOUtils.resourceToString("light.schema.json", StandardCharsets.UTF_8, TestEntities.class.getClassLoader());
+    }
+
+    public static void addMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber){
+        messageSubscribers.add(iotMessageSubscriber);
+    }
+    public static void removeMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber){
+        messageSubscribers.remove(iotMessageSubscriber);
     }
 
 

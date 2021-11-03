@@ -3,14 +3,19 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
+import com.flexicore.model.SecurityUser;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.request.SecurityUserCreate;
+import com.wizzdi.flexicore.security.request.TenantToUserCreate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
+import com.wizzdi.flexicore.security.service.SecurityUserService;
+import com.wizzdi.flexicore.security.service.TenantToUserService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +40,10 @@ public class GatewayService implements Plugin {
     private RemoteService remoteService;
     @Autowired
     private PendingGatewayService pendingGatewayService;
+    @Autowired
+    private SecurityUserService securityUserService;
+    @Autowired
+    private TenantToUserService tenantToUserService;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -122,6 +131,14 @@ public class GatewayService implements Plugin {
             gateway.setPublicKey(gatewayCreate.getPublicKey());
             update = true;
         }
+        if(gatewayCreate.getApprovingUser()!=null&&(gateway.getApprovingUser()==null||!gatewayCreate.getApprovingUser().getId().equals(gateway.getApprovingUser().getId()))){
+            gateway.setApprovingUser(gatewayCreate.getApprovingUser());
+            update=true;
+        }
+        if(gatewayCreate.getGatewayUser()!=null&&(gateway.getGatewayUser()==null||!gatewayCreate.getGatewayUser().getId().equals(gateway.getGatewayUser().getId()))){
+            gateway.setGatewayUser(gatewayCreate.getGatewayUser());
+            update=true;
+        }
         return update;
     }
 
@@ -143,12 +160,24 @@ public class GatewayService implements Plugin {
         List<Gateway> response=new ArrayList<>();
         List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, approveGatewaysRequest.getPendingGatewayFilter());
         for (PendingGateway pendingGateway : pendingGateways) {
-            GatewayCreate gatewayCreate=getGatwayCreate(pendingGateway);
+            SecurityUser gatewaySecurityUser=createGatewaySecurityUser(securityContext,pendingGateway.getGatewayId());
+            GatewayCreate gatewayCreate=getGatwayCreate(pendingGateway)
+                    .setApprovingUser(securityContext.getUser())
+                    .setGatewayUser(gatewaySecurityUser);
             Gateway gateway = createGateway(gatewayCreate, securityContext);
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway),securityContext);
         }
         return new PaginationResponse<>(response,response.size(),response.size());
+    }
+
+    private SecurityUser createGatewaySecurityUser(SecurityContextBase securityContext, String gatewayId) {
+        SecurityUserCreate securityUserCreate=new SecurityUserCreate()
+                .setDescription("Automatically Created User for Gateway "+gatewayId)
+                .setName(gatewayId+"-User");
+        SecurityUser securityUser = securityUserService.createSecurityUser(securityUserCreate, securityContext);
+        tenantToUserService.createTenantToUser(new TenantToUserCreate().setSecurityUser(securityUser).setDefaultTenant(true).setTenant(securityContext.getTenantToCreateIn()),securityContext);
+        return securityUser;
     }
 
     private GatewayCreate getGatwayCreate(PendingGateway pendingGateway) {

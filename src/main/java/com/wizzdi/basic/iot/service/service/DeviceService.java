@@ -4,16 +4,22 @@ package com.wizzdi.basic.iot.service.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.basic.iot.client.BasicIOTClient;
+import com.wizzdi.basic.iot.client.ChangeState;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.DeviceRepository;
+import com.wizzdi.basic.iot.service.request.ChangeStateRequest;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.basic.iot.service.request.DeviceUpdate;
+import com.wizzdi.basic.iot.service.response.ChangeStateResponse;
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -28,6 +34,8 @@ import java.util.stream.Collectors;
 @Component
 
 public class DeviceService implements Plugin {
+
+    private static final Logger logger= LoggerFactory.getLogger(DeviceService.class);
 
     @Autowired
     private DeviceRepository repository;
@@ -76,19 +84,19 @@ public class DeviceService implements Plugin {
     public void validateFiltering(DeviceFilter deviceFilter,
                                   SecurityContextBase securityContext) {
         remoteService.validateFiltering(deviceFilter, securityContext);
-        Set<String> gatewayIds=deviceFilter.getGatewayIds();
-        Map<String,Gateway> gatewayMap=gatewayIds.isEmpty()?new HashMap<>():listByIds(Gateway.class,gatewayIds,Remote_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+        Set<String> gatewayIds = deviceFilter.getGatewayIds();
+        Map<String, Gateway> gatewayMap = gatewayIds.isEmpty() ? new HashMap<>() : listByIds(Gateway.class, gatewayIds, Remote_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         gatewayIds.removeAll(gatewayMap.keySet());
-        if(!gatewayIds.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Gateway with ids "+gatewayIds);
+        if (!gatewayIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Gateway with ids " + gatewayIds);
         }
         deviceFilter.setGateways(new ArrayList<>(gatewayMap.values()));
 
-        Set<String> deviceTypeIds=deviceFilter.getDeviceTypeIds();
-        Map<String,DeviceType> deviceTypeMap=deviceTypeIds.isEmpty()?new HashMap<>():listByIds(DeviceType.class,deviceTypeIds,Remote_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+        Set<String> deviceTypeIds = deviceFilter.getDeviceTypeIds();
+        Map<String, DeviceType> deviceTypeMap = deviceTypeIds.isEmpty() ? new HashMap<>() : listByIds(DeviceType.class, deviceTypeIds, Remote_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         deviceTypeIds.removeAll(deviceTypeMap.keySet());
-        if(!deviceTypeIds.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no DeviceType with ids "+deviceTypeIds);
+        if (!deviceTypeIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no DeviceType with ids " + deviceTypeIds);
         }
         deviceFilter.setDeviceTypes(new ArrayList<>(deviceTypeMap.values()));
     }
@@ -105,14 +113,14 @@ public class DeviceService implements Plugin {
     }
 
     public Device createDevice(DeviceCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                               SecurityContextBase securityContext) {
         Device device = createDeviceNoMerge(creationContainer, securityContext);
         repository.merge(device);
         return device;
     }
 
     public Device createDeviceNoMerge(DeviceCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                      SecurityContextBase securityContext) {
         Device device = new Device();
         device.setId(Baseclass.getBase64ID());
 
@@ -122,14 +130,14 @@ public class DeviceService implements Plugin {
     }
 
     public boolean updateDeviceNoMerge(Device device,
-                                        DeviceCreate deviceCreate) {
+                                       DeviceCreate deviceCreate) {
         boolean update = remoteService.updateRemoteNoMerge(device, deviceCreate);
-        if (deviceCreate.getDeviceType() != null && (device.getDeviceType()==null||!deviceCreate.getDeviceType().getId().equals(device.getDeviceType().getId()))) {
+        if (deviceCreate.getDeviceType() != null && (device.getDeviceType() == null || !deviceCreate.getDeviceType().getId().equals(device.getDeviceType().getId()))) {
             device.setDeviceType(deviceCreate.getDeviceType());
             update = true;
         }
 
-        if (deviceCreate.getGateway() != null && (device.getGateway()==null||!deviceCreate.getGateway().getId().equals(device.getGateway().getId()))) {
+        if (deviceCreate.getGateway() != null && (device.getGateway() == null || !deviceCreate.getGateway().getId().equals(device.getGateway().getId()))) {
             device.setGateway(deviceCreate.getGateway());
             update = true;
         }
@@ -144,7 +152,7 @@ public class DeviceService implements Plugin {
     }
 
     public Device updateDevice(DeviceUpdate deviceUpdate,
-                                 SecurityContextBase securityContext) {
+                               SecurityContextBase securityContext) {
         Device device = deviceUpdate.getDevice();
         if (updateDeviceNoMerge(device, deviceUpdate)) {
             repository.merge(device);
@@ -152,23 +160,27 @@ public class DeviceService implements Plugin {
         return device;
     }
 
+
+
     public void validate(DeviceCreate deviceCreate,
                          SecurityContextBase securityContext) {
         remoteService.validate(deviceCreate, securityContext);
 
-        String deviceTypeId=deviceCreate.getDeviceTypeId();
-        DeviceType deviceType=deviceTypeId==null?null:getByIdOrNull(deviceTypeId,DeviceType.class, Remote_.security,securityContext);
-        if(deviceTypeId!=null&&deviceType==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No DeviceType with id "+deviceTypeId);
+        String deviceTypeId = deviceCreate.getDeviceTypeId();
+        DeviceType deviceType = deviceTypeId == null ? null : getByIdOrNull(deviceTypeId, DeviceType.class, Remote_.security, securityContext);
+        if (deviceTypeId != null && deviceType == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No DeviceType with id " + deviceTypeId);
         }
         deviceCreate.setDeviceType(deviceType);
 
-        String gatewayId=deviceCreate.getGatewayId();
-        Gateway gateway=gatewayId==null?null:getByIdOrNull(gatewayId,Gateway.class, Remote_.security,securityContext);
-        if(gatewayId!=null&&gateway==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Gateway with id "+gatewayId);
+        String gatewayId = deviceCreate.getGatewayId();
+        Gateway gateway = gatewayId == null ? null : getByIdOrNull(gatewayId, Gateway.class, Remote_.security, securityContext);
+        if (gatewayId != null && gateway == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Gateway with id " + gatewayId);
         }
         deviceCreate.setGateway(gateway);
 
     }
+
+
 }

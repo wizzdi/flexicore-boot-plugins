@@ -8,8 +8,11 @@ import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.app.App;
+import com.wizzdi.basic.iot.service.app.TestEntities;
 import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.response.ChangeStateResponse;
 import com.wizzdi.basic.iot.service.service.DeviceService;
+import com.wizzdi.basic.iot.service.service.DeviceStateService;
 import com.wizzdi.basic.iot.service.service.DeviceTypeService;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
@@ -17,6 +20,8 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
@@ -44,6 +50,8 @@ import java.util.concurrent.TimeoutException;
 @ActiveProfiles("test")
 
 public class FlowTest {
+
+    private static final Logger logger= LoggerFactory.getLogger(FlowTest.class);
 
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
@@ -63,6 +71,8 @@ public class FlowTest {
     private PublicKey clientPublicKey;
     @Value("${basic.iot.test.id:iot-client}")
     private String clientId;
+    @Autowired
+    private DeviceStateService deviceStateService;
 
 
     @Test
@@ -116,6 +126,50 @@ public class FlowTest {
         Assertions.assertEquals(jsonSchema,deviceType.getStateJsonSchema());
 
 
+    }
+
+    @Test
+    @Order(5)
+    public void testDeviceStateChange() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
+        ChangeStateRequest changeStateRequest=new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setRemoteIds(Collections.singleton(clientId))).setValue("dim",94);
+        deviceStateService.validate(changeStateRequest,adminSecurityContext);
+        AtomicBoolean received=new AtomicBoolean(false);
+        synchronized (changeStateRequest){
+            IOTMessageSubscriber iotMessageSubscriber = f -> handleMessage(f, testBasicIOTClient,received);
+            TestEntities.addMessageSubscriber(iotMessageSubscriber);
+            ChangeStateResponse changeStateResponse = deviceStateService.changeState(adminSecurityContext, changeStateRequest);
+            Assertions.assertFalse(changeStateResponse.getDevicesExecutedOn().isEmpty());
+            changeStateRequest.wait(5000);
+            TestEntities.removeMessageSubscriber(iotMessageSubscriber);
+        }
+
+        Assertions.assertTrue(received.get());
 
     }
+
+    private void handleMessage(IOTMessage iotMessage, BasicIOTClient basicIOTClient, AtomicBoolean lock)  {
+        if(iotMessage instanceof ChangeState){
+            synchronized (lock){
+                try {
+                    logger.info("Change state received");
+                    ChangeState changeState = (ChangeState) iotMessage;
+                    basicIOTClient.reply(new ChangeStateReceived().setChangeStateId(iotMessage.getId()), iotMessage);
+                    logger.info("replied with ChangeStateReceived");
+
+                    basicIOTClient.sendMessage(new StateChanged().setOtherProperties(changeState.getValues()));
+                    logger.info("sending StateChanged");
+                    lock.set(true);
+                }
+                catch (Exception e){
+                    logger.error("failed sending message",e);
+                }
+                finally {
+                    lock.notifyAll();
+                }
+            }
+
+
+        }
+    }
+
 }

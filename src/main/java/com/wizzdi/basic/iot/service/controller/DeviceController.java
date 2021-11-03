@@ -5,9 +5,11 @@ import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Device_;
+import com.wizzdi.basic.iot.service.request.ChangeStateRequest;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.basic.iot.service.request.DeviceUpdate;
+import com.wizzdi.basic.iot.service.response.ChangeStateResponse;
 import com.wizzdi.basic.iot.service.service.DeviceService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -34,7 +36,6 @@ public class DeviceController implements Plugin {
 
 
     @Operation(summary = "getAllDevices", description = "Lists all Device")
-    
     @PostMapping("/getAllDevices")
     public PaginationResponse<Device> getAllDevices(
 
