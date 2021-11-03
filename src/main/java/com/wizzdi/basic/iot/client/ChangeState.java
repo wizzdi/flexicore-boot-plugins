@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ChangeState extends IOTMessage{
     private String deviceId;
-    private final Map<String,Object> otherProperties =new HashMap<>();
+    private Map<String,Object> otherProperties =new HashMap<>();
 
 
     public String getDeviceId() {
@@ -28,6 +28,11 @@ public class ChangeState extends IOTMessage{
     @JsonAnySetter
     public <T extends ChangeState> T setValue(String key,Object value){
         otherProperties.put(key,value);
+        return (T) this;
+    }
+
+    public <T extends ChangeState> T setValues(Map<String,Object> otherProperties){
+       this.otherProperties=otherProperties;
         return (T) this;
     }
 }

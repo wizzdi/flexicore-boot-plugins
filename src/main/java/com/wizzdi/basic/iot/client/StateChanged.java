@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class StateChanged extends IOTMessage{
     private String deviceId;
-    private final Map<String,Object> otherProperties =new HashMap<>();
+    private Map<String,Object> otherProperties =new HashMap<>();
     private String deviceType;
 
 
@@ -39,6 +39,11 @@ public class StateChanged extends IOTMessage{
 
     public <T extends StateChanged> T setDeviceType(String deviceType) {
         this.deviceType = deviceType;
+        return (T) this;
+    }
+
+    public <T extends StateChanged> T setOtherProperties(Map<String, Object> otherProperties) {
+        this.otherProperties = otherProperties;
         return (T) this;
     }
 }
