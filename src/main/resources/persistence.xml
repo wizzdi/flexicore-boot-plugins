@@ -10,6 +10,7 @@
         <class>com.wizzdi.basic.iot.model.Gateway</class>
         <class>com.wizzdi.basic.iot.model.PendingGateway</class>
         <class>com.wizzdi.basic.iot.model.Remote</class>
+        <class>com.flexicore.model.SecurityUser</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
