@@ -4,21 +4,29 @@ package com.wizzdi.basic.iot.service.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
-import com.wizzdi.basic.iot.model.Remote;
+import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.RemoteRepository;
+import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteUpdate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.events.BasicCreated;
+import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.metamodel.SingularAttribute;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -27,11 +35,18 @@ import java.util.Set;
 
 public class RemoteService implements Plugin {
 
+    private static final Logger logger= LoggerFactory.getLogger(RemoteService.class);
+
     @Autowired
     private RemoteRepository repository;
 
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ConnectivityChangeService connectivityChangeService;
+    @Autowired
+    @Lazy
+    private SecurityContextProvider securityContextProvider;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -74,7 +89,6 @@ public class RemoteService implements Plugin {
     public void validateFiltering(RemoteFilter remoteFilter,
                                   SecurityContextBase securityContext) {
         basicService.validate(remoteFilter, securityContext);
-        Set<String> productTypesIds = remoteFilter.getRemoteIds();
     }
 
     public PaginationResponse<Remote> getAllRemotes(
@@ -122,6 +136,30 @@ public class RemoteService implements Plugin {
             repository.merge(remote);
         }
         return remote;
+    }
+
+    public SecurityContextBase getRemoteSecurityContext(Remote remote) {
+        if(remote instanceof Device){
+            return getRemoteSecurityContext(((Device) remote).getGateway());
+        }
+        if(remote instanceof Gateway){
+            return securityContextProvider.getSecurityContext(((Gateway) remote).getGatewayUser());
+        }
+        return null;
+    }
+    @EventListener
+    public void onGatewayCreated(BasicCreated<Gateway> remoteCreated){
+        onRemoteCreated(remoteCreated.getBaseclass());
+    }
+    @EventListener
+    public void onDeviceCreated(BasicCreated<Device> remoteCreated){
+        onRemoteCreated(remoteCreated.getBaseclass());
+    }
+    public void onRemoteCreated(Remote remote){
+        ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setDate(OffsetDateTime.now()).setConnectivity(Connectivity.OFF).setRemote(remote), getRemoteSecurityContext(remote));
+        remote.setLastConnectivityChange(connectivityChange);
+        merge(remote);
+        logger.info("default connectivity created for remote "+remote.getRemoteId() +"("+remote.getId()+")");
     }
 
     public void validate(RemoteCreate remoteCreate,

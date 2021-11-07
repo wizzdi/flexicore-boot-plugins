@@ -24,6 +24,7 @@ import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 @Extension
 @Configuration
+@EnableScheduling
 public class BasicIOTConfig implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);

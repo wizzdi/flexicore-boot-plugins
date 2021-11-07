@@ -5,6 +5,8 @@ package com.wizzdi.basic.iot.service.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.basic.iot.model.ConnectivityChange;
+import com.wizzdi.basic.iot.model.ConnectivityChange_;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.Remote_;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
@@ -61,6 +63,17 @@ public class RemoteRepository implements Plugin {
     public <T extends Remote> void addRemotePredicates(RemoteFilter filtering,
                                                            CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+
+        if(filtering.getRemoteIds()!=null&&filtering.getRemoteIds().isEmpty()){
+            preds.add(r.get(Remote_.remoteId).in(filtering.getRemoteIds()));
+        }
+        if(filtering.getConnectivity()!=null&&!filtering.getConnectivity().isEmpty()){
+            Join<T, ConnectivityChange> join=r.join(Remote_.lastConnectivityChange);
+            preds.add(join.get(ConnectivityChange_.connectivity).in(filtering.getConnectivity()));
+        }
+        if(filtering.getNotIds()!=null&&!filtering.getNotIds().isEmpty()){
+            preds.add(cb.not(r.get(Remote_.id).in(filtering.getNotIds())));
+        }
 
 
 

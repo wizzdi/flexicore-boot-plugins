@@ -3,10 +3,7 @@ package com.wizzdi.basic.iot.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
-import com.wizzdi.basic.iot.model.ConnectivityChange;
-import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.model.DeviceType;
-import com.wizzdi.basic.iot.model.Gateway;
+import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.app.TestEntities;
 import com.wizzdi.basic.iot.service.request.*;
@@ -35,9 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -51,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FlowTest {
 
-    private static final Logger logger= LoggerFactory.getLogger(FlowTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowTest.class);
 
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
@@ -73,7 +68,22 @@ public class FlowTest {
     private String clientId;
     @Autowired
     private DeviceStateService deviceStateService;
+    @Value("${basic.iot.connectivityCheckInterval:60000}")
+    private long checkInterval;
+    private boolean stopKeepAlive;
+    private Set<String> keepAliveDevices = new HashSet<>();
+    private Thread keepAliveThread;
 
+    @AfterAll
+    private void destroy() {
+        stopKeepAlive();
+
+    }
+
+    private void stopKeepAlive() {
+        stopKeepAlive = true;
+        keepAliveThread.interrupt();
+    }
 
     @Test
     @Order(1)
@@ -87,17 +97,42 @@ public class FlowTest {
         Assertions.assertNotNull(registerGatewayReceived);
 
 
-
     }
 
     @Test
     @Order(2)
     public void testApproveGateway() {
         PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
-        Assertions.assertTrue(approveResponse.getList().stream().anyMatch(f->f.getRemoteId().equals(clientId)));
+        Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
+        Assertions.assertNotNull(gateway);
+        Assertions.assertNotNull(gateway.getLastConnectivityChange());
+        Assertions.assertEquals(Connectivity.OFF,gateway.getLastConnectivityChange().getConnectivity());
+        startKeepAlive();
 
     }
 
+    private void startKeepAlive() {
+        keepAliveThread= new Thread(() -> {
+            logger.info("started keep alive");
+            while (!stopKeepAlive) {
+                try {
+                    testBasicIOTClient.sendMessage(new KeepAlive().setDeviceIds(keepAliveDevices), clientId);
+                } catch (JsonProcessingException e) {
+                    logger.error("failed sending keep alive ", e);
+                }
+                try {
+                    synchronized (keepAliveDevices){
+                        keepAliveDevices.wait(5000);
+                    }
+                } catch (InterruptedException e) {
+                    logger.error("failed sleeping", e);
+                    stopKeepAlive = true;
+                }
+            }
+            logger.info("stopped keep alive");
+        });
+        keepAliveThread.start();
+    }
 
 
     @Test
@@ -109,9 +144,15 @@ public class FlowTest {
         Assertions.assertNotNull(deviceType);
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(device);
-        Assertions.assertEquals(deviceType.getId(),device.getDeviceType().getId());
-        Assertions.assertEquals(device.getRemoteId(),DEVICE_ID);
-        Assertions.assertEquals(30,device.getOther().get("dim"));
+        Assertions.assertEquals(deviceType.getId(), device.getDeviceType().getId());
+        Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
+        Assertions.assertEquals(30, device.getOther().get("dim"));
+        Assertions.assertNotNull(device.getLastConnectivityChange());
+        Assertions.assertEquals(Connectivity.OFF,device.getLastConnectivityChange().getConnectivity());
+        synchronized (keepAliveDevices){
+            keepAliveDevices.add(device.getRemoteId());
+            keepAliveDevices.notifyAll();
+        }
 
 
     }
@@ -123,7 +164,7 @@ public class FlowTest {
         Assertions.assertNotNull(updateStateSchemaReceived);
         DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
-        Assertions.assertEquals(jsonSchema,deviceType.getStateJsonSchema());
+        Assertions.assertEquals(jsonSchema, deviceType.getStateJsonSchema());
 
 
     }
@@ -131,11 +172,11 @@ public class FlowTest {
     @Test
     @Order(5)
     public void testDeviceStateChange() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        ChangeStateRequest changeStateRequest=new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setRemoteIds(Collections.singleton(clientId))).setValue("dim",94);
-        deviceStateService.validate(changeStateRequest,adminSecurityContext);
-        AtomicBoolean received=new AtomicBoolean(false);
-        synchronized (changeStateRequest){
-            IOTMessageSubscriber iotMessageSubscriber = f -> handleMessage(f, testBasicIOTClient,received);
+        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setRemoteIds(Collections.singleton(clientId))).setValue("dim", 94);
+        deviceStateService.validate(changeStateRequest, adminSecurityContext);
+        AtomicBoolean received = new AtomicBoolean(false);
+        synchronized (changeStateRequest) {
+            IOTMessageSubscriber iotMessageSubscriber = f -> handleMessage(f, testBasicIOTClient, received);
             TestEntities.addMessageSubscriber(iotMessageSubscriber);
             ChangeStateResponse changeStateResponse = deviceStateService.changeState(adminSecurityContext, changeStateRequest);
             Assertions.assertFalse(changeStateResponse.getDevicesExecutedOn().isEmpty());
@@ -147,9 +188,34 @@ public class FlowTest {
 
     }
 
-    private void handleMessage(IOTMessage iotMessage, BasicIOTClient basicIOTClient, AtomicBoolean lock)  {
-        if(iotMessage instanceof ChangeState){
-            synchronized (lock){
+    @Test
+    @Order(6)
+    public void testConnectivity() throws InterruptedException {
+        checkDevicesAndGateways(Connectivity.ON);
+        stopKeepAlive();
+        logger.info("waiting "+checkInterval*2 +" ms till we detect devices are off");
+        Thread.sleep(checkInterval*2);
+        checkDevicesAndGateways(Connectivity.OFF);
+
+    }
+
+    private void checkDevicesAndGateways(Connectivity expected) {
+        Gateway gateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(clientId))).stream().findFirst().orElse(null);
+        Assertions.assertNotNull(gateway);
+        Assertions.assertNotNull(gateway.getLastConnectivityChange());
+        Assertions.assertEquals(expected,gateway.getLastConnectivityChange().getConnectivity());
+        List<Device> devices=deviceService.listAllDevices(null,new DeviceFilter().setGateways(Collections.singletonList(gateway)));
+        for (Device device : devices) {
+
+            Assertions.assertNotNull(device.getLastConnectivityChange());
+            Assertions.assertEquals(expected,device.getLastConnectivityChange().getConnectivity());
+        }
+    }
+
+
+    private void handleMessage(IOTMessage iotMessage, BasicIOTClient basicIOTClient, AtomicBoolean lock) {
+        if (iotMessage instanceof ChangeState) {
+            synchronized (lock) {
                 try {
                     logger.info("Change state received");
                     ChangeState changeState = (ChangeState) iotMessage;
@@ -159,11 +225,9 @@ public class FlowTest {
                     basicIOTClient.sendMessage(new StateChanged().setOtherProperties(changeState.getValues()));
                     logger.info("sending StateChanged");
                     lock.set(true);
-                }
-                catch (Exception e){
-                    logger.error("failed sending message",e);
-                }
-                finally {
+                } catch (Exception e) {
+                    logger.error("failed sending message", e);
+                } finally {
                     lock.notifyAll();
                 }
             }
