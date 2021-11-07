@@ -13,7 +13,7 @@ public class IOTMessage {
     private OffsetDateTime sentAt;
     @JsonIgnore
     private Message message;
-    private byte[] signature;
+    private String signature;
     private String gatewayId;
 
     public String getId() {
@@ -44,11 +44,11 @@ public class IOTMessage {
         return (T) this;
     }
 
-    public byte[] getSignature() {
+    public String getSignature() {
         return signature;
     }
 
-    public <T extends IOTMessage> T setSignature(byte[] signature) {
+    public <T extends IOTMessage> T setSignature(String signature) {
         this.signature = signature;
         return (T) this;
     }

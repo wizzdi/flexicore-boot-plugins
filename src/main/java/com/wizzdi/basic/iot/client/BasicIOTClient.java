@@ -102,7 +102,7 @@ public class BasicIOTClient implements MessageHandler {
                 Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
                 sig.initVerify(publicKey);
                 sig.update(iotMessage.getId().getBytes(StandardCharsets.UTF_8));
-                boolean verify = sig.verify(iotMessage.getSignature());
+                boolean verify = sig.verify(Base64.getDecoder().decode(iotMessage.getSignature()));
                 if (!verify) {
                     logger.warn("message " + iotMessage + " verify failed");
                 }
@@ -149,7 +149,7 @@ public class BasicIOTClient implements MessageHandler {
         try {
             signature.update(iotMessage.getId().getBytes(StandardCharsets.UTF_8));
             byte[] sign = signature.sign();
-            iotMessage.setSignature(sign);
+            iotMessage.setSignature(Base64.getEncoder().encodeToString(sign));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
