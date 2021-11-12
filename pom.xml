@@ -16,21 +16,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <pf4j-spring.version>0.7.0</pf4j-spring.version>
 
-        <messaging-service.version>2.0.0</messaging-service.version>
+        <messaging-service.version>2.1.2</messaging-service.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.0.RELEASE</version>
+                <version>2.5.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-boot-dependencies</artifactId>
-                <version>1.0.5</version>
+                <version>2.1.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>messaging-model</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

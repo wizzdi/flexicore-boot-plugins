@@ -1,6 +1,7 @@
 package com.wizzdi.messaging.firebase.controller;
 
 import com.flexicore.annotations.OperationsInside;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 
@@ -32,7 +33,7 @@ public class FirebaseEnabledDeviceController implements Plugin {
 	@Operation(description = "creates FirebaseEnabledDevice",summary = "creates FirebaseEnabledDevice")
 	public FirebaseEnabledDevice createFirebaseEnabledDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceCreate,securityContext);
-		return firebaseEnabledDeviceService.createFirebaseEnabledDevice(firebaseEnabledDeviceCreate,securityContext);
+		return firebaseEnabledDeviceService.getOrCreateFirebaseEnabledDevice(firebaseEnabledDeviceCreate,securityContext);
 	}
 
 	@PostMapping("/getAllFirebaseEnabledDevices")
@@ -48,7 +49,7 @@ public class FirebaseEnabledDeviceController implements Plugin {
 
 	public FirebaseEnabledDevice updateFirebaseEnabledDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=firebaseEnabledDeviceUpdate.getId();
-		FirebaseEnabledDevice firebaseEnabledDevice=id!=null? firebaseEnabledDeviceService.findByIdOrNull(FirebaseEnabledDevice.class,id):null;
+		FirebaseEnabledDevice firebaseEnabledDevice=id!=null? firebaseEnabledDeviceService.getByIdOrNull(id,FirebaseEnabledDevice.class, SecuredBasic_.security,securityContext):null;
 		if(firebaseEnabledDevice==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no FirebaseEnabledDevice with id "+id);
 		}

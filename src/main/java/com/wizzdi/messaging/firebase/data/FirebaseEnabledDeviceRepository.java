@@ -31,8 +31,6 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 	@PersistenceContext
 	private EntityManager em;
 	@Autowired
-	private BaseclassRepository baseclassRepository;
-	@Autowired
 	private MessageReceiverDeviceRepository messageReceiverDeviceRepository;
 
 
@@ -68,37 +66,41 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 
 	}
 
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+		return messageReceiverDeviceRepository.listByIds(c, ids, securityContext);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+		return messageReceiverDeviceRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return messageReceiverDeviceRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+		return messageReceiverDeviceRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	}
+
+	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+		return messageReceiverDeviceRepository.findByIds(c, ids, idAttribute);
+	}
+
+	public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
+		return messageReceiverDeviceRepository.findByIds(c, requested);
+	}
+
+	public <T> T findByIdOrNull(Class<T> type, String id) {
+		return messageReceiverDeviceRepository.findByIdOrNull(type, id);
+	}
+
 	@Transactional
 	public void merge(Object base) {
-		baseclassRepository.merge(base);
+		messageReceiverDeviceRepository.merge(base);
 	}
 
 	@Transactional
 	public void massMerge(List<?> toMerge) {
-		baseclassRepository.massMerge(toMerge);
-	}
-
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, securityContext);
-	}
-
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
-	}
-
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, securityContext);
-	}
-
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
-	}
-
-	public <T extends Baseclass> List<T> findByIds(Class<T> c, Set<String> requested) {
-		return baseclassRepository.findByIds(c, requested);
-	}
-
-	public <T> T findByIdOrNull(Class<T> type, String id) {
-		return baseclassRepository.findByIdOrNull(type, id);
+		messageReceiverDeviceRepository.massMerge(toMerge);
 	}
 }
