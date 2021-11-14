@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>license-model</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <name>license-model</name>
     <description>license model manages licensing for other FlexiCore Plugins</description>
     <url>https://wizzdi.com</url>
@@ -53,7 +53,7 @@
         <connection>scm:git:git://wizzdi/license-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/license-model.git</developerConnection>
         <url>https://github.com/wizzdi/license-model</url>
-        <tag>license-model-2.0.0</tag>
+        <tag>license-model-${version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
