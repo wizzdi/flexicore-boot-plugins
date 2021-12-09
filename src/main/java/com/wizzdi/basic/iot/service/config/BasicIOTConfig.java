@@ -48,19 +48,45 @@ public class BasicIOTConfig implements Plugin {
     private String iotId;
     @Value("${basic.iot.keyPath}")
     private String keyPath;
+    @Value("${basic.iot.mqtt.username:@null}")
+    private String username;
+    @Value("${basic.iot.mqtt.password:@null}")
+    private char[] password;
+    @Value("${basic.iot.mqtt.keyStore:@null}")
+    private String keystore;
+    @Value("${basic.iot.mqtt.keyStorePassword:@null}")
+    private String keystorePassword;
+    @Value("${basic.iot.mqtt.keyStoreType:@null}")
+    private String keyStoreType;
+
+    @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
+    private String[] mqttURLs;
     @Autowired
     private GatewayService gatewayService;
 
     @Bean
     public MqttPahoClientFactory mqttServerFactory() {
-        System.setProperty("javax.net.ssl.keyStore", "C:\\Users\\Asaf\\certs\\keystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "asafasaf");
-        System.setProperty("javax.net.ssl.keyStoreType", "JKS");
+        if(keystore!=null){
+            System.setProperty("javax.net.ssl.keyStore", keystore);
+
+        }
+        if(keystorePassword!=null){
+            System.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
+
+        }
+        if(keyStoreType!=null){
+            System.setProperty("javax.net.ssl.keyStoreType", keyStoreType);
+
+        }
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName("asaf");
-        options.setPassword("asaf".toCharArray());
-        options.setServerURIs(new String[]{"ssl://localhost:8883"});
+        if(username!=null){
+            options.setUserName(username);
+        }
+        if(password!=null){
+            options.setPassword(password);
+        }
+        options.setServerURIs(mqttURLs);
         factory.setConnectionOptions(options);
         return factory;
     }
