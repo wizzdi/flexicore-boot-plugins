@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>video-conference-model</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>video conference model</name>
     <description>video conference model</description>
@@ -58,7 +58,7 @@
         <connection>scm:git:git://wizzdi/video-conference-model.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/video-conference-model.git</developerConnection>
         <url>https://github.com/wizzdi/video-conference-model</url>
-        <tag>video-conference-model-1.0.0</tag>
+        <tag>video-conference-model-${version}</tag>
     </scm>
 
     <dependencyManagement>
