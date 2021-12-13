@@ -53,7 +53,7 @@ public class TestEntities {
         options.setUserName("asaf");
         options.setPassword("asaf".toCharArray());
 
-        options.setServerURIs(new String[]{"tcp://localhost:8883"});
+        options.setServerURIs(new String[]{"tcp://168.119.177.78:8883"});
         factory.setConnectionOptions(options);
         return factory;
     }
