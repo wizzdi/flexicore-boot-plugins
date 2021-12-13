@@ -8,8 +8,8 @@
     <artifactId>video-conference-model</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>FlexiCore security service</name>
-    <description>flexicore base service</description>
+    <name>video conference model</name>
+    <description>video conference model</description>
     <url>https://wizzdi.com</url>
 
     <licenses>
@@ -57,10 +57,10 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://wizzdi/flexicore-base-service.git</connection>
-        <developerConnection>scm:git:git@github.com:wizzdi/flexicore-base-service.git</developerConnection>
-        <url>https://github.com/wizzdi/flexicore-base-service</url>
-        <tag>flexicore-base-service-${version}</tag>
+        <connection>scm:git:git://wizzdi/video-conference-model.git</connection>
+        <developerConnection>scm:git:git@github.com:wizzdi/video-conference-model.git</developerConnection>
+        <url>https://github.com/wizzdi/video-conference-model</url>
+        <tag>video-conference-model-${version}</tag>
     </scm>
 
     <dependencyManagement>
