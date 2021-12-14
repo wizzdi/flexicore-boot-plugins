@@ -41,6 +41,12 @@ public class TestEntities {
     private String publicKeyPath;
     @Value("${basic.iot.test.id:iot-client}")
     private String clientId;
+    @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
+    private String[] mqttURLs;
+    @Value("${basic.iot.mqtt.username:@null}")
+    private String username;
+    @Value("${basic.iot.mqtt.password:@null}")
+    private char[] password;
     private static final Queue<IOTMessageSubscriber> messageSubscribers=new LinkedBlockingQueue<>();
 
 
@@ -50,10 +56,10 @@ public class TestEntities {
     public MqttPahoClientFactory mqttClientFactory() {
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setUserName("asaf");
-        options.setPassword("asaf".toCharArray());
+        options.setUserName(username);
+        options.setPassword(password);
 
-        options.setServerURIs(new String[]{"tcp://168.119.177.78:8883"});
+        options.setServerURIs(mqttURLs);
         factory.setConnectionOptions(options);
         return factory;
     }
