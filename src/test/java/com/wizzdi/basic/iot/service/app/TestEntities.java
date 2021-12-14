@@ -48,15 +48,12 @@ public class TestEntities {
 
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
-        System.setProperty("javax.net.ssl.keyStore", "C:\\Users\\Asaf\\certs\\keystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "asafasaf");
-        System.setProperty("javax.net.ssl.keyStoreType", "JKS");
         DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
         MqttConnectOptions options = new MqttConnectOptions();
         options.setUserName("asaf");
         options.setPassword("asaf".toCharArray());
 
-        options.setServerURIs(new String[]{"ssl://localhost:8883"});
+        options.setServerURIs(new String[]{"tcp://168.119.177.78:8883"});
         factory.setConnectionOptions(options);
         return factory;
     }
