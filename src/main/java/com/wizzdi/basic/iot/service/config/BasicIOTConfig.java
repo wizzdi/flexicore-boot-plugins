@@ -25,6 +25,7 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -89,6 +90,16 @@ public class BasicIOTConfig implements Plugin {
         options.setServerURIs(mqttURLs);
         factory.setConnectionOptions(options);
         return factory;
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler(){
+        ThreadPoolTaskScheduler threadPoolTaskScheduler
+                = new ThreadPoolTaskScheduler();
+        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setThreadNamePrefix(
+                "mqtt-task-scheduler");
+        return threadPoolTaskScheduler;
     }
 
     @Bean
