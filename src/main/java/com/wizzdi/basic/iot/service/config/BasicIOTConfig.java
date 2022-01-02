@@ -49,15 +49,15 @@ public class BasicIOTConfig implements Plugin {
     private String iotId;
     @Value("${basic.iot.keyPath}")
     private String keyPath;
-    @Value("${basic.iot.mqtt.username:@null}")
+    @Value("${basic.iot.mqtt.username:#{null}}")
     private String username;
-    @Value("${basic.iot.mqtt.password:@null}")
+    @Value("${basic.iot.mqtt.password:#{null}}")
     private char[] password;
-    @Value("${basic.iot.mqtt.keyStore:@null}")
+    @Value("${basic.iot.mqtt.keyStore:#{null}}")
     private String keystore;
-    @Value("${basic.iot.mqtt.keyStorePassword:@null}")
+    @Value("${basic.iot.mqtt.keyStorePassword:#{null}}")
     private String keystorePassword;
-    @Value("${basic.iot.mqtt.keyStoreType:@null}")
+    @Value("${basic.iot.mqtt.keyStoreType:#{null}}")
     private String keyStoreType;
 
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")

@@ -43,9 +43,9 @@ public class TestEntities {
     private String clientId;
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
-    @Value("${basic.iot.mqtt.username:@null}")
+    @Value("${basic.iot.mqtt.username:#{null}}")
     private String username;
-    @Value("${basic.iot.mqtt.password:@null}")
+    @Value("${basic.iot.mqtt.password:#{null}}")
     private char[] password;
     private static final Queue<IOTMessageSubscriber> messageSubscribers=new LinkedBlockingQueue<>();
 
