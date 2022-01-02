@@ -20,26 +20,21 @@ public class Schedule extends SecuredBasic {
   @OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
   private List<ScheduleTimeslot> timeslots = new ArrayList<>();
   private boolean enabled;
-
   private boolean monday;
-
   private boolean saturday;
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime timeFrameEnd;
-
   private boolean tuesday;
-
   private boolean holiday;
-
   private boolean sunday;
-
   private boolean thursday;
-
   private boolean friday;
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime timeFrameStart;
-
   private boolean wednesday;
+  private String startTimeOffsetId;
+  private String endTimeOffsetId;
+
 
   /** @return enabled */
   public boolean isEnabled() {
@@ -213,5 +208,23 @@ public class Schedule extends SecuredBasic {
   public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
     this.timeslots = timeslots;
     return this;
+  }
+
+  public String getStartTimeOffsetId() {
+    return startTimeOffsetId;
+  }
+
+  public <T extends Schedule> T setStartTimeOffsetId(String startTimeOffsetId) {
+    this.startTimeOffsetId = startTimeOffsetId;
+    return (T) this;
+  }
+
+  public String getEndTimeOffsetId() {
+    return endTimeOffsetId;
+  }
+
+  public <T extends Schedule> T setEndTimeOffsetId(String endTimeOffsetId) {
+    this.endTimeOffsetId = endTimeOffsetId;
+    return (T) this;
   }
 }
