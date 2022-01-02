@@ -1,8 +1,7 @@
 package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,16 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Schedule extends Baseclass {
+public class Schedule extends SecuredBasic {
 
 	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "leftside", cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
 	private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
 
 	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule", cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
 	private List<ScheduleTimeslot> timeslots = new ArrayList<>();
 
 	@Column(columnDefinition = "timestamp with time zone")
@@ -40,12 +37,6 @@ public class Schedule extends Baseclass {
 	private boolean holiday;
 	private boolean enabled;
 
-	public Schedule() {
-	}
-
-	public Schedule(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	public OffsetDateTime getTimeFrameStart() {
 		return timeFrameStart;
@@ -129,8 +120,7 @@ public class Schedule extends Baseclass {
 	}
 
 	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "leftside", cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
 	public List<ScheduleToAction> getScheduleToActions() {
 		return scheduleToActions;
 	}
@@ -151,8 +141,7 @@ public class Schedule extends Baseclass {
 	}
 
 	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule", cascade = {
-			CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
 	public List<ScheduleTimeslot> getTimeslots() {
 		return timeslots;
 	}

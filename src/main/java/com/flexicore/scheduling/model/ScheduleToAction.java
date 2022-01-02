@@ -1,55 +1,35 @@
 package com.flexicore.scheduling.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ScheduleToAction extends Baselink {
+public class ScheduleToAction extends SecuredBasic {
 
-	public ScheduleToAction() {
+	@ManyToOne(targetEntity = Schedule.class)
+	private Schedule schedule;
+	@ManyToOne(targetEntity = ScheduleAction.class)
+	private ScheduleAction scheduleAction;
+
+	@ManyToOne(targetEntity = Schedule.class)
+	public Schedule getSchedule() {
+		return schedule;
 	}
 
-	public ScheduleToAction(String name, SecurityContext securityContext) {
-		super(name, securityContext);
+	public <T extends ScheduleToAction> T setSchedule(Schedule schedule) {
+		this.schedule = schedule;
+		return (T) this;
 	}
 
-	@Override
-	@ManyToOne(targetEntity = Schedule.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public Schedule getLeftside() {
-		return (Schedule) super.getLeftside();
+	@ManyToOne(targetEntity = ScheduleAction.class)
+	public ScheduleAction getScheduleAction() {
+		return scheduleAction;
 	}
 
-	@JsonIgnore
-	public void setLeftside(Schedule leftside) {
-		super.setLeftside(leftside);
-	}
-
-	@Override
-	public void setLeftside(Baseclass leftside) {
-		super.setLeftside(leftside);
-	}
-
-	@Override
-	@ManyToOne(targetEntity = ScheduleAction.class, cascade = {
-			CascadeType.MERGE, CascadeType.PERSIST})
-	public ScheduleAction getRightside() {
-		return (ScheduleAction) super.getRightside();
-	}
-
-	@JsonIgnore
-	public void setRightside(ScheduleAction rightside) {
-		super.setRightside(rightside);
-	}
-
-	@Override
-	public void setRightside(Baseclass rightside) {
-		super.setRightside(rightside);
+	public <T extends ScheduleToAction> T setScheduleAction(ScheduleAction scheduleAction) {
+		this.scheduleAction = scheduleAction;
+		return (T) this;
 	}
 }

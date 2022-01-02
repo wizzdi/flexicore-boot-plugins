@@ -9,6 +9,7 @@
         <class>com.flexicore.scheduling.model.ScheduleTimeslot</class>
         <class>com.flexicore.scheduling.model.ScheduleToAction</class>
         <class>com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution</class>
+        <class>com.flexicore.model.SecuredBasic</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

@@ -1,7 +1,6 @@
 package com.flexicore.scheduling.model;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContext;
+import com.flexicore.model.SecuredBasic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +8,7 @@ import javax.persistence.ManyToOne;
 import java.time.OffsetDateTime;
 
 @Entity
-public class ScheduleTimeslot extends Baseclass {
+public class ScheduleTimeslot extends SecuredBasic {
 
 
 	@Column(columnDefinition = "timestamp with time zone")
@@ -37,13 +36,6 @@ public class ScheduleTimeslot extends Baseclass {
 
 	@ManyToOne(targetEntity = Schedule.class)
 	private Schedule schedule; // parent schedule
-
-	public ScheduleTimeslot() {
-	}
-
-	public ScheduleTimeslot(String name, SecurityContext securityContext) {
-		super(name, securityContext);
-	}
 
 	public OffsetDateTime getStartTime() {
 		return startTime;
