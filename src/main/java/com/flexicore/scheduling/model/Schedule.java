@@ -2,161 +2,216 @@ package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Schedule extends SecuredBasic {
 
-	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
-	private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
+  @JsonIgnore
+  @OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
+  private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
 
-	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
-	private List<ScheduleTimeslot> timeslots = new ArrayList<>();
+  @JsonIgnore
+  @OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
+  private List<ScheduleTimeslot> timeslots = new ArrayList<>();
+  private boolean enabled;
 
-	@Column(columnDefinition = "timestamp with time zone")
-	private OffsetDateTime timeFrameStart;
-	@Column(columnDefinition = "timestamp with time zone")
-	private OffsetDateTime timeFrameEnd;
+  private boolean monday;
 
-	private boolean sunday;
-	private boolean monday;
-	private boolean tuesday;
-	private boolean wednesday;
-	private boolean thursday;
-	private boolean friday;
-	private boolean saturday;
-	private boolean holiday;
-	private boolean enabled;
+  private boolean saturday;
+  @Column(columnDefinition = "timestamp with time zone")
+  private OffsetDateTime timeFrameEnd;
 
+  private boolean tuesday;
 
-	public OffsetDateTime getTimeFrameStart() {
-		return timeFrameStart;
-	}
+  private boolean holiday;
 
-	public Schedule setTimeFrameStart(OffsetDateTime timeFrameStart) {
-		this.timeFrameStart = timeFrameStart;
-		return this;
-	}
+  private boolean sunday;
 
-	public OffsetDateTime getTimeFrameEnd() {
-		return timeFrameEnd;
-	}
+  private boolean thursday;
 
-	public Schedule setTimeFrameEnd(OffsetDateTime timeFrameEnd) {
-		this.timeFrameEnd = timeFrameEnd;
-		return this;
-	}
+  private boolean friday;
+  @Column(columnDefinition = "timestamp with time zone")
+  private OffsetDateTime timeFrameStart;
 
-	public boolean isSunday() {
-		return sunday;
-	}
+  private boolean wednesday;
 
-	public Schedule setSunday(boolean sunday) {
-		this.sunday = sunday;
-		return this;
-	}
+  /** @return enabled */
+  public boolean isEnabled() {
+    return this.enabled;
+  }
 
-	public boolean isMonday() {
-		return monday;
-	}
+  /**
+   * @param enabled enabled to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    return (T) this;
+  }
 
-	public Schedule setMonday(boolean monday) {
-		this.monday = monday;
-		return this;
-	}
+  /** @return monday */
+  public boolean isMonday() {
+    return this.monday;
+  }
 
-	public boolean isTuesday() {
-		return tuesday;
-	}
+  /**
+   * @param monday monday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setMonday(boolean monday) {
+    this.monday = monday;
+    return (T) this;
+  }
 
-	public Schedule setTuesday(boolean tuesday) {
-		this.tuesday = tuesday;
-		return this;
-	}
+  /** @return saturday */
+  public boolean isSaturday() {
+    return this.saturday;
+  }
 
-	public boolean isWednesday() {
-		return wednesday;
-	}
+  /**
+   * @param saturday saturday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setSaturday(boolean saturday) {
+    this.saturday = saturday;
+    return (T) this;
+  }
 
-	public Schedule setWednesday(boolean wednesday) {
-		this.wednesday = wednesday;
-		return this;
-	}
+  /** @return timeFrameEnd */
+  public OffsetDateTime getTimeFrameEnd() {
+    return this.timeFrameEnd;
+  }
 
-	public boolean isThursday() {
-		return thursday;
-	}
+  /**
+   * @param timeFrameEnd timeFrameEnd to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setTimeFrameEnd(OffsetDateTime timeFrameEnd) {
+    this.timeFrameEnd = timeFrameEnd;
+    return (T) this;
+  }
 
-	public Schedule setThursday(boolean thursday) {
-		this.thursday = thursday;
-		return this;
-	}
+  /** @return tuesday */
+  public boolean isTuesday() {
+    return this.tuesday;
+  }
 
-	public boolean isFriday() {
-		return friday;
-	}
+  /**
+   * @param tuesday tuesday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setTuesday(boolean tuesday) {
+    this.tuesday = tuesday;
+    return (T) this;
+  }
 
-	public Schedule setFriday(boolean friday) {
-		this.friday = friday;
-		return this;
-	}
+  /** @return holiday */
+  public boolean isHoliday() {
+    return this.holiday;
+  }
 
-	public boolean isSaturday() {
-		return saturday;
-	}
+  /**
+   * @param holiday holiday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setHoliday(boolean holiday) {
+    this.holiday = holiday;
+    return (T) this;
+  }
 
-	public Schedule setSaturday(boolean saturday) {
-		this.saturday = saturday;
-		return this;
-	}
+  /** @return sunday */
+  public boolean isSunday() {
+    return this.sunday;
+  }
 
-	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
-	public List<ScheduleToAction> getScheduleToActions() {
-		return scheduleToActions;
-	}
+  /**
+   * @param sunday sunday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setSunday(boolean sunday) {
+    this.sunday = sunday;
+    return (T) this;
+  }
 
-	public Schedule setScheduleToActions(
-			List<ScheduleToAction> scheduleToActions) {
-		this.scheduleToActions = scheduleToActions;
-		return this;
-	}
+  /** @return thursday */
+  public boolean isThursday() {
+    return this.thursday;
+  }
 
-	public boolean isHoliday() {
-		return holiday;
-	}
+  /**
+   * @param thursday thursday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setThursday(boolean thursday) {
+    this.thursday = thursday;
+    return (T) this;
+  }
 
-	public Schedule setHoliday(boolean holiday) {
-		this.holiday = holiday;
-		return this;
-	}
+  /** @return friday */
+  public boolean isFriday() {
+    return this.friday;
+  }
 
-	@JsonIgnore
-	@OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
-	public List<ScheduleTimeslot> getTimeslots() {
-		return timeslots;
-	}
+  /**
+   * @param friday friday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setFriday(boolean friday) {
+    this.friday = friday;
+    return (T) this;
+  }
 
-	public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
-		this.timeslots = timeslots;
-		return this;
-	}
+  /** @return timeFrameStart */
+  public OffsetDateTime getTimeFrameStart() {
+    return this.timeFrameStart;
+  }
 
-	public boolean isEnabled() {
-		return enabled;
-	}
+  /**
+   * @param timeFrameStart timeFrameStart to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setTimeFrameStart(OffsetDateTime timeFrameStart) {
+    this.timeFrameStart = timeFrameStart;
+    return (T) this;
+  }
 
-	public Schedule setEnabled(boolean enabled) {
-		this.enabled = enabled;
-		return this;
-	}
+  /** @return wednesday */
+  public boolean isWednesday() {
+    return this.wednesday;
+  }
+
+  /**
+   * @param wednesday wednesday to set
+   * @return Schedule
+   */
+  public <T extends Schedule> T setWednesday(boolean wednesday) {
+    this.wednesday = wednesday;
+    return (T) this;
+  }
+  @JsonIgnore
+  @OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")
+  public List<ScheduleToAction> getScheduleToActions() {
+    return scheduleToActions;
+  }
+
+  public Schedule setScheduleToActions(
+          List<ScheduleToAction> scheduleToActions) {
+    this.scheduleToActions = scheduleToActions;
+    return this;
+  }
+  @JsonIgnore
+  @OneToMany(targetEntity = ScheduleTimeslot.class, mappedBy = "schedule")
+  public List<ScheduleTimeslot> getTimeslots() {
+    return timeslots;
+  }
+  public Schedule setTimeslots(List<ScheduleTimeslot> timeslots) {
+    this.timeslots = timeslots;
+    return this;
+  }
 }
