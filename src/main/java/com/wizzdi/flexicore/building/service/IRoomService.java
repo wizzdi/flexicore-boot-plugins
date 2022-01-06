@@ -1,12 +1,12 @@
-package com.admin.service.service;
+package com.wizzdi.flexicore.building.service;
 
-import com.admin.model.Room;
-import com.admin.service.request.RoomCreate;
-import com.admin.service.request.RoomFilter;
-import com.admin.service.request.RoomUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.building.model.Room;
+import com.wizzdi.flexicore.building.request.RoomCreate;
+import com.wizzdi.flexicore.building.request.RoomFilter;
+import com.wizzdi.flexicore.building.request.RoomUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.List;
 import java.util.Set;

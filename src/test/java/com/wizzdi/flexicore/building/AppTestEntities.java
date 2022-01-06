@@ -1,7 +1,5 @@
-package com.admin.service;
+package com.wizzdi.flexicore.building;
 
-import com.admin.model.Building;
-import com.admin.model.Room;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;
 import com.flexicore.model.Basic;
@@ -33,6 +31,8 @@ import com.flexicore.model.territories.State;
 import com.flexicore.model.territories.Street;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
+import com.wizzdi.flexicore.building.model.Building;
+import com.wizzdi.flexicore.building.model.Room;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.model.ZipFile;
 import com.wizzdi.flexicore.file.model.ZipFileToFileResource;

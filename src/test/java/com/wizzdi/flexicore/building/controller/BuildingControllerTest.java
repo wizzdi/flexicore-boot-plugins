@@ -1,12 +1,12 @@
-package com.admin.service.controller;
+package com.wizzdi.flexicore.building.controller;
 
-import com.admin.model.Room;
-import com.admin.service.App;
-import com.admin.service.request.RoomCreate;
-import com.admin.service.request.RoomFilter;
-import com.admin.service.request.RoomUpdate;
 import com.flexicore.request.AuthenticationRequest;
 import com.flexicore.response.AuthenticationResponse;
+import com.wizzdi.flexicore.building.App;
+import com.wizzdi.flexicore.building.model.Building;
+import com.wizzdi.flexicore.building.request.BuildingCreate;
+import com.wizzdi.flexicore.building.request.BuildingFilter;
+import com.wizzdi.flexicore.building.request.BuildingUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +28,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class RoomControllerTest {
+public class BuildingControllerTest {
 
-  private Room testRoom;
+  private Building testBuilding;
   @Autowired private TestRestTemplate restTemplate;
 
   @BeforeAll
@@ -53,55 +53,56 @@ public class RoomControllerTest {
 
   @Test
   @Order(1)
-  public void testRoomCreate() {
+  public void testBuildingCreate() {
     String name = UUID.randomUUID().toString();
-    RoomCreate request = new RoomCreate().setName(name);
+    BuildingCreate request = new BuildingCreate().setName(name);
 
     request.setExternalId("test-string");
 
-    ResponseEntity<Room> response =
-        this.restTemplate.postForEntity("/Room/createRoom", request, Room.class);
+    ResponseEntity<Building> response =
+        this.restTemplate.postForEntity("/Building/createBuilding", request, Building.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testRoom = response.getBody();
-    assertRoom(request, testRoom);
+    testBuilding = response.getBody();
+    assertBuilding(request, testBuilding);
   }
 
   @Test
   @Order(2)
-  public void testListAllRooms() {
-    RoomFilter request = new RoomFilter();
-    ParameterizedTypeReference<PaginationResponse<Room>> t = new ParameterizedTypeReference<>() {};
+  public void testListAllBuildings() {
+    BuildingFilter request = new BuildingFilter();
+    ParameterizedTypeReference<PaginationResponse<Building>> t =
+        new ParameterizedTypeReference<>() {};
 
-    ResponseEntity<PaginationResponse<Room>> response =
+    ResponseEntity<PaginationResponse<Building>> response =
         this.restTemplate.exchange(
-            "/Room/getAllRooms", HttpMethod.POST, new HttpEntity<>(request), t);
+            "/Building/getAllBuildings", HttpMethod.POST, new HttpEntity<>(request), t);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    PaginationResponse<Room> body = response.getBody();
+    PaginationResponse<Building> body = response.getBody();
     Assertions.assertNotNull(body);
-    List<Room> Rooms = body.getList();
-    Assertions.assertNotEquals(0, Rooms.size());
-    Assertions.assertTrue(Rooms.stream().anyMatch(f -> f.getId().equals(testRoom.getId())));
+    List<Building> Buildings = body.getList();
+    Assertions.assertNotEquals(0, Buildings.size());
+    Assertions.assertTrue(Buildings.stream().anyMatch(f -> f.getId().equals(testBuilding.getId())));
   }
 
-  public void assertRoom(RoomCreate request, Room testRoom) {
-    Assertions.assertNotNull(testRoom);
+  public void assertBuilding(BuildingCreate request, Building testBuilding) {
+    Assertions.assertNotNull(testBuilding);
 
     if (request.getExternalId() != null) {
 
-      Assertions.assertEquals(request.getExternalId(), testRoom.getExternalId());
+      Assertions.assertEquals(request.getExternalId(), testBuilding.getExternalId());
     }
   }
 
   @Test
   @Order(3)
-  public void testRoomUpdate() {
+  public void testBuildingUpdate() {
     String name = UUID.randomUUID().toString();
-    RoomUpdate request = new RoomUpdate().setId(testRoom.getId()).setName(name);
-    ResponseEntity<Room> response =
+    BuildingUpdate request = new BuildingUpdate().setId(testBuilding.getId()).setName(name);
+    ResponseEntity<Building> response =
         this.restTemplate.exchange(
-            "/Room/updateRoom", HttpMethod.PUT, new HttpEntity<>(request), Room.class);
+            "/Building/updateBuilding", HttpMethod.PUT, new HttpEntity<>(request), Building.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testRoom = response.getBody();
-    assertRoom(request, testRoom);
+    testBuilding = response.getBody();
+    assertBuilding(request, testBuilding);
   }
 }

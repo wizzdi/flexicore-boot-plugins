@@ -1,7 +1,7 @@
-package com.admin.service.request;
+package com.wizzdi.flexicore.building.request;
 
-import com.admin.model.Room;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wizzdi.flexicore.building.model.Room;
 
 public class RoomUpdate extends RoomCreate {
 

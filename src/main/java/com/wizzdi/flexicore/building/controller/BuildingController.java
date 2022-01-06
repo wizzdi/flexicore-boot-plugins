@@ -1,14 +1,14 @@
-package com.admin.service.controller;
+package com.wizzdi.flexicore.building.controller;
 
-import com.admin.model.Building;
-import com.admin.model.Building_;
-import com.admin.service.request.BuildingCreate;
-import com.admin.service.request.BuildingFilter;
-import com.admin.service.request.BuildingUpdate;
-import com.admin.service.service.BuildingService;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.building.model.Building;
+import com.wizzdi.flexicore.building.model.Building_;
+import com.wizzdi.flexicore.building.request.BuildingCreate;
+import com.wizzdi.flexicore.building.request.BuildingFilter;
+import com.wizzdi.flexicore.building.request.BuildingUpdate;
+import com.wizzdi.flexicore.building.service.BuildingService;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

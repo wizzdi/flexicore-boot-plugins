@@ -1,14 +1,14 @@
-package com.admin.service.controller;
+package com.wizzdi.flexicore.building.controller;
 
-import com.admin.model.Room;
-import com.admin.model.Room_;
-import com.admin.service.request.RoomCreate;
-import com.admin.service.request.RoomFilter;
-import com.admin.service.request.RoomUpdate;
-import com.admin.service.service.RoomService;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.building.model.Room;
+import com.wizzdi.flexicore.building.model.Room_;
+import com.wizzdi.flexicore.building.request.RoomCreate;
+import com.wizzdi.flexicore.building.request.RoomFilter;
+import com.wizzdi.flexicore.building.request.RoomUpdate;
+import com.wizzdi.flexicore.building.service.RoomService;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,12 +1,12 @@
-package com.admin.service.service;
+package com.wizzdi.flexicore.building.service;
 
-import com.admin.model.Building;
-import com.admin.service.request.BuildingCreate;
-import com.admin.service.request.BuildingFilter;
-import com.admin.service.request.BuildingUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.building.model.Building;
+import com.wizzdi.flexicore.building.request.BuildingCreate;
+import com.wizzdi.flexicore.building.request.BuildingFilter;
+import com.wizzdi.flexicore.building.request.BuildingUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.List;
 import java.util.Set;

@@ -1,7 +1,7 @@
-package com.admin.service.request;
+package com.wizzdi.flexicore.building.request;
 
-import com.admin.model.Building;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wizzdi.flexicore.building.model.Building;
 
 public class BuildingUpdate extends BuildingCreate {
 

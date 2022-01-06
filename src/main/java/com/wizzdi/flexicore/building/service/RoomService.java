@@ -1,14 +1,14 @@
-package com.admin.service.service;
+package com.wizzdi.flexicore.building.service;
 
-import com.admin.model.Room;
-import com.admin.service.data.RoomRepository;
-import com.admin.service.request.RoomCreate;
-import com.admin.service.request.RoomFilter;
-import com.admin.service.request.RoomUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.building.data.RoomRepository;
+import com.wizzdi.flexicore.building.model.Room;
+import com.wizzdi.flexicore.building.request.RoomCreate;
+import com.wizzdi.flexicore.building.request.RoomFilter;
+import com.wizzdi.flexicore.building.request.RoomUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;

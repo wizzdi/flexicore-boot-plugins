@@ -1,4 +1,4 @@
-package com.admin.service.request;
+package com.wizzdi.flexicore.building.request;
 
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;

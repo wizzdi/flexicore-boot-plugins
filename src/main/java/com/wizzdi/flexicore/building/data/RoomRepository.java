@@ -1,11 +1,11 @@
-package com.admin.service.data;
+package com.wizzdi.flexicore.building.data;
 
-import com.admin.model.Room;
-import com.admin.service.request.RoomFilter;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.building.model.Room;
+import com.wizzdi.flexicore.building.request.RoomFilter;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
 import java.util.ArrayList;

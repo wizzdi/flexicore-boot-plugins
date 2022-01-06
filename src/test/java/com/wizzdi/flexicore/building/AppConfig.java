@@ -1,4 +1,4 @@
-package com.admin.service;
+package com.wizzdi.flexicore.building;
 
 import com.flexicore.security.SecurityContextBase;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,26 +1,26 @@
-package com.admin.service.data;
+package com.wizzdi.flexicore.building.data;
 
-import com.admin.model.Building;
-import com.admin.service.request.BuildingFilter;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.building.model.Room;
+import com.wizzdi.flexicore.building.request.RoomFilter;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
 
-public interface IBuildingRepository {
+public interface IRoomRepository {
 
   /**
-   * @param filtering Object Used to List Entity1
+   * @param filtering Object Used to List Room
    * @param securityContext
-   * @return List of Building
+   * @return List of Room
    */
-  List<Building> listAllBuildings(BuildingFilter filtering, SecurityContextBase securityContext);
+  List<Room> listAllRooms(RoomFilter filtering, SecurityContextBase securityContext);
 
-  <T extends Building> void addBuildingPredicate(
-      BuildingFilter filtering,
+  <T extends Room> void addRoomPredicate(
+      RoomFilter filtering,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
@@ -28,11 +28,11 @@ public interface IBuildingRepository {
       SecurityContextBase securityContext);
 
   /**
-   * @param filtering Object Used to List Entity1
+   * @param filtering Object Used to List Room
    * @param securityContext
-   * @return count of Building
+   * @return count of Room
    */
-  Long countAllBuildings(BuildingFilter filtering, SecurityContextBase securityContext);
+  Long countAllRooms(RoomFilter filtering, SecurityContextBase securityContext);
 
   <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext);
