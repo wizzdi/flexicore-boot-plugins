@@ -22,8 +22,6 @@
         
         <flexicore-file-model.version>1.0.0</flexicore-file-model.version>
         
-        <maps-model.version>1.0.0</maps-model.version>
-        
         <flexicore-security-service.version>1.1.1</flexicore-security-service.version>
         
         <maps-model.version>1.0.0</maps-model.version>
@@ -137,14 +135,6 @@
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-file-model</artifactId>
                 <version>${flexicore-file-model.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        
-
-            <dependency>
-                <groupId>com.wizzdi</groupId>
-                <artifactId>maps-model</artifactId>
-                <version>${maps-model.version}</version>
                 <scope>provided</scope>
             </dependency>
         
