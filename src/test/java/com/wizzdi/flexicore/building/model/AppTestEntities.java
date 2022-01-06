@@ -1,4 +1,4 @@
-package com.admin.model;
+package com.wizzdi.flexicore.building.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baselink;

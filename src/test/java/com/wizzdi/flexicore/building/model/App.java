@@ -1,4 +1,4 @@
-package com.admin.model;
+package com.wizzdi.flexicore.building.model;
 
 import com.flexicore.annotations.EnableFlexiCoreBaseServices;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
