@@ -17,7 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication(scanBasePackages = {"com.admin.service"})
+@SpringBootApplication(scanBasePackages = {"com.wizzdi.flexicore.building"})
 @EnableFlexiCoreHealthPlugins
 @EnableFlexiCoreJAXRSPlugins
 @EnableFlexiCorePlugins
