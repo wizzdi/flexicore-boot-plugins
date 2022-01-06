@@ -6,7 +6,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>building-model</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
 
     <properties>
         <version.compiler.plugin>3.3</version.compiler.plugin>
@@ -16,21 +16,17 @@
         <swagger.version>2.1.2</swagger.version>
     <version.eclipselink>2.7.7</version.eclipselink>
         
-        <flexicore-security-model.version>1.1.1</flexicore-security-model.version>
-        
+
         <flexicore-territories-model.version>3.0.1</flexicore-territories-model.version>
         
         <flexicore-file-model.version>1.0.0</flexicore-file-model.version>
         
-        <flexicore-security-service.version>1.1.1</flexicore-security-service.version>
-        
+
         <maps-model.version>1.0.0</maps-model.version>
         
         <maps-service.version>1.0.0</maps-service.version>
         
-        <flexicore-base-service.version></flexicore-base-service.version>
-        
-        <flexicore-base-model.version></flexicore-base-model.version>
+
         
     </properties>
     
@@ -47,7 +43,7 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-boot-dependencies</artifactId>
-                <version>2.1.2</version>
+                <version>2.1.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -102,13 +98,6 @@
 
         
 
-            <dependency>
-                <groupId>com.wizzdi</groupId>
-                <artifactId>flexicore-security-model</artifactId>
-                <version>${flexicore-security-model.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        
 
             <dependency>
                 <groupId>com.wizzdi</groupId>
@@ -126,13 +115,6 @@
             </dependency>
         
 
-            <dependency>
-                <groupId>com.wizzdi</groupId>
-                <artifactId>flexicore-security-service</artifactId>
-                <version>${flexicore-security-service.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        
 
             <dependency>
                 <groupId>com.wizzdi</groupId>
@@ -150,21 +132,6 @@
             </dependency>
         
 
-            <dependency>
-                <groupId>com.wizzdi</groupId>
-                <artifactId>flexicore-base-service</artifactId>
-                <version>${flexicore-base-service.version}</version>
-                
-            </dependency>
-        
-
-            <dependency>
-                <groupId>com.wizzdi</groupId>
-                <artifactId>flexicore-base-model</artifactId>
-                <version>${flexicore-base-model.version}</version>
-                
-            </dependency>
-        
         
             <dependency>
                 <groupId>com.wizzdi</groupId>
