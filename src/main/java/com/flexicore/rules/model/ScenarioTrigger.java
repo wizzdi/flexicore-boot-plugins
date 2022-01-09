@@ -1,22 +1,31 @@
 package com.flexicore.rules.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.flexicore.file.model.FileResource;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class ScenarioTrigger extends SecuredBasic {
 
+  @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime lastEventId;
 
+  @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime lastActivated;
 
+  @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime validFrom;
 
   private Long cooldownIntervalMs;
 
+  @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime activeTill;
 
   private Long activeMs;
@@ -30,7 +39,12 @@ public class ScenarioTrigger extends SecuredBasic {
   @ManyToOne(targetEntity = ScenarioTriggerType.class)
   private ScenarioTriggerType scenarioTriggerType;
 
+  @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime validTill;
+
+  @OneToMany(targetEntity = ScenarioToTrigger.class,mappedBy = "scenarioTrigger")
+  @JsonIgnore
+  private List<ScenarioToTrigger> scenarioToTriggers=new ArrayList<>();
 
   /** @return lastEventId */
   public OffsetDateTime getLastEventId() {
@@ -175,4 +189,16 @@ public class ScenarioTrigger extends SecuredBasic {
     this.validTill = validTill;
     return (T) this;
   }
+
+  @OneToMany(targetEntity = ScenarioToTrigger.class,mappedBy = "scenarioTrigger")
+  @JsonIgnore
+  public List<ScenarioToTrigger> getScenarioToTriggers() {
+    return scenarioToTriggers;
+  }
+
+  public <T extends ScenarioTrigger> T setScenarioToTriggers(List<ScenarioToTrigger> scenarioToTriggers) {
+    this.scenarioToTriggers = scenarioToTriggers;
+    return (T) this;
+  }
+
 }
