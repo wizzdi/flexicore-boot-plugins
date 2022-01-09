@@ -11,8 +11,8 @@ public class JSFunctionParameter extends SecuredBasic {
 
   private String parameterType;
 
-  @ManyToOne(targetEntity = JsFunction.class)
-  private JsFunction jsFunction;
+  @ManyToOne(targetEntity = JSFunction.class)
+  private JSFunction jsFunction;
 
   /** @return ordinal */
   public Integer getOrdinal() {
@@ -43,8 +43,8 @@ public class JSFunctionParameter extends SecuredBasic {
   }
 
   /** @return jsFunction */
-  @ManyToOne(targetEntity = JsFunction.class)
-  public JsFunction getJsFunction() {
+  @ManyToOne(targetEntity = JSFunction.class)
+  public JSFunction getJsFunction() {
     return this.jsFunction;
   }
 
@@ -52,7 +52,7 @@ public class JSFunctionParameter extends SecuredBasic {
    * @param jsFunction jsFunction to set
    * @return JSFunctionParameter
    */
-  public <T extends JSFunctionParameter> T setJsFunction(JsFunction jsFunction) {
+  public <T extends JSFunctionParameter> T setJsFunction(JSFunction jsFunction) {
     this.jsFunction = jsFunction;
     return (T) this;
   }

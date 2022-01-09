@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class JsFunction extends SecuredBasic {
+public class JSFunction extends SecuredBasic {
 
   @ManyToOne(targetEntity = FileResource.class)
   private FileResource evaluatingJSCode;
@@ -23,9 +23,9 @@ public class JsFunction extends SecuredBasic {
 
   /**
    * @param evaluatingJSCode evaluatingJSCode to set
-   * @return JsFunction
+   * @return JSFunction
    */
-  public <T extends JsFunction> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
+  public <T extends JSFunction> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
     return (T) this;
   }
@@ -37,9 +37,9 @@ public class JsFunction extends SecuredBasic {
 
   /**
    * @param returnType returnType to set
-   * @return JsFunction
+   * @return JSFunction
    */
-  public <T extends JsFunction> T setReturnType(String returnType) {
+  public <T extends JSFunction> T setReturnType(String returnType) {
     this.returnType = returnType;
     return (T) this;
   }
@@ -51,9 +51,9 @@ public class JsFunction extends SecuredBasic {
 
   /**
    * @param methodName methodName to set
-   * @return JsFunction
+   * @return JSFunction
    */
-  public <T extends JsFunction> T setMethodName(String methodName) {
+  public <T extends JSFunction> T setMethodName(String methodName) {
     this.methodName = methodName;
     return (T) this;
   }

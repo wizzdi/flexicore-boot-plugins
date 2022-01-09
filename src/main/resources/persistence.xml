@@ -22,11 +22,11 @@
             
                 <class>com.flexicore.model.Basic</class>
             
-                <class>com.flexicore.rules.model.JsFunction</class>
-            
                 <class>com.flexicore.rules.model.ScenarioTriggerType</class>
             
                 <class>com.flexicore.rules.model.Scenario</class>
+            
+                <class>com.flexicore.rules.model.JSFunction</class>
             
 
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
