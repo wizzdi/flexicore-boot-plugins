@@ -3,10 +3,10 @@ package com.flexicore.rules.controller;
 import com.flexicore.request.AuthenticationRequest;
 import com.flexicore.response.AuthenticationResponse;
 import com.flexicore.rules.App;
-import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.request.JsFunctionCreate;
-import com.flexicore.rules.request.JsFunctionFilter;
-import com.flexicore.rules.request.JsFunctionUpdate;
+import com.flexicore.rules.model.JSFunction;
+import com.flexicore.rules.request.JSFunctionCreate;
+import com.flexicore.rules.request.JSFunctionFilter;
+import com.flexicore.rules.request.JSFunctionUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +28,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class JsFunctionControllerTest {
+public class JSFunctionControllerTest {
 
-  private JsFunction testJsFunction;
+  private JSFunction testJSFunction;
   @Autowired private TestRestTemplate restTemplate;
 
   @BeforeAll
@@ -53,67 +53,67 @@ public class JsFunctionControllerTest {
 
   @Test
   @Order(1)
-  public void testJsFunctionCreate() {
+  public void testJSFunctionCreate() {
     String name = UUID.randomUUID().toString();
-    JsFunctionCreate request = new JsFunctionCreate().setName(name);
+    JSFunctionCreate request = new JSFunctionCreate().setName(name);
 
     request.setReturnType("test-string");
 
     request.setMethodName("test-string");
 
-    ResponseEntity<JsFunction> response =
-        this.restTemplate.postForEntity("/JsFunction/createJsFunction", request, JsFunction.class);
+    ResponseEntity<JSFunction> response =
+        this.restTemplate.postForEntity("/JSFunction/createJSFunction", request, JSFunction.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testJsFunction = response.getBody();
-    assertJsFunction(request, testJsFunction);
+    testJSFunction = response.getBody();
+    assertJSFunction(request, testJSFunction);
   }
 
   @Test
   @Order(2)
-  public void testListAllJsFunctions() {
-    JsFunctionFilter request = new JsFunctionFilter();
-    ParameterizedTypeReference<PaginationResponse<JsFunction>> t =
+  public void testListAllJSFunctions() {
+    JSFunctionFilter request = new JSFunctionFilter();
+    ParameterizedTypeReference<PaginationResponse<JSFunction>> t =
         new ParameterizedTypeReference<>() {};
 
-    ResponseEntity<PaginationResponse<JsFunction>> response =
+    ResponseEntity<PaginationResponse<JSFunction>> response =
         this.restTemplate.exchange(
-            "/JsFunction/getAllJsFunctions", HttpMethod.POST, new HttpEntity<>(request), t);
+            "/JSFunction/getAllJSFunctions", HttpMethod.POST, new HttpEntity<>(request), t);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    PaginationResponse<JsFunction> body = response.getBody();
+    PaginationResponse<JSFunction> body = response.getBody();
     Assertions.assertNotNull(body);
-    List<JsFunction> JsFunctions = body.getList();
-    Assertions.assertNotEquals(0, JsFunctions.size());
+    List<JSFunction> JSFunctions = body.getList();
+    Assertions.assertNotEquals(0, JSFunctions.size());
     Assertions.assertTrue(
-        JsFunctions.stream().anyMatch(f -> f.getId().equals(testJsFunction.getId())));
+        JSFunctions.stream().anyMatch(f -> f.getId().equals(testJSFunction.getId())));
   }
 
-  public void assertJsFunction(JsFunctionCreate request, JsFunction testJsFunction) {
-    Assertions.assertNotNull(testJsFunction);
+  public void assertJSFunction(JSFunctionCreate request, JSFunction testJSFunction) {
+    Assertions.assertNotNull(testJSFunction);
 
     if (request.getReturnType() != null) {
 
-      Assertions.assertEquals(request.getReturnType(), testJsFunction.getReturnType());
+      Assertions.assertEquals(request.getReturnType(), testJSFunction.getReturnType());
     }
 
     if (request.getMethodName() != null) {
 
-      Assertions.assertEquals(request.getMethodName(), testJsFunction.getMethodName());
+      Assertions.assertEquals(request.getMethodName(), testJSFunction.getMethodName());
     }
   }
 
   @Test
   @Order(3)
-  public void testJsFunctionUpdate() {
+  public void testJSFunctionUpdate() {
     String name = UUID.randomUUID().toString();
-    JsFunctionUpdate request = new JsFunctionUpdate().setId(testJsFunction.getId()).setName(name);
-    ResponseEntity<JsFunction> response =
+    JSFunctionUpdate request = new JSFunctionUpdate().setId(testJSFunction.getId()).setName(name);
+    ResponseEntity<JSFunction> response =
         this.restTemplate.exchange(
-            "/JsFunction/updateJsFunction",
+            "/JSFunction/updateJSFunction",
             HttpMethod.PUT,
             new HttpEntity<>(request),
-            JsFunction.class);
+            JSFunction.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testJsFunction = response.getBody();
-    assertJsFunction(request, testJsFunction);
+    testJSFunction = response.getBody();
+    assertJSFunction(request, testJSFunction);
   }
 }

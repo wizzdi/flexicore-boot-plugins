@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class JsFunctionCreate extends BasicCreate {
+public class JSFunctionCreate extends BasicCreate {
 
   private String evaluatingJSCodeId;
 
@@ -18,7 +18,7 @@ public class JsFunctionCreate extends BasicCreate {
     return this.evaluatingJSCodeId;
   }
 
-  public <T extends JsFunctionCreate> T setEvaluatingJSCodeId(String evaluatingJSCodeId) {
+  public <T extends JSFunctionCreate> T setEvaluatingJSCodeId(String evaluatingJSCodeId) {
     this.evaluatingJSCodeId = evaluatingJSCodeId;
     return (T) this;
   }
@@ -28,7 +28,7 @@ public class JsFunctionCreate extends BasicCreate {
     return this.evaluatingJSCode;
   }
 
-  public <T extends JsFunctionCreate> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
+  public <T extends JSFunctionCreate> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
     return (T) this;
   }
@@ -37,7 +37,7 @@ public class JsFunctionCreate extends BasicCreate {
     return this.returnType;
   }
 
-  public <T extends JsFunctionCreate> T setReturnType(String returnType) {
+  public <T extends JSFunctionCreate> T setReturnType(String returnType) {
     this.returnType = returnType;
     return (T) this;
   }
@@ -46,7 +46,7 @@ public class JsFunctionCreate extends BasicCreate {
     return this.methodName;
   }
 
-  public <T extends JsFunctionCreate> T setMethodName(String methodName) {
+  public <T extends JSFunctionCreate> T setMethodName(String methodName) {
     this.methodName = methodName;
     return (T) this;
   }

@@ -7,7 +7,7 @@ import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
 
-public class JsFunctionFilter extends PaginationFilter {
+public class JSFunctionFilter extends PaginationFilter {
 
   private Set<String> evaluatingJSCodeIds;
 
@@ -23,7 +23,7 @@ public class JsFunctionFilter extends PaginationFilter {
     return this.evaluatingJSCodeIds;
   }
 
-  public <T extends JsFunctionFilter> T setEvaluatingJSCodeIds(Set<String> evaluatingJSCodeIds) {
+  public <T extends JSFunctionFilter> T setEvaluatingJSCodeIds(Set<String> evaluatingJSCodeIds) {
     this.evaluatingJSCodeIds = evaluatingJSCodeIds;
     return (T) this;
   }
@@ -33,7 +33,7 @@ public class JsFunctionFilter extends PaginationFilter {
     return this.evaluatingJSCode;
   }
 
-  public <T extends JsFunctionFilter> T setEvaluatingJSCode(List<FileResource> evaluatingJSCode) {
+  public <T extends JSFunctionFilter> T setEvaluatingJSCode(List<FileResource> evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
     return (T) this;
   }
@@ -42,7 +42,7 @@ public class JsFunctionFilter extends PaginationFilter {
     return this.returnType;
   }
 
-  public <T extends JsFunctionFilter> T setReturnType(Set<String> returnType) {
+  public <T extends JSFunctionFilter> T setReturnType(Set<String> returnType) {
     this.returnType = returnType;
     return (T) this;
   }
@@ -51,7 +51,7 @@ public class JsFunctionFilter extends PaginationFilter {
     return this.methodName;
   }
 
-  public <T extends JsFunctionFilter> T setMethodName(Set<String> methodName) {
+  public <T extends JSFunctionFilter> T setMethodName(Set<String> methodName) {
     this.methodName = methodName;
     return (T) this;
   }
@@ -60,7 +60,7 @@ public class JsFunctionFilter extends PaginationFilter {
     return this.basicPropertiesFilter;
   }
 
-  public <T extends JsFunctionFilter> T setBasicPropertiesFilter(
+  public <T extends JSFunctionFilter> T setBasicPropertiesFilter(
       BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;

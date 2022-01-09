@@ -3,9 +3,9 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
+import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.model.JSFunctionParameter;
 import com.flexicore.rules.model.JSFunctionParameter_;
-import com.flexicore.rules.model.JsFunction;
 import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -67,7 +67,7 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
           filtering.getJsFunction().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
-      Join<T, JsFunction> join = r.join(JSFunctionParameter_.jsFunction);
+      Join<T, JSFunction> join = r.join(JSFunctionParameter_.jsFunction);
       preds.add(join.get(Basic_.id).in(ids));
     }
   }

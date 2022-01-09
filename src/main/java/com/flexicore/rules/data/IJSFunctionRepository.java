@@ -2,26 +2,26 @@ package com.flexicore.rules.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.request.JsFunctionFilter;
+import com.flexicore.rules.model.JSFunction;
+import com.flexicore.rules.request.JSFunctionFilter;
 import com.flexicore.security.SecurityContextBase;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
 
-public interface IJsFunctionRepository {
+public interface IJSFunctionRepository {
 
   /**
    * @param filtering Object Used to List JsFunction
    * @param securityContext
-   * @return List of JsFunction
+   * @return List of JSFunction
    */
-  List<JsFunction> listAllJsFunctions(
-      JsFunctionFilter filtering, SecurityContextBase securityContext);
+  List<JSFunction> listAllJSFunctions(
+      JSFunctionFilter filtering, SecurityContextBase securityContext);
 
-  <T extends JsFunction> void addJsFunctionPredicate(
-      JsFunctionFilter filtering,
+  <T extends JSFunction> void addJSFunctionPredicate(
+      JSFunctionFilter filtering,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
@@ -31,9 +31,9 @@ public interface IJsFunctionRepository {
   /**
    * @param filtering Object Used to List JsFunction
    * @param securityContext
-   * @return count of JsFunction
+   * @return count of JSFunction
    */
-  Long countAllJsFunctions(JsFunctionFilter filtering, SecurityContextBase securityContext);
+  Long countAllJSFunctions(JSFunctionFilter filtering, SecurityContextBase securityContext);
 
   <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext);

@@ -3,11 +3,11 @@ package com.flexicore.rules.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecuredBasic_;
-import com.flexicore.rules.data.JsFunctionRepository;
-import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.request.JsFunctionCreate;
-import com.flexicore.rules.request.JsFunctionFilter;
-import com.flexicore.rules.request.JsFunctionUpdate;
+import com.flexicore.rules.data.JSFunctionRepository;
+import com.flexicore.rules.model.JSFunction;
+import com.flexicore.rules.request.JSFunctionCreate;
+import com.flexicore.rules.request.JSFunctionFilter;
+import com.flexicore.rules.request.JSFunctionUpdate;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
@@ -31,127 +31,127 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class JsFunctionService implements Plugin, IJsFunctionService {
+public class JSFunctionService implements Plugin, IJSFunctionService {
 
-  @Autowired private JsFunctionRepository repository;
+  @Autowired private JSFunctionRepository repository;
 
   @Autowired private BasicService basicService;
 
   /**
-   * @param jsFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JsFunction
    * @param securityContext
-   * @return created JsFunction
+   * @return created JSFunction
    */
   @Override
-  public JsFunction createJsFunction(
-      JsFunctionCreate jsFunctionCreate, SecurityContextBase securityContext) {
-    JsFunction jsFunction = createJsFunctionNoMerge(jsFunctionCreate, securityContext);
-    this.repository.merge(jsFunction);
-    return jsFunction;
+  public JSFunction createJSFunction(
+      JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+    JSFunction jSFunction = createJSFunctionNoMerge(jSFunctionCreate, securityContext);
+    this.repository.merge(jSFunction);
+    return jSFunction;
   }
 
   /**
-   * @param jsFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JsFunction
    * @param securityContext
-   * @return created JsFunction unmerged
+   * @return created JSFunction unmerged
    */
   @Override
-  public JsFunction createJsFunctionNoMerge(
-      JsFunctionCreate jsFunctionCreate, SecurityContextBase securityContext) {
-    JsFunction jsFunction = new JsFunction();
-    jsFunction.setId(UUID.randomUUID().toString());
-    updateJsFunctionNoMerge(jsFunction, jsFunctionCreate);
+  public JSFunction createJSFunctionNoMerge(
+      JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+    JSFunction jSFunction = new JSFunction();
+    jSFunction.setId(UUID.randomUUID().toString());
+    updateJSFunctionNoMerge(jSFunction, jSFunctionCreate);
 
-    BaseclassService.createSecurityObjectNoMerge(jsFunction, securityContext);
+    BaseclassService.createSecurityObjectNoMerge(jSFunction, securityContext);
 
-    return jsFunction;
+    return jSFunction;
   }
 
   /**
-   * @param jsFunctionCreate Object Used to Create JsFunction
-   * @param jsFunction
-   * @return if jsFunction was updated
+   * @param jSFunctionCreate Object Used to Create JsFunction
+   * @param jSFunction
+   * @return if jSFunction was updated
    */
   @Override
-  public boolean updateJsFunctionNoMerge(JsFunction jsFunction, JsFunctionCreate jsFunctionCreate) {
-    boolean update = basicService.updateBasicNoMerge(jsFunctionCreate, jsFunction);
+  public boolean updateJSFunctionNoMerge(JSFunction jSFunction, JSFunctionCreate jSFunctionCreate) {
+    boolean update = basicService.updateBasicNoMerge(jSFunctionCreate, jSFunction);
 
-    if (jsFunctionCreate.getEvaluatingJSCode() != null
-        && (jsFunction.getEvaluatingJSCode() == null
-            || !jsFunctionCreate
+    if (jSFunctionCreate.getEvaluatingJSCode() != null
+        && (jSFunction.getEvaluatingJSCode() == null
+            || !jSFunctionCreate
                 .getEvaluatingJSCode()
                 .getId()
-                .equals(jsFunction.getEvaluatingJSCode().getId()))) {
-      jsFunction.setEvaluatingJSCode(jsFunctionCreate.getEvaluatingJSCode());
+                .equals(jSFunction.getEvaluatingJSCode().getId()))) {
+      jSFunction.setEvaluatingJSCode(jSFunctionCreate.getEvaluatingJSCode());
       update = true;
     }
 
-    if (jsFunctionCreate.getMethodName() != null
-        && (!jsFunctionCreate.getMethodName().equals(jsFunction.getMethodName()))) {
-      jsFunction.setMethodName(jsFunctionCreate.getMethodName());
+    if (jSFunctionCreate.getMethodName() != null
+        && (!jSFunctionCreate.getMethodName().equals(jSFunction.getMethodName()))) {
+      jSFunction.setMethodName(jSFunctionCreate.getMethodName());
       update = true;
     }
 
-    if (jsFunctionCreate.getReturnType() != null
-        && (!jsFunctionCreate.getReturnType().equals(jsFunction.getReturnType()))) {
-      jsFunction.setReturnType(jsFunctionCreate.getReturnType());
+    if (jSFunctionCreate.getReturnType() != null
+        && (!jSFunctionCreate.getReturnType().equals(jSFunction.getReturnType()))) {
+      jSFunction.setReturnType(jSFunctionCreate.getReturnType());
       update = true;
     }
 
     return update;
   }
   /**
-   * @param jsFunctionUpdate
+   * @param jSFunctionUpdate
    * @param securityContext
-   * @return jsFunction
+   * @return jSFunction
    */
   @Override
-  public JsFunction updateJsFunction(
-      JsFunctionUpdate jsFunctionUpdate, SecurityContextBase securityContext) {
-    JsFunction jsFunction = jsFunctionUpdate.getJsFunction();
-    if (updateJsFunctionNoMerge(jsFunction, jsFunctionUpdate)) {
-      this.repository.merge(jsFunction);
+  public JSFunction updateJSFunction(
+      JSFunctionUpdate jSFunctionUpdate, SecurityContextBase securityContext) {
+    JSFunction jSFunction = jSFunctionUpdate.getJSFunction();
+    if (updateJSFunctionNoMerge(jSFunction, jSFunctionUpdate)) {
+      this.repository.merge(jSFunction);
     }
-    return jsFunction;
+    return jSFunction;
   }
 
   /**
-   * @param jsFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JsFunction
    * @param securityContext
-   * @return PaginationResponse containing paging information for JsFunction
+   * @return PaginationResponse containing paging information for JSFunction
    */
   @Override
-  public PaginationResponse<JsFunction> getAllJsFunctions(
-      JsFunctionFilter jsFunctionFilter, SecurityContextBase securityContext) {
-    List<JsFunction> list = listAllJsFunctions(jsFunctionFilter, securityContext);
-    long count = this.repository.countAllJsFunctions(jsFunctionFilter, securityContext);
-    return new PaginationResponse<>(list, jsFunctionFilter, count);
+  public PaginationResponse<JSFunction> getAllJSFunctions(
+      JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+    List<JSFunction> list = listAllJSFunctions(jSFunctionFilter, securityContext);
+    long count = this.repository.countAllJSFunctions(jSFunctionFilter, securityContext);
+    return new PaginationResponse<>(list, jSFunctionFilter, count);
   }
 
   /**
-   * @param jsFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JsFunction
    * @param securityContext
-   * @return List of JsFunction
+   * @return List of JSFunction
    */
   @Override
-  public List<JsFunction> listAllJsFunctions(
-      JsFunctionFilter jsFunctionFilter, SecurityContextBase securityContext) {
-    return this.repository.listAllJsFunctions(jsFunctionFilter, securityContext);
+  public List<JSFunction> listAllJSFunctions(
+      JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+    return this.repository.listAllJSFunctions(jSFunctionFilter, securityContext);
   }
 
   /**
-   * @param jsFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JsFunction
    * @param securityContext
-   * @throws ResponseStatusException if jsFunctionFilter is not valid
+   * @throws ResponseStatusException if jSFunctionFilter is not valid
    */
   @Override
-  public void validate(JsFunctionFilter jsFunctionFilter, SecurityContextBase securityContext) {
-    basicService.validate(jsFunctionFilter, securityContext);
+  public void validate(JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+    basicService.validate(jSFunctionFilter, securityContext);
 
     Set<String> evaluatingJSCodeIds =
-        jsFunctionFilter.getEvaluatingJSCodeIds() == null
+        jSFunctionFilter.getEvaluatingJSCodeIds() == null
             ? new HashSet<>()
-            : jsFunctionFilter.getEvaluatingJSCodeIds();
+            : jSFunctionFilter.getEvaluatingJSCodeIds();
     Map<String, FileResource> evaluatingJSCode =
         evaluatingJSCodeIds.isEmpty()
             ? new HashMap<>()
@@ -168,19 +168,19 @@ public class JsFunctionService implements Plugin, IJsFunctionService {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No FileResource with ids " + evaluatingJSCodeIds);
     }
-    jsFunctionFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
+    jSFunctionFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
   }
 
   /**
-   * @param jsFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JsFunction
    * @param securityContext
-   * @throws ResponseStatusException if jsFunctionCreate is not valid
+   * @throws ResponseStatusException if jSFunctionCreate is not valid
    */
   @Override
-  public void validate(JsFunctionCreate jsFunctionCreate, SecurityContextBase securityContext) {
-    basicService.validate(jsFunctionCreate, securityContext);
+  public void validate(JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+    basicService.validate(jSFunctionCreate, securityContext);
 
-    String evaluatingJSCodeId = jsFunctionCreate.getEvaluatingJSCodeId();
+    String evaluatingJSCodeId = jSFunctionCreate.getEvaluatingJSCodeId();
     FileResource evaluatingJSCode =
         evaluatingJSCodeId == null
             ? null
@@ -190,7 +190,7 @@ public class JsFunctionService implements Plugin, IJsFunctionService {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No FileResource with id " + evaluatingJSCodeId);
     }
-    jsFunctionCreate.setEvaluatingJSCode(evaluatingJSCode);
+    jSFunctionCreate.setEvaluatingJSCode(evaluatingJSCode);
   }
 
   @Override

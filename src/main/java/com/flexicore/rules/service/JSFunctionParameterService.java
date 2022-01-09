@@ -4,8 +4,8 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecuredBasic_;
 import com.flexicore.rules.data.JSFunctionParameterRepository;
+import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.model.JSFunctionParameter;
-import com.flexicore.rules.model.JsFunction;
 import com.flexicore.rules.request.JSFunctionParameterCreate;
 import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.rules.request.JSFunctionParameterUpdate;
@@ -161,17 +161,17 @@ public class JSFunctionParameterService implements Plugin, IJSFunctionParameterS
         jSFunctionParameterFilter.getJsFunctionIds() == null
             ? new HashSet<>()
             : jSFunctionParameterFilter.getJsFunctionIds();
-    Map<String, JsFunction> jsFunction =
+    Map<String, JSFunction> jsFunction =
         jsFunctionIds.isEmpty()
             ? new HashMap<>()
             : this.repository
-                .listByIds(JsFunction.class, jsFunctionIds, SecuredBasic_.security, securityContext)
+                .listByIds(JSFunction.class, jsFunctionIds, SecuredBasic_.security, securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     jsFunctionIds.removeAll(jsFunction.keySet());
     if (!jsFunctionIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No JsFunction with ids " + jsFunctionIds);
+          HttpStatus.BAD_REQUEST, "No JSFunction with ids " + jsFunctionIds);
     }
     jSFunctionParameterFilter.setJsFunction(new ArrayList<>(jsFunction.values()));
   }
@@ -187,14 +187,14 @@ public class JSFunctionParameterService implements Plugin, IJSFunctionParameterS
     basicService.validate(jSFunctionParameterCreate, securityContext);
 
     String jsFunctionId = jSFunctionParameterCreate.getJsFunctionId();
-    JsFunction jsFunction =
+    JSFunction jsFunction =
         jsFunctionId == null
             ? null
             : this.repository.getByIdOrNull(
-                jsFunctionId, JsFunction.class, SecuredBasic_.security, securityContext);
+                jsFunctionId, JSFunction.class, SecuredBasic_.security, securityContext);
     if (jsFunctionId != null && jsFunction == null) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No JsFunction with id " + jsFunctionId);
+          HttpStatus.BAD_REQUEST, "No JSFunction with id " + jsFunctionId);
     }
     jSFunctionParameterCreate.setJsFunction(jsFunction);
   }

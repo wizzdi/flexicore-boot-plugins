@@ -3,8 +3,8 @@ package com.flexicore.rules.controller;
 import com.flexicore.request.AuthenticationRequest;
 import com.flexicore.response.AuthenticationResponse;
 import com.flexicore.rules.App;
+import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.model.JSFunctionParameter;
-import com.flexicore.rules.model.JsFunction;
 import com.flexicore.rules.request.JSFunctionParameterCreate;
 import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.rules.request.JSFunctionParameterUpdate;
@@ -34,7 +34,7 @@ public class JSFunctionParameterControllerTest {
   private JSFunctionParameter testJSFunctionParameter;
   @Autowired private TestRestTemplate restTemplate;
 
-  @Autowired private JsFunction jsFunction;
+  @Autowired private JSFunction jSFunction;
 
   @BeforeAll
   private void init() {
@@ -62,7 +62,7 @@ public class JSFunctionParameterControllerTest {
 
     request.setOrdinal(10);
 
-    request.setJsFunctionId(this.jsFunction.getId());
+    request.setJsFunctionId(this.jSFunction.getId());
 
     request.setParameterType("test-string");
 

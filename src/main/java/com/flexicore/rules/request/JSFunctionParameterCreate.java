@@ -1,7 +1,7 @@
 package com.flexicore.rules.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.rules.model.JsFunction;
+import com.flexicore.rules.model.JSFunction;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
 public class JSFunctionParameterCreate extends BasicCreate {
@@ -12,7 +12,7 @@ public class JSFunctionParameterCreate extends BasicCreate {
 
   private String parameterType;
 
-  @JsonIgnore private JsFunction jsFunction;
+  @JsonIgnore private JSFunction jsFunction;
 
   public Integer getOrdinal() {
     return this.ordinal;
@@ -42,11 +42,11 @@ public class JSFunctionParameterCreate extends BasicCreate {
   }
 
   @JsonIgnore
-  public JsFunction getJsFunction() {
+  public JSFunction getJsFunction() {
     return this.jsFunction;
   }
 
-  public <T extends JSFunctionParameterCreate> T setJsFunction(JsFunction jsFunction) {
+  public <T extends JSFunctionParameterCreate> T setJsFunction(JSFunction jsFunction) {
     this.jsFunction = jsFunction;
     return (T) this;
   }
