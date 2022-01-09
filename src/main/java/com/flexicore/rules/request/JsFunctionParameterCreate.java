@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.security.request.BasicCreate;
 
 public class JsFunctionParameterCreate extends BasicCreate {
 
-  private String ordinal;
+  private Integer ordinal;
 
   private String jsFunctionId;
 
@@ -14,11 +14,11 @@ public class JsFunctionParameterCreate extends BasicCreate {
 
   @JsonIgnore private JsFunction jsFunction;
 
-  public String getOrdinal() {
+  public Integer getOrdinal() {
     return this.ordinal;
   }
 
-  public <T extends JsFunctionParameterCreate> T setOrdinal(String ordinal) {
+  public <T extends JsFunctionParameterCreate> T setOrdinal(Integer ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }

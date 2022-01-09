@@ -90,17 +90,17 @@ public class JsFunctionParameterService implements Plugin, IJsFunctionParameterS
       update = true;
     }
 
-    if (jsFunctionParameterCreate.getOrdinal() != null
-        && (!jsFunctionParameterCreate.getOrdinal().equals(jsFunctionParameter.getOrdinal()))) {
-      jsFunctionParameter.setOrdinal(jsFunctionParameterCreate.getOrdinal());
-      update = true;
-    }
-
     if (jsFunctionParameterCreate.getParameterType() != null
         && (!jsFunctionParameterCreate
             .getParameterType()
             .equals(jsFunctionParameter.getParameterType()))) {
       jsFunctionParameter.setParameterType(jsFunctionParameterCreate.getParameterType());
+      update = true;
+    }
+
+    if (jsFunctionParameterCreate.getOrdinal() != null
+        && (!jsFunctionParameterCreate.getOrdinal().equals(jsFunctionParameter.getOrdinal()))) {
+      jsFunctionParameter.setOrdinal(jsFunctionParameterCreate.getOrdinal());
       update = true;
     }
 

@@ -121,18 +121,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
       update = true;
     }
 
-    if (scenarioTriggerCreate.getLastActivated() != null
-        && (!scenarioTriggerCreate.getLastActivated().equals(scenarioTrigger.getLastActivated()))) {
-      scenarioTrigger.setLastActivated(scenarioTriggerCreate.getLastActivated());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getLastEventId() != null
-        && (!scenarioTriggerCreate.getLastEventId().equals(scenarioTrigger.getLastEventId()))) {
-      scenarioTrigger.setLastEventId(scenarioTriggerCreate.getLastEventId());
-      update = true;
-    }
-
     if (scenarioTriggerCreate.getLogFileResource() != null
         && (scenarioTrigger.getLogFileResource() == null
             || !scenarioTriggerCreate
@@ -150,6 +138,18 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
                 .getId()
                 .equals(scenarioTrigger.getEvaluatingJSCode().getId()))) {
       scenarioTrigger.setEvaluatingJSCode(scenarioTriggerCreate.getEvaluatingJSCode());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getLastActivated() != null
+        && (!scenarioTriggerCreate.getLastActivated().equals(scenarioTrigger.getLastActivated()))) {
+      scenarioTrigger.setLastActivated(scenarioTriggerCreate.getLastActivated());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getLastEventId() != null
+        && (!scenarioTriggerCreate.getLastEventId().equals(scenarioTrigger.getLastEventId()))) {
+      scenarioTrigger.setLastEventId(scenarioTriggerCreate.getLastEventId());
       update = true;
     }
 

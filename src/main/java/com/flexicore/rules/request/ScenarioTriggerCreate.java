@@ -4,67 +4,68 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.ScenarioTriggerType;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import java.time.OffsetDateTime;
 
 public class ScenarioTriggerCreate extends BasicCreate {
 
-  private String lastEventId;
+  private OffsetDateTime lastEventId;
 
-  private String lastActivated;
+  private OffsetDateTime lastActivated;
 
-  private String validFrom;
+  private OffsetDateTime validFrom;
 
-  private String cooldownIntervalMs;
+  private Long cooldownIntervalMs;
 
   private String logFileResourceId;
 
   @JsonIgnore private ScenarioTriggerType scenarioTriggerType;
 
-  private String validTill;
+  private OffsetDateTime validTill;
 
   private String scenarioTriggerTypeId;
 
   private String evaluatingJSCodeId;
 
-  private String activeTill;
+  private OffsetDateTime activeTill;
 
-  private String activeMs;
+  private Long activeMs;
 
   @JsonIgnore private FileResource logFileResource;
 
   @JsonIgnore private FileResource evaluatingJSCode;
 
-  public String getLastEventId() {
+  public OffsetDateTime getLastEventId() {
     return this.lastEventId;
   }
 
-  public <T extends ScenarioTriggerCreate> T setLastEventId(String lastEventId) {
+  public <T extends ScenarioTriggerCreate> T setLastEventId(OffsetDateTime lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
 
-  public String getLastActivated() {
+  public OffsetDateTime getLastActivated() {
     return this.lastActivated;
   }
 
-  public <T extends ScenarioTriggerCreate> T setLastActivated(String lastActivated) {
+  public <T extends ScenarioTriggerCreate> T setLastActivated(OffsetDateTime lastActivated) {
     this.lastActivated = lastActivated;
     return (T) this;
   }
 
-  public String getValidFrom() {
+  public OffsetDateTime getValidFrom() {
     return this.validFrom;
   }
 
-  public <T extends ScenarioTriggerCreate> T setValidFrom(String validFrom) {
+  public <T extends ScenarioTriggerCreate> T setValidFrom(OffsetDateTime validFrom) {
     this.validFrom = validFrom;
     return (T) this;
   }
 
-  public String getCooldownIntervalMs() {
+  public Long getCooldownIntervalMs() {
     return this.cooldownIntervalMs;
   }
 
-  public <T extends ScenarioTriggerCreate> T setCooldownIntervalMs(String cooldownIntervalMs) {
+  public <T extends ScenarioTriggerCreate> T setCooldownIntervalMs(Long cooldownIntervalMs) {
     this.cooldownIntervalMs = cooldownIntervalMs;
     return (T) this;
   }
@@ -89,11 +90,11 @@ public class ScenarioTriggerCreate extends BasicCreate {
     return (T) this;
   }
 
-  public String getValidTill() {
+  public OffsetDateTime getValidTill() {
     return this.validTill;
   }
 
-  public <T extends ScenarioTriggerCreate> T setValidTill(String validTill) {
+  public <T extends ScenarioTriggerCreate> T setValidTill(OffsetDateTime validTill) {
     this.validTill = validTill;
     return (T) this;
   }
@@ -117,20 +118,20 @@ public class ScenarioTriggerCreate extends BasicCreate {
     return (T) this;
   }
 
-  public String getActiveTill() {
+  public OffsetDateTime getActiveTill() {
     return this.activeTill;
   }
 
-  public <T extends ScenarioTriggerCreate> T setActiveTill(String activeTill) {
+  public <T extends ScenarioTriggerCreate> T setActiveTill(OffsetDateTime activeTill) {
     this.activeTill = activeTill;
     return (T) this;
   }
 
-  public String getActiveMs() {
+  public Long getActiveMs() {
     return this.activeMs;
   }
 
-  public <T extends ScenarioTriggerCreate> T setActiveMs(String activeMs) {
+  public <T extends ScenarioTriggerCreate> T setActiveMs(Long activeMs) {
     this.activeMs = activeMs;
     return (T) this;
   }

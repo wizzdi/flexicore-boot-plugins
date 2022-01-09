@@ -9,6 +9,7 @@ import com.flexicore.rules.request.ScenarioTriggerCreate;
 import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.rules.request.ScenarioTriggerUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -60,21 +61,21 @@ public class ScenarioTriggerControllerTest {
     String name = UUID.randomUUID().toString();
     ScenarioTriggerCreate request = new ScenarioTriggerCreate().setName(name);
 
-    request.setLastEventId("test-string");
+    request.setLastEventId(OffsetDateTime.now());
 
-    request.setLastActivated("test-string");
+    request.setLastActivated(OffsetDateTime.now());
 
-    request.setValidFrom("test-string");
+    request.setValidFrom(OffsetDateTime.now());
 
-    request.setCooldownIntervalMs("test-string");
+    request.setCooldownIntervalMs(10L);
 
-    request.setValidTill("test-string");
+    request.setValidTill(OffsetDateTime.now());
 
     request.setScenarioTriggerTypeId(this.scenarioTriggerType.getId());
 
-    request.setActiveTill("test-string");
+    request.setActiveTill(OffsetDateTime.now());
 
-    request.setActiveMs("test-string");
+    request.setActiveMs(10L);
 
     ResponseEntity<ScenarioTrigger> response =
         this.restTemplate.postForEntity(

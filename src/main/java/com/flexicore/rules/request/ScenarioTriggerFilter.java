@@ -5,32 +5,33 @@ import com.flexicore.rules.model.ScenarioTriggerType;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
 public class ScenarioTriggerFilter extends PaginationFilter {
 
-  private Set<String> lastEventId;
+  private Set<OffsetDateTime> lastEventId;
 
-  private Set<String> lastActivated;
+  private Set<OffsetDateTime> lastActivated;
 
-  private Set<String> validFrom;
+  private Set<OffsetDateTime> validFrom;
 
-  private Set<String> cooldownIntervalMs;
+  private Set<Long> cooldownIntervalMs;
 
   private Set<String> logFileResourceIds;
 
   @JsonIgnore private List<ScenarioTriggerType> scenarioTriggerType;
 
-  private Set<String> validTill;
+  private Set<OffsetDateTime> validTill;
 
   private Set<String> scenarioTriggerTypeIds;
 
   private Set<String> evaluatingJSCodeIds;
 
-  private Set<String> activeTill;
+  private Set<OffsetDateTime> activeTill;
 
-  private Set<String> activeMs;
+  private Set<Long> activeMs;
 
   @JsonIgnore private List<FileResource> logFileResource;
 
@@ -38,38 +39,38 @@ public class ScenarioTriggerFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  public Set<String> getLastEventId() {
+  public Set<OffsetDateTime> getLastEventId() {
     return this.lastEventId;
   }
 
-  public <T extends ScenarioTriggerFilter> T setLastEventId(Set<String> lastEventId) {
+  public <T extends ScenarioTriggerFilter> T setLastEventId(Set<OffsetDateTime> lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
 
-  public Set<String> getLastActivated() {
+  public Set<OffsetDateTime> getLastActivated() {
     return this.lastActivated;
   }
 
-  public <T extends ScenarioTriggerFilter> T setLastActivated(Set<String> lastActivated) {
+  public <T extends ScenarioTriggerFilter> T setLastActivated(Set<OffsetDateTime> lastActivated) {
     this.lastActivated = lastActivated;
     return (T) this;
   }
 
-  public Set<String> getValidFrom() {
+  public Set<OffsetDateTime> getValidFrom() {
     return this.validFrom;
   }
 
-  public <T extends ScenarioTriggerFilter> T setValidFrom(Set<String> validFrom) {
+  public <T extends ScenarioTriggerFilter> T setValidFrom(Set<OffsetDateTime> validFrom) {
     this.validFrom = validFrom;
     return (T) this;
   }
 
-  public Set<String> getCooldownIntervalMs() {
+  public Set<Long> getCooldownIntervalMs() {
     return this.cooldownIntervalMs;
   }
 
-  public <T extends ScenarioTriggerFilter> T setCooldownIntervalMs(Set<String> cooldownIntervalMs) {
+  public <T extends ScenarioTriggerFilter> T setCooldownIntervalMs(Set<Long> cooldownIntervalMs) {
     this.cooldownIntervalMs = cooldownIntervalMs;
     return (T) this;
   }
@@ -94,11 +95,11 @@ public class ScenarioTriggerFilter extends PaginationFilter {
     return (T) this;
   }
 
-  public Set<String> getValidTill() {
+  public Set<OffsetDateTime> getValidTill() {
     return this.validTill;
   }
 
-  public <T extends ScenarioTriggerFilter> T setValidTill(Set<String> validTill) {
+  public <T extends ScenarioTriggerFilter> T setValidTill(Set<OffsetDateTime> validTill) {
     this.validTill = validTill;
     return (T) this;
   }
@@ -123,20 +124,20 @@ public class ScenarioTriggerFilter extends PaginationFilter {
     return (T) this;
   }
 
-  public Set<String> getActiveTill() {
+  public Set<OffsetDateTime> getActiveTill() {
     return this.activeTill;
   }
 
-  public <T extends ScenarioTriggerFilter> T setActiveTill(Set<String> activeTill) {
+  public <T extends ScenarioTriggerFilter> T setActiveTill(Set<OffsetDateTime> activeTill) {
     this.activeTill = activeTill;
     return (T) this;
   }
 
-  public Set<String> getActiveMs() {
+  public Set<Long> getActiveMs() {
     return this.activeMs;
   }
 
-  public <T extends ScenarioTriggerFilter> T setActiveMs(Set<String> activeMs) {
+  public <T extends ScenarioTriggerFilter> T setActiveMs(Set<Long> activeMs) {
     this.activeMs = activeMs;
     return (T) this;
   }

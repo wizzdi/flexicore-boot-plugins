@@ -60,7 +60,7 @@ public class JsFunctionParameterControllerTest {
     String name = UUID.randomUUID().toString();
     JsFunctionParameterCreate request = new JsFunctionParameterCreate().setName(name);
 
-    request.setOrdinal("test-string");
+    request.setOrdinal(10);
 
     request.setJsFunctionId(this.jsFunction.getId());
 

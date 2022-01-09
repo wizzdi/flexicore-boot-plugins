@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class JsFunctionParameterFilter extends PaginationFilter {
 
-  private Set<String> ordinal;
+  private Set<Integer> ordinal;
 
   private Set<String> jsFunctionIds;
 
@@ -19,11 +19,11 @@ public class JsFunctionParameterFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  public Set<String> getOrdinal() {
+  public Set<Integer> getOrdinal() {
     return this.ordinal;
   }
 
-  public <T extends JsFunctionParameterFilter> T setOrdinal(Set<String> ordinal) {
+  public <T extends JsFunctionParameterFilter> T setOrdinal(Set<Integer> ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }
