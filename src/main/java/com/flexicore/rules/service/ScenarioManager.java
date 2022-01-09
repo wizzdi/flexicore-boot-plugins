@@ -5,17 +5,14 @@ import com.flexicore.rules.events.ScenarioEvent;
 import com.flexicore.rules.events.ScenarioSavableEvent;
 import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.*;
-
 import com.flexicore.rules.response.EvaluateScenarioResponse;
 import com.flexicore.rules.response.EvaluateTriggerResponse;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
-import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteDynamicExecution;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.file.model.FileResource;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.io.FileUtils;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -46,23 +43,22 @@ public class ScenarioManager implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(ScenarioManager.class);
 
-    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
 
 
-    
     @Autowired
     private ScenarioToTriggerService scenarioToTriggerService;
 
-    
+
     @Autowired
     private ScenarioToDataSourceService scenarioToDataSourceService;
 
-    
+
     @Autowired
     private ScenarioToActionService scenarioToActionService;
 
     @Autowired
-    
+
     private ScenarioTriggerService scenarioTriggerService;
 
 
@@ -74,7 +70,7 @@ public class ScenarioManager implements Plugin {
     private DynamicInvokerService dynamicInvokerService;
 
     @Autowired
-    
+
     private ScenarioSavableEventService scenarioEventService;
 
 
@@ -86,7 +82,7 @@ public class ScenarioManager implements Plugin {
     @EventListener
     public void handleTrigger(ScenarioEvent scenarioEvent) {
         logger.info("Scenario Trigger Event " + scenarioEvent + "captured by Scenario Manager");
-        SecurityContextBase securityContext=scenarioEvent.getSecurityContext();
+        SecurityContextBase securityContext = scenarioEvent.getSecurityContext();
         List<ScenarioTrigger> triggers = scenarioTriggerService.listAllScenarioTriggers(new ScenarioTriggerFilter().setEventCanonicalNames(Collections.singleton(scenarioEvent.getClass().getCanonicalName())), securityContext);
         List<ScenarioTrigger> activeTriggers = new ArrayList<>();
         List<Object> toMerge = new ArrayList<>();
@@ -128,7 +124,7 @@ public class ScenarioManager implements Plugin {
                 .setScenario(new ArrayList<>(scenarioMap.values()));
         Map<String, List<ScenarioToDataSource>> scenarioToDataSource = scenarioMap.isEmpty() ? new HashMap<>() : scenarioToDataSourceService.listAllScenarioToDataSources(scenarioToDataSourceFilter, securityContext).stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
         List<EvaluateScenarioResponse> evaluateScenarioResponses = new ArrayList<>();
-        List<ScenarioToAction> scenarioToActions =scenarioMap.isEmpty()?new ArrayList<>(): scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), securityContext);
+        List<ScenarioToAction> scenarioToActions = scenarioMap.isEmpty() ? new ArrayList<>() : scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), securityContext);
         Map<String, List<ScenarioToAction>> actions = scenarioToActions.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
 
         for (Map.Entry<String, List<ScenarioToTrigger>> entry : fireingScenarios.entrySet()) {
@@ -136,7 +132,7 @@ public class ScenarioManager implements Plugin {
             Scenario scenario = scenarioMap.get(scenarioId);
             List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
             List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
-            Map<String, ExecuteInvokerRequest> scenarioActions=actions.getOrDefault(scenarioId,new ArrayList<>()).stream().map(f->f.getScenarioAction()).collect(Collectors.toMap(f->f.getId(), f-> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(),securityContext),(a, b)->a));
+            Map<String, ExecuteInvokerRequest> scenarioActions = actions.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a));
 
             EvaluateScenarioRequest evaluateScenarioRequest = new EvaluateScenarioRequest()
                     .setScenario(scenario)
@@ -149,9 +145,9 @@ public class ScenarioManager implements Plugin {
 
         }
         for (EvaluateScenarioResponse evaluateScenarioResponse : evaluateScenarioResponses) {
-            if(evaluateScenarioResponse.getActions()!=null){
+            if (evaluateScenarioResponse.getActions() != null) {
                 for (ExecuteInvokerRequest executeInvokerRequest : evaluateScenarioResponse.getActions().values()) {
-                    dynamicInvokerService.executeInvoker(executeInvokerRequest,securityContext);
+                    dynamicInvokerService.executeInvoker(executeInvokerRequest, securityContext);
                 }
             }
         }
@@ -196,8 +192,7 @@ public class ScenarioManager implements Plugin {
         java.util.logging.Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
         try {
             File file = new File(script.getFullPath());
-            ScriptObjectMirror loaded = loadScript(file,
-                    buildFunctionTableFunction(FunctionTypes.EVALUATE));
+            Bindings bindings = loadScript(file);
             Map<String, ExecuteInvokerRequest> actions = evaluateScenarioRequest.getActions();
             EvaluateScenarioScriptContext scenarioEventScriptContext = new EvaluateScenarioScriptContext(this::fetchEvent)
                     .setScenario(evaluateScenarioRequest.getScenario())
@@ -206,15 +201,16 @@ public class ScenarioManager implements Plugin {
                     .setScenarioEvent(scenarioEvent)
                     .setScenarioToDataSources(scenarioToDataSources)
                     .setScenarioTriggers(scenarioTriggers);
-            Object[] parameters = new Object[]{scenarioEventScriptContext};
-            String[] res = (String[]) loaded.callMember(
-                    FunctionTypes.EVALUATE.getFunctionName(), parameters);
+            bindings.put("x",scenarioEventScriptContext);
+            String functionName = FunctionTypes.EVALUATE.getFunctionName();
+
+            String[] res = (String[]) engine.eval(functionName+"(x);");
             Set<String> idsToRun = Stream.of(res).collect(Collectors.toSet());
             Map<String, ExecuteInvokerRequest> filtered = actions.entrySet().parallelStream().filter(f -> idsToRun.contains(f.getKey())).collect(Collectors.toMap(f -> f.getKey(), f -> f.getValue()));
             evaluateScenarioResponse.setActions(filtered);
 
         } catch (Exception e) {
-            logger.error( "failed executing script", e);
+            logger.error("failed executing script", e);
             scenarioTriggerLogger.log(Level.SEVERE,
                     "failed executing script: " + e.toString(), e);
         } finally {
@@ -263,14 +259,12 @@ public class ScenarioManager implements Plugin {
         java.util.logging.Logger scenarioTriggerLogger = getLogger(scenarioTrigger.getId(), scenarioTrigger.getLogFileResource().getFullPath());
         try {
             File file = new File(script.getFullPath());
-            ScriptObjectMirror loaded = loadScript(file,
-                    buildFunctionTableFunction(FunctionTypes.EVALUATE));
+            Bindings loaded = loadScript(file);
             EvaluateTriggerScriptContext scenarioEventScriptContext = new EvaluateTriggerScriptContext()
                     .setLogger(scenarioTriggerLogger)
                     .setScenarioEvent(scenarioEvent);
-            Object[] parameters = new Object[]{scenarioEventScriptContext};
-            boolean res = (boolean) loaded.callMember(
-                    FunctionTypes.EVALUATE.getFunctionName(), parameters);
+            loaded.put("x",scenarioEventScriptContext);
+            boolean res = (boolean)engine.eval( FunctionTypes.EVALUATE.getFunctionName()+"(x);",loaded);
             evaluateTriggerResponse.setActive(res);
 
         } catch (Exception e) {
@@ -285,14 +279,14 @@ public class ScenarioManager implements Plugin {
 
     }
 
-    private ScriptObjectMirror loadScript(File file, String functionTable)
+    private Bindings loadScript(File file)
             throws IOException, ScriptException {
         String script = FileUtils
                 .readFileToString(file, StandardCharsets.UTF_8);
-        script += functionTable;
         CompiledScript compiled = ((Compilable) engine).compile(script);
-        ScriptObjectMirror table = (ScriptObjectMirror) compiled.eval();
-        return (ScriptObjectMirror) table.call(null);
+        Bindings bindings=engine.createBindings();
+        Object eval = compiled.eval(bindings);
+        return bindings;
     }
 
     private String buildFunctionTableFunction(FunctionTypes... functionTypes) {
