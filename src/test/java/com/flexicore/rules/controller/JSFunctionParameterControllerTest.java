@@ -3,11 +3,11 @@ package com.flexicore.rules.controller;
 import com.flexicore.request.AuthenticationRequest;
 import com.flexicore.response.AuthenticationResponse;
 import com.flexicore.rules.App;
+import com.flexicore.rules.model.JSFunctionParameter;
 import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.model.JsFunctionParameter;
-import com.flexicore.rules.request.JsFunctionParameterCreate;
-import com.flexicore.rules.request.JsFunctionParameterFilter;
-import com.flexicore.rules.request.JsFunctionParameterUpdate;
+import com.flexicore.rules.request.JSFunctionParameterCreate;
+import com.flexicore.rules.request.JSFunctionParameterFilter;
+import com.flexicore.rules.request.JSFunctionParameterUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +29,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-public class JsFunctionParameterControllerTest {
+public class JSFunctionParameterControllerTest {
 
-  private JsFunctionParameter testJsFunctionParameter;
+  private JSFunctionParameter testJSFunctionParameter;
   @Autowired private TestRestTemplate restTemplate;
 
   @Autowired private JsFunction jsFunction;
@@ -56,9 +56,9 @@ public class JsFunctionParameterControllerTest {
 
   @Test
   @Order(1)
-  public void testJsFunctionParameterCreate() {
+  public void testJSFunctionParameterCreate() {
     String name = UUID.randomUUID().toString();
-    JsFunctionParameterCreate request = new JsFunctionParameterCreate().setName(name);
+    JSFunctionParameterCreate request = new JSFunctionParameterCreate().setName(name);
 
     request.setOrdinal(10);
 
@@ -66,74 +66,74 @@ public class JsFunctionParameterControllerTest {
 
     request.setParameterType("test-string");
 
-    ResponseEntity<JsFunctionParameter> response =
+    ResponseEntity<JSFunctionParameter> response =
         this.restTemplate.postForEntity(
-            "/JsFunctionParameter/createJsFunctionParameter", request, JsFunctionParameter.class);
+            "/JSFunctionParameter/createJSFunctionParameter", request, JSFunctionParameter.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testJsFunctionParameter = response.getBody();
-    assertJsFunctionParameter(request, testJsFunctionParameter);
+    testJSFunctionParameter = response.getBody();
+    assertJSFunctionParameter(request, testJSFunctionParameter);
   }
 
   @Test
   @Order(2)
-  public void testListAllJsFunctionParameters() {
-    JsFunctionParameterFilter request = new JsFunctionParameterFilter();
-    ParameterizedTypeReference<PaginationResponse<JsFunctionParameter>> t =
+  public void testListAllJSFunctionParameters() {
+    JSFunctionParameterFilter request = new JSFunctionParameterFilter();
+    ParameterizedTypeReference<PaginationResponse<JSFunctionParameter>> t =
         new ParameterizedTypeReference<>() {};
 
-    ResponseEntity<PaginationResponse<JsFunctionParameter>> response =
+    ResponseEntity<PaginationResponse<JSFunctionParameter>> response =
         this.restTemplate.exchange(
-            "/JsFunctionParameter/getAllJsFunctionParameters",
+            "/JSFunctionParameter/getAllJSFunctionParameters",
             HttpMethod.POST,
             new HttpEntity<>(request),
             t);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    PaginationResponse<JsFunctionParameter> body = response.getBody();
+    PaginationResponse<JSFunctionParameter> body = response.getBody();
     Assertions.assertNotNull(body);
-    List<JsFunctionParameter> JsFunctionParameters = body.getList();
-    Assertions.assertNotEquals(0, JsFunctionParameters.size());
+    List<JSFunctionParameter> JSFunctionParameters = body.getList();
+    Assertions.assertNotEquals(0, JSFunctionParameters.size());
     Assertions.assertTrue(
-        JsFunctionParameters.stream()
-            .anyMatch(f -> f.getId().equals(testJsFunctionParameter.getId())));
+        JSFunctionParameters.stream()
+            .anyMatch(f -> f.getId().equals(testJSFunctionParameter.getId())));
   }
 
-  public void assertJsFunctionParameter(
-      JsFunctionParameterCreate request, JsFunctionParameter testJsFunctionParameter) {
-    Assertions.assertNotNull(testJsFunctionParameter);
+  public void assertJSFunctionParameter(
+      JSFunctionParameterCreate request, JSFunctionParameter testJSFunctionParameter) {
+    Assertions.assertNotNull(testJSFunctionParameter);
 
     if (request.getOrdinal() != null) {
 
-      Assertions.assertEquals(request.getOrdinal(), testJsFunctionParameter.getOrdinal());
+      Assertions.assertEquals(request.getOrdinal(), testJSFunctionParameter.getOrdinal());
     }
 
     if (request.getJsFunctionId() != null) {
 
-      Assertions.assertNotNull(testJsFunctionParameter.getJsFunction());
+      Assertions.assertNotNull(testJSFunctionParameter.getJsFunction());
       Assertions.assertEquals(
-          request.getJsFunctionId(), testJsFunctionParameter.getJsFunction().getId());
+          request.getJsFunctionId(), testJSFunctionParameter.getJsFunction().getId());
     }
 
     if (request.getParameterType() != null) {
 
       Assertions.assertEquals(
-          request.getParameterType(), testJsFunctionParameter.getParameterType());
+          request.getParameterType(), testJSFunctionParameter.getParameterType());
     }
   }
 
   @Test
   @Order(3)
-  public void testJsFunctionParameterUpdate() {
+  public void testJSFunctionParameterUpdate() {
     String name = UUID.randomUUID().toString();
-    JsFunctionParameterUpdate request =
-        new JsFunctionParameterUpdate().setId(testJsFunctionParameter.getId()).setName(name);
-    ResponseEntity<JsFunctionParameter> response =
+    JSFunctionParameterUpdate request =
+        new JSFunctionParameterUpdate().setId(testJSFunctionParameter.getId()).setName(name);
+    ResponseEntity<JSFunctionParameter> response =
         this.restTemplate.exchange(
-            "/JsFunctionParameter/updateJsFunctionParameter",
+            "/JSFunctionParameter/updateJSFunctionParameter",
             HttpMethod.PUT,
             new HttpEntity<>(request),
-            JsFunctionParameter.class);
+            JSFunctionParameter.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
-    testJsFunctionParameter = response.getBody();
-    assertJsFunctionParameter(request, testJsFunctionParameter);
+    testJSFunctionParameter = response.getBody();
+    assertJSFunctionParameter(request, testJSFunctionParameter);
   }
 }

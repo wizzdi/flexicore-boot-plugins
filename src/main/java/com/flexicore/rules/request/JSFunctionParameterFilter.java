@@ -7,7 +7,7 @@ import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
 
-public class JsFunctionParameterFilter extends PaginationFilter {
+public class JSFunctionParameterFilter extends PaginationFilter {
 
   private Set<Integer> ordinal;
 
@@ -23,7 +23,7 @@ public class JsFunctionParameterFilter extends PaginationFilter {
     return this.ordinal;
   }
 
-  public <T extends JsFunctionParameterFilter> T setOrdinal(Set<Integer> ordinal) {
+  public <T extends JSFunctionParameterFilter> T setOrdinal(Set<Integer> ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }
@@ -32,7 +32,7 @@ public class JsFunctionParameterFilter extends PaginationFilter {
     return this.jsFunctionIds;
   }
 
-  public <T extends JsFunctionParameterFilter> T setJsFunctionIds(Set<String> jsFunctionIds) {
+  public <T extends JSFunctionParameterFilter> T setJsFunctionIds(Set<String> jsFunctionIds) {
     this.jsFunctionIds = jsFunctionIds;
     return (T) this;
   }
@@ -41,7 +41,7 @@ public class JsFunctionParameterFilter extends PaginationFilter {
     return this.parameterType;
   }
 
-  public <T extends JsFunctionParameterFilter> T setParameterType(Set<String> parameterType) {
+  public <T extends JSFunctionParameterFilter> T setParameterType(Set<String> parameterType) {
     this.parameterType = parameterType;
     return (T) this;
   }
@@ -51,7 +51,7 @@ public class JsFunctionParameterFilter extends PaginationFilter {
     return this.jsFunction;
   }
 
-  public <T extends JsFunctionParameterFilter> T setJsFunction(List<JsFunction> jsFunction) {
+  public <T extends JSFunctionParameterFilter> T setJsFunction(List<JsFunction> jsFunction) {
     this.jsFunction = jsFunction;
     return (T) this;
   }
@@ -60,7 +60,7 @@ public class JsFunctionParameterFilter extends PaginationFilter {
     return this.basicPropertiesFilter;
   }
 
-  public <T extends JsFunctionParameterFilter> T setBasicPropertiesFilter(
+  public <T extends JSFunctionParameterFilter> T setBasicPropertiesFilter(
       BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;

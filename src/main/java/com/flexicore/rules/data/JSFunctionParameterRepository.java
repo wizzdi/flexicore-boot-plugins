@@ -3,10 +3,10 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
+import com.flexicore.rules.model.JSFunctionParameter;
+import com.flexicore.rules.model.JSFunctionParameter_;
 import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.model.JsFunctionParameter;
-import com.flexicore.rules.model.JsFunctionParameter_;
-import com.flexicore.rules.request.JsFunctionParameterFilter;
+import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -27,32 +27,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class JsFunctionParameterRepository implements Plugin, IJsFunctionParameterRepository {
+public class JSFunctionParameterRepository implements Plugin, IJSFunctionParameterRepository {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
    * @param filtering Object Used to List JsFunctionParameter
    * @param securityContext
-   * @return List of JsFunctionParameter
+   * @return List of JSFunctionParameter
    */
   @Override
-  public List<JsFunctionParameter> listAllJsFunctionParameters(
-      JsFunctionParameterFilter filtering, SecurityContextBase securityContext) {
+  public List<JSFunctionParameter> listAllJSFunctionParameters(
+      JSFunctionParameterFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
-    CriteriaQuery<JsFunctionParameter> q = cb.createQuery(JsFunctionParameter.class);
-    Root<JsFunctionParameter> r = q.from(JsFunctionParameter.class);
+    CriteriaQuery<JSFunctionParameter> q = cb.createQuery(JSFunctionParameter.class);
+    Root<JSFunctionParameter> r = q.from(JSFunctionParameter.class);
     List<Predicate> preds = new ArrayList<>();
-    addJsFunctionParameterPredicate(filtering, cb, q, r, preds, securityContext);
+    addJSFunctionParameterPredicate(filtering, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
-    TypedQuery<JsFunctionParameter> query = em.createQuery(q);
+    TypedQuery<JSFunctionParameter> query = em.createQuery(q);
     BasicRepository.addPagination(filtering, query);
     return query.getResultList();
   }
 
   @Override
-  public <T extends JsFunctionParameter> void addJsFunctionParameterPredicate(
-      JsFunctionParameterFilter filtering,
+  public <T extends JSFunctionParameter> void addJSFunctionParameterPredicate(
+      JSFunctionParameterFilter filtering,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
@@ -67,23 +67,23 @@ public class JsFunctionParameterRepository implements Plugin, IJsFunctionParamet
           filtering.getJsFunction().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
-      Join<T, JsFunction> join = r.join(JsFunctionParameter_.jsFunction);
+      Join<T, JsFunction> join = r.join(JSFunctionParameter_.jsFunction);
       preds.add(join.get(Basic_.id).in(ids));
     }
   }
   /**
    * @param filtering Object Used to List JsFunctionParameter
    * @param securityContext
-   * @return count of JsFunctionParameter
+   * @return count of JSFunctionParameter
    */
   @Override
-  public Long countAllJsFunctionParameters(
-      JsFunctionParameterFilter filtering, SecurityContextBase securityContext) {
+  public Long countAllJSFunctionParameters(
+      JSFunctionParameterFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
-    Root<JsFunctionParameter> r = q.from(JsFunctionParameter.class);
+    Root<JSFunctionParameter> r = q.from(JSFunctionParameter.class);
     List<Predicate> preds = new ArrayList<>();
-    addJsFunctionParameterPredicate(filtering, cb, q, r, preds, securityContext);
+    addJSFunctionParameterPredicate(filtering, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

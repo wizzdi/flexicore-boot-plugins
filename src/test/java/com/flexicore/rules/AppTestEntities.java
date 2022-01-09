@@ -24,8 +24,8 @@ import com.flexicore.model.TenantToUser;
 import com.flexicore.model.UserToBaseClass;
 import com.flexicore.model.security.SecurityPolicy;
 import com.flexicore.rules.model.DataSource;
+import com.flexicore.rules.model.JSFunctionParameter;
 import com.flexicore.rules.model.JsFunction;
-import com.flexicore.rules.model.JsFunctionParameter;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioAction;
 import com.flexicore.rules.model.ScenarioToAction;
@@ -84,9 +84,9 @@ public class AppTestEntities {
                 ServiceCanonicalName.class,
                 DynamicExecution.class,
                 ZipFileToFileResource.class,
-                JsFunctionParameter.class,
                 JsFunction.class,
                 Scenario.class,
+                JSFunctionParameter.class,
                 ScenarioTrigger.class,
                 ScenarioAction.class,
                 DataSource.class,

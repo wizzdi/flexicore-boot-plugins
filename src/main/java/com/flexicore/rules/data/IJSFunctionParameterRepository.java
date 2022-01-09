@@ -2,26 +2,26 @@ package com.flexicore.rules.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.rules.model.JsFunctionParameter;
-import com.flexicore.rules.request.JsFunctionParameterFilter;
+import com.flexicore.rules.model.JSFunctionParameter;
+import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.security.SecurityContextBase;
 import java.util.List;
 import java.util.Set;
 import javax.persistence.criteria.*;
 import javax.persistence.metamodel.SingularAttribute;
 
-public interface IJsFunctionParameterRepository {
+public interface IJSFunctionParameterRepository {
 
   /**
    * @param filtering Object Used to List JsFunctionParameter
    * @param securityContext
-   * @return List of JsFunctionParameter
+   * @return List of JSFunctionParameter
    */
-  List<JsFunctionParameter> listAllJsFunctionParameters(
-      JsFunctionParameterFilter filtering, SecurityContextBase securityContext);
+  List<JSFunctionParameter> listAllJSFunctionParameters(
+      JSFunctionParameterFilter filtering, SecurityContextBase securityContext);
 
-  <T extends JsFunctionParameter> void addJsFunctionParameterPredicate(
-      JsFunctionParameterFilter filtering,
+  <T extends JSFunctionParameter> void addJSFunctionParameterPredicate(
+      JSFunctionParameterFilter filtering,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
@@ -31,10 +31,10 @@ public interface IJsFunctionParameterRepository {
   /**
    * @param filtering Object Used to List JsFunctionParameter
    * @param securityContext
-   * @return count of JsFunctionParameter
+   * @return count of JSFunctionParameter
    */
-  Long countAllJsFunctionParameters(
-      JsFunctionParameterFilter filtering, SecurityContextBase securityContext);
+  Long countAllJSFunctionParameters(
+      JSFunctionParameterFilter filtering, SecurityContextBase securityContext);
 
   <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext);

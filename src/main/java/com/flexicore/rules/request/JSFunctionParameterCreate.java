@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.JsFunction;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
-public class JsFunctionParameterCreate extends BasicCreate {
+public class JSFunctionParameterCreate extends BasicCreate {
 
   private Integer ordinal;
 
@@ -18,7 +18,7 @@ public class JsFunctionParameterCreate extends BasicCreate {
     return this.ordinal;
   }
 
-  public <T extends JsFunctionParameterCreate> T setOrdinal(Integer ordinal) {
+  public <T extends JSFunctionParameterCreate> T setOrdinal(Integer ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }
@@ -27,7 +27,7 @@ public class JsFunctionParameterCreate extends BasicCreate {
     return this.jsFunctionId;
   }
 
-  public <T extends JsFunctionParameterCreate> T setJsFunctionId(String jsFunctionId) {
+  public <T extends JSFunctionParameterCreate> T setJsFunctionId(String jsFunctionId) {
     this.jsFunctionId = jsFunctionId;
     return (T) this;
   }
@@ -36,7 +36,7 @@ public class JsFunctionParameterCreate extends BasicCreate {
     return this.parameterType;
   }
 
-  public <T extends JsFunctionParameterCreate> T setParameterType(String parameterType) {
+  public <T extends JSFunctionParameterCreate> T setParameterType(String parameterType) {
     this.parameterType = parameterType;
     return (T) this;
   }
@@ -46,7 +46,7 @@ public class JsFunctionParameterCreate extends BasicCreate {
     return this.jsFunction;
   }
 
-  public <T extends JsFunctionParameterCreate> T setJsFunction(JsFunction jsFunction) {
+  public <T extends JSFunctionParameterCreate> T setJsFunction(JsFunction jsFunction) {
     this.jsFunction = jsFunction;
     return (T) this;
   }
