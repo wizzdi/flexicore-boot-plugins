@@ -61,7 +61,7 @@ public class ScenarioTriggerControllerTest {
     String name = UUID.randomUUID().toString();
     ScenarioTriggerCreate request = new ScenarioTriggerCreate().setName(name);
 
-    request.setLastEventId(OffsetDateTime.now());
+    request.setLastEventId("test-string");
 
     request.setLastActivated(OffsetDateTime.now());
 

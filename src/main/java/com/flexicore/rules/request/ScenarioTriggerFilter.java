@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class ScenarioTriggerFilter extends PaginationFilter {
 
-  private Set<OffsetDateTime> lastEventId;
+  private Set<String> lastEventId;
 
   private Set<OffsetDateTime> lastActivated;
 
@@ -39,11 +39,11 @@ public class ScenarioTriggerFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  public Set<OffsetDateTime> getLastEventId() {
+  public Set<String> getLastEventId() {
     return this.lastEventId;
   }
 
-  public <T extends ScenarioTriggerFilter> T setLastEventId(Set<OffsetDateTime> lastEventId) {
+  public <T extends ScenarioTriggerFilter> T setLastEventId(Set<String> lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }

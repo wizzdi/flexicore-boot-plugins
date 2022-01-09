@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 public class ScenarioTriggerCreate extends BasicCreate {
 
-  private OffsetDateTime lastEventId;
+  private String lastEventId;
 
   private OffsetDateTime lastActivated;
 
@@ -34,11 +34,11 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   @JsonIgnore private FileResource evaluatingJSCode;
 
-  public OffsetDateTime getLastEventId() {
+  public String getLastEventId() {
     return this.lastEventId;
   }
 
-  public <T extends ScenarioTriggerCreate> T setLastEventId(OffsetDateTime lastEventId) {
+  public <T extends ScenarioTriggerCreate> T setLastEventId(String lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
