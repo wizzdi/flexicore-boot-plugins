@@ -2,23 +2,24 @@ package com.flexicore.rules.model;
 
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.flexicore.file.model.FileResource;
+import java.time.OffsetDateTime;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class ScenarioTrigger extends SecuredBasic {
 
-  private String lastEventId;
+  private OffsetDateTime lastEventId;
 
-  private String lastActivated;
+  private OffsetDateTime lastActivated;
 
-  private String validFrom;
+  private OffsetDateTime validFrom;
 
-  private String cooldownIntervalMs;
+  private Long cooldownIntervalMs;
 
-  private String activeTill;
+  private OffsetDateTime activeTill;
 
-  private String activeMs;
+  private Long activeMs;
 
   @ManyToOne(targetEntity = FileResource.class)
   private FileResource logFileResource;
@@ -29,10 +30,10 @@ public class ScenarioTrigger extends SecuredBasic {
   @ManyToOne(targetEntity = ScenarioTriggerType.class)
   private ScenarioTriggerType scenarioTriggerType;
 
-  private String validTill;
+  private OffsetDateTime validTill;
 
   /** @return lastEventId */
-  public String getLastEventId() {
+  public OffsetDateTime getLastEventId() {
     return this.lastEventId;
   }
 
@@ -40,13 +41,13 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param lastEventId lastEventId to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setLastEventId(String lastEventId) {
+  public <T extends ScenarioTrigger> T setLastEventId(OffsetDateTime lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
 
   /** @return lastActivated */
-  public String getLastActivated() {
+  public OffsetDateTime getLastActivated() {
     return this.lastActivated;
   }
 
@@ -54,13 +55,13 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param lastActivated lastActivated to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setLastActivated(String lastActivated) {
+  public <T extends ScenarioTrigger> T setLastActivated(OffsetDateTime lastActivated) {
     this.lastActivated = lastActivated;
     return (T) this;
   }
 
   /** @return validFrom */
-  public String getValidFrom() {
+  public OffsetDateTime getValidFrom() {
     return this.validFrom;
   }
 
@@ -68,13 +69,13 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param validFrom validFrom to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setValidFrom(String validFrom) {
+  public <T extends ScenarioTrigger> T setValidFrom(OffsetDateTime validFrom) {
     this.validFrom = validFrom;
     return (T) this;
   }
 
   /** @return cooldownIntervalMs */
-  public String getCooldownIntervalMs() {
+  public Long getCooldownIntervalMs() {
     return this.cooldownIntervalMs;
   }
 
@@ -82,13 +83,13 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param cooldownIntervalMs cooldownIntervalMs to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setCooldownIntervalMs(String cooldownIntervalMs) {
+  public <T extends ScenarioTrigger> T setCooldownIntervalMs(Long cooldownIntervalMs) {
     this.cooldownIntervalMs = cooldownIntervalMs;
     return (T) this;
   }
 
   /** @return activeTill */
-  public String getActiveTill() {
+  public OffsetDateTime getActiveTill() {
     return this.activeTill;
   }
 
@@ -96,13 +97,13 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param activeTill activeTill to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setActiveTill(String activeTill) {
+  public <T extends ScenarioTrigger> T setActiveTill(OffsetDateTime activeTill) {
     this.activeTill = activeTill;
     return (T) this;
   }
 
   /** @return activeMs */
-  public String getActiveMs() {
+  public Long getActiveMs() {
     return this.activeMs;
   }
 
@@ -110,7 +111,7 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param activeMs activeMs to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setActiveMs(String activeMs) {
+  public <T extends ScenarioTrigger> T setActiveMs(Long activeMs) {
     this.activeMs = activeMs;
     return (T) this;
   }
@@ -162,7 +163,7 @@ public class ScenarioTrigger extends SecuredBasic {
   }
 
   /** @return validTill */
-  public String getValidTill() {
+  public OffsetDateTime getValidTill() {
     return this.validTill;
   }
 
@@ -170,7 +171,7 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param validTill validTill to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setValidTill(String validTill) {
+  public <T extends ScenarioTrigger> T setValidTill(OffsetDateTime validTill) {
     this.validTill = validTill;
     return (T) this;
   }
