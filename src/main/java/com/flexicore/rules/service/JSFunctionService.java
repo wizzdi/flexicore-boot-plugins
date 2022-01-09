@@ -148,27 +148,7 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
   public void validate(JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     basicService.validate(jSFunctionFilter, securityContext);
 
-    Set<String> evaluatingJSCodeIds =
-        jSFunctionFilter.getEvaluatingJSCodeIds() == null
-            ? new HashSet<>()
-            : jSFunctionFilter.getEvaluatingJSCodeIds();
-    Map<String, FileResource> evaluatingJSCode =
-        evaluatingJSCodeIds.isEmpty()
-            ? new HashMap<>()
-            : this.repository
-                .listByIds(
-                    FileResource.class,
-                    evaluatingJSCodeIds,
-                    SecuredBasic_.security,
-                    securityContext)
-                .parallelStream()
-                .collect(Collectors.toMap(f -> f.getId(), f -> f));
-    evaluatingJSCodeIds.removeAll(evaluatingJSCode.keySet());
-    if (!evaluatingJSCodeIds.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + evaluatingJSCodeIds);
-    }
-    jSFunctionFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
+
   }
 
   /**

@@ -10,6 +10,7 @@ import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.rules.request.ScenarioTriggerUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -62,8 +63,6 @@ public class ScenarioTriggerControllerTest {
     ScenarioTriggerCreate request = new ScenarioTriggerCreate().setName(name);
 
     request.setLastEventId("test-string");
-
-    request.setLastActivated(OffsetDateTime.now());
 
     request.setValidFrom(OffsetDateTime.now());
 
@@ -118,12 +117,12 @@ public class ScenarioTriggerControllerTest {
 
     if (request.getLastActivated() != null) {
 
-      Assertions.assertEquals(request.getLastActivated(), testScenarioTrigger.getLastActivated());
+      Assertions.assertEquals(request.getLastActivated().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getLastActivated().atZoneSameInstant(ZoneId.systemDefault()));
     }
 
     if (request.getValidFrom() != null) {
 
-      Assertions.assertEquals(request.getValidFrom(), testScenarioTrigger.getValidFrom());
+      Assertions.assertEquals(request.getValidFrom().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getValidFrom().atZoneSameInstant(ZoneId.systemDefault()));
     }
 
     if (request.getCooldownIntervalMs() != null) {
@@ -134,7 +133,7 @@ public class ScenarioTriggerControllerTest {
 
     if (request.getValidTill() != null) {
 
-      Assertions.assertEquals(request.getValidTill(), testScenarioTrigger.getValidTill());
+      Assertions.assertEquals(request.getValidTill().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getValidTill().atZoneSameInstant(ZoneId.systemDefault()));
     }
 
     if (request.getScenarioTriggerTypeId() != null) {
@@ -146,7 +145,7 @@ public class ScenarioTriggerControllerTest {
 
     if (request.getActiveTill() != null) {
 
-      Assertions.assertEquals(request.getActiveTill(), testScenarioTrigger.getActiveTill());
+      Assertions.assertEquals(request.getActiveTill().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getActiveTill().atZoneSameInstant(ZoneId.systemDefault()));
     }
 
     if (request.getActiveMs() != null) {

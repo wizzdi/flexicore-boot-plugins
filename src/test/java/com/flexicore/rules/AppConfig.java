@@ -44,7 +44,8 @@ public class AppConfig {
   private SecurityContextBase securityContext;
 
   @Bean
-  public DataSource dataSource() {
+  @Qualifier("scenarioDataSource")
+  public DataSource scenarioDataSource() {
     DataSourceCreate dataSourceCreate = new DataSourceCreate();
     return dataSourceService.createDataSource(dataSourceCreate, securityContext);
   }

@@ -10,6 +10,7 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   private String lastEventId;
 
+  @JsonIgnore
   private OffsetDateTime lastActivated;
 
   private OffsetDateTime validFrom;
@@ -43,6 +44,7 @@ public class ScenarioTriggerCreate extends BasicCreate {
     return (T) this;
   }
 
+  @JsonIgnore
   public OffsetDateTime getLastActivated() {
     return this.lastActivated;
   }

@@ -9,9 +9,6 @@ import java.util.Set;
 
 public class JSFunctionFilter extends PaginationFilter {
 
-  private Set<String> evaluatingJSCodeIds;
-
-  @JsonIgnore private List<FileResource> evaluatingJSCode;
 
   private Set<String> returnType;
 
@@ -19,24 +16,6 @@ public class JSFunctionFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  public Set<String> getEvaluatingJSCodeIds() {
-    return this.evaluatingJSCodeIds;
-  }
-
-  public <T extends JSFunctionFilter> T setEvaluatingJSCodeIds(Set<String> evaluatingJSCodeIds) {
-    this.evaluatingJSCodeIds = evaluatingJSCodeIds;
-    return (T) this;
-  }
-
-  @JsonIgnore
-  public List<FileResource> getEvaluatingJSCode() {
-    return this.evaluatingJSCode;
-  }
-
-  public <T extends JSFunctionFilter> T setEvaluatingJSCode(List<FileResource> evaluatingJSCode) {
-    this.evaluatingJSCode = evaluatingJSCode;
-    return (T) this;
-  }
 
   public Set<String> getReturnType() {
     return this.returnType;

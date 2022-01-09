@@ -62,14 +62,6 @@ public class JSFunctionRepository implements Plugin, IJSFunctionRepository {
     this.securedBasicRepository.addSecuredBasicPredicates(
         filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
-    if (filtering.getEvaluatingJSCode() != null && !filtering.getEvaluatingJSCode().isEmpty()) {
-      Set<String> ids =
-          filtering.getEvaluatingJSCode().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, FileResource> join = r.join(JSFunction_.evaluatingJSCode);
-      preds.add(join.get(Basic_.id).in(ids));
-    }
   }
   /**
    * @param filtering Object Used to List JsFunction
