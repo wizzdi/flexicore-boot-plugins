@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ScenarioTrigger extends SecuredBasic {
 
-  private OffsetDateTime lastEventId;
+  private String lastEventId;
 
   private OffsetDateTime lastActivated;
 
@@ -33,7 +33,7 @@ public class ScenarioTrigger extends SecuredBasic {
   private OffsetDateTime validTill;
 
   /** @return lastEventId */
-  public OffsetDateTime getLastEventId() {
+  public String getLastEventId() {
     return this.lastEventId;
   }
 
@@ -41,7 +41,7 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param lastEventId lastEventId to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setLastEventId(OffsetDateTime lastEventId) {
+  public <T extends ScenarioTrigger> T setLastEventId(String lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
