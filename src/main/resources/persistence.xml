@@ -6,13 +6,13 @@
             
                 <class>com.flexicore.rules.model.DataSource</class>
             
-                <class>com.flexicore.rules.model.JsFunctionParameter</class>
-            
                 <class>com.flexicore.rules.model.ScenarioToAction</class>
             
                 <class>com.flexicore.rules.model.ScenarioAction</class>
             
                 <class>com.flexicore.model.SecuredBasic</class>
+            
+                <class>com.flexicore.rules.model.JSFunctionParameter</class>
             
                 <class>com.flexicore.rules.model.ScenarioToTrigger</class>
             

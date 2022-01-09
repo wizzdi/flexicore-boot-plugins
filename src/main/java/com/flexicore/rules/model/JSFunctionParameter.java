@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class JsFunctionParameter extends SecuredBasic {
+public class JSFunctionParameter extends SecuredBasic {
 
   private Integer ordinal;
 
@@ -21,9 +21,9 @@ public class JsFunctionParameter extends SecuredBasic {
 
   /**
    * @param ordinal ordinal to set
-   * @return JsFunctionParameter
+   * @return JSFunctionParameter
    */
-  public <T extends JsFunctionParameter> T setOrdinal(Integer ordinal) {
+  public <T extends JSFunctionParameter> T setOrdinal(Integer ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }
@@ -35,9 +35,9 @@ public class JsFunctionParameter extends SecuredBasic {
 
   /**
    * @param parameterType parameterType to set
-   * @return JsFunctionParameter
+   * @return JSFunctionParameter
    */
-  public <T extends JsFunctionParameter> T setParameterType(String parameterType) {
+  public <T extends JSFunctionParameter> T setParameterType(String parameterType) {
     this.parameterType = parameterType;
     return (T) this;
   }
@@ -50,9 +50,9 @@ public class JsFunctionParameter extends SecuredBasic {
 
   /**
    * @param jsFunction jsFunction to set
-   * @return JsFunctionParameter
+   * @return JSFunctionParameter
    */
-  public <T extends JsFunctionParameter> T setJsFunction(JsFunction jsFunction) {
+  public <T extends JSFunctionParameter> T setJsFunction(JsFunction jsFunction) {
     this.jsFunction = jsFunction;
     return (T) this;
   }
