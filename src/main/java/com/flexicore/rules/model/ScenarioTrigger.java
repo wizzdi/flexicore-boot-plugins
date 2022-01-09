@@ -14,8 +14,8 @@ import javax.persistence.OneToMany;
 @Entity
 public class ScenarioTrigger extends SecuredBasic {
 
-  @Column(columnDefinition = "timestamp with time zone")
-  private OffsetDateTime lastEventId;
+  private String lastEventId;
+
 
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime lastActivated;
@@ -47,7 +47,7 @@ public class ScenarioTrigger extends SecuredBasic {
   private List<ScenarioToTrigger> scenarioToTriggers=new ArrayList<>();
 
   /** @return lastEventId */
-  public OffsetDateTime getLastEventId() {
+  public String getLastEventId() {
     return this.lastEventId;
   }
 
@@ -55,7 +55,7 @@ public class ScenarioTrigger extends SecuredBasic {
    * @param lastEventId lastEventId to set
    * @return ScenarioTrigger
    */
-  public <T extends ScenarioTrigger> T setLastEventId(OffsetDateTime lastEventId) {
+  public <T extends ScenarioTrigger> T setLastEventId(String lastEventId) {
     this.lastEventId = lastEventId;
     return (T) this;
   }
@@ -171,7 +171,7 @@ public class ScenarioTrigger extends SecuredBasic {
    * @return ScenarioTrigger
    */
   public <T extends ScenarioTrigger> T setScenarioTriggerType(
-      ScenarioTriggerType scenarioTriggerType) {
+          ScenarioTriggerType scenarioTriggerType) {
     this.scenarioTriggerType = scenarioTriggerType;
     return (T) this;
   }
