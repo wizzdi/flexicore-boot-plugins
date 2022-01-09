@@ -5,6 +5,7 @@ import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.model.ScenarioTriggerType;
+import com.flexicore.rules.model.ScenarioTriggerType_;
 import com.flexicore.rules.model.ScenarioTrigger_;
 import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.security.SecurityContextBase;
@@ -63,6 +64,10 @@ public class ScenarioTriggerRepository implements Plugin, IScenarioTriggerReposi
     this.securedBasicRepository.addSecuredBasicPredicates(
         filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
+    if (filtering.getEventCanonicalNames() != null && !filtering.getEventCanonicalNames().isEmpty()) {
+      Join<T,ScenarioTriggerType> join=r.join(ScenarioTrigger_.scenarioTriggerType);
+      preds.add(join.get(ScenarioTriggerType_.eventCanonicalName).in(filtering.getEventCanonicalNames()));
+    }
     if (filtering.getScenarioTriggerType() != null
         && !filtering.getScenarioTriggerType().isEmpty()) {
       Set<String> ids =

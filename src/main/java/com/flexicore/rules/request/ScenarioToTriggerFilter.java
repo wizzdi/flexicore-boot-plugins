@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class ScenarioToTriggerFilter extends PaginationFilter {
 
-  private Set<Boolean> firing;
+  private Boolean firing;
 
   @JsonIgnore private List<ScenarioTrigger> scenarioTrigger;
 
@@ -24,16 +24,9 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
 
   private Set<Integer> ordinal;
 
-  private Set<Boolean> enabled;
+  private Boolean enabled;
+  private Boolean nonDeletedScenarios;
 
-  public Set<Boolean> getFiring() {
-    return this.firing;
-  }
-
-  public <T extends ScenarioToTriggerFilter> T setFiring(Set<Boolean> firing) {
-    this.firing = firing;
-    return (T) this;
-  }
 
   @JsonIgnore
   public List<ScenarioTrigger> getScenarioTrigger() {
@@ -94,12 +87,30 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
     return (T) this;
   }
 
-  public Set<Boolean> getEnabled() {
-    return this.enabled;
+  public Boolean getFiring() {
+    return firing;
   }
 
-  public <T extends ScenarioToTriggerFilter> T setEnabled(Set<Boolean> enabled) {
+  public <T extends ScenarioToTriggerFilter> T setFiring(Boolean firing) {
+    this.firing = firing;
+    return (T) this;
+  }
+
+  public Boolean getEnabled() {
+    return enabled;
+  }
+
+  public <T extends ScenarioToTriggerFilter> T setEnabled(Boolean enabled) {
     this.enabled = enabled;
     return (T) this;
+  }
+
+  public  <T extends ScenarioToTriggerFilter> T setNonDeletedScenarios(Boolean nonDeletedScenarios) {
+    this.nonDeletedScenarios = nonDeletedScenarios;
+    return (T)this;
+  }
+
+  public Boolean getNonDeletedScenarios() {
+    return nonDeletedScenarios;
   }
 }

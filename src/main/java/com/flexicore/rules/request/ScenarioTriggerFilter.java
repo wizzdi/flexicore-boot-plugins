@@ -37,7 +37,9 @@ public class ScenarioTriggerFilter extends PaginationFilter {
 
   @JsonIgnore private List<FileResource> evaluatingJSCode;
 
+
   private BasicPropertiesFilter basicPropertiesFilter;
+  private Set<String> eventCanonicalNames;
 
   public Set<String> getLastEventId() {
     return this.lastEventId;
@@ -172,5 +174,15 @@ public class ScenarioTriggerFilter extends PaginationFilter {
       BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
+  }
+
+  public <T extends ScenarioTriggerFilter> T setEventCanonicalNames(Set<String> eventCanonicalNames) {
+    this.eventCanonicalNames = eventCanonicalNames;
+    return (T) this;
+
+  }
+
+  public Set<String> getEventCanonicalNames() {
+    return eventCanonicalNames;
   }
 }

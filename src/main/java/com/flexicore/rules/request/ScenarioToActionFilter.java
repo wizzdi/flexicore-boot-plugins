@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class ScenarioToActionFilter extends PaginationFilter {
 
-  private Set<Boolean> enabled;
+  private Boolean enabled;
 
   @JsonIgnore private List<ScenarioAction> scenarioAction;
 
@@ -22,11 +22,11 @@ public class ScenarioToActionFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  public Set<Boolean> getEnabled() {
+  public Boolean getEnabled() {
     return this.enabled;
   }
 
-  public <T extends ScenarioToActionFilter> T setEnabled(Set<Boolean> enabled) {
+  public <T extends ScenarioToActionFilter> T setEnabled(Boolean enabled) {
     this.enabled = enabled;
     return (T) this;
   }

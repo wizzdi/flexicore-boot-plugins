@@ -3,10 +3,7 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
-import com.flexicore.rules.model.Scenario;
-import com.flexicore.rules.model.ScenarioAction;
-import com.flexicore.rules.model.ScenarioToAction;
-import com.flexicore.rules.model.ScenarioToAction_;
+import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.ScenarioToActionFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -63,6 +60,10 @@ public class ScenarioToActionRepository implements Plugin, IScenarioToActionRepo
     this.securedBasicRepository.addSecuredBasicPredicates(
         filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
+    if (filtering.getEnabled() != null) {
+
+      preds.add(cb.equal(r.get(ScenarioToAction_.enabled), filtering.getEnabled()));
+    }
     if (filtering.getScenarioAction() != null && !filtering.getScenarioAction().isEmpty()) {
       Set<String> ids =
           filtering.getScenarioAction().parallelStream()
