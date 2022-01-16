@@ -212,7 +212,7 @@ public class ScenarioManager implements Plugin {
         } catch (Exception e) {
             logger.error("failed executing script", e);
             scenarioTriggerLogger.log(Level.SEVERE,
-                    "failed executing script: " + e.toString(), e);
+                    "failed executing script: " + e, e);
         } finally {
             flush(scenarioTriggerLogger);
         }
