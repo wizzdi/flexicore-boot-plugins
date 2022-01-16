@@ -32,7 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
+public class ScenarioTriggerService implements Plugin {
 
   @Autowired private ScenarioTriggerRepository repository;
 
@@ -43,7 +43,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @return created ScenarioTrigger
    */
-  @Override
   public ScenarioTrigger createScenarioTrigger(
       ScenarioTriggerCreate scenarioTriggerCreate, SecurityContextBase securityContext) {
     ScenarioTrigger scenarioTrigger =
@@ -57,7 +56,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @return created ScenarioTrigger unmerged
    */
-  @Override
   public ScenarioTrigger createScenarioTriggerNoMerge(
       ScenarioTriggerCreate scenarioTriggerCreate, SecurityContextBase securityContext) {
     ScenarioTrigger scenarioTrigger = new ScenarioTrigger();
@@ -74,52 +72,9 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param scenarioTrigger
    * @return if scenarioTrigger was updated
    */
-  @Override
   public boolean updateScenarioTriggerNoMerge(
       ScenarioTrigger scenarioTrigger, ScenarioTriggerCreate scenarioTriggerCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioTriggerCreate, scenarioTrigger);
-
-    if (scenarioTriggerCreate.getScenarioTriggerType() != null
-        && (scenarioTrigger.getScenarioTriggerType() == null
-            || !scenarioTriggerCreate
-                .getScenarioTriggerType()
-                .getId()
-                .equals(scenarioTrigger.getScenarioTriggerType().getId()))) {
-      scenarioTrigger.setScenarioTriggerType(scenarioTriggerCreate.getScenarioTriggerType());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getActiveTill() != null
-        && (!scenarioTriggerCreate.getActiveTill().equals(scenarioTrigger.getActiveTill()))) {
-      scenarioTrigger.setActiveTill(scenarioTriggerCreate.getActiveTill());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getValidFrom() != null
-        && (!scenarioTriggerCreate.getValidFrom().equals(scenarioTrigger.getValidFrom()))) {
-      scenarioTrigger.setValidFrom(scenarioTriggerCreate.getValidFrom());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getValidTill() != null
-        && (!scenarioTriggerCreate.getValidTill().equals(scenarioTrigger.getValidTill()))) {
-      scenarioTrigger.setValidTill(scenarioTriggerCreate.getValidTill());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getActiveMs() != null
-        && (!scenarioTriggerCreate.getActiveMs().equals(scenarioTrigger.getActiveMs()))) {
-      scenarioTrigger.setActiveMs(scenarioTriggerCreate.getActiveMs());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getCooldownIntervalMs() != null
-        && (!scenarioTriggerCreate
-            .getCooldownIntervalMs()
-            .equals(scenarioTrigger.getCooldownIntervalMs()))) {
-      scenarioTrigger.setCooldownIntervalMs(scenarioTriggerCreate.getCooldownIntervalMs());
-      update = true;
-    }
 
     if (scenarioTriggerCreate.getLogFileResource() != null
         && (scenarioTrigger.getLogFileResource() == null
@@ -141,15 +96,13 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
       update = true;
     }
 
-    if (scenarioTriggerCreate.getLastActivated() != null
-        && (!scenarioTriggerCreate.getLastActivated().equals(scenarioTrigger.getLastActivated()))) {
-      scenarioTrigger.setLastActivated(scenarioTriggerCreate.getLastActivated());
-      update = true;
-    }
-
-    if (scenarioTriggerCreate.getLastEventId() != null
-        && (!scenarioTriggerCreate.getLastEventId().equals(scenarioTrigger.getLastEventId()))) {
-      scenarioTrigger.setLastEventId(scenarioTriggerCreate.getLastEventId());
+    if (scenarioTriggerCreate.getScenarioTriggerType() != null
+        && (scenarioTrigger.getScenarioTriggerType() == null
+            || !scenarioTriggerCreate
+                .getScenarioTriggerType()
+                .getId()
+                .equals(scenarioTrigger.getScenarioTriggerType().getId()))) {
+      scenarioTrigger.setScenarioTriggerType(scenarioTriggerCreate.getScenarioTriggerType());
       update = true;
     }
 
@@ -160,7 +113,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @return scenarioTrigger
    */
-  @Override
   public ScenarioTrigger updateScenarioTrigger(
       ScenarioTriggerUpdate scenarioTriggerUpdate, SecurityContextBase securityContext) {
     ScenarioTrigger scenarioTrigger = scenarioTriggerUpdate.getScenarioTrigger();
@@ -175,7 +127,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @return PaginationResponse containing paging information for ScenarioTrigger
    */
-  @Override
   public PaginationResponse<ScenarioTrigger> getAllScenarioTriggers(
       ScenarioTriggerFilter scenarioTriggerFilter, SecurityContextBase securityContext) {
     List<ScenarioTrigger> list = listAllScenarioTriggers(scenarioTriggerFilter, securityContext);
@@ -188,7 +139,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @return List of ScenarioTrigger
    */
-  @Override
   public List<ScenarioTrigger> listAllScenarioTriggers(
       ScenarioTriggerFilter scenarioTriggerFilter, SecurityContextBase securityContext) {
     return this.repository.listAllScenarioTriggers(scenarioTriggerFilter, securityContext);
@@ -199,7 +149,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @throws ResponseStatusException if scenarioTriggerFilter is not valid
    */
-  @Override
   public void validate(
       ScenarioTriggerFilter scenarioTriggerFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerFilter, securityContext);
@@ -219,30 +168,9 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
     logFileResourceIds.removeAll(logFileResource.keySet());
     if (!logFileResourceIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + logFileResourceIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + logFileResourceIds);
     }
     scenarioTriggerFilter.setLogFileResource(new ArrayList<>(logFileResource.values()));
-    Set<String> scenarioTriggerTypeIds =
-        scenarioTriggerFilter.getScenarioTriggerTypeIds() == null
-            ? new HashSet<>()
-            : scenarioTriggerFilter.getScenarioTriggerTypeIds();
-    Map<String, ScenarioTriggerType> scenarioTriggerType =
-        scenarioTriggerTypeIds.isEmpty()
-            ? new HashMap<>()
-            : this.repository
-                .listByIds(
-                    ScenarioTriggerType.class,
-                    scenarioTriggerTypeIds,
-                    SecuredBasic_.security,
-                    securityContext)
-                .parallelStream()
-                .collect(Collectors.toMap(f -> f.getId(), f -> f));
-    scenarioTriggerTypeIds.removeAll(scenarioTriggerType.keySet());
-    if (!scenarioTriggerTypeIds.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No ScenarioTriggerType with ids " + scenarioTriggerTypeIds);
-    }
-    scenarioTriggerFilter.setScenarioTriggerType(new ArrayList<>(scenarioTriggerType.values()));
     Set<String> evaluatingJSCodeIds =
         scenarioTriggerFilter.getEvaluatingJSCodeIds() == null
             ? new HashSet<>()
@@ -261,9 +189,30 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
     evaluatingJSCodeIds.removeAll(evaluatingJSCode.keySet());
     if (!evaluatingJSCodeIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + evaluatingJSCodeIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + evaluatingJSCodeIds);
     }
     scenarioTriggerFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
+    Set<String> scenarioTriggerTypeIds =
+        scenarioTriggerFilter.getScenarioTriggerTypeIds() == null
+            ? new HashSet<>()
+            : scenarioTriggerFilter.getScenarioTriggerTypeIds();
+    Map<String, ScenarioTriggerType> scenarioTriggerType =
+        scenarioTriggerTypeIds.isEmpty()
+            ? new HashMap<>()
+            : this.repository
+                .listByIds(
+                    ScenarioTriggerType.class,
+                    scenarioTriggerTypeIds,
+                    SecuredBasic_.security,
+                    securityContext)
+                .parallelStream()
+                .collect(Collectors.toMap(f -> f.getId(), f -> f));
+    scenarioTriggerTypeIds.removeAll(scenarioTriggerType.keySet());
+    if (!scenarioTriggerTypeIds.isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "No Set with ids " + scenarioTriggerTypeIds);
+    }
+    scenarioTriggerFilter.setScenarioTriggerType(new ArrayList<>(scenarioTriggerType.values()));
   }
 
   /**
@@ -271,7 +220,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
    * @param securityContext
    * @throws ResponseStatusException if scenarioTriggerCreate is not valid
    */
-  @Override
   public void validate(
       ScenarioTriggerCreate scenarioTriggerCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerCreate, securityContext);
@@ -288,6 +236,18 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
     }
     scenarioTriggerCreate.setLogFileResource(logFileResource);
 
+    String evaluatingJSCodeId = scenarioTriggerCreate.getEvaluatingJSCodeId();
+    FileResource evaluatingJSCode =
+        evaluatingJSCodeId == null
+            ? null
+            : this.repository.getByIdOrNull(
+                evaluatingJSCodeId, FileResource.class, SecuredBasic_.security, securityContext);
+    if (evaluatingJSCodeId != null && evaluatingJSCode == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "No FileResource with id " + evaluatingJSCodeId);
+    }
+    scenarioTriggerCreate.setEvaluatingJSCode(evaluatingJSCode);
+
     String scenarioTriggerTypeId = scenarioTriggerCreate.getScenarioTriggerTypeId();
     ScenarioTriggerType scenarioTriggerType =
         scenarioTriggerTypeId == null
@@ -302,33 +262,18 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
           HttpStatus.BAD_REQUEST, "No ScenarioTriggerType with id " + scenarioTriggerTypeId);
     }
     scenarioTriggerCreate.setScenarioTriggerType(scenarioTriggerType);
-
-    String evaluatingJSCodeId = scenarioTriggerCreate.getEvaluatingJSCodeId();
-    FileResource evaluatingJSCode =
-        evaluatingJSCodeId == null
-            ? null
-            : this.repository.getByIdOrNull(
-                evaluatingJSCodeId, FileResource.class, SecuredBasic_.security, securityContext);
-    if (evaluatingJSCodeId != null && evaluatingJSCode == null) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with id " + evaluatingJSCodeId);
-    }
-    scenarioTriggerCreate.setEvaluatingJSCode(evaluatingJSCode);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -337,7 +282,6 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -346,28 +290,23 @@ public class ScenarioTriggerService implements Plugin, IScenarioTriggerService {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

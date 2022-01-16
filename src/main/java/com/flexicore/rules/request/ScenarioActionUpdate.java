@@ -3,27 +3,39 @@ package com.flexicore.rules.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.ScenarioAction;
 
+/** Object Used to Update ScenarioAction */
 public class ScenarioActionUpdate extends ScenarioActionCreate {
 
-  private String id;
   @JsonIgnore private ScenarioAction scenarioAction;
 
-  public String getId() {
-    return id;
+  private String id;
+
+  /** @return scenarioAction */
+  @JsonIgnore
+  public ScenarioAction getScenarioAction() {
+    return this.scenarioAction;
   }
 
-  public <T extends ScenarioActionUpdate> T setId(String id) {
-    this.id = id;
+  /**
+   * @param scenarioAction scenarioAction to set
+   * @return ScenarioActionUpdate
+   */
+  public <T extends ScenarioActionUpdate> T setScenarioAction(ScenarioAction scenarioAction) {
+    this.scenarioAction = scenarioAction;
     return (T) this;
   }
 
-  @JsonIgnore
-  public ScenarioAction getScenarioAction() {
-    return scenarioAction;
+  /** @return id */
+  public String getId() {
+    return this.id;
   }
 
-  public <T extends ScenarioActionUpdate> T setScenarioAction(ScenarioAction scenarioAction) {
-    this.scenarioAction = scenarioAction;
+  /**
+   * @param id id to set
+   * @return ScenarioActionUpdate
+   */
+  public <T extends ScenarioActionUpdate> T setId(String id) {
+    this.id = id;
     return (T) this;
   }
 }

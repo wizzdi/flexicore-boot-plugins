@@ -27,22 +27,22 @@ public class ScenarioController implements Plugin {
 
   @Autowired private ScenarioService scenarioService;
 
-  @PostMapping("createScenario")
   @Operation(summary = "createScenario", description = "Creates Scenario")
   public Scenario createScenario(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioCreate scenarioCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioService.validate(scenarioCreate, securityContext);
     return scenarioService.createScenario(scenarioCreate, securityContext);
   }
 
   @Operation(summary = "updateScenario", description = "Updates Scenario")
-  @PutMapping("updateScenario")
   public Scenario updateScenario(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioUpdate scenarioUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioId = scenarioUpdate.getId();
     Scenario scenario =
         scenarioService.getByIdOrNull(
@@ -56,12 +56,12 @@ public class ScenarioController implements Plugin {
     return scenarioService.updateScenario(scenarioUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllScenarios", description = "Gets All Scenarios Filtered")
-  @PostMapping("getAllScenarios")
-  public PaginationResponse<Scenario> getAllScenarios(
+  @Operation(summary = "getAllScenario", description = "lists Scenario")
+  public PaginationResponse<Scenario> getAllScenario(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioFilter scenarioFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioService.validate(scenarioFilter, securityContext);
     return scenarioService.getAllScenarios(scenarioFilter, securityContext);
   }

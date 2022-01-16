@@ -31,18 +31,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class JSFunctionService implements Plugin, IJSFunctionService {
+public class JSFunctionService implements Plugin {
 
   @Autowired private JSFunctionRepository repository;
 
   @Autowired private BasicService basicService;
 
   /**
-   * @param jSFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JSFunction
    * @param securityContext
    * @return created JSFunction
    */
-  @Override
   public JSFunction createJSFunction(
       JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
     JSFunction jSFunction = createJSFunctionNoMerge(jSFunctionCreate, securityContext);
@@ -51,11 +50,10 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
   }
 
   /**
-   * @param jSFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JSFunction
    * @param securityContext
    * @return created JSFunction unmerged
    */
-  @Override
   public JSFunction createJSFunctionNoMerge(
       JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
     JSFunction jSFunction = new JSFunction();
@@ -68,11 +66,10 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
   }
 
   /**
-   * @param jSFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JSFunction
    * @param jSFunction
    * @return if jSFunction was updated
    */
-  @Override
   public boolean updateJSFunctionNoMerge(JSFunction jSFunction, JSFunctionCreate jSFunctionCreate) {
     boolean update = basicService.updateBasicNoMerge(jSFunctionCreate, jSFunction);
 
@@ -86,18 +83,6 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
       update = true;
     }
 
-    if (jSFunctionCreate.getMethodName() != null
-        && (!jSFunctionCreate.getMethodName().equals(jSFunction.getMethodName()))) {
-      jSFunction.setMethodName(jSFunctionCreate.getMethodName());
-      update = true;
-    }
-
-    if (jSFunctionCreate.getReturnType() != null
-        && (!jSFunctionCreate.getReturnType().equals(jSFunction.getReturnType()))) {
-      jSFunction.setReturnType(jSFunctionCreate.getReturnType());
-      update = true;
-    }
-
     return update;
   }
   /**
@@ -105,7 +90,6 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
    * @param securityContext
    * @return jSFunction
    */
-  @Override
   public JSFunction updateJSFunction(
       JSFunctionUpdate jSFunctionUpdate, SecurityContextBase securityContext) {
     JSFunction jSFunction = jSFunctionUpdate.getJSFunction();
@@ -116,11 +100,10 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
   }
 
   /**
-   * @param jSFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
    * @return PaginationResponse containing paging information for JSFunction
    */
-  @Override
   public PaginationResponse<JSFunction> getAllJSFunctions(
       JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     List<JSFunction> list = listAllJSFunctions(jSFunctionFilter, securityContext);
@@ -129,22 +112,20 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
   }
 
   /**
-   * @param jSFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
    * @return List of JSFunction
    */
-  @Override
   public List<JSFunction> listAllJSFunctions(
       JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     return this.repository.listAllJSFunctions(jSFunctionFilter, securityContext);
   }
 
   /**
-   * @param jSFunctionFilter Object Used to List JsFunction
+   * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
    * @throws ResponseStatusException if jSFunctionFilter is not valid
    */
-  @Override
   public void validate(JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     basicService.validate(jSFunctionFilter, securityContext);
 
@@ -166,17 +147,16 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
     evaluatingJSCodeIds.removeAll(evaluatingJSCode.keySet());
     if (!evaluatingJSCodeIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + evaluatingJSCodeIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + evaluatingJSCodeIds);
     }
     jSFunctionFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
   }
 
   /**
-   * @param jSFunctionCreate Object Used to Create JsFunction
+   * @param jSFunctionCreate Object Used to Create JSFunction
    * @param securityContext
    * @throws ResponseStatusException if jSFunctionCreate is not valid
    */
-  @Override
   public void validate(JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
     basicService.validate(jSFunctionCreate, securityContext);
 
@@ -193,19 +173,16 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
     jSFunctionCreate.setEvaluatingJSCode(evaluatingJSCode);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -214,7 +191,6 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -223,28 +199,23 @@ public class JSFunctionService implements Plugin, IJSFunctionService {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScenarioRepository implements Plugin, IScenarioRepository {
+public class ScenarioRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
@@ -36,7 +36,6 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
    * @param securityContext
    * @return List of Scenario
    */
-  @Override
   public List<Scenario> listAllScenarios(
       ScenarioFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -50,34 +49,38 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
     return query.getResultList();
   }
 
-  @Override
   public <T extends Scenario> void addScenarioPredicate(
-      ScenarioFilter filtering,
+      ScenarioFilter scenarioFilter,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(
-        filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getLogFileResource() != null && !filtering.getLogFileResource().isEmpty()) {
+    if (scenarioFilter.getEvaluatingJSCode() != null
+        && !scenarioFilter.getEvaluatingJSCode().isEmpty()) {
       Set<String> ids =
-          filtering.getLogFileResource().parallelStream()
+          scenarioFilter.getEvaluatingJSCode().parallelStream()
+              .map(f -> f.getId())
+              .collect(Collectors.toSet());
+      Join<T, FileResource> join = r.join(Scenario_.evaluatingJSCode);
+      preds.add(join.get(Basic_.id).in(ids));
+    }
+
+    if (scenarioFilter.getLogFileResource() != null
+        && !scenarioFilter.getLogFileResource().isEmpty()) {
+      Set<String> ids =
+          scenarioFilter.getLogFileResource().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
       Join<T, FileResource> join = r.join(Scenario_.logFileResource);
       preds.add(join.get(Basic_.id).in(ids));
     }
 
-    if (filtering.getEvaluatingJSCode() != null && !filtering.getEvaluatingJSCode().isEmpty()) {
-      Set<String> ids =
-          filtering.getEvaluatingJSCode().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, FileResource> join = r.join(Scenario_.evaluatingJSCode);
-      preds.add(join.get(Basic_.id).in(ids));
+    if (scenarioFilter.getScenarioHint() != null && !scenarioFilter.getScenarioHint().isEmpty()) {
+      preds.add(r.get(Scenario_.scenarioHint).in(scenarioFilter.getScenarioHint()));
     }
   }
   /**
@@ -85,7 +88,6 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
    * @param securityContext
    * @return count of Scenario
    */
-  @Override
   public Long countAllScenarios(ScenarioFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -97,19 +99,16 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
     return query.getSingleResult();
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -118,7 +117,6 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -127,29 +125,24 @@ public class ScenarioRepository implements Plugin, IScenarioRepository {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);

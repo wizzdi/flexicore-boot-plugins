@@ -27,22 +27,22 @@ public class ScenarioActionController implements Plugin {
 
   @Autowired private ScenarioActionService scenarioActionService;
 
-  @PostMapping("createScenarioAction")
   @Operation(summary = "createScenarioAction", description = "Creates ScenarioAction")
   public ScenarioAction createScenarioAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioActionCreate scenarioActionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioActionService.validate(scenarioActionCreate, securityContext);
     return scenarioActionService.createScenarioAction(scenarioActionCreate, securityContext);
   }
 
   @Operation(summary = "updateScenarioAction", description = "Updates ScenarioAction")
-  @PutMapping("updateScenarioAction")
   public ScenarioAction updateScenarioAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioActionUpdate scenarioActionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioActionId = scenarioActionUpdate.getId();
     ScenarioAction scenarioAction =
         scenarioActionService.getByIdOrNull(
@@ -56,12 +56,12 @@ public class ScenarioActionController implements Plugin {
     return scenarioActionService.updateScenarioAction(scenarioActionUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllScenarioActions", description = "Gets All ScenarioActions Filtered")
-  @PostMapping("getAllScenarioActions")
-  public PaginationResponse<ScenarioAction> getAllScenarioActions(
+  @Operation(summary = "getAllScenarioAction", description = "lists ScenarioAction")
+  public PaginationResponse<ScenarioAction> getAllScenarioAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioActionFilter scenarioActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioActionService.validate(scenarioActionFilter, securityContext);
     return scenarioActionService.getAllScenarioActions(scenarioActionFilter, securityContext);
   }

@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeService {
+public class ScenarioTriggerTypeService implements Plugin {
 
   @Autowired private ScenarioTriggerTypeRepository repository;
 
@@ -34,7 +34,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @return created ScenarioTriggerType
    */
-  @Override
   public ScenarioTriggerType createScenarioTriggerType(
       ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
     ScenarioTriggerType scenarioTriggerType =
@@ -48,7 +47,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @return created ScenarioTriggerType unmerged
    */
-  @Override
   public ScenarioTriggerType createScenarioTriggerTypeNoMerge(
       ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
     ScenarioTriggerType scenarioTriggerType = new ScenarioTriggerType();
@@ -65,20 +63,11 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param scenarioTriggerType
    * @return if scenarioTriggerType was updated
    */
-  @Override
   public boolean updateScenarioTriggerTypeNoMerge(
       ScenarioTriggerType scenarioTriggerType,
       ScenarioTriggerTypeCreate scenarioTriggerTypeCreate) {
     boolean update =
         basicService.updateBasicNoMerge(scenarioTriggerTypeCreate, scenarioTriggerType);
-
-    if (scenarioTriggerTypeCreate.getEventCanonicalName() != null
-        && (!scenarioTriggerTypeCreate
-            .getEventCanonicalName()
-            .equals(scenarioTriggerType.getEventCanonicalName()))) {
-      scenarioTriggerType.setEventCanonicalName(scenarioTriggerTypeCreate.getEventCanonicalName());
-      update = true;
-    }
 
     return update;
   }
@@ -87,7 +76,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @return scenarioTriggerType
    */
-  @Override
   public ScenarioTriggerType updateScenarioTriggerType(
       ScenarioTriggerTypeUpdate scenarioTriggerTypeUpdate, SecurityContextBase securityContext) {
     ScenarioTriggerType scenarioTriggerType = scenarioTriggerTypeUpdate.getScenarioTriggerType();
@@ -102,7 +90,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @return PaginationResponse containing paging information for ScenarioTriggerType
    */
-  @Override
   public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerTypes(
       ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
     List<ScenarioTriggerType> list =
@@ -117,7 +104,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @return List of ScenarioTriggerType
    */
-  @Override
   public List<ScenarioTriggerType> listAllScenarioTriggerTypes(
       ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
     return this.repository.listAllScenarioTriggerTypes(scenarioTriggerTypeFilter, securityContext);
@@ -128,7 +114,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @throws ResponseStatusException if scenarioTriggerTypeFilter is not valid
    */
-  @Override
   public void validate(
       ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerTypeFilter, securityContext);
@@ -139,25 +124,21 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
    * @param securityContext
    * @throws ResponseStatusException if scenarioTriggerTypeCreate is not valid
    */
-  @Override
   public void validate(
       ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerTypeCreate, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -166,7 +147,6 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -175,28 +155,23 @@ public class ScenarioTriggerTypeService implements Plugin, IScenarioTriggerTypeS
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

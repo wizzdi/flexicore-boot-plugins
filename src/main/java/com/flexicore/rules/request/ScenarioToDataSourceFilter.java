@@ -3,90 +3,108 @@ package com.flexicore.rules.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.model.Scenario;
-import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
 
+/** Object Used to List ScenarioToDataSource */
 public class ScenarioToDataSourceFilter extends PaginationFilter {
-
-  private Set<Boolean> enabled;
-
-  private Set<String> dataSourceIds;
-
-  @JsonIgnore private List<DataSource> dataSource;
 
   private Set<Integer> ordinal;
 
   private Set<String> scenarioIds;
 
-  private BasicPropertiesFilter basicPropertiesFilter;
-
   @JsonIgnore private List<Scenario> scenario;
 
-  public Set<Boolean> getEnabled() {
-    return this.enabled;
-  }
+  private Set<Boolean> enabled;
 
-  public <T extends ScenarioToDataSourceFilter> T setEnabled(Set<Boolean> enabled) {
-    this.enabled = enabled;
-    return (T) this;
-  }
+  @JsonIgnore private List<DataSource> dataSource;
 
-  public Set<String> getDataSourceIds() {
-    return this.dataSourceIds;
-  }
+  private Set<String> dataSourceIds;
 
-  public <T extends ScenarioToDataSourceFilter> T setDataSourceIds(Set<String> dataSourceIds) {
-    this.dataSourceIds = dataSourceIds;
-    return (T) this;
-  }
-
-  @JsonIgnore
-  public List<DataSource> getDataSource() {
-    return this.dataSource;
-  }
-
-  public <T extends ScenarioToDataSourceFilter> T setDataSource(List<DataSource> dataSource) {
-    this.dataSource = dataSource;
-    return (T) this;
-  }
-
+  /** @return ordinal */
   public Set<Integer> getOrdinal() {
     return this.ordinal;
   }
 
+  /**
+   * @param ordinal ordinal to set
+   * @return ScenarioToDataSourceFilter
+   */
   public <T extends ScenarioToDataSourceFilter> T setOrdinal(Set<Integer> ordinal) {
     this.ordinal = ordinal;
     return (T) this;
   }
 
+  /** @return scenarioIds */
   public Set<String> getScenarioIds() {
     return this.scenarioIds;
   }
 
+  /**
+   * @param scenarioIds scenarioIds to set
+   * @return ScenarioToDataSourceFilter
+   */
   public <T extends ScenarioToDataSourceFilter> T setScenarioIds(Set<String> scenarioIds) {
     this.scenarioIds = scenarioIds;
     return (T) this;
   }
 
-  public BasicPropertiesFilter getBasicPropertiesFilter() {
-    return this.basicPropertiesFilter;
-  }
-
-  public <T extends ScenarioToDataSourceFilter> T setBasicPropertiesFilter(
-      BasicPropertiesFilter basicPropertiesFilter) {
-    this.basicPropertiesFilter = basicPropertiesFilter;
-    return (T) this;
-  }
-
+  /** @return scenario */
   @JsonIgnore
   public List<Scenario> getScenario() {
     return this.scenario;
   }
 
+  /**
+   * @param scenario scenario to set
+   * @return ScenarioToDataSourceFilter
+   */
   public <T extends ScenarioToDataSourceFilter> T setScenario(List<Scenario> scenario) {
     this.scenario = scenario;
+    return (T) this;
+  }
+
+  /** @return enabled */
+  public Set<Boolean> getEnabled() {
+    return this.enabled;
+  }
+
+  /**
+   * @param enabled enabled to set
+   * @return ScenarioToDataSourceFilter
+   */
+  public <T extends ScenarioToDataSourceFilter> T setEnabled(Set<Boolean> enabled) {
+    this.enabled = enabled;
+    return (T) this;
+  }
+
+  /** @return dataSource */
+  @JsonIgnore
+  public List<DataSource> getDataSource() {
+    return this.dataSource;
+  }
+
+  /**
+   * @param dataSource dataSource to set
+   * @return ScenarioToDataSourceFilter
+   */
+  public <T extends ScenarioToDataSourceFilter> T setDataSource(List<DataSource> dataSource) {
+    this.dataSource = dataSource;
+    return (T) this;
+  }
+
+  /** @return dataSourceIds */
+  public Set<String> getDataSourceIds() {
+    return this.dataSourceIds;
+  }
+
+  /**
+   * @param dataSourceIds dataSourceIds to set
+   * @return ScenarioToDataSourceFilter
+   */
+  public <T extends ScenarioToDataSourceFilter> T setDataSourceIds(Set<String> dataSourceIds) {
+    this.dataSourceIds = dataSourceIds;
     return (T) this;
   }
 }

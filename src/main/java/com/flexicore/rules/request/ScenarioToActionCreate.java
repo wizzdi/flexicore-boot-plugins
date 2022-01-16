@@ -5,62 +5,88 @@ import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioAction;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
+/** Object Used to Create ScenarioToAction */
 public class ScenarioToActionCreate extends BasicCreate {
+
+  private String scenarioActionId;
+
+  private String scenarioId;
 
   private Boolean enabled;
 
   @JsonIgnore private ScenarioAction scenarioAction;
 
-  private String scenarioId;
-
   @JsonIgnore private Scenario scenario;
 
-  private String scenarioActionId;
-
-  public Boolean isEnabled() {
-    return this.enabled;
+  /** @return scenarioActionId */
+  public String getScenarioActionId() {
+    return this.scenarioActionId;
   }
 
-  public <T extends ScenarioToActionCreate> T setEnabled(Boolean enabled) {
-    this.enabled = enabled;
+  /**
+   * @param scenarioActionId scenarioActionId to set
+   * @return ScenarioToActionCreate
+   */
+  public <T extends ScenarioToActionCreate> T setScenarioActionId(String scenarioActionId) {
+    this.scenarioActionId = scenarioActionId;
     return (T) this;
   }
 
-  @JsonIgnore
-  public ScenarioAction getScenarioAction() {
-    return this.scenarioAction;
-  }
-
-  public <T extends ScenarioToActionCreate> T setScenarioAction(ScenarioAction scenarioAction) {
-    this.scenarioAction = scenarioAction;
-    return (T) this;
-  }
-
+  /** @return scenarioId */
   public String getScenarioId() {
     return this.scenarioId;
   }
 
+  /**
+   * @param scenarioId scenarioId to set
+   * @return ScenarioToActionCreate
+   */
   public <T extends ScenarioToActionCreate> T setScenarioId(String scenarioId) {
     this.scenarioId = scenarioId;
     return (T) this;
   }
 
+  /** @return enabled */
+  public Boolean getEnabled() {
+    return this.enabled;
+  }
+
+  /**
+   * @param enabled enabled to set
+   * @return ScenarioToActionCreate
+   */
+  public <T extends ScenarioToActionCreate> T setEnabled(Boolean enabled) {
+    this.enabled = enabled;
+    return (T) this;
+  }
+
+  /** @return scenarioAction */
+  @JsonIgnore
+  public ScenarioAction getScenarioAction() {
+    return this.scenarioAction;
+  }
+
+  /**
+   * @param scenarioAction scenarioAction to set
+   * @return ScenarioToActionCreate
+   */
+  public <T extends ScenarioToActionCreate> T setScenarioAction(ScenarioAction scenarioAction) {
+    this.scenarioAction = scenarioAction;
+    return (T) this;
+  }
+
+  /** @return scenario */
   @JsonIgnore
   public Scenario getScenario() {
     return this.scenario;
   }
 
+  /**
+   * @param scenario scenario to set
+   * @return ScenarioToActionCreate
+   */
   public <T extends ScenarioToActionCreate> T setScenario(Scenario scenario) {
     this.scenario = scenario;
-    return (T) this;
-  }
-
-  public String getScenarioActionId() {
-    return this.scenarioActionId;
-  }
-
-  public <T extends ScenarioToActionCreate> T setScenarioActionId(String scenarioActionId) {
-    this.scenarioActionId = scenarioActionId;
     return (T) this;
   }
 }

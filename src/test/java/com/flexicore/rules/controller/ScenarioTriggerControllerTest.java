@@ -69,13 +69,13 @@ public class ScenarioTriggerControllerTest {
 
     request.setCooldownIntervalMs(10L);
 
-    request.setValidTill(OffsetDateTime.now());
-
-    request.setScenarioTriggerTypeId(this.scenarioTriggerType.getId());
-
     request.setActiveTill(OffsetDateTime.now());
 
     request.setActiveMs(10L);
+
+    request.setScenarioTriggerTypeId(this.scenarioTriggerType.getId());
+
+    request.setValidTill(OffsetDateTime.now());
 
     ResponseEntity<ScenarioTrigger> response =
         this.restTemplate.postForEntity(
@@ -112,29 +112,28 @@ public class ScenarioTriggerControllerTest {
     Assertions.assertNotNull(testScenarioTrigger);
 
     if (request.getLastEventId() != null) {
-
       Assertions.assertEquals(request.getLastEventId(), testScenarioTrigger.getLastEventId());
     }
 
     if (request.getLastActivated() != null) {
-
       Assertions.assertEquals(request.getLastActivated(), testScenarioTrigger.getLastActivated());
     }
 
     if (request.getValidFrom() != null) {
-
       Assertions.assertEquals(request.getValidFrom(), testScenarioTrigger.getValidFrom());
     }
 
     if (request.getCooldownIntervalMs() != null) {
-
       Assertions.assertEquals(
           request.getCooldownIntervalMs(), testScenarioTrigger.getCooldownIntervalMs());
     }
 
-    if (request.getValidTill() != null) {
+    if (request.getActiveTill() != null) {
+      Assertions.assertEquals(request.getActiveTill(), testScenarioTrigger.getActiveTill());
+    }
 
-      Assertions.assertEquals(request.getValidTill(), testScenarioTrigger.getValidTill());
+    if (request.getActiveMs() != null) {
+      Assertions.assertEquals(request.getActiveMs(), testScenarioTrigger.getActiveMs());
     }
 
     if (request.getScenarioTriggerTypeId() != null) {
@@ -144,14 +143,8 @@ public class ScenarioTriggerControllerTest {
           request.getScenarioTriggerTypeId(), testScenarioTrigger.getScenarioTriggerType().getId());
     }
 
-    if (request.getActiveTill() != null) {
-
-      Assertions.assertEquals(request.getActiveTill(), testScenarioTrigger.getActiveTill());
-    }
-
-    if (request.getActiveMs() != null) {
-
-      Assertions.assertEquals(request.getActiveMs(), testScenarioTrigger.getActiveMs());
+    if (request.getValidTill() != null) {
+      Assertions.assertEquals(request.getValidTill(), testScenarioTrigger.getValidTill());
     }
   }
 

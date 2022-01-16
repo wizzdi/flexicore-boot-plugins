@@ -28,16 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScenarioToDataSourceRepository implements Plugin, IScenarioToDataSourceRepository {
+public class ScenarioToDataSourceRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioActionToDataSource
+   * @param filtering Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return List of ScenarioToDataSource
    */
-  @Override
   public List<ScenarioToDataSource> listAllScenarioToDataSources(
       ScenarioToDataSourceFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -51,40 +50,51 @@ public class ScenarioToDataSourceRepository implements Plugin, IScenarioToDataSo
     return query.getResultList();
   }
 
-  @Override
   public <T extends ScenarioToDataSource> void addScenarioToDataSourcePredicate(
-      ScenarioToDataSourceFilter filtering,
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(
-        filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getDataSource() != null && !filtering.getDataSource().isEmpty()) {
+    if (scenarioToDataSourceFilter.getEnabled() != null
+        && !scenarioToDataSourceFilter.getEnabled().isEmpty()) {
+      preds.add(r.get(ScenarioToDataSource_.enabled).in(scenarioToDataSourceFilter.getEnabled()));
+    }
+
+    if (scenarioToDataSourceFilter.getDataSource() != null
+        && !scenarioToDataSourceFilter.getDataSource().isEmpty()) {
       Set<String> ids =
-          filtering.getDataSource().parallelStream()
+          scenarioToDataSourceFilter.getDataSource().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
       Join<T, DataSource> join = r.join(ScenarioToDataSource_.dataSource);
       preds.add(join.get(Basic_.id).in(ids));
     }
 
-    if (filtering.getScenario() != null && !filtering.getScenario().isEmpty()) {
+    if (scenarioToDataSourceFilter.getOrdinal() != null
+        && !scenarioToDataSourceFilter.getOrdinal().isEmpty()) {
+      preds.add(r.get(ScenarioToDataSource_.ordinal).in(scenarioToDataSourceFilter.getOrdinal()));
+    }
+
+    if (scenarioToDataSourceFilter.getScenario() != null
+        && !scenarioToDataSourceFilter.getScenario().isEmpty()) {
       Set<String> ids =
-          filtering.getScenario().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
+          scenarioToDataSourceFilter.getScenario().parallelStream()
+              .map(f -> f.getId())
+              .collect(Collectors.toSet());
       Join<T, Scenario> join = r.join(ScenarioToDataSource_.scenario);
       preds.add(join.get(Basic_.id).in(ids));
     }
   }
   /**
-   * @param filtering Object Used to List ScenarioActionToDataSource
+   * @param filtering Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return count of ScenarioToDataSource
    */
-  @Override
   public Long countAllScenarioToDataSources(
       ScenarioToDataSourceFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -97,19 +107,16 @@ public class ScenarioToDataSourceRepository implements Plugin, IScenarioToDataSo
     return query.getSingleResult();
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -118,7 +125,6 @@ public class ScenarioToDataSourceRepository implements Plugin, IScenarioToDataSo
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -127,29 +133,24 @@ public class ScenarioToDataSourceRepository implements Plugin, IScenarioToDataSo
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);

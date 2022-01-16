@@ -65,9 +65,9 @@ public class ScenarioToActionControllerTest {
 
     request.setEnabled(true);
 
-    request.setScenarioId(this.scenario.getId());
-
     request.setScenarioActionId(this.scenarioAction.getId());
+
+    request.setScenarioId(this.scenario.getId());
 
     ResponseEntity<ScenarioToAction> response =
         this.restTemplate.postForEntity(
@@ -103,15 +103,8 @@ public class ScenarioToActionControllerTest {
       ScenarioToActionCreate request, ScenarioToAction testScenarioToAction) {
     Assertions.assertNotNull(testScenarioToAction);
 
-    if (request.isEnabled() != null) {
-
-      Assertions.assertEquals(request.isEnabled(), testScenarioToAction.isEnabled());
-    }
-
-    if (request.getScenarioId() != null) {
-
-      Assertions.assertNotNull(testScenarioToAction.getScenario());
-      Assertions.assertEquals(request.getScenarioId(), testScenarioToAction.getScenario().getId());
+    if (request.getEnabled() != null) {
+      Assertions.assertEquals(request.getEnabled(), testScenarioToAction.isEnabled());
     }
 
     if (request.getScenarioActionId() != null) {
@@ -119,6 +112,12 @@ public class ScenarioToActionControllerTest {
       Assertions.assertNotNull(testScenarioToAction.getScenarioAction());
       Assertions.assertEquals(
           request.getScenarioActionId(), testScenarioToAction.getScenarioAction().getId());
+    }
+
+    if (request.getScenarioId() != null) {
+
+      Assertions.assertNotNull(testScenarioToAction.getScenario());
+      Assertions.assertEquals(request.getScenarioId(), testScenarioToAction.getScenario().getId());
     }
   }
 

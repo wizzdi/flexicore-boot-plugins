@@ -65,9 +65,9 @@ public class ScenarioToTriggerControllerTest {
 
     request.setFiring(true);
 
-    request.setScenarioId(this.scenario.getId());
-
     request.setScenarioTriggerId(this.scenarioTrigger.getId());
+
+    request.setScenarioId(this.scenario.getId());
 
     request.setOrdinal(10);
 
@@ -107,15 +107,8 @@ public class ScenarioToTriggerControllerTest {
       ScenarioToTriggerCreate request, ScenarioToTrigger testScenarioToTrigger) {
     Assertions.assertNotNull(testScenarioToTrigger);
 
-    if (request.isFiring() != null) {
-
-      Assertions.assertEquals(request.isFiring(), testScenarioToTrigger.isFiring());
-    }
-
-    if (request.getScenarioId() != null) {
-
-      Assertions.assertNotNull(testScenarioToTrigger.getScenario());
-      Assertions.assertEquals(request.getScenarioId(), testScenarioToTrigger.getScenario().getId());
+    if (request.getFiring() != null) {
+      Assertions.assertEquals(request.getFiring(), testScenarioToTrigger.isFiring());
     }
 
     if (request.getScenarioTriggerId() != null) {
@@ -125,14 +118,18 @@ public class ScenarioToTriggerControllerTest {
           request.getScenarioTriggerId(), testScenarioToTrigger.getScenarioTrigger().getId());
     }
 
-    if (request.getOrdinal() != null) {
+    if (request.getScenarioId() != null) {
 
+      Assertions.assertNotNull(testScenarioToTrigger.getScenario());
+      Assertions.assertEquals(request.getScenarioId(), testScenarioToTrigger.getScenario().getId());
+    }
+
+    if (request.getOrdinal() != null) {
       Assertions.assertEquals(request.getOrdinal(), testScenarioToTrigger.getOrdinal());
     }
 
-    if (request.isEnabled() != null) {
-
-      Assertions.assertEquals(request.isEnabled(), testScenarioToTrigger.isEnabled());
+    if (request.getEnabled() != null) {
+      Assertions.assertEquals(request.getEnabled(), testScenarioToTrigger.isEnabled());
     }
   }
 

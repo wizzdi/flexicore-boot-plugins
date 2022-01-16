@@ -95,7 +95,6 @@ public class ScenarioTriggerTypeControllerTest {
     Assertions.assertNotNull(testScenarioTriggerType);
 
     if (request.getEventCanonicalName() != null) {
-
       Assertions.assertEquals(
           request.getEventCanonicalName(), testScenarioTriggerType.getEventCanonicalName());
     }

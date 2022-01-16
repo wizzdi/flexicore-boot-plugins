@@ -27,23 +27,23 @@ public class ScenarioToDataSourceController implements Plugin {
 
   @Autowired private ScenarioToDataSourceService scenarioToDataSourceService;
 
-  @PostMapping("createScenarioToDataSource")
   @Operation(summary = "createScenarioToDataSource", description = "Creates ScenarioToDataSource")
   public ScenarioToDataSource createScenarioToDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToDataSourceCreate scenarioToDataSourceCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToDataSourceService.validate(scenarioToDataSourceCreate, securityContext);
     return scenarioToDataSourceService.createScenarioToDataSource(
         scenarioToDataSourceCreate, securityContext);
   }
 
   @Operation(summary = "updateScenarioToDataSource", description = "Updates ScenarioToDataSource")
-  @PutMapping("updateScenarioToDataSource")
   public ScenarioToDataSource updateScenarioToDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToDataSourceUpdate scenarioToDataSourceUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioToDataSourceId = scenarioToDataSourceUpdate.getId();
     ScenarioToDataSource scenarioToDataSource =
         scenarioToDataSourceService.getByIdOrNull(
@@ -61,14 +61,12 @@ public class ScenarioToDataSourceController implements Plugin {
         scenarioToDataSourceUpdate, securityContext);
   }
 
-  @Operation(
-      summary = "getAllScenarioToDataSources",
-      description = "Gets All ScenarioToDataSources Filtered")
-  @PostMapping("getAllScenarioToDataSources")
-  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
+  @Operation(summary = "getAllScenarioToDataSource", description = "lists ScenarioToDataSource")
+  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToDataSourceFilter scenarioToDataSourceFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToDataSourceService.validate(scenarioToDataSourceFilter, securityContext);
     return scenarioToDataSourceService.getAllScenarioToDataSources(
         scenarioToDataSourceFilter, securityContext);

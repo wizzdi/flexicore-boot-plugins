@@ -108,9 +108,8 @@ public class ScenarioToDataSourceControllerTest {
       ScenarioToDataSourceCreate request, ScenarioToDataSource testScenarioToDataSource) {
     Assertions.assertNotNull(testScenarioToDataSource);
 
-    if (request.isEnabled() != null) {
-
-      Assertions.assertEquals(request.isEnabled(), testScenarioToDataSource.isEnabled());
+    if (request.getEnabled() != null) {
+      Assertions.assertEquals(request.getEnabled(), testScenarioToDataSource.isEnabled());
     }
 
     if (request.getDataSourceId() != null) {
@@ -121,7 +120,6 @@ public class ScenarioToDataSourceControllerTest {
     }
 
     if (request.getOrdinal() != null) {
-
       Assertions.assertEquals(request.getOrdinal(), testScenarioToDataSource.getOrdinal());
     }
 
