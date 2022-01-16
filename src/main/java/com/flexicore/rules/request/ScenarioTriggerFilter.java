@@ -3,6 +3,7 @@ package com.flexicore.rules.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.ScenarioTriggerType;
 import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -36,6 +37,8 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   @JsonIgnore private List<ScenarioTriggerType> scenarioTriggerType;
 
   private Set<Long> activeMs;
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   /** @return logFileResource */
   @JsonIgnore
@@ -224,6 +227,21 @@ public class ScenarioTriggerFilter extends PaginationFilter {
    */
   public <T extends ScenarioTriggerFilter> T setActiveMs(Set<Long> activeMs) {
     this.activeMs = activeMs;
+    return (T) this;
+  }
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return ScenarioTriggerFilter
+   */
+  public <T extends ScenarioTriggerFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }
 }

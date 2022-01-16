@@ -3,6 +3,7 @@ package com.flexicore.rules.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioAction;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,8 @@ public class ScenarioToActionFilter extends PaginationFilter {
   private Set<String> scenarioIds;
 
   @JsonIgnore private List<Scenario> scenario;
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   private Set<String> scenarioActionIds;
 
@@ -76,6 +79,21 @@ public class ScenarioToActionFilter extends PaginationFilter {
    */
   public <T extends ScenarioToActionFilter> T setScenario(List<Scenario> scenario) {
     this.scenario = scenario;
+    return (T) this;
+  }
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return ScenarioToActionFilter
+   */
+  public <T extends ScenarioToActionFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }
 

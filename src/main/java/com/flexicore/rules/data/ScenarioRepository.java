@@ -57,7 +57,8 @@ public class ScenarioRepository implements Plugin {
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(
+        scenarioFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (scenarioFilter.getEvaluatingJSCode() != null
         && !scenarioFilter.getEvaluatingJSCode().isEmpty()) {

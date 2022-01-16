@@ -57,7 +57,8 @@ public class JSFunctionRepository implements Plugin {
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(
+        jSFunctionFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (jSFunctionFilter.getEvaluatingJSCode() != null
         && !jSFunctionFilter.getEvaluatingJSCode().isEmpty()) {

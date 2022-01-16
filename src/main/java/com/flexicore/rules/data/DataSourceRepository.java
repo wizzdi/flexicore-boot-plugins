@@ -57,7 +57,8 @@ public class DataSourceRepository implements Plugin {
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(
+        dataSourceFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (dataSourceFilter.getDynamicExecution() != null
         && !dataSourceFilter.getDynamicExecution().isEmpty()) {

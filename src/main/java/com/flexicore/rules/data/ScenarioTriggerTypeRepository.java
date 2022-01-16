@@ -54,7 +54,8 @@ public class ScenarioTriggerTypeRepository implements Plugin {
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(
+        scenarioTriggerTypeFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (scenarioTriggerTypeFilter.getEventCanonicalName() != null
         && !scenarioTriggerTypeFilter.getEventCanonicalName().isEmpty()) {

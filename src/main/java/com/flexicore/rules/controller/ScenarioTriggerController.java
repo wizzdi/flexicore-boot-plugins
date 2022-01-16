@@ -27,7 +27,7 @@ public class ScenarioTriggerController implements Plugin {
 
   @Autowired private ScenarioTriggerService scenarioTriggerService;
 
-  @PostMapping("")
+  @PostMapping("createScenarioTrigger")
   @Operation(summary = "createScenarioTrigger", description = "Creates ScenarioTrigger")
   public ScenarioTrigger createScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -38,7 +38,7 @@ public class ScenarioTriggerController implements Plugin {
     return scenarioTriggerService.createScenarioTrigger(scenarioTriggerCreate, securityContext);
   }
 
-  @PutMapping("")
+  @PutMapping("updateScenarioTrigger")
   @Operation(summary = "updateScenarioTrigger", description = "Updates ScenarioTrigger")
   public ScenarioTrigger updateScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -58,7 +58,7 @@ public class ScenarioTriggerController implements Plugin {
     return scenarioTriggerService.updateScenarioTrigger(scenarioTriggerUpdate, securityContext);
   }
 
-  @PostMapping("")
+  @PostMapping("getAllScenarioTrigger")
   @Operation(summary = "getAllScenarioTrigger", description = "lists ScenarioTrigger")
   public PaginationResponse<ScenarioTrigger> getAllScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,

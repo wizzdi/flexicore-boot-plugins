@@ -3,6 +3,7 @@ package com.flexicore.rules.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.model.Scenario;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,8 @@ public class ScenarioToDataSourceFilter extends PaginationFilter {
   @JsonIgnore private List<DataSource> dataSource;
 
   private Set<String> dataSourceIds;
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   /** @return ordinal */
   public Set<Integer> getOrdinal() {
@@ -105,6 +108,21 @@ public class ScenarioToDataSourceFilter extends PaginationFilter {
    */
   public <T extends ScenarioToDataSourceFilter> T setDataSourceIds(Set<String> dataSourceIds) {
     this.dataSourceIds = dataSourceIds;
+    return (T) this;
+  }
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return ScenarioToDataSourceFilter
+   */
+  public <T extends ScenarioToDataSourceFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }
 }

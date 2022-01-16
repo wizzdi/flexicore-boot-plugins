@@ -2,6 +2,7 @@ package com.flexicore.rules.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,8 @@ public class JSFunctionFilter extends PaginationFilter {
   @JsonIgnore private List<FileResource> evaluatingJSCode;
 
   private Set<String> returnType;
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   private Set<String> methodName;
 
@@ -43,6 +46,21 @@ public class JSFunctionFilter extends PaginationFilter {
    */
   public <T extends JSFunctionFilter> T setReturnType(Set<String> returnType) {
     this.returnType = returnType;
+    return (T) this;
+  }
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return JSFunctionFilter
+   */
+  public <T extends JSFunctionFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }
 
