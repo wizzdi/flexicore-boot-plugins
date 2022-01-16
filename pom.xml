@@ -16,9 +16,9 @@
         <swagger.version>2.1.2</swagger.version>
     <version.eclipselink>2.7.7</version.eclipselink>
         
-        <flexicore-security-model.version>1.1.1</flexicore-security-model.version>
+        <flexicore-security-model.version>1.0.5</flexicore-security-model.version>
         
-        <flexicore-boot-dynamic-invokers-model.version>1.1.1</flexicore-boot-dynamic-invokers-model.version>
+        <flexicore-security-model.version>1.1.1</flexicore-security-model.version>
         
         <flexicore-file-model.version>1.0.0</flexicore-file-model.version>
         
@@ -108,8 +108,8 @@
 
             <dependency>
                 <groupId>com.wizzdi</groupId>
-                <artifactId>flexicore-boot-dynamic-invokers-model</artifactId>
-                <version>${flexicore-boot-dynamic-invokers-model.version}</version>
+                <artifactId>flexicore-security-model</artifactId>
+                <version>${flexicore-security-model.version}</version>
                 <scope>provided</scope>
             </dependency>
         
