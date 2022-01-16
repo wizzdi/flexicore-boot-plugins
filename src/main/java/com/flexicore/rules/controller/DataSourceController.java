@@ -27,6 +27,7 @@ public class DataSourceController implements Plugin {
 
   @Autowired private DataSourceService dataSourceService;
 
+  @PostMapping("")
   @Operation(summary = "createDataSource", description = "Creates DataSource")
   public DataSource createDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -37,6 +38,7 @@ public class DataSourceController implements Plugin {
     return dataSourceService.createDataSource(dataSourceCreate, securityContext);
   }
 
+  @PutMapping("")
   @Operation(summary = "updateDataSource", description = "Updates DataSource")
   public DataSource updateDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -56,6 +58,7 @@ public class DataSourceController implements Plugin {
     return dataSourceService.updateDataSource(dataSourceUpdate, securityContext);
   }
 
+  @PostMapping("")
   @Operation(summary = "getAllDataSource", description = "lists DataSource")
   public PaginationResponse<DataSource> getAllDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,

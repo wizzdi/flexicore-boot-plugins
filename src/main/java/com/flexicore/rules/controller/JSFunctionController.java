@@ -27,6 +27,7 @@ public class JSFunctionController implements Plugin {
 
   @Autowired private JSFunctionService jSFunctionService;
 
+  @PostMapping("")
   @Operation(summary = "createJSFunction", description = "Creates JSFunction")
   public JSFunction createJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -37,6 +38,7 @@ public class JSFunctionController implements Plugin {
     return jSFunctionService.createJSFunction(jSFunctionCreate, securityContext);
   }
 
+  @PutMapping("")
   @Operation(summary = "updateJSFunction", description = "Updates JSFunction")
   public JSFunction updateJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -56,6 +58,7 @@ public class JSFunctionController implements Plugin {
     return jSFunctionService.updateJSFunction(jSFunctionUpdate, securityContext);
   }
 
+  @PostMapping("")
   @Operation(summary = "getAllJSFunction", description = "lists JSFunction")
   public PaginationResponse<JSFunction> getAllJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
