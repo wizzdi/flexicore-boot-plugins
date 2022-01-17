@@ -181,7 +181,11 @@
             <artifactId>flexicore-base-service</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
