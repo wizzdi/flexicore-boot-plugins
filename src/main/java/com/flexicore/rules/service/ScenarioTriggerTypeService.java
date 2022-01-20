@@ -69,6 +69,14 @@ public class ScenarioTriggerTypeService implements Plugin {
     boolean update =
         basicService.updateBasicNoMerge(scenarioTriggerTypeCreate, scenarioTriggerType);
 
+    if (scenarioTriggerTypeCreate.getEventCanonicalName() != null
+        && (!scenarioTriggerTypeCreate
+            .getEventCanonicalName()
+            .equals(scenarioTriggerType.getEventCanonicalName()))) {
+      scenarioTriggerType.setEventCanonicalName(scenarioTriggerTypeCreate.getEventCanonicalName());
+      update = true;
+    }
+
     return update;
   }
   /**

@@ -27,6 +27,7 @@ public class ScenarioToDataSourceController implements Plugin {
 
   @Autowired private ScenarioToDataSourceService scenarioToDataSourceService;
 
+  @PostMapping("createScenarioToDataSource")
   @Operation(summary = "createScenarioToDataSource", description = "Creates ScenarioToDataSource")
   public ScenarioToDataSource createScenarioToDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -38,6 +39,7 @@ public class ScenarioToDataSourceController implements Plugin {
         scenarioToDataSourceCreate, securityContext);
   }
 
+  @PutMapping("updateScenarioToDataSource")
   @Operation(summary = "updateScenarioToDataSource", description = "Updates ScenarioToDataSource")
   public ScenarioToDataSource updateScenarioToDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -61,8 +63,9 @@ public class ScenarioToDataSourceController implements Plugin {
         scenarioToDataSourceUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllScenarioToDataSource", description = "lists ScenarioToDataSource")
-  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSource(
+  @PostMapping("getAllScenarioToDataSources")
+  @Operation(summary = "getAllScenarioToDataSources", description = "lists ScenarioToDataSources")
+  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToDataSourceFilter scenarioToDataSourceFilter,
       @RequestAttribute SecurityContextBase securityContext) {

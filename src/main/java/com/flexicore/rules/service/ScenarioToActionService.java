@@ -76,6 +76,12 @@ public class ScenarioToActionService implements Plugin {
       ScenarioToAction scenarioToAction, ScenarioToActionCreate scenarioToActionCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioToActionCreate, scenarioToAction);
 
+    if (scenarioToActionCreate.getEnabled() != null
+        && (!scenarioToActionCreate.getEnabled().equals(scenarioToAction.isEnabled()))) {
+      scenarioToAction.setEnabled(scenarioToActionCreate.getEnabled());
+      update = true;
+    }
+
     if (scenarioToActionCreate.getScenarioAction() != null
         && (scenarioToAction.getScenarioAction() == null
             || !scenarioToActionCreate

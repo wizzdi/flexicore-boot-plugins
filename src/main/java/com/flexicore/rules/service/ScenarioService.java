@@ -93,6 +93,12 @@ public class ScenarioService implements Plugin {
       update = true;
     }
 
+    if (scenarioCreate.getScenarioHint() != null
+        && (!scenarioCreate.getScenarioHint().equals(scenario.getScenarioHint()))) {
+      scenario.setScenarioHint(scenarioCreate.getScenarioHint());
+      update = true;
+    }
+
     return update;
   }
   /**

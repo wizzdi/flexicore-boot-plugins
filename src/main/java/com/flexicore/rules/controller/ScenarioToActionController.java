@@ -27,6 +27,7 @@ public class ScenarioToActionController implements Plugin {
 
   @Autowired private ScenarioToActionService scenarioToActionService;
 
+  @PostMapping("createScenarioToAction")
   @Operation(summary = "createScenarioToAction", description = "Creates ScenarioToAction")
   public ScenarioToAction createScenarioToAction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -37,6 +38,7 @@ public class ScenarioToActionController implements Plugin {
     return scenarioToActionService.createScenarioToAction(scenarioToActionCreate, securityContext);
   }
 
+  @PutMapping("updateScenarioToAction")
   @Operation(summary = "updateScenarioToAction", description = "Updates ScenarioToAction")
   public ScenarioToAction updateScenarioToAction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -59,8 +61,9 @@ public class ScenarioToActionController implements Plugin {
     return scenarioToActionService.updateScenarioToAction(scenarioToActionUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllScenarioToAction", description = "lists ScenarioToAction")
-  public PaginationResponse<ScenarioToAction> getAllScenarioToAction(
+  @PostMapping("getAllScenarioToActions")
+  @Operation(summary = "getAllScenarioToActions", description = "lists ScenarioToActions")
+  public PaginationResponse<ScenarioToAction> getAllScenarioToActions(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToActionFilter scenarioToActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {

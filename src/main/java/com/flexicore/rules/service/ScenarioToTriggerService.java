@@ -76,6 +76,12 @@ public class ScenarioToTriggerService implements Plugin {
       ScenarioToTrigger scenarioToTrigger, ScenarioToTriggerCreate scenarioToTriggerCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioToTriggerCreate, scenarioToTrigger);
 
+    if (scenarioToTriggerCreate.getFiring() != null
+        && (!scenarioToTriggerCreate.getFiring().equals(scenarioToTrigger.isFiring()))) {
+      scenarioToTrigger.setFiring(scenarioToTriggerCreate.getFiring());
+      update = true;
+    }
+
     if (scenarioToTriggerCreate.getScenarioTrigger() != null
         && (scenarioToTrigger.getScenarioTrigger() == null
             || !scenarioToTriggerCreate
@@ -93,6 +99,18 @@ public class ScenarioToTriggerService implements Plugin {
                 .getId()
                 .equals(scenarioToTrigger.getScenario().getId()))) {
       scenarioToTrigger.setScenario(scenarioToTriggerCreate.getScenario());
+      update = true;
+    }
+
+    if (scenarioToTriggerCreate.getOrdinal() != null
+        && (!scenarioToTriggerCreate.getOrdinal().equals(scenarioToTrigger.getOrdinal()))) {
+      scenarioToTrigger.setOrdinal(scenarioToTriggerCreate.getOrdinal());
+      update = true;
+    }
+
+    if (scenarioToTriggerCreate.getEnabled() != null
+        && (!scenarioToTriggerCreate.getEnabled().equals(scenarioToTrigger.isEnabled()))) {
+      scenarioToTrigger.setEnabled(scenarioToTriggerCreate.getEnabled());
       update = true;
     }
 

@@ -2,6 +2,7 @@ package com.flexicore.rules.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,8 @@ import java.util.Set;
 public class DataSourceFilter extends PaginationFilter {
 
   private Set<String> dynamicExecutionIds;
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   @JsonIgnore private List<DynamicExecution> dynamicExecution;
 
@@ -24,6 +27,21 @@ public class DataSourceFilter extends PaginationFilter {
    */
   public <T extends DataSourceFilter> T setDynamicExecutionIds(Set<String> dynamicExecutionIds) {
     this.dynamicExecutionIds = dynamicExecutionIds;
+    return (T) this;
+  }
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return DataSourceFilter
+   */
+  public <T extends DataSourceFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }
 

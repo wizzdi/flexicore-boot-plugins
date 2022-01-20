@@ -29,20 +29,20 @@ public class ScenarioTriggerTypeRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioTriggerType
+   * @param scenarioTriggerTypeFilter Object Used to List ScenarioTriggerType
    * @param securityContext
    * @return List of ScenarioTriggerType
    */
   public List<ScenarioTriggerType> listAllScenarioTriggerTypes(
-      ScenarioTriggerTypeFilter filtering, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioTriggerType> q = cb.createQuery(ScenarioTriggerType.class);
     Root<ScenarioTriggerType> r = q.from(ScenarioTriggerType.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioTriggerTypePredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioTriggerTypePredicate(scenarioTriggerTypeFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<ScenarioTriggerType> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(scenarioTriggerTypeFilter, query);
     return query.getResultList();
   }
 
@@ -54,7 +54,8 @@ public class ScenarioTriggerTypeRepository implements Plugin {
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(
+        scenarioTriggerTypeFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (scenarioTriggerTypeFilter.getEventCanonicalName() != null
         && !scenarioTriggerTypeFilter.getEventCanonicalName().isEmpty()) {
@@ -64,17 +65,17 @@ public class ScenarioTriggerTypeRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List ScenarioTriggerType
+   * @param scenarioTriggerTypeFilter Object Used to List ScenarioTriggerType
    * @param securityContext
    * @return count of ScenarioTriggerType
    */
   public Long countAllScenarioTriggerTypes(
-      ScenarioTriggerTypeFilter filtering, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioTriggerType> r = q.from(ScenarioTriggerType.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioTriggerTypePredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioTriggerTypePredicate(scenarioTriggerTypeFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

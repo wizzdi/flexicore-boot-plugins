@@ -27,6 +27,18 @@ public class JSFunctionController implements Plugin {
 
   @Autowired private JSFunctionService jSFunctionService;
 
+  @PostMapping("getAllJSFunctions")
+  @Operation(summary = "getAllJSFunctions", description = "lists JSFunctions")
+  public PaginationResponse<JSFunction> getAllJSFunctions(
+      @RequestHeader("authenticationKey") String authenticationKey,
+      @RequestBody JSFunctionFilter jSFunctionFilter,
+      @RequestAttribute SecurityContextBase securityContext) {
+
+    jSFunctionService.validate(jSFunctionFilter, securityContext);
+    return jSFunctionService.getAllJSFunctions(jSFunctionFilter, securityContext);
+  }
+
+  @PostMapping("createJSFunction")
   @Operation(summary = "createJSFunction", description = "Creates JSFunction")
   public JSFunction createJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -37,6 +49,7 @@ public class JSFunctionController implements Plugin {
     return jSFunctionService.createJSFunction(jSFunctionCreate, securityContext);
   }
 
+  @PutMapping("updateJSFunction")
   @Operation(summary = "updateJSFunction", description = "Updates JSFunction")
   public JSFunction updateJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -54,15 +67,5 @@ public class JSFunctionController implements Plugin {
     jSFunctionUpdate.setJSFunction(jSFunction);
     jSFunctionService.validate(jSFunctionUpdate, securityContext);
     return jSFunctionService.updateJSFunction(jSFunctionUpdate, securityContext);
-  }
-
-  @Operation(summary = "getAllJSFunction", description = "lists JSFunction")
-  public PaginationResponse<JSFunction> getAllJSFunction(
-      @RequestHeader("authenticationKey") String authenticationKey,
-      @RequestBody JSFunctionFilter jSFunctionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
-
-    jSFunctionService.validate(jSFunctionFilter, securityContext);
-    return jSFunctionService.getAllJSFunctions(jSFunctionFilter, securityContext);
   }
 }

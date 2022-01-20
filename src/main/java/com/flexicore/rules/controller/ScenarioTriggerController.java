@@ -27,6 +27,7 @@ public class ScenarioTriggerController implements Plugin {
 
   @Autowired private ScenarioTriggerService scenarioTriggerService;
 
+  @PostMapping("createScenarioTrigger")
   @Operation(summary = "createScenarioTrigger", description = "Creates ScenarioTrigger")
   public ScenarioTrigger createScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -37,6 +38,18 @@ public class ScenarioTriggerController implements Plugin {
     return scenarioTriggerService.createScenarioTrigger(scenarioTriggerCreate, securityContext);
   }
 
+  @PostMapping("getAllScenarioTriggers")
+  @Operation(summary = "getAllScenarioTriggers", description = "lists ScenarioTriggers")
+  public PaginationResponse<ScenarioTrigger> getAllScenarioTriggers(
+      @RequestHeader("authenticationKey") String authenticationKey,
+      @RequestBody ScenarioTriggerFilter scenarioTriggerFilter,
+      @RequestAttribute SecurityContextBase securityContext) {
+
+    scenarioTriggerService.validate(scenarioTriggerFilter, securityContext);
+    return scenarioTriggerService.getAllScenarioTriggers(scenarioTriggerFilter, securityContext);
+  }
+
+  @PutMapping("updateScenarioTrigger")
   @Operation(summary = "updateScenarioTrigger", description = "Updates ScenarioTrigger")
   public ScenarioTrigger updateScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -54,15 +67,5 @@ public class ScenarioTriggerController implements Plugin {
     scenarioTriggerUpdate.setScenarioTrigger(scenarioTrigger);
     scenarioTriggerService.validate(scenarioTriggerUpdate, securityContext);
     return scenarioTriggerService.updateScenarioTrigger(scenarioTriggerUpdate, securityContext);
-  }
-
-  @Operation(summary = "getAllScenarioTrigger", description = "lists ScenarioTrigger")
-  public PaginationResponse<ScenarioTrigger> getAllScenarioTrigger(
-      @RequestHeader("authenticationKey") String authenticationKey,
-      @RequestBody ScenarioTriggerFilter scenarioTriggerFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
-
-    scenarioTriggerService.validate(scenarioTriggerFilter, securityContext);
-    return scenarioTriggerService.getAllScenarioTriggers(scenarioTriggerFilter, securityContext);
   }
 }

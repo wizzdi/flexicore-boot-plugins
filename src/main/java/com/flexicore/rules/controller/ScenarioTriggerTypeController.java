@@ -27,6 +27,7 @@ public class ScenarioTriggerTypeController implements Plugin {
 
   @Autowired private ScenarioTriggerTypeService scenarioTriggerTypeService;
 
+  @PostMapping("createScenarioTriggerType")
   @Operation(summary = "createScenarioTriggerType", description = "Creates ScenarioTriggerType")
   public ScenarioTriggerType createScenarioTriggerType(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -38,6 +39,19 @@ public class ScenarioTriggerTypeController implements Plugin {
         scenarioTriggerTypeCreate, securityContext);
   }
 
+  @PostMapping("getAllScenarioTriggerTypes")
+  @Operation(summary = "getAllScenarioTriggerTypes", description = "lists ScenarioTriggerTypes")
+  public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerTypes(
+      @RequestHeader("authenticationKey") String authenticationKey,
+      @RequestBody ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
+      @RequestAttribute SecurityContextBase securityContext) {
+
+    scenarioTriggerTypeService.validate(scenarioTriggerTypeFilter, securityContext);
+    return scenarioTriggerTypeService.getAllScenarioTriggerTypes(
+        scenarioTriggerTypeFilter, securityContext);
+  }
+
+  @PutMapping("updateScenarioTriggerType")
   @Operation(summary = "updateScenarioTriggerType", description = "Updates ScenarioTriggerType")
   public ScenarioTriggerType updateScenarioTriggerType(
       @RequestHeader("authenticationKey") String authenticationKey,
@@ -59,16 +73,5 @@ public class ScenarioTriggerTypeController implements Plugin {
     scenarioTriggerTypeService.validate(scenarioTriggerTypeUpdate, securityContext);
     return scenarioTriggerTypeService.updateScenarioTriggerType(
         scenarioTriggerTypeUpdate, securityContext);
-  }
-
-  @Operation(summary = "getAllScenarioTriggerType", description = "lists ScenarioTriggerType")
-  public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerType(
-      @RequestHeader("authenticationKey") String authenticationKey,
-      @RequestBody ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
-
-    scenarioTriggerTypeService.validate(scenarioTriggerTypeFilter, securityContext);
-    return scenarioTriggerTypeService.getAllScenarioTriggerTypes(
-        scenarioTriggerTypeFilter, securityContext);
   }
 }

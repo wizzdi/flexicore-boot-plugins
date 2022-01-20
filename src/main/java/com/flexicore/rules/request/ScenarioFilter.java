@@ -2,12 +2,15 @@ package com.flexicore.rules.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import java.util.List;
 import java.util.Set;
 
 /** Object Used to List Scenario */
 public class ScenarioFilter extends PaginationFilter {
+
+  private BasicPropertiesFilter basicPropertiesFilter;
 
   @JsonIgnore private List<FileResource> evaluatingJSCode;
 
@@ -18,6 +21,21 @@ public class ScenarioFilter extends PaginationFilter {
   private Set<String> evaluatingJSCodeIds;
 
   private Set<String> scenarioHint;
+
+  /** @return basicPropertiesFilter */
+  public BasicPropertiesFilter getBasicPropertiesFilter() {
+    return this.basicPropertiesFilter;
+  }
+
+  /**
+   * @param basicPropertiesFilter basicPropertiesFilter to set
+   * @return ScenarioFilter
+   */
+  public <T extends ScenarioFilter> T setBasicPropertiesFilter(
+      BasicPropertiesFilter basicPropertiesFilter) {
+    this.basicPropertiesFilter = basicPropertiesFilter;
+    return (T) this;
+  }
 
   /** @return evaluatingJSCode */
   @JsonIgnore

@@ -83,6 +83,18 @@ public class JSFunctionService implements Plugin {
       update = true;
     }
 
+    if (jSFunctionCreate.getReturnType() != null
+        && (!jSFunctionCreate.getReturnType().equals(jSFunction.getReturnType()))) {
+      jSFunction.setReturnType(jSFunctionCreate.getReturnType());
+      update = true;
+    }
+
+    if (jSFunctionCreate.getMethodName() != null
+        && (!jSFunctionCreate.getMethodName().equals(jSFunction.getMethodName()))) {
+      jSFunction.setMethodName(jSFunctionCreate.getMethodName());
+      update = true;
+    }
+
     return update;
   }
   /**
