@@ -35,6 +35,7 @@ import com.flexicore.rules.model.ScenarioToTrigger;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.model.ScenarioTriggerType;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.model.ZipFile;
@@ -55,6 +56,7 @@ public class AppTestEntities {
     return new EntitiesHolder(
         new HashSet<>(
             Arrays.asList(
+                    DynamicExecution.class,
                 PermissionGroup.class,
                 Baselink.class,
                 SecurityEntity.class,

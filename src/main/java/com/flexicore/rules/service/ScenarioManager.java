@@ -2,7 +2,6 @@ package com.flexicore.rules.service;
 
 
 import com.flexicore.rules.events.ScenarioEvent;
-import com.flexicore.rules.events.ScenarioSavableEvent;
 import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.*;
 import com.flexicore.rules.response.EvaluateScenarioResponse;
@@ -13,6 +12,7 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import org.apache.commons.io.FileUtils;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -224,7 +224,7 @@ public class ScenarioManager implements Plugin {
         if (eventId == null) {
             return null;
         }
-        List<ScenarioSavableEvent> scenarioEvents = scenarioEventService.listAllScenarioSavableEvents(new ScenarioSavableEventFilter().setScenarioEventIds(Collections.singleton(new ScenarioEventIdFiltering(eventId))));
+        List<ScenarioSavableEvent> scenarioEvents = scenarioEventService.listAllScenarioSavableEvents(new ScenarioSavableEventFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setOnlyIds(Collections.singleton(eventId))),null);
         return scenarioEvents.isEmpty() ? null : scenarioEvents.get(0);
     }
 

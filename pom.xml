@@ -215,6 +215,12 @@
             <artifactId>flexicore-base-service</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-converter-postgresql</artifactId>
+            <version>1.1.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

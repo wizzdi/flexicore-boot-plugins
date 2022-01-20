@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.rules.events.ScenarioEvent;
-import com.flexicore.rules.events.ScenarioSavableEvent;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 

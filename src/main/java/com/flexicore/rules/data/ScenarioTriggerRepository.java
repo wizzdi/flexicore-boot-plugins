@@ -5,6 +5,7 @@ import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.model.ScenarioTriggerType;
+import com.flexicore.rules.model.ScenarioTriggerType_;
 import com.flexicore.rules.model.ScenarioTrigger_;
 import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.security.SecurityContextBase;
@@ -126,9 +127,9 @@ public class ScenarioTriggerRepository implements Plugin {
             && !scenarioTriggerFilter.getValidTill().isEmpty()) {
       preds.add(r.get(ScenarioTrigger_.validTill).in(scenarioTriggerFilter.getValidTill()));
     }
-    if (filtering.getEventCanonicalNames() != null && !filtering.getEventCanonicalNames().isEmpty()) {
+    if (scenarioTriggerFilter.getEventCanonicalNames() != null && !scenarioTriggerFilter.getEventCanonicalNames().isEmpty()) {
       Join<T,ScenarioTriggerType> join=r.join(ScenarioTrigger_.scenarioTriggerType);
-      preds.add(join.get(ScenarioTriggerType_.eventCanonicalName).in(filtering.getEventCanonicalNames()));
+      preds.add(join.get(ScenarioTriggerType_.eventCanonicalName).in(scenarioTriggerFilter.getEventCanonicalNames()));
     }
   }
   /**

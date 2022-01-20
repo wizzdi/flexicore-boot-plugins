@@ -3,10 +3,7 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
-import com.flexicore.rules.model.Scenario;
-import com.flexicore.rules.model.ScenarioToTrigger;
-import com.flexicore.rules.model.ScenarioToTrigger_;
-import com.flexicore.rules.model.ScenarioTrigger;
+import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.ScenarioToTriggerFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -60,15 +57,15 @@ public class ScenarioToTriggerRepository implements Plugin {
 
     this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getFiring() != null ) {
+    if (scenarioToTriggerFilter.getFiring() != null ) {
 
-      preds.add(cb.equal(r.get(ScenarioToTrigger_.firing),filtering.getFiring()));
+      preds.add(cb.equal(r.get(ScenarioToTrigger_.firing),scenarioToTriggerFilter.getFiring()));
     }
-    if (filtering.getEnabled() != null ) {
+    if (scenarioToTriggerFilter.getEnabled() != null ) {
 
-      preds.add(cb.equal(r.get(ScenarioToTrigger_.enabled),filtering.getEnabled()));
+      preds.add(cb.equal(r.get(ScenarioToTrigger_.enabled),scenarioToTriggerFilter.getEnabled()));
     }
-    if (filtering.getNonDeletedScenarios() != null ) {
+    if (scenarioToTriggerFilter.getNonDeletedScenarios() != null ) {
       Join<T, Scenario> join = r.join(ScenarioToTrigger_.scenario);
 
       preds.add(cb.isFalse(join.get(Scenario_.softDelete)));

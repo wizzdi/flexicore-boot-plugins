@@ -60,9 +60,9 @@ public class ScenarioToActionRepository implements Plugin {
 
     this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getEnabled() != null) {
+    if (scenarioToActionFilter.getEnabled() != null) {
 
-      preds.add(cb.equal(r.get(ScenarioToAction_.enabled), filtering.getEnabled()));
+      preds.add(cb.equal(r.get(ScenarioToAction_.enabled), scenarioToActionFilter.getEnabled()));
     }
     if (scenarioToActionFilter.getScenarioAction() != null
             && !scenarioToActionFilter.getScenarioAction().isEmpty()) {

@@ -60,13 +60,9 @@ public class ScenarioToDataSourceRepository implements Plugin {
 
     this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getEnabled() != null) {
+    if (scenarioToDataSourceFilter.getEnabled() != null) {
 
-      preds.add(cb.equal(r.get(ScenarioToDataSource_.enabled), filtering.getEnabled()));
-    }
-    if (scenarioToDataSourceFilter.getEnabled() != null
-            && !scenarioToDataSourceFilter.getEnabled().isEmpty()) {
-      preds.add(r.get(ScenarioToDataSource_.enabled).in(scenarioToDataSourceFilter.getEnabled()));
+      preds.add(cb.equal(r.get(ScenarioToDataSource_.enabled), scenarioToDataSourceFilter.getEnabled()));
     }
 
     if (scenarioToDataSourceFilter.getDataSource() != null

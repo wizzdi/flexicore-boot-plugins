@@ -1,6 +1,7 @@
 package com.flexicore.rules;
 
 import com.flexicore.annotations.EnableFlexiCoreBaseServices;
+import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
 import com.wizzdi.flexicore.boot.health.annotations.EnableFlexiCoreHealthPlugins;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 @EnableFlexiCoreSecurity
 @EnableDynamicInvokersPlugins
 @EnableFlexiCoreBaseServices
+@EnableDynamicProperties
 public class App {
 
   public static void main(String[] args) {
