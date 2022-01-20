@@ -3,12 +3,12 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
-import com.flexicore.rules.model.Scenario;
-import com.flexicore.rules.model.Scenario_;
-import com.flexicore.rules.request.ScenarioFilter;
+import com.flexicore.rules.model.ScenarioSavableEvent;
+import com.flexicore.rules.model.ScenarioSavableEvent_;
+import com.flexicore.rules.model.ScenarioTrigger;
+import com.flexicore.rules.request.ScenarioSavableEventFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
-import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
 import java.util.ArrayList;
@@ -27,30 +27,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScenarioRepository implements Plugin {
+public class ScenarioSavableEventRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param scenarioFilter Object Used to List Scenario
+   * @param scenarioSavableEventFilter Object Used to List ScenarioSavableEvent
    * @param securityContext
-   * @return List of Scenario
+   * @return List of ScenarioSavableEvent
    */
-  public List<Scenario> listAllScenarios(
-      ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
+  public List<ScenarioSavableEvent> listAllScenarioSavableEvents(
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
-    CriteriaQuery<Scenario> q = cb.createQuery(Scenario.class);
-    Root<Scenario> r = q.from(Scenario.class);
+    CriteriaQuery<ScenarioSavableEvent> q = cb.createQuery(ScenarioSavableEvent.class);
+    Root<ScenarioSavableEvent> r = q.from(ScenarioSavableEvent.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioPredicate(scenarioFilter, cb, q, r, preds, securityContext);
+    addScenarioSavableEventPredicate(scenarioSavableEventFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
-    TypedQuery<Scenario> query = em.createQuery(q);
-    BasicRepository.addPagination(scenarioFilter, query);
+    TypedQuery<ScenarioSavableEvent> query = em.createQuery(q);
+    BasicRepository.addPagination(scenarioSavableEventFilter, query);
     return query.getResultList();
   }
 
-  public <T extends Scenario> void addScenarioPredicate(
-      ScenarioFilter scenarioFilter,
+  public <T extends ScenarioSavableEvent> void addScenarioSavableEventPredicate(
+      ScenarioSavableEventFilter scenarioSavableEventFilter,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
@@ -58,44 +58,30 @@ public class ScenarioRepository implements Plugin {
       SecurityContextBase securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
-        scenarioFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+        scenarioSavableEventFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
-    if (scenarioFilter.getEvaluatingJSCode() != null
-        && !scenarioFilter.getEvaluatingJSCode().isEmpty()) {
+    if (scenarioSavableEventFilter.getScenarioTrigger() != null
+        && !scenarioSavableEventFilter.getScenarioTrigger().isEmpty()) {
       Set<String> ids =
-          scenarioFilter.getEvaluatingJSCode().parallelStream()
+          scenarioSavableEventFilter.getScenarioTrigger().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
-      Join<T, FileResource> join = r.join(Scenario_.evaluatingJSCode);
+      Join<T, ScenarioTrigger> join = r.join(ScenarioSavableEvent_.scenarioTrigger);
       preds.add(join.get(Basic_.id).in(ids));
-    }
-
-    if (scenarioFilter.getLogFileResource() != null
-        && !scenarioFilter.getLogFileResource().isEmpty()) {
-      Set<String> ids =
-          scenarioFilter.getLogFileResource().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, FileResource> join = r.join(Scenario_.logFileResource);
-      preds.add(join.get(Basic_.id).in(ids));
-    }
-
-    if (scenarioFilter.getScenarioHint() != null && !scenarioFilter.getScenarioHint().isEmpty()) {
-      preds.add(r.get(Scenario_.scenarioHint).in(scenarioFilter.getScenarioHint()));
     }
   }
   /**
-   * @param scenarioFilter Object Used to List Scenario
+   * @param scenarioSavableEventFilter Object Used to List ScenarioSavableEvent
    * @param securityContext
-   * @return count of Scenario
+   * @return count of ScenarioSavableEvent
    */
-  public Long countAllScenarios(
-      ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
+  public Long countAllScenarioSavableEvents(
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
-    Root<Scenario> r = q.from(Scenario.class);
+    Root<ScenarioSavableEvent> r = q.from(ScenarioSavableEvent.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioPredicate(scenarioFilter, cb, q, r, preds, securityContext);
+    addScenarioSavableEventPredicate(scenarioSavableEventFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

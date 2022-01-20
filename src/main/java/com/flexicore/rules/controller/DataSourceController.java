@@ -38,6 +38,17 @@ public class DataSourceController implements Plugin {
     return dataSourceService.createDataSource(dataSourceCreate, securityContext);
   }
 
+  @PostMapping("getAllDataSources")
+  @Operation(summary = "getAllDataSources", description = "lists DataSources")
+  public PaginationResponse<DataSource> getAllDataSources(
+      @RequestHeader("authenticationKey") String authenticationKey,
+      @RequestBody DataSourceFilter dataSourceFilter,
+      @RequestAttribute SecurityContextBase securityContext) {
+
+    dataSourceService.validate(dataSourceFilter, securityContext);
+    return dataSourceService.getAllDataSources(dataSourceFilter, securityContext);
+  }
+
   @PutMapping("updateDataSource")
   @Operation(summary = "updateDataSource", description = "Updates DataSource")
   public DataSource updateDataSource(
@@ -56,16 +67,5 @@ public class DataSourceController implements Plugin {
     dataSourceUpdate.setDataSource(dataSource);
     dataSourceService.validate(dataSourceUpdate, securityContext);
     return dataSourceService.updateDataSource(dataSourceUpdate, securityContext);
-  }
-
-  @PostMapping("getAllDataSource")
-  @Operation(summary = "getAllDataSource", description = "lists DataSource")
-  public PaginationResponse<DataSource> getAllDataSource(
-      @RequestHeader("authenticationKey") String authenticationKey,
-      @RequestBody DataSourceFilter dataSourceFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
-
-    dataSourceService.validate(dataSourceFilter, securityContext);
-    return dataSourceService.getAllDataSources(dataSourceFilter, securityContext);
   }
 }

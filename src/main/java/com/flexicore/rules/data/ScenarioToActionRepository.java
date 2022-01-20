@@ -33,20 +33,20 @@ public class ScenarioToActionRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioToAction
+   * @param scenarioToActionFilter Object Used to List ScenarioToAction
    * @param securityContext
    * @return List of ScenarioToAction
    */
   public List<ScenarioToAction> listAllScenarioToActions(
-      ScenarioToActionFilter filtering, SecurityContextBase securityContext) {
+      ScenarioToActionFilter scenarioToActionFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioToAction> q = cb.createQuery(ScenarioToAction.class);
     Root<ScenarioToAction> r = q.from(ScenarioToAction.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioToActionPredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioToActionPredicate(scenarioToActionFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<ScenarioToAction> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(scenarioToActionFilter, query);
     return query.getResultList();
   }
 
@@ -87,17 +87,17 @@ public class ScenarioToActionRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List ScenarioToAction
+   * @param scenarioToActionFilter Object Used to List ScenarioToAction
    * @param securityContext
    * @return count of ScenarioToAction
    */
   public Long countAllScenarioToActions(
-      ScenarioToActionFilter filtering, SecurityContextBase securityContext) {
+      ScenarioToActionFilter scenarioToActionFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioToAction> r = q.from(ScenarioToAction.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioToActionPredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioToActionPredicate(scenarioToActionFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

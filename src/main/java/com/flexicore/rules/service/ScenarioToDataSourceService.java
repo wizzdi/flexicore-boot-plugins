@@ -78,6 +78,12 @@ public class ScenarioToDataSourceService implements Plugin {
     boolean update =
         basicService.updateBasicNoMerge(scenarioToDataSourceCreate, scenarioToDataSource);
 
+    if (scenarioToDataSourceCreate.getEnabled() != null
+        && (!scenarioToDataSourceCreate.getEnabled().equals(scenarioToDataSource.isEnabled()))) {
+      scenarioToDataSource.setEnabled(scenarioToDataSourceCreate.getEnabled());
+      update = true;
+    }
+
     if (scenarioToDataSourceCreate.getDataSource() != null
         && (scenarioToDataSource.getDataSource() == null
             || !scenarioToDataSourceCreate
@@ -85,6 +91,12 @@ public class ScenarioToDataSourceService implements Plugin {
                 .getId()
                 .equals(scenarioToDataSource.getDataSource().getId()))) {
       scenarioToDataSource.setDataSource(scenarioToDataSourceCreate.getDataSource());
+      update = true;
+    }
+
+    if (scenarioToDataSourceCreate.getOrdinal() != null
+        && (!scenarioToDataSourceCreate.getOrdinal().equals(scenarioToDataSource.getOrdinal()))) {
+      scenarioToDataSource.setOrdinal(scenarioToDataSourceCreate.getOrdinal());
       update = true;
     }
 

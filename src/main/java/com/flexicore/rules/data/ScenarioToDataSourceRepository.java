@@ -33,20 +33,20 @@ public class ScenarioToDataSourceRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioToDataSource
+   * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return List of ScenarioToDataSource
    */
   public List<ScenarioToDataSource> listAllScenarioToDataSources(
-      ScenarioToDataSourceFilter filtering, SecurityContextBase securityContext) {
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioToDataSource> q = cb.createQuery(ScenarioToDataSource.class);
     Root<ScenarioToDataSource> r = q.from(ScenarioToDataSource.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioToDataSourcePredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioToDataSourcePredicate(scenarioToDataSourceFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<ScenarioToDataSource> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(scenarioToDataSourceFilter, query);
     return query.getResultList();
   }
 
@@ -92,17 +92,17 @@ public class ScenarioToDataSourceRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List ScenarioToDataSource
+   * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return count of ScenarioToDataSource
    */
   public Long countAllScenarioToDataSources(
-      ScenarioToDataSourceFilter filtering, SecurityContextBase securityContext) {
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioToDataSource> r = q.from(ScenarioToDataSource.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioToDataSourcePredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioToDataSourcePredicate(scenarioToDataSourceFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

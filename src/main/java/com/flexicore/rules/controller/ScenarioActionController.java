@@ -58,9 +58,9 @@ public class ScenarioActionController implements Plugin {
     return scenarioActionService.updateScenarioAction(scenarioActionUpdate, securityContext);
   }
 
-  @PostMapping("getAllScenarioAction")
-  @Operation(summary = "getAllScenarioAction", description = "lists ScenarioAction")
-  public PaginationResponse<ScenarioAction> getAllScenarioAction(
+  @PostMapping("getAllScenarioActions")
+  @Operation(summary = "getAllScenarioActions", description = "lists ScenarioActions")
+  public PaginationResponse<ScenarioAction> getAllScenarioActions(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioActionFilter scenarioActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {

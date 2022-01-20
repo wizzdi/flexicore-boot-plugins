@@ -32,20 +32,20 @@ public class DataSourceRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List DataSource
+   * @param dataSourceFilter Object Used to List DataSource
    * @param securityContext
    * @return List of DataSource
    */
   public List<DataSource> listAllDataSources(
-      DataSourceFilter filtering, SecurityContextBase securityContext) {
+      DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<DataSource> q = cb.createQuery(DataSource.class);
     Root<DataSource> r = q.from(DataSource.class);
     List<Predicate> preds = new ArrayList<>();
-    addDataSourcePredicate(filtering, cb, q, r, preds, securityContext);
+    addDataSourcePredicate(dataSourceFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<DataSource> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(dataSourceFilter, query);
     return query.getResultList();
   }
 
@@ -71,16 +71,17 @@ public class DataSourceRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List DataSource
+   * @param dataSourceFilter Object Used to List DataSource
    * @param securityContext
    * @return count of DataSource
    */
-  public Long countAllDataSources(DataSourceFilter filtering, SecurityContextBase securityContext) {
+  public Long countAllDataSources(
+      DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<DataSource> r = q.from(DataSource.class);
     List<Predicate> preds = new ArrayList<>();
-    addDataSourcePredicate(filtering, cb, q, r, preds, securityContext);
+    addDataSourcePredicate(dataSourceFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

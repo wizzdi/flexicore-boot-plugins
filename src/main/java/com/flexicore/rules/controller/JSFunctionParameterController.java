@@ -63,9 +63,9 @@ public class JSFunctionParameterController implements Plugin {
         jSFunctionParameterUpdate, securityContext);
   }
 
-  @PostMapping("getAllJSFunctionParameter")
-  @Operation(summary = "getAllJSFunctionParameter", description = "lists JSFunctionParameter")
-  public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameter(
+  @PostMapping("getAllJSFunctionParameters")
+  @Operation(summary = "getAllJSFunctionParameters", description = "lists JSFunctionParameters")
+  public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameters(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionParameterFilter jSFunctionParameterFilter,
       @RequestAttribute SecurityContextBase securityContext) {

@@ -58,9 +58,9 @@ public class ScenarioController implements Plugin {
     return scenarioService.updateScenario(scenarioUpdate, securityContext);
   }
 
-  @PostMapping("getAllScenario")
-  @Operation(summary = "getAllScenario", description = "lists Scenario")
-  public PaginationResponse<Scenario> getAllScenario(
+  @PostMapping("getAllScenarios")
+  @Operation(summary = "getAllScenarios", description = "lists Scenarios")
+  public PaginationResponse<Scenario> getAllScenarios(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioFilter scenarioFilter,
       @RequestAttribute SecurityContextBase securityContext) {

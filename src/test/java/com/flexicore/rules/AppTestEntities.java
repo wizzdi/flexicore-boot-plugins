@@ -28,6 +28,7 @@ import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.model.JSFunctionParameter;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioAction;
+import com.flexicore.rules.model.ScenarioSavableEvent;
 import com.flexicore.rules.model.ScenarioToAction;
 import com.flexicore.rules.model.ScenarioToDataSource;
 import com.flexicore.rules.model.ScenarioToTrigger;
@@ -98,6 +99,7 @@ public class AppTestEntities {
                 FileResource.class,
                 ZipFile.class,
                 ZipFileToFileResource.class,
+                ScenarioSavableEvent.class,
                 Scenario.class,
                 JSFunctionParameter.class,
                 JSFunction.class,

@@ -32,20 +32,20 @@ public class JSFunctionRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List JSFunction
+   * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
    * @return List of JSFunction
    */
   public List<JSFunction> listAllJSFunctions(
-      JSFunctionFilter filtering, SecurityContextBase securityContext) {
+      JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<JSFunction> q = cb.createQuery(JSFunction.class);
     Root<JSFunction> r = q.from(JSFunction.class);
     List<Predicate> preds = new ArrayList<>();
-    addJSFunctionPredicate(filtering, cb, q, r, preds, securityContext);
+    addJSFunctionPredicate(jSFunctionFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<JSFunction> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(jSFunctionFilter, query);
     return query.getResultList();
   }
 
@@ -79,16 +79,17 @@ public class JSFunctionRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List JSFunction
+   * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
    * @return count of JSFunction
    */
-  public Long countAllJSFunctions(JSFunctionFilter filtering, SecurityContextBase securityContext) {
+  public Long countAllJSFunctions(
+      JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<JSFunction> r = q.from(JSFunction.class);
     List<Predicate> preds = new ArrayList<>();
-    addJSFunctionPredicate(filtering, cb, q, r, preds, securityContext);
+    addJSFunctionPredicate(jSFunctionFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

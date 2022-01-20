@@ -33,20 +33,20 @@ public class ScenarioTriggerRepository implements Plugin {
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioTrigger
+   * @param scenarioTriggerFilter Object Used to List ScenarioTrigger
    * @param securityContext
    * @return List of ScenarioTrigger
    */
   public List<ScenarioTrigger> listAllScenarioTriggers(
-      ScenarioTriggerFilter filtering, SecurityContextBase securityContext) {
+      ScenarioTriggerFilter scenarioTriggerFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioTrigger> q = cb.createQuery(ScenarioTrigger.class);
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioTriggerPredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioTriggerPredicate(scenarioTriggerFilter, cb, q, r, preds, securityContext);
     q.select(r).where(preds.toArray(new Predicate[0]));
     TypedQuery<ScenarioTrigger> query = em.createQuery(q);
-    BasicRepository.addPagination(filtering, query);
+    BasicRepository.addPagination(scenarioTriggerFilter, query);
     return query.getResultList();
   }
 
@@ -129,17 +129,17 @@ public class ScenarioTriggerRepository implements Plugin {
     }
   }
   /**
-   * @param filtering Object Used to List ScenarioTrigger
+   * @param scenarioTriggerFilter Object Used to List ScenarioTrigger
    * @param securityContext
    * @return count of ScenarioTrigger
    */
   public Long countAllScenarioTriggers(
-      ScenarioTriggerFilter filtering, SecurityContextBase securityContext) {
+      ScenarioTriggerFilter scenarioTriggerFilter, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
     List<Predicate> preds = new ArrayList<>();
-    addScenarioTriggerPredicate(filtering, cb, q, r, preds, securityContext);
+    addScenarioTriggerPredicate(scenarioTriggerFilter, cb, q, r, preds, securityContext);
     q.select(cb.count(r)).where(preds.toArray(new Predicate[0]));
     TypedQuery<Long> query = em.createQuery(q);
     return query.getSingleResult();

@@ -39,6 +39,18 @@ public class ScenarioTriggerTypeController implements Plugin {
         scenarioTriggerTypeCreate, securityContext);
   }
 
+  @PostMapping("getAllScenarioTriggerTypes")
+  @Operation(summary = "getAllScenarioTriggerTypes", description = "lists ScenarioTriggerTypes")
+  public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerTypes(
+      @RequestHeader("authenticationKey") String authenticationKey,
+      @RequestBody ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
+      @RequestAttribute SecurityContextBase securityContext) {
+
+    scenarioTriggerTypeService.validate(scenarioTriggerTypeFilter, securityContext);
+    return scenarioTriggerTypeService.getAllScenarioTriggerTypes(
+        scenarioTriggerTypeFilter, securityContext);
+  }
+
   @PutMapping("updateScenarioTriggerType")
   @Operation(summary = "updateScenarioTriggerType", description = "Updates ScenarioTriggerType")
   public ScenarioTriggerType updateScenarioTriggerType(
@@ -61,17 +73,5 @@ public class ScenarioTriggerTypeController implements Plugin {
     scenarioTriggerTypeService.validate(scenarioTriggerTypeUpdate, securityContext);
     return scenarioTriggerTypeService.updateScenarioTriggerType(
         scenarioTriggerTypeUpdate, securityContext);
-  }
-
-  @PostMapping("getAllScenarioTriggerType")
-  @Operation(summary = "getAllScenarioTriggerType", description = "lists ScenarioTriggerType")
-  public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerType(
-      @RequestHeader("authenticationKey") String authenticationKey,
-      @RequestBody ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
-
-    scenarioTriggerTypeService.validate(scenarioTriggerTypeFilter, securityContext);
-    return scenarioTriggerTypeService.getAllScenarioTriggerTypes(
-        scenarioTriggerTypeFilter, securityContext);
   }
 }

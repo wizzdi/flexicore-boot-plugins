@@ -77,6 +77,20 @@ public class JSFunctionParameterService implements Plugin {
     boolean update =
         basicService.updateBasicNoMerge(jSFunctionParameterCreate, jSFunctionParameter);
 
+    if (jSFunctionParameterCreate.getOrdinal() != null
+        && (!jSFunctionParameterCreate.getOrdinal().equals(jSFunctionParameter.getOrdinal()))) {
+      jSFunctionParameter.setOrdinal(jSFunctionParameterCreate.getOrdinal());
+      update = true;
+    }
+
+    if (jSFunctionParameterCreate.getParameterType() != null
+        && (!jSFunctionParameterCreate
+            .getParameterType()
+            .equals(jSFunctionParameter.getParameterType()))) {
+      jSFunctionParameter.setParameterType(jSFunctionParameterCreate.getParameterType());
+      update = true;
+    }
+
     if (jSFunctionParameterCreate.getJsFunction() != null
         && (jSFunctionParameter.getJsFunction() == null
             || !jSFunctionParameterCreate

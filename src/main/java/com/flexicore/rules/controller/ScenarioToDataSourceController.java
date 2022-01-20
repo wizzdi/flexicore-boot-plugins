@@ -63,9 +63,9 @@ public class ScenarioToDataSourceController implements Plugin {
         scenarioToDataSourceUpdate, securityContext);
   }
 
-  @PostMapping("getAllScenarioToDataSource")
-  @Operation(summary = "getAllScenarioToDataSource", description = "lists ScenarioToDataSource")
-  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSource(
+  @PostMapping("getAllScenarioToDataSources")
+  @Operation(summary = "getAllScenarioToDataSources", description = "lists ScenarioToDataSources")
+  public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToDataSourceFilter scenarioToDataSourceFilter,
       @RequestAttribute SecurityContextBase securityContext) {

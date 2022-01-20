@@ -76,6 +76,44 @@ public class ScenarioTriggerService implements Plugin {
       ScenarioTrigger scenarioTrigger, ScenarioTriggerCreate scenarioTriggerCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioTriggerCreate, scenarioTrigger);
 
+    if (scenarioTriggerCreate.getLastEventId() != null
+        && (!scenarioTriggerCreate.getLastEventId().equals(scenarioTrigger.getLastEventId()))) {
+      scenarioTrigger.setLastEventId(scenarioTriggerCreate.getLastEventId());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getLastActivated() != null
+        && (!scenarioTriggerCreate.getLastActivated().equals(scenarioTrigger.getLastActivated()))) {
+      scenarioTrigger.setLastActivated(scenarioTriggerCreate.getLastActivated());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getValidFrom() != null
+        && (!scenarioTriggerCreate.getValidFrom().equals(scenarioTrigger.getValidFrom()))) {
+      scenarioTrigger.setValidFrom(scenarioTriggerCreate.getValidFrom());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getCooldownIntervalMs() != null
+        && (!scenarioTriggerCreate
+            .getCooldownIntervalMs()
+            .equals(scenarioTrigger.getCooldownIntervalMs()))) {
+      scenarioTrigger.setCooldownIntervalMs(scenarioTriggerCreate.getCooldownIntervalMs());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getActiveTill() != null
+        && (!scenarioTriggerCreate.getActiveTill().equals(scenarioTrigger.getActiveTill()))) {
+      scenarioTrigger.setActiveTill(scenarioTriggerCreate.getActiveTill());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getActiveMs() != null
+        && (!scenarioTriggerCreate.getActiveMs().equals(scenarioTrigger.getActiveMs()))) {
+      scenarioTrigger.setActiveMs(scenarioTriggerCreate.getActiveMs());
+      update = true;
+    }
+
     if (scenarioTriggerCreate.getLogFileResource() != null
         && (scenarioTrigger.getLogFileResource() == null
             || !scenarioTriggerCreate
@@ -103,6 +141,12 @@ public class ScenarioTriggerService implements Plugin {
                 .getId()
                 .equals(scenarioTrigger.getScenarioTriggerType().getId()))) {
       scenarioTrigger.setScenarioTriggerType(scenarioTriggerCreate.getScenarioTriggerType());
+      update = true;
+    }
+
+    if (scenarioTriggerCreate.getValidTill() != null
+        && (!scenarioTriggerCreate.getValidTill().equals(scenarioTrigger.getValidTill()))) {
+      scenarioTrigger.setValidTill(scenarioTriggerCreate.getValidTill());
       update = true;
     }
 
