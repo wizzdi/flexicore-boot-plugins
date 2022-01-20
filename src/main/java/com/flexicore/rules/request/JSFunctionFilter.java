@@ -40,7 +40,7 @@ public class JSFunctionFilter extends PaginationFilter {
   }
 
   public <T extends JSFunctionFilter> T setBasicPropertiesFilter(
-      BasicPropertiesFilter basicPropertiesFilter) {
+          BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }

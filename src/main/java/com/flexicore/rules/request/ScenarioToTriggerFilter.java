@@ -34,7 +34,7 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioToTriggerFilter> T setScenarioTrigger(
-      List<ScenarioTrigger> scenarioTrigger) {
+          List<ScenarioTrigger> scenarioTrigger) {
     this.scenarioTrigger = scenarioTrigger;
     return (T) this;
   }
@@ -53,7 +53,7 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioToTriggerFilter> T setScenarioTriggerIds(
-      Set<String> scenarioTriggerIds) {
+          Set<String> scenarioTriggerIds) {
     this.scenarioTriggerIds = scenarioTriggerIds;
     return (T) this;
   }
@@ -73,7 +73,7 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioToTriggerFilter> T setBasicPropertiesFilter(
-      BasicPropertiesFilter basicPropertiesFilter) {
+          BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }

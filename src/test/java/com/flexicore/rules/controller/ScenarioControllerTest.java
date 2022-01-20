@@ -88,7 +88,6 @@ public class ScenarioControllerTest {
     Assertions.assertNotNull(testScenario);
 
     if (request.getScenarioHint() != null) {
-
       Assertions.assertEquals(request.getScenarioHint(), testScenario.getScenarioHint());
     }
   }

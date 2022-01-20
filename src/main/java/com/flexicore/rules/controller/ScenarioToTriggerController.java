@@ -27,23 +27,23 @@ public class ScenarioToTriggerController implements Plugin {
 
   @Autowired private ScenarioToTriggerService scenarioToTriggerService;
 
-  @PostMapping("createScenarioToTrigger")
   @Operation(summary = "createScenarioToTrigger", description = "Creates ScenarioToTrigger")
   public ScenarioToTrigger createScenarioToTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToTriggerCreate scenarioToTriggerCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToTriggerService.validate(scenarioToTriggerCreate, securityContext);
     return scenarioToTriggerService.createScenarioToTrigger(
         scenarioToTriggerCreate, securityContext);
   }
 
   @Operation(summary = "updateScenarioToTrigger", description = "Updates ScenarioToTrigger")
-  @PutMapping("updateScenarioToTrigger")
   public ScenarioToTrigger updateScenarioToTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToTriggerUpdate scenarioToTriggerUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioToTriggerId = scenarioToTriggerUpdate.getId();
     ScenarioToTrigger scenarioToTrigger =
         scenarioToTriggerService.getByIdOrNull(
@@ -61,14 +61,12 @@ public class ScenarioToTriggerController implements Plugin {
         scenarioToTriggerUpdate, securityContext);
   }
 
-  @Operation(
-      summary = "getAllScenarioToTriggers",
-      description = "Gets All ScenarioToTriggers Filtered")
-  @PostMapping("getAllScenarioToTriggers")
-  public PaginationResponse<ScenarioToTrigger> getAllScenarioToTriggers(
+  @Operation(summary = "getAllScenarioToTrigger", description = "lists ScenarioToTrigger")
+  public PaginationResponse<ScenarioToTrigger> getAllScenarioToTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToTriggerFilter scenarioToTriggerFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToTriggerService.validate(scenarioToTriggerFilter, securityContext);
     return scenarioToTriggerService.getAllScenarioToTriggers(
         scenarioToTriggerFilter, securityContext);

@@ -3,7 +3,10 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
-import com.flexicore.rules.model.*;
+import com.flexicore.rules.model.Scenario;
+import com.flexicore.rules.model.ScenarioToTrigger;
+import com.flexicore.rules.model.ScenarioToTrigger_;
+import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.request.ScenarioToTriggerFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -25,18 +28,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScenarioToTriggerRepository implements Plugin, IScenarioToTriggerRepository {
+public class ScenarioToTriggerRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List ScenarioToScenarioTrigger
+   * @param filtering Object Used to List ScenarioToTrigger
    * @param securityContext
    * @return List of ScenarioToTrigger
    */
-  @Override
   public List<ScenarioToTrigger> listAllScenarioToTriggers(
-      ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioToTrigger> q = cb.createQuery(ScenarioToTrigger.class);
     Root<ScenarioToTrigger> r = q.from(ScenarioToTrigger.class);
@@ -48,17 +50,16 @@ public class ScenarioToTriggerRepository implements Plugin, IScenarioToTriggerRe
     return query.getResultList();
   }
 
-  @Override
   public <T extends ScenarioToTrigger> void addScenarioToTriggerPredicate(
-      ScenarioToTriggerFilter filtering,
-      CriteriaBuilder cb,
-      CommonAbstractCriteria q,
-      From<?, T> r,
-      List<Predicate> preds,
-      SecurityContextBase securityContext) {
+          ScenarioToTriggerFilter scenarioToTriggerFilter,
+          CriteriaBuilder cb,
+          CommonAbstractCriteria q,
+          From<?, T> r,
+          List<Predicate> preds,
+          SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(
-        filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+
     if (filtering.getFiring() != null ) {
 
       preds.add(cb.equal(r.get(ScenarioToTrigger_.firing),filtering.getFiring()));
@@ -72,30 +73,41 @@ public class ScenarioToTriggerRepository implements Plugin, IScenarioToTriggerRe
 
       preds.add(cb.isFalse(join.get(Scenario_.softDelete)));
     }
-    if (filtering.getScenario() != null && !filtering.getScenario().isEmpty()) {
+
+    if (scenarioToTriggerFilter.getScenarioTrigger() != null
+            && !scenarioToTriggerFilter.getScenarioTrigger().isEmpty()) {
       Set<String> ids =
-          filtering.getScenario().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
+              scenarioToTriggerFilter.getScenarioTrigger().parallelStream()
+                      .map(f -> f.getId())
+                      .collect(Collectors.toSet());
+      Join<T, ScenarioTrigger> join = r.join(ScenarioToTrigger_.scenarioTrigger);
+      preds.add(join.get(Basic_.id).in(ids));
+    }
+
+    if (scenarioToTriggerFilter.getScenario() != null
+            && !scenarioToTriggerFilter.getScenario().isEmpty()) {
+      Set<String> ids =
+              scenarioToTriggerFilter.getScenario().parallelStream()
+                      .map(f -> f.getId())
+                      .collect(Collectors.toSet());
       Join<T, Scenario> join = r.join(ScenarioToTrigger_.scenario);
       preds.add(join.get(Basic_.id).in(ids));
     }
 
-    if (filtering.getScenarioTrigger() != null && !filtering.getScenarioTrigger().isEmpty()) {
-      Set<String> ids =
-          filtering.getScenarioTrigger().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, ScenarioTrigger> join = r.join(ScenarioToTrigger_.scenarioTrigger);
-      preds.add(join.get(Basic_.id).in(ids));
+    if (scenarioToTriggerFilter.getOrdinal() != null
+            && !scenarioToTriggerFilter.getOrdinal().isEmpty()) {
+      preds.add(r.get(ScenarioToTrigger_.ordinal).in(scenarioToTriggerFilter.getOrdinal()));
     }
+
+
   }
   /**
-   * @param filtering Object Used to List ScenarioToScenarioTrigger
+   * @param filtering Object Used to List ScenarioToTrigger
    * @param securityContext
    * @return count of ScenarioToTrigger
    */
-  @Override
   public Long countAllScenarioToTriggers(
-      ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioToTrigger> r = q.from(ScenarioToTrigger.class);
@@ -106,59 +118,50 @@ public class ScenarioToTriggerRepository implements Plugin, IScenarioToTriggerRe
     return query.getSingleResult();
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+          Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+          String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
-      String id,
-      Class<T> c,
-      SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+          String id,
+          Class<T> c,
+          SingularAttribute<D, E> baseclassAttribute,
+          SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
-      Class<T> c,
-      Set<String> ids,
-      SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+          Class<T> c,
+          Set<String> ids,
+          SingularAttribute<D, E> baseclassAttribute,
+          SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
-      Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
+          Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);

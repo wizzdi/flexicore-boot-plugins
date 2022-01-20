@@ -37,7 +37,7 @@ public class ScenarioToActionFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioToActionFilter> T setScenarioAction(
-      List<ScenarioAction> scenarioAction) {
+          List<ScenarioAction> scenarioAction) {
     this.scenarioAction = scenarioAction;
     return (T) this;
   }
@@ -75,7 +75,7 @@ public class ScenarioToActionFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioToActionFilter> T setBasicPropertiesFilter(
-      BasicPropertiesFilter basicPropertiesFilter) {
+          BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }

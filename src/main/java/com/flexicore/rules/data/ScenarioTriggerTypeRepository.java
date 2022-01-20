@@ -3,6 +3,7 @@ package com.flexicore.rules.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.rules.model.ScenarioTriggerType;
+import com.flexicore.rules.model.ScenarioTriggerType_;
 import com.flexicore.rules.request.ScenarioTriggerTypeFilter;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTypeRepository {
+public class ScenarioTriggerTypeRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
@@ -32,7 +33,6 @@ public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTy
    * @param securityContext
    * @return List of ScenarioTriggerType
    */
-  @Override
   public List<ScenarioTriggerType> listAllScenarioTriggerTypes(
       ScenarioTriggerTypeFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -46,24 +46,28 @@ public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTy
     return query.getResultList();
   }
 
-  @Override
   public <T extends ScenarioTriggerType> void addScenarioTriggerTypePredicate(
-      ScenarioTriggerTypeFilter filtering,
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(
-        filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
+
+    if (scenarioTriggerTypeFilter.getEventCanonicalName() != null
+        && !scenarioTriggerTypeFilter.getEventCanonicalName().isEmpty()) {
+      preds.add(
+          r.get(ScenarioTriggerType_.eventCanonicalName)
+              .in(scenarioTriggerTypeFilter.getEventCanonicalName()));
+    }
   }
   /**
    * @param filtering Object Used to List ScenarioTriggerType
    * @param securityContext
    * @return count of ScenarioTriggerType
    */
-  @Override
   public Long countAllScenarioTriggerTypes(
       ScenarioTriggerTypeFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -76,19 +80,16 @@ public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTy
     return query.getSingleResult();
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -97,7 +98,6 @@ public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTy
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -106,29 +106,24 @@ public class ScenarioTriggerTypeRepository implements Plugin, IScenarioTriggerTy
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);

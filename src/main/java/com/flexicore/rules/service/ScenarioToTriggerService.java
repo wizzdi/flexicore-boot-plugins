@@ -32,18 +32,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerService {
+public class ScenarioToTriggerService implements Plugin {
 
   @Autowired private ScenarioToTriggerRepository repository;
 
   @Autowired private BasicService basicService;
 
   /**
-   * @param scenarioToTriggerCreate Object Used to Create ScenarioToScenarioTrigger
+   * @param scenarioToTriggerCreate Object Used to Create ScenarioToTrigger
    * @param securityContext
    * @return created ScenarioToTrigger
    */
-  @Override
   public ScenarioToTrigger createScenarioToTrigger(
       ScenarioToTriggerCreate scenarioToTriggerCreate, SecurityContextBase securityContext) {
     ScenarioToTrigger scenarioToTrigger =
@@ -53,11 +52,10 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
   }
 
   /**
-   * @param scenarioToTriggerCreate Object Used to Create ScenarioToScenarioTrigger
+   * @param scenarioToTriggerCreate Object Used to Create ScenarioToTrigger
    * @param securityContext
    * @return created ScenarioToTrigger unmerged
    */
-  @Override
   public ScenarioToTrigger createScenarioToTriggerNoMerge(
       ScenarioToTriggerCreate scenarioToTriggerCreate, SecurityContextBase securityContext) {
     ScenarioToTrigger scenarioToTrigger = new ScenarioToTrigger();
@@ -70,24 +68,13 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
   }
 
   /**
-   * @param scenarioToTriggerCreate Object Used to Create ScenarioToScenarioTrigger
+   * @param scenarioToTriggerCreate Object Used to Create ScenarioToTrigger
    * @param scenarioToTrigger
    * @return if scenarioToTrigger was updated
    */
-  @Override
   public boolean updateScenarioToTriggerNoMerge(
       ScenarioToTrigger scenarioToTrigger, ScenarioToTriggerCreate scenarioToTriggerCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioToTriggerCreate, scenarioToTrigger);
-
-    if (scenarioToTriggerCreate.getScenario() != null
-        && (scenarioToTrigger.getScenario() == null
-            || !scenarioToTriggerCreate
-                .getScenario()
-                .getId()
-                .equals(scenarioToTrigger.getScenario().getId()))) {
-      scenarioToTrigger.setScenario(scenarioToTriggerCreate.getScenario());
-      update = true;
-    }
 
     if (scenarioToTriggerCreate.getScenarioTrigger() != null
         && (scenarioToTrigger.getScenarioTrigger() == null
@@ -99,21 +86,13 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
       update = true;
     }
 
-    if (scenarioToTriggerCreate.getOrdinal() != null
-        && (!scenarioToTriggerCreate.getOrdinal().equals(scenarioToTrigger.getOrdinal()))) {
-      scenarioToTrigger.setOrdinal(scenarioToTriggerCreate.getOrdinal());
-      update = true;
-    }
-
-    if (scenarioToTriggerCreate.isEnabled() != null
-        && (!scenarioToTriggerCreate.isEnabled().equals(scenarioToTrigger.isEnabled()))) {
-      scenarioToTrigger.setEnabled(scenarioToTriggerCreate.isEnabled());
-      update = true;
-    }
-
-    if (scenarioToTriggerCreate.isFiring() != null
-        && (!scenarioToTriggerCreate.isFiring().equals(scenarioToTrigger.isFiring()))) {
-      scenarioToTrigger.setFiring(scenarioToTriggerCreate.isFiring());
+    if (scenarioToTriggerCreate.getScenario() != null
+        && (scenarioToTrigger.getScenario() == null
+            || !scenarioToTriggerCreate
+                .getScenario()
+                .getId()
+                .equals(scenarioToTrigger.getScenario().getId()))) {
+      scenarioToTrigger.setScenario(scenarioToTriggerCreate.getScenario());
       update = true;
     }
 
@@ -124,7 +103,6 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
    * @param securityContext
    * @return scenarioToTrigger
    */
-  @Override
   public ScenarioToTrigger updateScenarioToTrigger(
       ScenarioToTriggerUpdate scenarioToTriggerUpdate, SecurityContextBase securityContext) {
     ScenarioToTrigger scenarioToTrigger = scenarioToTriggerUpdate.getScenarioToTrigger();
@@ -135,11 +113,10 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
   }
 
   /**
-   * @param scenarioToTriggerFilter Object Used to List ScenarioToScenarioTrigger
+   * @param scenarioToTriggerFilter Object Used to List ScenarioToTrigger
    * @param securityContext
    * @return PaginationResponse containing paging information for ScenarioToTrigger
    */
-  @Override
   public PaginationResponse<ScenarioToTrigger> getAllScenarioToTriggers(
       ScenarioToTriggerFilter scenarioToTriggerFilter, SecurityContextBase securityContext) {
     List<ScenarioToTrigger> list =
@@ -150,43 +127,24 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
   }
 
   /**
-   * @param scenarioToTriggerFilter Object Used to List ScenarioToScenarioTrigger
+   * @param scenarioToTriggerFilter Object Used to List ScenarioToTrigger
    * @param securityContext
    * @return List of ScenarioToTrigger
    */
-  @Override
   public List<ScenarioToTrigger> listAllScenarioToTriggers(
       ScenarioToTriggerFilter scenarioToTriggerFilter, SecurityContextBase securityContext) {
     return this.repository.listAllScenarioToTriggers(scenarioToTriggerFilter, securityContext);
   }
 
   /**
-   * @param scenarioToTriggerFilter Object Used to List ScenarioToScenarioTrigger
+   * @param scenarioToTriggerFilter Object Used to List ScenarioToTrigger
    * @param securityContext
    * @throws ResponseStatusException if scenarioToTriggerFilter is not valid
    */
-  @Override
   public void validate(
       ScenarioToTriggerFilter scenarioToTriggerFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioToTriggerFilter, securityContext);
 
-    Set<String> scenarioIds =
-        scenarioToTriggerFilter.getScenarioIds() == null
-            ? new HashSet<>()
-            : scenarioToTriggerFilter.getScenarioIds();
-    Map<String, Scenario> scenario =
-        scenarioIds.isEmpty()
-            ? new HashMap<>()
-            : this.repository
-                .listByIds(Scenario.class, scenarioIds, SecuredBasic_.security, securityContext)
-                .parallelStream()
-                .collect(Collectors.toMap(f -> f.getId(), f -> f));
-    scenarioIds.removeAll(scenario.keySet());
-    if (!scenarioIds.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No Scenario with ids " + scenarioIds);
-    }
-    scenarioToTriggerFilter.setScenario(new ArrayList<>(scenario.values()));
     Set<String> scenarioTriggerIds =
         scenarioToTriggerFilter.getScenarioTriggerIds() == null
             ? new HashSet<>()
@@ -205,32 +163,35 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
     scenarioTriggerIds.removeAll(scenarioTrigger.keySet());
     if (!scenarioTriggerIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No ScenarioTrigger with ids " + scenarioTriggerIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + scenarioTriggerIds);
     }
     scenarioToTriggerFilter.setScenarioTrigger(new ArrayList<>(scenarioTrigger.values()));
+    Set<String> scenarioIds =
+        scenarioToTriggerFilter.getScenarioIds() == null
+            ? new HashSet<>()
+            : scenarioToTriggerFilter.getScenarioIds();
+    Map<String, Scenario> scenario =
+        scenarioIds.isEmpty()
+            ? new HashMap<>()
+            : this.repository
+                .listByIds(Scenario.class, scenarioIds, SecuredBasic_.security, securityContext)
+                .parallelStream()
+                .collect(Collectors.toMap(f -> f.getId(), f -> f));
+    scenarioIds.removeAll(scenario.keySet());
+    if (!scenarioIds.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Set with ids " + scenarioIds);
+    }
+    scenarioToTriggerFilter.setScenario(new ArrayList<>(scenario.values()));
   }
 
   /**
-   * @param scenarioToTriggerCreate Object Used to Create ScenarioToScenarioTrigger
+   * @param scenarioToTriggerCreate Object Used to Create ScenarioToTrigger
    * @param securityContext
    * @throws ResponseStatusException if scenarioToTriggerCreate is not valid
    */
-  @Override
   public void validate(
       ScenarioToTriggerCreate scenarioToTriggerCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioToTriggerCreate, securityContext);
-
-    String scenarioId = scenarioToTriggerCreate.getScenarioId();
-    Scenario scenario =
-        scenarioId == null
-            ? null
-            : this.repository.getByIdOrNull(
-                scenarioId, Scenario.class, SecuredBasic_.security, securityContext);
-    if (scenarioId != null && scenario == null) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No Scenario with id " + scenarioId);
-    }
-    scenarioToTriggerCreate.setScenario(scenario);
 
     String scenarioTriggerId = scenarioToTriggerCreate.getScenarioTriggerId();
     ScenarioTrigger scenarioTrigger =
@@ -243,21 +204,30 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
           HttpStatus.BAD_REQUEST, "No ScenarioTrigger with id " + scenarioTriggerId);
     }
     scenarioToTriggerCreate.setScenarioTrigger(scenarioTrigger);
+
+    String scenarioId = scenarioToTriggerCreate.getScenarioId();
+    Scenario scenario =
+        scenarioId == null
+            ? null
+            : this.repository.getByIdOrNull(
+                scenarioId, Scenario.class, SecuredBasic_.security, securityContext);
+    if (scenarioId != null && scenario == null) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "No Scenario with id " + scenarioId);
+    }
+    scenarioToTriggerCreate.setScenario(scenario);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -266,7 +236,6 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -275,28 +244,23 @@ public class ScenarioToTriggerService implements Plugin, IScenarioToTriggerServi
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

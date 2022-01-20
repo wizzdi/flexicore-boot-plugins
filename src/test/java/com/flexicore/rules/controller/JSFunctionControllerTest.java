@@ -91,12 +91,10 @@ public class JSFunctionControllerTest {
     Assertions.assertNotNull(testJSFunction);
 
     if (request.getReturnType() != null) {
-
       Assertions.assertEquals(request.getReturnType(), testJSFunction.getReturnType());
     }
 
     if (request.getMethodName() != null) {
-
       Assertions.assertEquals(request.getMethodName(), testJSFunction.getMethodName());
     }
   }

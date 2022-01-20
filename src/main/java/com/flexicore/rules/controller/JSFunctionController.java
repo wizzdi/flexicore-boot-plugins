@@ -27,22 +27,22 @@ public class JSFunctionController implements Plugin {
 
   @Autowired private JSFunctionService jSFunctionService;
 
-  @PostMapping("createJSFunction")
   @Operation(summary = "createJSFunction", description = "Creates JSFunction")
   public JSFunction createJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionCreate jSFunctionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     jSFunctionService.validate(jSFunctionCreate, securityContext);
     return jSFunctionService.createJSFunction(jSFunctionCreate, securityContext);
   }
 
   @Operation(summary = "updateJSFunction", description = "Updates JSFunction")
-  @PutMapping("updateJSFunction")
   public JSFunction updateJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionUpdate jSFunctionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String jSFunctionId = jSFunctionUpdate.getId();
     JSFunction jSFunction =
         jSFunctionService.getByIdOrNull(
@@ -56,12 +56,12 @@ public class JSFunctionController implements Plugin {
     return jSFunctionService.updateJSFunction(jSFunctionUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllJSFunctions", description = "Gets All JSFunctions Filtered")
-  @PostMapping("getAllJSFunctions")
-  public PaginationResponse<JSFunction> getAllJSFunctions(
+  @Operation(summary = "getAllJSFunction", description = "lists JSFunction")
+  public PaginationResponse<JSFunction> getAllJSFunction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionFilter jSFunctionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     jSFunctionService.validate(jSFunctionFilter, securityContext);
     return jSFunctionService.getAllJSFunctions(jSFunctionFilter, securityContext);
   }

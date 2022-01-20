@@ -32,18 +32,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourceService {
+public class ScenarioToDataSourceService implements Plugin {
 
   @Autowired private ScenarioToDataSourceRepository repository;
 
   @Autowired private BasicService basicService;
 
   /**
-   * @param scenarioToDataSourceCreate Object Used to Create ScenarioActionToDataSource
+   * @param scenarioToDataSourceCreate Object Used to Create ScenarioToDataSource
    * @param securityContext
    * @return created ScenarioToDataSource
    */
-  @Override
   public ScenarioToDataSource createScenarioToDataSource(
       ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
     ScenarioToDataSource scenarioToDataSource =
@@ -53,11 +52,10 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
   }
 
   /**
-   * @param scenarioToDataSourceCreate Object Used to Create ScenarioActionToDataSource
+   * @param scenarioToDataSourceCreate Object Used to Create ScenarioToDataSource
    * @param securityContext
    * @return created ScenarioToDataSource unmerged
    */
-  @Override
   public ScenarioToDataSource createScenarioToDataSourceNoMerge(
       ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
     ScenarioToDataSource scenarioToDataSource = new ScenarioToDataSource();
@@ -70,11 +68,10 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
   }
 
   /**
-   * @param scenarioToDataSourceCreate Object Used to Create ScenarioActionToDataSource
+   * @param scenarioToDataSourceCreate Object Used to Create ScenarioToDataSource
    * @param scenarioToDataSource
    * @return if scenarioToDataSource was updated
    */
-  @Override
   public boolean updateScenarioToDataSourceNoMerge(
       ScenarioToDataSource scenarioToDataSource,
       ScenarioToDataSourceCreate scenarioToDataSourceCreate) {
@@ -101,18 +98,6 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
       update = true;
     }
 
-    if (scenarioToDataSourceCreate.isEnabled() != null
-        && (!scenarioToDataSourceCreate.isEnabled().equals(scenarioToDataSource.isEnabled()))) {
-      scenarioToDataSource.setEnabled(scenarioToDataSourceCreate.isEnabled());
-      update = true;
-    }
-
-    if (scenarioToDataSourceCreate.getOrdinal() != null
-        && (!scenarioToDataSourceCreate.getOrdinal().equals(scenarioToDataSource.getOrdinal()))) {
-      scenarioToDataSource.setOrdinal(scenarioToDataSourceCreate.getOrdinal());
-      update = true;
-    }
-
     return update;
   }
   /**
@@ -120,7 +105,6 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
    * @param securityContext
    * @return scenarioToDataSource
    */
-  @Override
   public ScenarioToDataSource updateScenarioToDataSource(
       ScenarioToDataSourceUpdate scenarioToDataSourceUpdate, SecurityContextBase securityContext) {
     ScenarioToDataSource scenarioToDataSource =
@@ -132,11 +116,10 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
   }
 
   /**
-   * @param scenarioToDataSourceFilter Object Used to List ScenarioActionToDataSource
+   * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return PaginationResponse containing paging information for ScenarioToDataSource
    */
-  @Override
   public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
       ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
     List<ScenarioToDataSource> list =
@@ -147,11 +130,10 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
   }
 
   /**
-   * @param scenarioToDataSourceFilter Object Used to List ScenarioActionToDataSource
+   * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
    * @return List of ScenarioToDataSource
    */
-  @Override
   public List<ScenarioToDataSource> listAllScenarioToDataSources(
       ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
     return this.repository.listAllScenarioToDataSources(
@@ -159,11 +141,10 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
   }
 
   /**
-   * @param scenarioToDataSourceFilter Object Used to List ScenarioActionToDataSource
+   * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
    * @throws ResponseStatusException if scenarioToDataSourceFilter is not valid
    */
-  @Override
   public void validate(
       ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioToDataSourceFilter, securityContext);
@@ -181,8 +162,7 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     dataSourceIds.removeAll(dataSource.keySet());
     if (!dataSourceIds.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No DataSource with ids " + dataSourceIds);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Set with ids " + dataSourceIds);
     }
     scenarioToDataSourceFilter.setDataSource(new ArrayList<>(dataSource.values()));
     Set<String> scenarioIds =
@@ -198,18 +178,16 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     scenarioIds.removeAll(scenario.keySet());
     if (!scenarioIds.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No Scenario with ids " + scenarioIds);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Set with ids " + scenarioIds);
     }
     scenarioToDataSourceFilter.setScenario(new ArrayList<>(scenario.values()));
   }
 
   /**
-   * @param scenarioToDataSourceCreate Object Used to Create ScenarioActionToDataSource
+   * @param scenarioToDataSourceCreate Object Used to Create ScenarioToDataSource
    * @param securityContext
    * @throws ResponseStatusException if scenarioToDataSourceCreate is not valid
    */
-  @Override
   public void validate(
       ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioToDataSourceCreate, securityContext);
@@ -239,19 +217,16 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
     scenarioToDataSourceCreate.setScenario(scenario);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -260,7 +235,6 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -269,28 +243,23 @@ public class ScenarioToDataSourceService implements Plugin, IScenarioToDataSourc
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

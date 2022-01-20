@@ -62,9 +62,9 @@ public class JSFunctionParameterControllerTest {
 
     request.setOrdinal(10);
 
-    request.setJsFunctionId(this.jSFunction.getId());
-
     request.setParameterType("test-string");
+
+    request.setJsFunctionId(this.jSFunction.getId());
 
     ResponseEntity<JSFunctionParameter> response =
         this.restTemplate.postForEntity(
@@ -102,8 +102,12 @@ public class JSFunctionParameterControllerTest {
     Assertions.assertNotNull(testJSFunctionParameter);
 
     if (request.getOrdinal() != null) {
-
       Assertions.assertEquals(request.getOrdinal(), testJSFunctionParameter.getOrdinal());
+    }
+
+    if (request.getParameterType() != null) {
+      Assertions.assertEquals(
+          request.getParameterType(), testJSFunctionParameter.getParameterType());
     }
 
     if (request.getJsFunctionId() != null) {
@@ -111,12 +115,6 @@ public class JSFunctionParameterControllerTest {
       Assertions.assertNotNull(testJSFunctionParameter.getJsFunction());
       Assertions.assertEquals(
           request.getJsFunctionId(), testJSFunctionParameter.getJsFunction().getId());
-    }
-
-    if (request.getParameterType() != null) {
-
-      Assertions.assertEquals(
-          request.getParameterType(), testJSFunctionParameter.getParameterType());
     }
   }
 

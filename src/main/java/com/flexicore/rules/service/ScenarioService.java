@@ -31,7 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScenarioService implements Plugin, IScenarioService {
+public class ScenarioService implements Plugin {
 
   @Autowired private ScenarioRepository repository;
 
@@ -42,7 +42,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @return created Scenario
    */
-  @Override
   public Scenario createScenario(
       ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
     Scenario scenario = createScenarioNoMerge(scenarioCreate, securityContext);
@@ -55,7 +54,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @return created Scenario unmerged
    */
-  @Override
   public Scenario createScenarioNoMerge(
       ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
     Scenario scenario = new Scenario();
@@ -72,13 +70,16 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param scenario
    * @return if scenario was updated
    */
-  @Override
   public boolean updateScenarioNoMerge(Scenario scenario, ScenarioCreate scenarioCreate) {
     boolean update = basicService.updateBasicNoMerge(scenarioCreate, scenario);
 
-    if (scenarioCreate.getScenarioHint() != null
-        && (!scenarioCreate.getScenarioHint().equals(scenario.getScenarioHint()))) {
-      scenario.setScenarioHint(scenarioCreate.getScenarioHint());
+    if (scenarioCreate.getEvaluatingJSCode() != null
+        && (scenario.getEvaluatingJSCode() == null
+            || !scenarioCreate
+                .getEvaluatingJSCode()
+                .getId()
+                .equals(scenario.getEvaluatingJSCode().getId()))) {
+      scenario.setEvaluatingJSCode(scenarioCreate.getEvaluatingJSCode());
       update = true;
     }
 
@@ -92,16 +93,6 @@ public class ScenarioService implements Plugin, IScenarioService {
       update = true;
     }
 
-    if (scenarioCreate.getEvaluatingJSCode() != null
-        && (scenario.getEvaluatingJSCode() == null
-            || !scenarioCreate
-                .getEvaluatingJSCode()
-                .getId()
-                .equals(scenario.getEvaluatingJSCode().getId()))) {
-      scenario.setEvaluatingJSCode(scenarioCreate.getEvaluatingJSCode());
-      update = true;
-    }
-
     return update;
   }
   /**
@@ -109,7 +100,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @return scenario
    */
-  @Override
   public Scenario updateScenario(
       ScenarioUpdate scenarioUpdate, SecurityContextBase securityContext) {
     Scenario scenario = scenarioUpdate.getScenario();
@@ -124,7 +114,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @return PaginationResponse containing paging information for Scenario
    */
-  @Override
   public PaginationResponse<Scenario> getAllScenarios(
       ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
     List<Scenario> list = listAllScenarios(scenarioFilter, securityContext);
@@ -137,7 +126,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @return List of Scenario
    */
-  @Override
   public List<Scenario> listAllScenarios(
       ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
     return this.repository.listAllScenarios(scenarioFilter, securityContext);
@@ -148,7 +136,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @throws ResponseStatusException if scenarioFilter is not valid
    */
-  @Override
   public void validate(ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioFilter, securityContext);
 
@@ -170,7 +157,7 @@ public class ScenarioService implements Plugin, IScenarioService {
     evaluatingJSCodeIds.removeAll(evaluatingJSCode.keySet());
     if (!evaluatingJSCodeIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + evaluatingJSCodeIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + evaluatingJSCodeIds);
     }
     scenarioFilter.setEvaluatingJSCode(new ArrayList<>(evaluatingJSCode.values()));
     Set<String> logFileResourceIds =
@@ -188,7 +175,7 @@ public class ScenarioService implements Plugin, IScenarioService {
     logFileResourceIds.removeAll(logFileResource.keySet());
     if (!logFileResourceIds.isEmpty()) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with ids " + logFileResourceIds);
+          HttpStatus.BAD_REQUEST, "No Set with ids " + logFileResourceIds);
     }
     scenarioFilter.setLogFileResource(new ArrayList<>(logFileResource.values()));
   }
@@ -198,7 +185,6 @@ public class ScenarioService implements Plugin, IScenarioService {
    * @param securityContext
    * @throws ResponseStatusException if scenarioCreate is not valid
    */
-  @Override
   public void validate(ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioCreate, securityContext);
 
@@ -227,19 +213,16 @@ public class ScenarioService implements Plugin, IScenarioService {
     scenarioCreate.setLogFileResource(logFileResource);
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -248,7 +231,6 @@ public class ScenarioService implements Plugin, IScenarioService {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -257,28 +239,23 @@ public class ScenarioService implements Plugin, IScenarioService {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return this.repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return this.repository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return this.repository.findByIdOrNull(type, id);
   }
 
-  @Override
   public void merge(java.lang.Object base) {
     this.repository.merge(base);
   }
 
-  @Override
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
   }

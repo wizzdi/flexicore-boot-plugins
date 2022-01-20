@@ -87,7 +87,7 @@ public class ScenarioTriggerCreate extends BasicCreate {
   }
 
   public <T extends ScenarioTriggerCreate> T setScenarioTriggerType(
-      ScenarioTriggerType scenarioTriggerType) {
+          ScenarioTriggerType scenarioTriggerType) {
     this.scenarioTriggerType = scenarioTriggerType;
     return (T) this;
   }
@@ -106,7 +106,7 @@ public class ScenarioTriggerCreate extends BasicCreate {
   }
 
   public <T extends ScenarioTriggerCreate> T setScenarioTriggerTypeId(
-      String scenarioTriggerTypeId) {
+          String scenarioTriggerTypeId) {
     this.scenarioTriggerTypeId = scenarioTriggerTypeId;
     return (T) this;
   }

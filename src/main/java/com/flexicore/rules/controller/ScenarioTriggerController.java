@@ -27,22 +27,22 @@ public class ScenarioTriggerController implements Plugin {
 
   @Autowired private ScenarioTriggerService scenarioTriggerService;
 
-  @PostMapping("createScenarioTrigger")
   @Operation(summary = "createScenarioTrigger", description = "Creates ScenarioTrigger")
   public ScenarioTrigger createScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioTriggerCreate scenarioTriggerCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioTriggerService.validate(scenarioTriggerCreate, securityContext);
     return scenarioTriggerService.createScenarioTrigger(scenarioTriggerCreate, securityContext);
   }
 
   @Operation(summary = "updateScenarioTrigger", description = "Updates ScenarioTrigger")
-  @PutMapping("updateScenarioTrigger")
   public ScenarioTrigger updateScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioTriggerUpdate scenarioTriggerUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioTriggerId = scenarioTriggerUpdate.getId();
     ScenarioTrigger scenarioTrigger =
         scenarioTriggerService.getByIdOrNull(
@@ -56,12 +56,12 @@ public class ScenarioTriggerController implements Plugin {
     return scenarioTriggerService.updateScenarioTrigger(scenarioTriggerUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllScenarioTriggers", description = "Gets All ScenarioTriggers Filtered")
-  @PostMapping("getAllScenarioTriggers")
-  public PaginationResponse<ScenarioTrigger> getAllScenarioTriggers(
+  @Operation(summary = "getAllScenarioTrigger", description = "lists ScenarioTrigger")
+  public PaginationResponse<ScenarioTrigger> getAllScenarioTrigger(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioTriggerFilter scenarioTriggerFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioTriggerService.validate(scenarioTriggerFilter, securityContext);
     return scenarioTriggerService.getAllScenarioTriggers(scenarioTriggerFilter, securityContext);
   }

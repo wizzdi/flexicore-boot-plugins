@@ -27,22 +27,22 @@ public class DataSourceController implements Plugin {
 
   @Autowired private DataSourceService dataSourceService;
 
-  @PostMapping("createDataSource")
   @Operation(summary = "createDataSource", description = "Creates DataSource")
   public DataSource createDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody DataSourceCreate dataSourceCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     dataSourceService.validate(dataSourceCreate, securityContext);
     return dataSourceService.createDataSource(dataSourceCreate, securityContext);
   }
 
   @Operation(summary = "updateDataSource", description = "Updates DataSource")
-  @PutMapping("updateDataSource")
   public DataSource updateDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody DataSourceUpdate dataSourceUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String dataSourceId = dataSourceUpdate.getId();
     DataSource dataSource =
         dataSourceService.getByIdOrNull(
@@ -56,12 +56,12 @@ public class DataSourceController implements Plugin {
     return dataSourceService.updateDataSource(dataSourceUpdate, securityContext);
   }
 
-  @Operation(summary = "getAllDataSources", description = "Gets All DataSources Filtered")
-  @PostMapping("getAllDataSources")
-  public PaginationResponse<DataSource> getAllDataSources(
+  @Operation(summary = "getAllDataSource", description = "lists DataSource")
+  public PaginationResponse<DataSource> getAllDataSource(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody DataSourceFilter dataSourceFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     dataSourceService.validate(dataSourceFilter, securityContext);
     return dataSourceService.getAllDataSources(dataSourceFilter, securityContext);
   }

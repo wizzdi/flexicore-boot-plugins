@@ -92,7 +92,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setScenarioTriggerType(
-      List<ScenarioTriggerType> scenarioTriggerType) {
+          List<ScenarioTriggerType> scenarioTriggerType) {
     this.scenarioTriggerType = scenarioTriggerType;
     return (T) this;
   }
@@ -111,7 +111,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setScenarioTriggerTypeIds(
-      Set<String> scenarioTriggerTypeIds) {
+          Set<String> scenarioTriggerTypeIds) {
     this.scenarioTriggerTypeIds = scenarioTriggerTypeIds;
     return (T) this;
   }
@@ -121,7 +121,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setEvaluatingJSCodeIds(
-      Set<String> evaluatingJSCodeIds) {
+          Set<String> evaluatingJSCodeIds) {
     this.evaluatingJSCodeIds = evaluatingJSCodeIds;
     return (T) this;
   }
@@ -150,7 +150,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setLogFileResource(
-      List<FileResource> logFileResource) {
+          List<FileResource> logFileResource) {
     this.logFileResource = logFileResource;
     return (T) this;
   }
@@ -161,7 +161,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setEvaluatingJSCode(
-      List<FileResource> evaluatingJSCode) {
+          List<FileResource> evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
     return (T) this;
   }
@@ -171,7 +171,7 @@ public class ScenarioTriggerFilter extends PaginationFilter {
   }
 
   public <T extends ScenarioTriggerFilter> T setBasicPropertiesFilter(
-      BasicPropertiesFilter basicPropertiesFilter) {
+          BasicPropertiesFilter basicPropertiesFilter) {
     this.basicPropertiesFilter = basicPropertiesFilter;
     return (T) this;
   }

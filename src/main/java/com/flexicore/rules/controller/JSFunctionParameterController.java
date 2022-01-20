@@ -27,23 +27,23 @@ public class JSFunctionParameterController implements Plugin {
 
   @Autowired private JSFunctionParameterService jSFunctionParameterService;
 
-  @PostMapping("createJSFunctionParameter")
   @Operation(summary = "createJSFunctionParameter", description = "Creates JSFunctionParameter")
   public JSFunctionParameter createJSFunctionParameter(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionParameterCreate jSFunctionParameterCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     jSFunctionParameterService.validate(jSFunctionParameterCreate, securityContext);
     return jSFunctionParameterService.createJSFunctionParameter(
         jSFunctionParameterCreate, securityContext);
   }
 
   @Operation(summary = "updateJSFunctionParameter", description = "Updates JSFunctionParameter")
-  @PutMapping("updateJSFunctionParameter")
   public JSFunctionParameter updateJSFunctionParameter(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionParameterUpdate jSFunctionParameterUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String jSFunctionParameterId = jSFunctionParameterUpdate.getId();
     JSFunctionParameter jSFunctionParameter =
         jSFunctionParameterService.getByIdOrNull(
@@ -61,14 +61,12 @@ public class JSFunctionParameterController implements Plugin {
         jSFunctionParameterUpdate, securityContext);
   }
 
-  @Operation(
-      summary = "getAllJSFunctionParameters",
-      description = "Gets All JSFunctionParameters Filtered")
-  @PostMapping("getAllJSFunctionParameters")
-  public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameters(
+  @Operation(summary = "getAllJSFunctionParameter", description = "lists JSFunctionParameter")
+  public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameter(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody JSFunctionParameterFilter jSFunctionParameterFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     jSFunctionParameterService.validate(jSFunctionParameterFilter, securityContext);
     return jSFunctionParameterService.getAllJSFunctionParameters(
         jSFunctionParameterFilter, securityContext);

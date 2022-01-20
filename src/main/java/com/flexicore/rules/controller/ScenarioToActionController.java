@@ -27,22 +27,22 @@ public class ScenarioToActionController implements Plugin {
 
   @Autowired private ScenarioToActionService scenarioToActionService;
 
-  @PostMapping("createScenarioToAction")
   @Operation(summary = "createScenarioToAction", description = "Creates ScenarioToAction")
   public ScenarioToAction createScenarioToAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToActionCreate scenarioToActionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToActionService.validate(scenarioToActionCreate, securityContext);
     return scenarioToActionService.createScenarioToAction(scenarioToActionCreate, securityContext);
   }
 
   @Operation(summary = "updateScenarioToAction", description = "Updates ScenarioToAction")
-  @PutMapping("updateScenarioToAction")
   public ScenarioToAction updateScenarioToAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToActionUpdate scenarioToActionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
+
     String scenarioToActionId = scenarioToActionUpdate.getId();
     ScenarioToAction scenarioToAction =
         scenarioToActionService.getByIdOrNull(
@@ -59,14 +59,12 @@ public class ScenarioToActionController implements Plugin {
     return scenarioToActionService.updateScenarioToAction(scenarioToActionUpdate, securityContext);
   }
 
-  @Operation(
-      summary = "getAllScenarioToActions",
-      description = "Gets All ScenarioToActions Filtered")
-  @PostMapping("getAllScenarioToActions")
-  public PaginationResponse<ScenarioToAction> getAllScenarioToActions(
+  @Operation(summary = "getAllScenarioToAction", description = "lists ScenarioToAction")
+  public PaginationResponse<ScenarioToAction> getAllScenarioToAction(
       @RequestHeader("authenticationKey") String authenticationKey,
       @RequestBody ScenarioToActionFilter scenarioToActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
+
     scenarioToActionService.validate(scenarioToActionFilter, securityContext);
     return scenarioToActionService.getAllScenarioToActions(scenarioToActionFilter, securityContext);
   }

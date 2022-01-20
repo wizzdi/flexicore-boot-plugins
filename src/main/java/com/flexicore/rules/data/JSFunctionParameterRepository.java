@@ -27,16 +27,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class JSFunctionParameterRepository implements Plugin, IJSFunctionParameterRepository {
+public class JSFunctionParameterRepository implements Plugin {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
   /**
-   * @param filtering Object Used to List JsFunctionParameter
+   * @param filtering Object Used to List JSFunctionParameter
    * @param securityContext
    * @return List of JSFunctionParameter
    */
-  @Override
   public List<JSFunctionParameter> listAllJSFunctionParameters(
       JSFunctionParameterFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -50,21 +49,32 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
     return query.getResultList();
   }
 
-  @Override
   public <T extends JSFunctionParameter> void addJSFunctionParameterPredicate(
-      JSFunctionParameterFilter filtering,
+      JSFunctionParameterFilter jSFunctionParameterFilter,
       CriteriaBuilder cb,
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
       SecurityContextBase securityContext) {
 
-    this.securedBasicRepository.addSecuredBasicPredicates(
-        filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+    this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
-    if (filtering.getJsFunction() != null && !filtering.getJsFunction().isEmpty()) {
+    if (jSFunctionParameterFilter.getOrdinal() != null
+        && !jSFunctionParameterFilter.getOrdinal().isEmpty()) {
+      preds.add(r.get(JSFunctionParameter_.ordinal).in(jSFunctionParameterFilter.getOrdinal()));
+    }
+
+    if (jSFunctionParameterFilter.getParameterType() != null
+        && !jSFunctionParameterFilter.getParameterType().isEmpty()) {
+      preds.add(
+          r.get(JSFunctionParameter_.parameterType)
+              .in(jSFunctionParameterFilter.getParameterType()));
+    }
+
+    if (jSFunctionParameterFilter.getJsFunction() != null
+        && !jSFunctionParameterFilter.getJsFunction().isEmpty()) {
       Set<String> ids =
-          filtering.getJsFunction().parallelStream()
+          jSFunctionParameterFilter.getJsFunction().parallelStream()
               .map(f -> f.getId())
               .collect(Collectors.toSet());
       Join<T, JSFunction> join = r.join(JSFunctionParameter_.jsFunction);
@@ -72,11 +82,10 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
     }
   }
   /**
-   * @param filtering Object Used to List JsFunctionParameter
+   * @param filtering Object Used to List JSFunctionParameter
    * @param securityContext
    * @return count of JSFunctionParameter
    */
-  @Override
   public Long countAllJSFunctionParameters(
       JSFunctionParameterFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -89,19 +98,16 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
     return query.getSingleResult();
   }
 
-  @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -110,7 +116,6 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -119,29 +124,24 @@ public class JSFunctionParameterRepository implements Plugin, IJSFunctionParamet
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);

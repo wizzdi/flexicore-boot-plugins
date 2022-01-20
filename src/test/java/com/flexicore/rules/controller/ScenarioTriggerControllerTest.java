@@ -10,7 +10,6 @@ import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.rules.request.ScenarioTriggerUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -41,19 +40,19 @@ public class ScenarioTriggerControllerTest {
   @BeforeAll
   private void init() {
     ResponseEntity<AuthenticationResponse> authenticationResponse =
-        this.restTemplate.postForEntity(
-            "/FlexiCore/rest/authenticationNew/login",
-            new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"),
-            AuthenticationResponse.class);
+            this.restTemplate.postForEntity(
+                    "/FlexiCore/rest/authenticationNew/login",
+                    new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"),
+                    AuthenticationResponse.class);
     String authenticationKey = authenticationResponse.getBody().getAuthenticationKey();
     restTemplate
-        .getRestTemplate()
-        .setInterceptors(
-            Collections.singletonList(
-                (request, body, execution) -> {
-                  request.getHeaders().add("authenticationKey", authenticationKey);
-                  return execution.execute(request, body);
-                }));
+            .getRestTemplate()
+            .setInterceptors(
+                    Collections.singletonList(
+                            (request, body, execution) -> {
+                              request.getHeaders().add("authenticationKey", authenticationKey);
+                              return execution.execute(request, body);
+                            }));
   }
 
   @Test
@@ -64,21 +63,23 @@ public class ScenarioTriggerControllerTest {
 
     request.setLastEventId("test-string");
 
+    request.setLastActivated(OffsetDateTime.now());
+
     request.setValidFrom(OffsetDateTime.now());
 
     request.setCooldownIntervalMs(10L);
-
-    request.setValidTill(OffsetDateTime.now());
-
-    request.setScenarioTriggerTypeId(this.scenarioTriggerType.getId());
 
     request.setActiveTill(OffsetDateTime.now());
 
     request.setActiveMs(10L);
 
+    request.setScenarioTriggerTypeId(this.scenarioTriggerType.getId());
+
+    request.setValidTill(OffsetDateTime.now());
+
     ResponseEntity<ScenarioTrigger> response =
-        this.restTemplate.postForEntity(
-            "/ScenarioTrigger/createScenarioTrigger", request, ScenarioTrigger.class);
+            this.restTemplate.postForEntity(
+                    "/ScenarioTrigger/createScenarioTrigger", request, ScenarioTrigger.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
     testScenarioTrigger = response.getBody();
     assertScenarioTrigger(request, testScenarioTrigger);
@@ -89,68 +90,61 @@ public class ScenarioTriggerControllerTest {
   public void testListAllScenarioTriggers() {
     ScenarioTriggerFilter request = new ScenarioTriggerFilter();
     ParameterizedTypeReference<PaginationResponse<ScenarioTrigger>> t =
-        new ParameterizedTypeReference<>() {};
+            new ParameterizedTypeReference<>() {};
 
     ResponseEntity<PaginationResponse<ScenarioTrigger>> response =
-        this.restTemplate.exchange(
-            "/ScenarioTrigger/getAllScenarioTriggers",
-            HttpMethod.POST,
-            new HttpEntity<>(request),
-            t);
+            this.restTemplate.exchange(
+                    "/ScenarioTrigger/getAllScenarioTriggers",
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    t);
     Assertions.assertEquals(200, response.getStatusCodeValue());
     PaginationResponse<ScenarioTrigger> body = response.getBody();
     Assertions.assertNotNull(body);
     List<ScenarioTrigger> ScenarioTriggers = body.getList();
     Assertions.assertNotEquals(0, ScenarioTriggers.size());
     Assertions.assertTrue(
-        ScenarioTriggers.stream().anyMatch(f -> f.getId().equals(testScenarioTrigger.getId())));
+            ScenarioTriggers.stream().anyMatch(f -> f.getId().equals(testScenarioTrigger.getId())));
   }
 
   public void assertScenarioTrigger(
-      ScenarioTriggerCreate request, ScenarioTrigger testScenarioTrigger) {
+          ScenarioTriggerCreate request, ScenarioTrigger testScenarioTrigger) {
     Assertions.assertNotNull(testScenarioTrigger);
 
     if (request.getLastEventId() != null) {
-
       Assertions.assertEquals(request.getLastEventId(), testScenarioTrigger.getLastEventId());
     }
 
     if (request.getLastActivated() != null) {
-
-      Assertions.assertEquals(request.getLastActivated().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getLastActivated().atZoneSameInstant(ZoneId.systemDefault()));
+      Assertions.assertEquals(request.getLastActivated(), testScenarioTrigger.getLastActivated());
     }
 
     if (request.getValidFrom() != null) {
-
-      Assertions.assertEquals(request.getValidFrom().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getValidFrom().atZoneSameInstant(ZoneId.systemDefault()));
+      Assertions.assertEquals(request.getValidFrom(), testScenarioTrigger.getValidFrom());
     }
 
     if (request.getCooldownIntervalMs() != null) {
-
       Assertions.assertEquals(
-          request.getCooldownIntervalMs(), testScenarioTrigger.getCooldownIntervalMs());
+              request.getCooldownIntervalMs(), testScenarioTrigger.getCooldownIntervalMs());
     }
 
-    if (request.getValidTill() != null) {
+    if (request.getActiveTill() != null) {
+      Assertions.assertEquals(request.getActiveTill(), testScenarioTrigger.getActiveTill());
+    }
 
-      Assertions.assertEquals(request.getValidTill().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getValidTill().atZoneSameInstant(ZoneId.systemDefault()));
+    if (request.getActiveMs() != null) {
+      Assertions.assertEquals(request.getActiveMs(), testScenarioTrigger.getActiveMs());
     }
 
     if (request.getScenarioTriggerTypeId() != null) {
 
       Assertions.assertNotNull(testScenarioTrigger.getScenarioTriggerType());
       Assertions.assertEquals(
-          request.getScenarioTriggerTypeId(), testScenarioTrigger.getScenarioTriggerType().getId());
+              request.getScenarioTriggerTypeId(), testScenarioTrigger.getScenarioTriggerType().getId());
     }
 
-    if (request.getActiveTill() != null) {
-
-      Assertions.assertEquals(request.getActiveTill().atZoneSameInstant(ZoneId.systemDefault()), testScenarioTrigger.getActiveTill().atZoneSameInstant(ZoneId.systemDefault()));
-    }
-
-    if (request.getActiveMs() != null) {
-
-      Assertions.assertEquals(request.getActiveMs(), testScenarioTrigger.getActiveMs());
+    if (request.getValidTill() != null) {
+      Assertions.assertEquals(request.getValidTill(), testScenarioTrigger.getValidTill());
     }
   }
 
@@ -159,13 +153,13 @@ public class ScenarioTriggerControllerTest {
   public void testScenarioTriggerUpdate() {
     String name = UUID.randomUUID().toString();
     ScenarioTriggerUpdate request =
-        new ScenarioTriggerUpdate().setId(testScenarioTrigger.getId()).setName(name);
+            new ScenarioTriggerUpdate().setId(testScenarioTrigger.getId()).setName(name);
     ResponseEntity<ScenarioTrigger> response =
-        this.restTemplate.exchange(
-            "/ScenarioTrigger/updateScenarioTrigger",
-            HttpMethod.PUT,
-            new HttpEntity<>(request),
-            ScenarioTrigger.class);
+            this.restTemplate.exchange(
+                    "/ScenarioTrigger/updateScenarioTrigger",
+                    HttpMethod.PUT,
+                    new HttpEntity<>(request),
+                    ScenarioTrigger.class);
     Assertions.assertEquals(200, response.getStatusCodeValue());
     testScenarioTrigger = response.getBody();
     assertScenarioTrigger(request, testScenarioTrigger);
