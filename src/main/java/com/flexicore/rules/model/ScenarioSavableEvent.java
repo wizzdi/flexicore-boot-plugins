@@ -9,10 +9,12 @@ import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity
 public class ScenarioSavableEvent extends SecuredBasic {
 
     @ManyToOne(targetEntity = ScenarioTrigger.class)
