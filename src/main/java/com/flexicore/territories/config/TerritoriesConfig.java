@@ -8,6 +8,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,6 +22,7 @@ public class TerritoriesConfig implements Plugin {
 		return new RestTemplate();
 	}
 
+	@Primary
 	@Bean
 	public ObjectMapper objectMapper(){
 		return new ObjectMapper()
