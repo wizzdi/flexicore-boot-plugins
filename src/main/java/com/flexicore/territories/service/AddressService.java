@@ -74,6 +74,7 @@ public class AddressService implements Plugin {
 	@Autowired
 	private RestTemplate restTemplate;
 	@Autowired
+	@Qualifier("xmlMapper")
 	private XmlMapper xmlMapper;
 
 

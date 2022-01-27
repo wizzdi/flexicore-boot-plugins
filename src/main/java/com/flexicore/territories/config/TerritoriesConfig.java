@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,6 +25,7 @@ public class TerritoriesConfig implements Plugin {
 
 	@Primary
 	@Bean
+	@Qualifier("objectMapper")
 	public ObjectMapper objectMapper(){
 		return new ObjectMapper()
 				.registerModule(new JavaTimeModule())
@@ -31,6 +33,7 @@ public class TerritoriesConfig implements Plugin {
 	}
 
 	@Bean
+	@Qualifier("xmlMapper")
 	public XmlMapper xmlMapper(){
 		return new XmlMapper();
 	}
