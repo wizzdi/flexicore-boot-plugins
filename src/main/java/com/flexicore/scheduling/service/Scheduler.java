@@ -1,11 +1,8 @@
 package com.flexicore.scheduling.service;
 
-import com.flexicore.model.SecurityOperation;
-
 import com.flexicore.scheduling.model.*;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
-import com.flexicore.scheduling.request.SchedulingAuditTypes;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -267,41 +264,13 @@ public class Scheduler implements Plugin, InitializingBean {
                 failed = true;
 
             } finally {
-                auditSchedule(securityContext, scheduleAction, start, failed,
-                        response);
+                //auditSchedule(securityContext, scheduleAction, start, failed, response);
             }
 
         }
 
     }
 
-    private void auditSchedule(SecurityContextBase securityContext,
-                               ScheduleAction scheduleAction, long start, boolean failed,
-                               Object response) {
-        long timeTaken = System.currentTimeMillis() - start;
-        SecurityContextBase securityContextForAuditing = getSecurityContextForAuditing(
-                securityContext, scheduleAction);
-      /*  applicationEventPublisher.publishEvent(new AuditingJob()
-                .setDateOccured(Date.from(Instant.now()))
-                .setResponse(response)
-                .setTimeTaken(timeTaken)
-                .setSecurityContext(securityContextForAuditing)
-                .setParameters(Arrays.asList(scheduleAction, securityContext))
-                .setAuditingType(SchedulingAuditTypes.SCHEDULING.name())
-                .setFailed(failed));*/
-    }
-
-    private SecurityContextBase getSecurityContextForAuditing(
-            SecurityContextBase securityContext, ScheduleAction scheduleAction) {
-
-        SecurityContextBase securityContextForAuditing = securityContextProvider.getSecurityContext(securityContext.getUser());
-        SecurityOperation schedulingOperation = new SecurityOperation();
-        schedulingOperation.setId(scheduleAction.getId());
-        schedulingOperation.setName(scheduleAction.getName());
-        schedulingOperation.setDescription(scheduleAction.getDescription());
-        securityContextForAuditing.setOperation(schedulingOperation);
-        return securityContext;
-    }
 
     private boolean matchParameters(Method method) {
         Class<?>[] parameterTypes = method.getParameterTypes();
