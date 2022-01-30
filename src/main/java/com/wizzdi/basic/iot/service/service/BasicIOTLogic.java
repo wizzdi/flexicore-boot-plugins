@@ -108,7 +108,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}")
     public void checkConnectivity() {
-        logger.info("checking connectivity");
+        logger.debug("checking connectivity");
         Set<String> actuallyConnectedRemotes=gatewayToLastSeen.entrySet().stream().filter(f->System.currentTimeMillis()-f.getValue() <lastSeenThreshold ).map(f->f.getKey()).collect(Collectors.toSet());
         List<Remote> remotesToUpdate=remoteService.listAllRemotes(null,new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setNotIds(actuallyConnectedRemotes));
         for (Remote remote : remotesToUpdate) {
@@ -118,7 +118,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             gatewayService.merge(remote);
             logger.info("remote "+remote.getRemoteId() +"("+remote.getId()+") is OFF");
         }
-        logger.info("done checking connectivity");
+        logger.debug("done checking connectivity");
     }
 
 
