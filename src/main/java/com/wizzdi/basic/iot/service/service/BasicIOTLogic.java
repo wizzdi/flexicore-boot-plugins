@@ -85,6 +85,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if (iotMessage instanceof KeepAlive) {
             onKeepAlive((KeepAlive) iotMessage, gateway, gatewaySecurityContext);
         }
+        if( iotMessage instanceof BadMessage){
+            BadMessage badMessage= (BadMessage) iotMessage;
+            return new BadMessageReceived().setOriginalMessage(badMessage.getOriginalMessage()).setError(badMessage.getError());
+        }
         return null;
     }
 

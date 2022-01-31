@@ -79,6 +79,11 @@ public class FlowTest {
         stopKeepAlive();
 
     }
+    @BeforeAll
+    private void start() {
+        TestEntities.clearMessageSubscribers();
+
+    }
 
     private void stopKeepAlive() {
         stopKeepAlive = true;

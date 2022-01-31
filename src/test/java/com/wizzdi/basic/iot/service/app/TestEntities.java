@@ -128,6 +128,9 @@ public class TestEntities {
     public static void removeMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber){
         messageSubscribers.remove(iotMessageSubscriber);
     }
+    public static void clearMessageSubscribers(){
+        messageSubscribers.clear();
+    }
 
 
 }
