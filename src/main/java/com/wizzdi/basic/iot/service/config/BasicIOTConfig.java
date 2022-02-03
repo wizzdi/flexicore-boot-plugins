@@ -1,6 +1,8 @@
 package com.wizzdi.basic.iot.service.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.client.BasicIOTConnection;
 import com.wizzdi.basic.iot.client.IOTMessageSubscriber;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
@@ -28,19 +31,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Extension
 @Configuration
 @EnableScheduling
+@EnableIntegration
 public class BasicIOTConfig implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
@@ -67,6 +68,10 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     public MqttPahoClientFactory mqttServerFactory() {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         if(keystore!=null){
             System.setProperty("javax.net.ssl.keyStore", keystore);
 
@@ -104,6 +109,10 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     public MqttPahoMessageHandler mqttPahoMessageHandlerServer(MqttPahoClientFactory mqttServerFactory) {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         MqttPahoMessageHandler someMqttClient = new MqttPahoMessageHandler("iot-server-out", mqttServerFactory);
         someMqttClient.setDefaultQos(1);
         return someMqttClient;
@@ -111,6 +120,10 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterServer(MqttPahoClientFactory mqttServerFactory) {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-server-in", mqttServerFactory, BasicIOTClient.IOT_MESSAGES_SUBJECT);
         messageProducer.setQos(1);
         return messageProducer;
@@ -140,13 +153,22 @@ public class BasicIOTConfig implements Plugin {
     }
 
     @Bean
-    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers, ObjectMapper objectMapper) throws IOException, InterruptedException {
+    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers) throws IOException, InterruptedException {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
+        ObjectMapper objectMapper=new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false).registerModule(new JavaTimeModule());
         return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().collect(Collectors.toList()))
                 .setPublicKeyProvider(publicKeyProvider);
     }
 
     @Bean
     public IntegrationFlow serverInputIntegrationFlow(BasicIOTClient basicIOTClient, MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterServer) {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         return IntegrationFlows.from(
                         mqttPahoMessageDrivenChannelAdapterServer)
                 .handle(basicIOTClient)
@@ -156,11 +178,19 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     public IntegrationFlow serverOutputIntegrationFlow(MqttPahoMessageHandler mqttPahoMessageHandlerServer) {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         return f -> f.handle(mqttPahoMessageHandlerServer);
     }
 
     @Bean
     public BasicIOTConnection basicIOTConnection(BasicIOTClient basicIOTClient, IntegrationFlow serverOutputIntegrationFlow, IntegrationFlow serverInputIntegrationFlow, MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterServer) {
+        if(mqttURLs==null||mqttURLs.length==0){
+            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
+            return null;
+        }
         return basicIOTClient.open(serverInputIntegrationFlow, serverOutputIntegrationFlow, mqttPahoMessageDrivenChannelAdapterServer);
     }
 

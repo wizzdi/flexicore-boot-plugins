@@ -28,7 +28,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Autowired
     private SecurityContextBase adminSecurityContext;
-    @Autowired
+    @Autowired(required = false)
     private BasicIOTClient basicIOTClient;
     @Autowired
     private GatewayService gatewayService;
@@ -42,6 +42,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private ConnectivityChangeService connectivityChangeService;
     @Autowired
     private RemoteService remoteService;
+
     @Value("${basic.iot.lastSeenThreshold:#{60*60*1000}}")
     private  long lastSeenThreshold;
     private final Map<String, Long> gatewayToLastSeen = new ConcurrentHashMap<>();

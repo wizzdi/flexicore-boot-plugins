@@ -3,7 +3,10 @@ package com.wizzdi.basic.iot.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
-import com.wizzdi.basic.iot.model.*;
+import com.wizzdi.basic.iot.model.Connectivity;
+import com.wizzdi.basic.iot.model.Device;
+import com.wizzdi.basic.iot.model.DeviceType;
+import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.app.TestEntities;
 import com.wizzdi.basic.iot.service.request.*;
@@ -22,19 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -44,9 +40,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 
-public class FlowTest {
+public class FlowTestRemote {
 
-    private static final Logger logger = LoggerFactory.getLogger(FlowTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(FlowTestRemote.class);
 
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
@@ -90,38 +86,7 @@ public class FlowTest {
         keepAliveThread.interrupt();
     }
 
-    @Test
-    @Order(1)
-    public void testRegister() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        IOTMessageSubscriber iotMessageSubscriber = f -> {
-            if (f instanceof BadMessageReceived) {
-                BadMessageReceived badMessageReceived = (BadMessageReceived) f;
-                logger.info("Bad Message Received: " + badMessageReceived.getError());
-            }
-        };
-        TestEntities.addMessageSubscriber(iotMessageSubscriber);
-        RegisterGateway registerGateway = new RegisterGateway()
-                .setPublicKey(Base64.encodeBase64String(clientPublicKey.getEncoded()))
-                .setGatewayId(clientId)
 
-                .setId(UUID.randomUUID().toString());
-        RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway);
-        Assertions.assertNotNull(registerGatewayReceived);
-
-
-    }
-
-    @Test
-    @Order(2)
-    public void testApproveGateway() {
-        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
-        Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
-        Assertions.assertNotNull(gateway);
-        Assertions.assertNotNull(gateway.getLastConnectivityChange());
-        Assertions.assertEquals(Connectivity.OFF,gateway.getLastConnectivityChange().getConnectivity());
-        startKeepAlive();
-
-    }
 
     private void startKeepAlive() {
         keepAliveThread= new Thread(() -> {
