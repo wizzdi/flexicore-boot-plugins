@@ -7,21 +7,21 @@ import org.springframework.messaging.Message;
 
 import java.time.OffsetDateTime;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "messageType", visible = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "messageType", visible = true)
 @JsonSubTypes(
         {
-                @JsonSubTypes.Type(BadMessage.class),
-                @JsonSubTypes.Type(BadMessageReceived.class),
-                @JsonSubTypes.Type(ChangeState.class),
-                @JsonSubTypes.Type(ChangeStateReceived.class),
-                @JsonSubTypes.Type(ConnectReceived.class),
-                @JsonSubTypes.Type(KeepAlive.class),
-                @JsonSubTypes.Type(RegisterGateway.class),
-                @JsonSubTypes.Type(RegisterGatewayReceived.class),
-                @JsonSubTypes.Type(StateChanged.class),
-                @JsonSubTypes.Type(StateChangedReceived.class),
-                @JsonSubTypes.Type(UpdateStateSchema.class),
-                @JsonSubTypes.Type(UpdateStateSchemaReceived.class)
+                @JsonSubTypes.Type(value = BadMessage.class,name = "com.wizzdi.basic.iot.client.BadMessage"),
+                @JsonSubTypes.Type(value = BadMessageReceived.class,name = "com.wizzdi.basic.iot.client.BadMessageReceived"),
+                @JsonSubTypes.Type(value = ChangeState.class,name = "com.wizzdi.basic.iot.client.ChangeState"),
+                @JsonSubTypes.Type(value = ChangeStateReceived.class,name = "com.wizzdi.basic.iot.client.ChangeStateReceived"),
+                @JsonSubTypes.Type(value = ConnectReceived.class,name = "com.wizzdi.basic.iot.client.ConnectReceived"),
+                @JsonSubTypes.Type(value = KeepAlive.class,name = "com.wizzdi.basic.iot.client.KeepAlive"),
+                @JsonSubTypes.Type(value = RegisterGateway.class,name = "com.wizzdi.basic.iot.client.RegisterGateway"),
+                @JsonSubTypes.Type(value = RegisterGatewayReceived.class,name = "com.wizzdi.basic.iot.client.RegisterGatewayReceived"),
+                @JsonSubTypes.Type(value = StateChanged.class,name = "com.wizzdi.basic.iot.client.StateChanged"),
+                @JsonSubTypes.Type(value = StateChangedReceived.class,name = "com.wizzdi.basic.iot.client.StateChangedReceived"),
+                @JsonSubTypes.Type(value = UpdateStateSchema.class,name = "com.wizzdi.basic.iot.client.UpdateStateSchema"),
+                @JsonSubTypes.Type(value = UpdateStateSchemaReceived.class,name = "com.wizzdi.basic.iot.client.UpdateStateSchemaReceived")
 
 
         }
