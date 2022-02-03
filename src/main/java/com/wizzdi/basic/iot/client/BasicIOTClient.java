@@ -29,6 +29,7 @@ public class BasicIOTClient implements MessageHandler {
     public static final String MQTT_TOPIC = "mqtt_topic";
     public static final String SIGNATURE_ALGORITHM = "SHA1WithRSA";
     public static final String MQTT_RECEIVED_TOPIC = "mqtt_receivedTopic";
+    private static final String MQTT_BY = "MQTT_BY";
     private final Signature signature;
 
 
@@ -77,20 +78,18 @@ public class BasicIOTClient implements MessageHandler {
 
     private void parseAndCallSubscribers(Message<?> message) {
         IOTMessage iotMessage = parseMessage(message, IOTMessage.class);
-        boolean badMessage = iotMessage instanceof BadMessage;
-        if (!badMessage) {
-            try {
-                if (!verifyMessage(iotMessage)) {
-                    iotMessage = getBadMessage(message,(String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
-                    badMessage = true;
-                }
-            }
-            catch (VerificationException e){
-                iotMessage = getBadMessage(message,(String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with exception " + e.getMessage());
-                badMessage = true;
-            }
-
+        if(iotMessage.getGatewayId().equals(id)){
+            logger.debug("ignoring self message");
+            return;
         }
+        try {
+            if (!verifyMessage(iotMessage)) {
+                iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
+            }
+        } catch (VerificationException e) {
+            iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with exception " + e.getMessage());
+        }
+
 
         for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
             requestResponseMessageHandler.onIOTMessage(iotMessage);
@@ -143,11 +142,11 @@ public class BasicIOTClient implements MessageHandler {
             T t = objectMapper.readValue(payload, type);
             return t.setMessage(message);
         } catch (Exception e) {
-            return (T) getBadMessage(message,payload, e.getMessage());
+            throw new RuntimeException("failed parsing message", e);
         }
     }
 
-    private BadMessage getBadMessage(Message message,String payload, String error) {
+    private BadMessage getBadMessage(Message message, String payload, String error) {
         return new BadMessage().setOriginalMessage(payload).setError(error).setMessage(message);
     }
 
@@ -215,7 +214,7 @@ public class BasicIOTClient implements MessageHandler {
                 try {
                     String jsonString = objectMapper.writeValueAsString(request);
                     logger.debug("out ( " + targetGatewayId + ") reply to " + replyTo + ":" + jsonString);
-                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, MAIN_TOPIC_PATH + "/" + targetGatewayId, MessageHeaders.REPLY_CHANNEL, replyTo));
+                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, MAIN_TOPIC_PATH + "/" + targetGatewayId, MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
                     outbound.getInputChannel().send(message);
                 } catch (Exception e) {
                     logger.error("error", e);
@@ -239,7 +238,7 @@ public class BasicIOTClient implements MessageHandler {
 
     public void reply(IOTMessage iotMessage, String replyTo) throws JsonProcessingException {
         prepareMessage(iotMessage);
-        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MQTT_TOPIC, replyTo));
+        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MQTT_TOPIC, replyTo, MQTT_BY, id));
         outbound.getInputChannel().send(message);
     }
 
@@ -248,14 +247,16 @@ public class BasicIOTClient implements MessageHandler {
         if (replyToTopic == null) {
             replyToTopic = replyTo.getId();
         }
-        if(replyToTopic==null && replyTo instanceof BadMessage){
-            replyToTopic=(String) replyTo.getMessage().getHeaders().get(MQTT_RECEIVED_TOPIC);
+        if (replyToTopic == null && replyTo instanceof BadMessage) {
+            replyToTopic = (String) replyTo.getMessage().getHeaders().get(MQTT_RECEIVED_TOPIC);
         }
         reply(iotMessage, replyToTopic);
     }
 
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
+
         parseAndCallSubscribers(message);
+
     }
 }
