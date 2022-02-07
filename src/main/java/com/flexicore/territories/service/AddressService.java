@@ -107,6 +107,39 @@ public class AddressService implements Plugin {
 		}
 		addressFiltering.setStreets(new ArrayList<>(streetMap.values()));
 
+		Set<String> neighbourhoodIds = addressFiltering.getNeighbourhoodIds();
+		Map<String, Neighbourhood> neighbourhoodMap = neighbourhoodIds.isEmpty() ? new HashMap<>() : repository.listByIds(Neighbourhood.class, neighbourhoodIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		neighbourhoodIds.removeAll(neighbourhoodMap.keySet());
+		if (!neighbourhoodIds.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Neighbourhoods with ids " + neighbourhoodIds);
+		}
+		addressFiltering.setNeighbourhoods(new ArrayList<>(neighbourhoodMap.values()));
+
+
+		Set<String> stateIds = addressFiltering.getStateIds();
+		Map<String, State> stateMap = stateIds.isEmpty() ? new HashMap<>() : repository.listByIds(State.class, stateIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		stateIds.removeAll(stateMap.keySet());
+		if (!stateIds.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No States with ids " + stateIds);
+		}
+		addressFiltering.setStates(new ArrayList<>(stateMap.values()));
+
+		Set<String> countryIds = addressFiltering.getCountryIds();
+		Map<String, Country> countryMap = countryIds.isEmpty() ? new HashMap<>() : repository.listByIds(Country.class, countryIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		countryIds.removeAll(countryMap.keySet());
+		if (!countryIds.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Countries with ids " + countryIds);
+		}
+		addressFiltering.setCountries(new ArrayList<>(countryMap.values()));
+
+		Set<String> citiesIds = addressFiltering.getCitiesIds();
+		Map<String, City> cityMap = citiesIds.isEmpty() ? new HashMap<>() : repository.listByIds(City.class, citiesIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		citiesIds.removeAll(cityMap.keySet());
+		if (!citiesIds.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Cities with ids " + citiesIds);
+		}
+		addressFiltering.setCities(new ArrayList<>(cityMap.values()));
+
 
 	}
 
