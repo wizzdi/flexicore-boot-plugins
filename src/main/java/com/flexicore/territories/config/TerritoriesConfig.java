@@ -32,9 +32,4 @@ public class TerritoriesConfig implements Plugin {
 				.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
 	}
 
-	@Bean
-	@Qualifier("xmlMapper")
-	public XmlMapper xmlMapper(){
-		return new XmlMapper();
-	}
 }

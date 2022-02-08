@@ -61,9 +61,9 @@ public class AddressRepository implements Plugin {
 
 	}
 
-	private void addAddressPredicate(AddressFilter filtering,
+	public <T extends Address> void addAddressPredicate(AddressFilter filtering,
 									 CommonAbstractCriteria q,
-									 CriteriaBuilder cb, From<?,Address> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+									 CriteriaBuilder cb, From<?,T> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
 		if (filtering.getExternalIds() != null
 				&& !filtering.getExternalIds().isEmpty()) {
 			preds.add(r.get(Address_.externalId).in(filtering.getExternalIds()));
@@ -81,27 +81,27 @@ public class AddressRepository implements Plugin {
 		if (filtering.getStreets() != null && !filtering.getStreets().isEmpty()) {
 
 			Set<String> ids = filtering.getStreets().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-			Join<Address, Street> join = r.join(Address_.street);
+			Join<T, Street> join = r.join(Address_.street);
 			preds.add(join.get(Street_.id).in(ids));
 		}
 		if (filtering.getCities() != null && !filtering.getCities().isEmpty()) {
 
 			Set<String> ids = filtering.getCities().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-			Join<Address, Street> join = r.join(Address_.street);
+			Join<T, Street> join = r.join(Address_.street);
 			Join<Street, City> join2 = join.join(Street_.city);
 			preds.add(join2.get(City_.id).in(ids));
 		}
 		if (filtering.getNeighbourhoods() != null && !filtering.getNeighbourhoods().isEmpty()) {
 
 			Set<String> ids = filtering.getNeighbourhoods().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-			Join<Address, Neighbourhood> join = r.join(Address_.neighbourhood);
+			Join<T, Neighbourhood> join = r.join(Address_.neighbourhood);
 			preds.add(join.get(Neighbourhood_.id).in(ids));
 		}
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
 		if(securityContextBase!=null){
-			Join<Address, Baseclass> join=r.join(Address_.security);
+			Join<T, Baseclass> join=r.join(Address_.security);
 			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
 		}
 
