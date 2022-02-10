@@ -74,7 +74,6 @@ public class DeviceStateService implements Plugin {
     private ChangeState getChangeStateMessage(Map<String, Object> values, Device device) {
         return new ChangeState()
                 .setDeviceId(device.getRemoteId())
-                .setValues(new HashMap<>(values))
-                .setGatewayId(device.getGateway().getRemoteId());
+                .setValues(new HashMap<>(values));
     }
 }

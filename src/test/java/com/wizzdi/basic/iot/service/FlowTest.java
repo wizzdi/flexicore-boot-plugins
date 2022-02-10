@@ -73,6 +73,7 @@ public class FlowTest {
     private boolean stopKeepAlive;
     private Set<String> keepAliveDevices = new HashSet<>();
     private Thread keepAliveThread;
+    private Gateway gateway;
 
     @AfterAll
     private void destroy() {
@@ -115,7 +116,7 @@ public class FlowTest {
     @Order(2)
     public void testApproveGateway() {
         PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
-        Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
+        gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertNotNull(gateway.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF,gateway.getLastConnectivityChange().getConnectivity());
@@ -184,7 +185,7 @@ public class FlowTest {
     @Test
     @Order(5)
     public void testDeviceStateChange() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setRemoteIds(Collections.singleton(clientId))).setValue("dim", 94);
+        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setGatewayIds(Collections.singleton(gateway.getId()))).setValue("dim", 94);
         deviceStateService.validate(changeStateRequest, adminSecurityContext);
         AtomicBoolean received = new AtomicBoolean(false);
         synchronized (changeStateRequest) {

@@ -25,8 +25,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import java.security.PublicKey;
 import java.util.*;
@@ -46,16 +52,9 @@ public class FlowTestRemote {
 
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
-    @Autowired
-    private SecurityContextBase adminSecurityContext;
+
     @Autowired
     private BasicIOTClient testBasicIOTClient;
-    @Autowired
-    private GatewayService gatewayService;
-    @Autowired
-    private DeviceTypeService deviceTypeService;
-    @Autowired
-    private DeviceService deviceService;
     @Autowired
     private String jsonSchema;
     @Autowired
@@ -66,18 +65,41 @@ public class FlowTestRemote {
     private DeviceStateService deviceStateService;
     @Value("${basic.iot.connectivityCheckInterval:60000}")
     private long checkInterval;
+    @Value("${basic.iot.test.server.username}")
+    private String username;
+    @Value("${basic.iot.test.server.password}")
+    private String password;
+    @Value("${basic.iot.test.server.url}")
+    private String url;
     private boolean stopKeepAlive;
     private Set<String> keepAliveDevices = new HashSet<>();
     private Thread keepAliveThread;
+    private RestTemplate restTemplate;
+
 
     @AfterAll
     private void destroy() {
         stopKeepAlive();
 
     }
+
     @BeforeAll
     private void start() {
         TestEntities.clearMessageSubscribers();
+        restTemplate = new RestTemplate();
+        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(url));
+        ResponseEntity<AuthenticationResponse> authenticationResponseResponseEntity = restTemplate.postForEntity("FlexiCore/rest/authenticationNew/login", new AuthenticationRequest().setEmail(username).setPassword(password), AuthenticationResponse.class);
+        Assertions.assertTrue(authenticationResponseResponseEntity.getStatusCode().is2xxSuccessful());
+        AuthenticationResponse body1 = authenticationResponseResponseEntity.getBody();
+        Assertions.assertNotNull(body1);
+        String key= body1.getAuthenticationKey();
+        restTemplate.setInterceptors(
+                Collections.singletonList((request, body, execution) -> {
+                    request.getHeaders()
+                            .add("authenticationKey", key);
+                    return execution.execute(request, body);
+                }));
+        startKeepAlive();
 
     }
 
@@ -117,9 +139,9 @@ public class FlowTestRemote {
     public void testDeviceStateChanged() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
         StateChangedReceived stateChangedReceived = testBasicIOTClient.request(new StateChanged().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30));
         Assertions.assertNotNull(stateChangedReceived);
-        DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
+        DeviceType deviceType = getDeviceTypes(new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
-        Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
+        Device device = getAllDevices( new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(device);
         Assertions.assertEquals(deviceType.getId(), device.getDeviceType().getId());
         Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
@@ -134,12 +156,58 @@ public class FlowTestRemote {
 
     }
 
+    private List<DeviceType> getDeviceTypes(DeviceTypeFilter deviceTypeFilter) {
+        ParameterizedTypeReference<PaginationResponse<DeviceType>> t= new ParameterizedTypeReference<>() {
+        };
+
+        ResponseEntity<PaginationResponse<DeviceType>> deviceTypeResponse = this.restTemplate.exchange("/plugins/DeviceType/getAllDeviceTypes", HttpMethod.POST, new HttpEntity<>(deviceTypeFilter), t);
+        Assertions.assertTrue(deviceTypeResponse.getStatusCode().is2xxSuccessful());
+        PaginationResponse<DeviceType> body = deviceTypeResponse.getBody();
+        Assertions.assertNotNull(body);
+
+        return body.getList();
+    }
+
+    private List<Device> getAllDevices(DeviceFilter deviceFilter) {
+        ParameterizedTypeReference<PaginationResponse<Device>> t= new ParameterizedTypeReference<>() {
+        };
+
+        ResponseEntity<PaginationResponse<Device>> deviceResponse = this.restTemplate.exchange("/plugins/Device/getAllDevices", HttpMethod.POST, new HttpEntity<>(deviceFilter), t);
+        Assertions.assertTrue(deviceResponse.getStatusCode().is2xxSuccessful());
+        PaginationResponse<Device> body = deviceResponse.getBody();
+        Assertions.assertNotNull(body);
+
+        return body.getList();
+    }
+
+    private List<Gateway> getAllGateways(GatewayFilter gatewayFilter) {
+        ParameterizedTypeReference<PaginationResponse<Gateway>> t= new ParameterizedTypeReference<>() {
+        };
+
+        ResponseEntity<PaginationResponse<Gateway>> gatewayResponse = this.restTemplate.exchange("/plugins/Gateway/getAllGateways", HttpMethod.POST, new HttpEntity<>(gatewayFilter), t);
+        Assertions.assertTrue(gatewayResponse.getStatusCode().is2xxSuccessful());
+        PaginationResponse<Gateway> body = gatewayResponse.getBody();
+        Assertions.assertNotNull(body);
+
+        return body.getList();
+    }
+
+    private ChangeStateResponse changeState(ChangeStateRequest changeStateRequest) {
+
+
+        ResponseEntity<ChangeStateResponse> deviceResponse = this.restTemplate.postForEntity("/plugins/DeviceState/changeState",changeStateRequest,ChangeStateResponse.class);
+        Assertions.assertTrue(deviceResponse.getStatusCode().is2xxSuccessful());
+        ChangeStateResponse body = deviceResponse.getBody();
+        Assertions.assertNotNull(body);
+
+        return body;
+    }
     @Test
     @Order(4)
     public void testUpdateSchema() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
         UpdateStateSchemaReceived updateStateSchemaReceived = testBasicIOTClient.request(new UpdateStateSchema().setDeviceType(DEVICE_TYPE).setVersion(1).setJsonSchema(jsonSchema));
         Assertions.assertNotNull(updateStateSchemaReceived);
-        DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
+        DeviceType deviceType = getDeviceTypes(new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
         Assertions.assertEquals(jsonSchema, deviceType.getStateJsonSchema());
 
@@ -149,13 +217,13 @@ public class FlowTestRemote {
     @Test
     @Order(5)
     public void testDeviceStateChange() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setRemoteIds(Collections.singleton(clientId))).setValue("dim", 94);
-        deviceStateService.validate(changeStateRequest, adminSecurityContext);
+        Gateway gateway = getAllGateways(new GatewayFilter().setRemoteIds(Collections.singleton(clientId))).stream().findFirst().orElse(null);
+        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setGatewayIds(Collections.singleton(gateway.getId()))).setValue("dim", 94);
         AtomicBoolean received = new AtomicBoolean(false);
         synchronized (changeStateRequest) {
             IOTMessageSubscriber iotMessageSubscriber = f -> handleMessage(f, testBasicIOTClient, received);
             TestEntities.addMessageSubscriber(iotMessageSubscriber);
-            ChangeStateResponse changeStateResponse = deviceStateService.changeState(adminSecurityContext, changeStateRequest);
+            ChangeStateResponse changeStateResponse = changeState( changeStateRequest);
             Assertions.assertFalse(changeStateResponse.getDevicesExecutedOn().isEmpty());
             changeStateRequest.wait(5000);
             TestEntities.removeMessageSubscriber(iotMessageSubscriber);
@@ -177,16 +245,12 @@ public class FlowTestRemote {
     }
 
     private void checkDevicesAndGateways(Connectivity expected) {
-        Gateway gateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(clientId))).stream().findFirst().orElse(null);
+        Gateway gateway = getAllGateways( new GatewayFilter().setRemoteIds(Collections.singleton(clientId))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertNotNull(gateway.getLastConnectivityChange());
         Assertions.assertEquals(expected,gateway.getLastConnectivityChange().getConnectivity());
-        List<Device> devices=deviceService.listAllDevices(null,new DeviceFilter().setGateways(Collections.singletonList(gateway)));
-        for (Device device : devices) {
-
-            Assertions.assertNotNull(device.getLastConnectivityChange());
-            Assertions.assertEquals(expected,device.getLastConnectivityChange().getConnectivity());
-        }
+        List<Device> devices=getAllDevices(new DeviceFilter().setGateways(Collections.singletonList(gateway)));
+        Assertions.assertTrue(devices.stream().anyMatch(f->DEVICE_ID.equals(f.getRemoteId())&&f.getLastConnectivityChange()!=null&&expected.equals(f.getLastConnectivityChange().getConnectivity())));
     }
 
 
