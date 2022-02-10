@@ -30,13 +30,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 
 
 public class KeyTest {
@@ -47,5 +49,15 @@ public class KeyTest {
         PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\test2\\public.pem");
         String s = Base64.encodeBase64String(publicKey.getEncoded());
         System.out.println(s);
+    }
+
+    @Test
+    public void testSignature() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        PrivateKey key=KeyUtils.readPrivateKey("C:\\Users\\Asaf\\certs\\client-key.pem");
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+        signature.initSign(key);
+        signature.update("847a198f-2646-4f2b-bc84-6f7843f32375".getBytes(StandardCharsets.UTF_8));
+        byte[] sign = signature.sign();
+        System.out.println(java.util.Base64.getEncoder().encodeToString(sign));
     }
 }
