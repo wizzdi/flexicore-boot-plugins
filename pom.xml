@@ -52,10 +52,10 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://wizzdi/profile-model.git</connection>
-        <developerConnection>scm:git:git@github.com:wizzdi/profile-model.git</developerConnection>
-        <url>https://github.com/wizzdi/profile-model</url>
-        <tag>profile-model-{version}</tag>
+        <connection>scm:git:git://wizzdi/user-profile-model.git</connection>
+        <developerConnection>scm:git:git@github.com:wizzdi/user-profile-model.git</developerConnection>
+        <url>https://github.com/wizzdi/user-profile-model</url>
+        <tag>user-profile-model-{version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
