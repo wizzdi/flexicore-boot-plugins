@@ -6,7 +6,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>user-profile-model</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>user-profile-model</name>
     <description>FlexiCore model plugin , managing profiles</description>
     <url>https://wizzdi.com</url>
@@ -62,14 +62,14 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.0.RELEASE</version>
+                <version>2.5.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-boot-dependencies</artifactId>
-                <version>1.0.5</version>
+                <version>2.1.12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
