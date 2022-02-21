@@ -6,7 +6,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>user-profile-service</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <name>user-profile-service</name>
     <description>FlexiCore service plugin , managing userProfiles</description>
     <url>https://wizzdi.com</url>
@@ -52,24 +52,24 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:git://wizzdi/userProfile-model.git</connection>
-        <developerConnection>scm:git:git@github.com:wizzdi/userProfile-model.git</developerConnection>
-        <url>https://github.com/wizzdi/userProfile-model</url>
-        <tag>userProfile-model-{version}</tag>
+        <connection>scm:git:git://wizzdi/user-profile-service.git</connection>
+        <developerConnection>scm:git:git@github.com:wizzdi/user-profile-service.git</developerConnection>
+        <url>https://github.com/wizzdi/user-profile-service</url>
+        <tag>user-profile-service-{version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.3.0.RELEASE</version>
+                <version>2.5.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>flexicore-boot-dependencies</artifactId>
-                <version>1.0.5</version>
+                <version>2.1.12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>user-profile-model</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>2.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-file-service</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.1.2</version>
+            <version>2.1.12</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -183,10 +183,12 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <executions>

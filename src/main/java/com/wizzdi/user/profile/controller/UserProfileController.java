@@ -29,7 +29,7 @@ public class UserProfileController implements Plugin {
 
 	@PostMapping("/createUserProfile")
 	@Operation(description = "creates UserProfile",summary = "creates UserProfile")
-	public UserProfile createUserProfile(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody UserProfileCreate userProfileCreate, @RequestAttribute SecurityContextBase securityContext){
+	public UserProfile createUserProfile( @RequestBody UserProfileCreate userProfileCreate, @RequestAttribute SecurityContextBase securityContext){
 		userProfileService.validateCreate(userProfileCreate,securityContext);
 		return userProfileService.createUserProfile(userProfileCreate,securityContext);
 	}
@@ -37,7 +37,7 @@ public class UserProfileController implements Plugin {
 	@PostMapping("/getAllUserProfiles")
 	@Operation(description = "returns UserProfiles",summary = "returns UserProfiles")
 
-	public PaginationResponse<UserProfile> getAllUserProfiles(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody
+	public PaginationResponse<UserProfile> getAllUserProfiles( @RequestBody
 			UserProfileFilter userProfileFilter, @RequestAttribute SecurityContextBase securityContext){
 		userProfileService.validate(userProfileFilter,securityContext);
 		return userProfileService.getAllUserProfiles(userProfileFilter,securityContext);
@@ -46,7 +46,7 @@ public class UserProfileController implements Plugin {
 	@PutMapping("/updateUserProfile")
 	@Operation(description = "updates UserProfile",summary = "updates UserProfile")
 
-	public UserProfile updateUserProfile(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody UserProfileUpdate userProfileUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public UserProfile updateUserProfile( @RequestBody UserProfileUpdate userProfileUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=userProfileUpdate.getId();
 		UserProfile userProfile=id!=null? userProfileService.findByIdOrNull(UserProfile.class,id):null;
 		if(userProfile==null){
