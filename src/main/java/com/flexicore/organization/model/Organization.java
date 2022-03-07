@@ -29,6 +29,7 @@ public class Organization extends SecuredBasic {
 	@JsonIgnore
 	private List<Employee> employees = new ArrayList<>();
 
+	private String externalId;
 	@OneToMany(targetEntity = Branch.class, mappedBy = "organization")
 	@JsonIgnore
 	public List<Branch> getBranches() {
@@ -59,5 +60,14 @@ public class Organization extends SecuredBasic {
 	public <T extends Organization> T setMainAddress(Address mainAddress) {
 		this.mainAddress = mainAddress;
 		return (T) this;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public Organization setExternalId(String externalId) {
+		this.externalId = externalId;
+		return this;
 	}
 }
