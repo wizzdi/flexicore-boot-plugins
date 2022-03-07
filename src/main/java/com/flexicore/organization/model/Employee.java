@@ -12,7 +12,6 @@ public class Employee extends SecuredBasic {
 	@ManyToOne(targetEntity = Organization.class)
 	private Organization organization;
 	private String externalId;
-	private String externalEmployeeId;
 	@ManyToOne(targetEntity = Organization.class)
 	public Organization getOrganization() {
 		return organization;
@@ -32,12 +31,5 @@ public class Employee extends SecuredBasic {
 		return this;
 	}
 
-	public String getExternalEmployeeId() {
-		return externalEmployeeId;
-	}
 
-	public Employee setExternalEmployeeId(String externalEmployeeId) {
-		this.externalEmployeeId = externalEmployeeId;
-		return this;
-	}
 }
