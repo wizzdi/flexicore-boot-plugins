@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 public class Organization extends SecuredBasic {
 
-
+	private String externalId;
 	@ManyToOne(targetEntity = Address.class)
 	private Address mainAddress;
 
@@ -55,6 +55,15 @@ public class Organization extends SecuredBasic {
 	public <T extends Organization> T setMainAddress(Address mainAddress) {
 		this.mainAddress = mainAddress;
 		return (T) this;
+	}
+
+	public String getExternalId() {
+		return externalId;
+	}
+
+	public Organization setExternalId(String externalId) {
+		this.externalId = externalId;
+		return this;
 	}
 
 	public PermissionGroup getPermissionGroup() {
