@@ -158,7 +158,7 @@ public class GatewayService implements Plugin {
             gatewayCreate.setGatewayUser(securityContext.getUser());
         }
         if(gatewayCreate.getApprovingUser()==null){
-            gatewayCreate.setGatewayUser(securityContext.getUser());
+            gatewayCreate.setApprovingUser(securityContext.getUser());
         }
     }
 
