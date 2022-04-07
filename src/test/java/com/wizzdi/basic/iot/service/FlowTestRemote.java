@@ -3,10 +3,7 @@ package com.wizzdi.basic.iot.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
-import com.wizzdi.basic.iot.model.Connectivity;
-import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.model.DeviceType;
-import com.wizzdi.basic.iot.model.Gateway;
+import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.app.TestEntities;
 import com.wizzdi.basic.iot.service.request.*;
@@ -59,7 +56,7 @@ public class FlowTestRemote {
     private String jsonSchema;
     @Autowired
     private PublicKey clientPublicKey;
-    @Value("${basic.iot.test.id:iot-client}")
+    @Value("${basic.iot.test.id}")
     private String clientId;
     @Autowired
     private DeviceStateService deviceStateService;
@@ -83,11 +80,13 @@ public class FlowTestRemote {
 
     }
 
+
     @BeforeAll
-    private void start() {
+    private void start() throws InterruptedException {
         TestEntities.clearMessageSubscribers();
         restTemplate = new RestTemplate();
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(url));
+
         ResponseEntity<AuthenticationResponse> authenticationResponseResponseEntity = restTemplate.postForEntity("FlexiCore/rest/authenticationNew/login", new AuthenticationRequest().setEmail(username).setPassword(password), AuthenticationResponse.class);
         Assertions.assertTrue(authenticationResponseResponseEntity.getStatusCode().is2xxSuccessful());
         AuthenticationResponse body1 = authenticationResponseResponseEntity.getBody();
@@ -99,8 +98,33 @@ public class FlowTestRemote {
                             .add("authenticationKey", key);
                     return execution.execute(request, body);
                 }));
+
+        registerAndApproveGateway();
+        System.out.println("gateway");
         startKeepAlive();
 
+    }
+
+    private Gateway registerAndApproveGateway() throws InterruptedException {
+        RegisterGateway registerGateway = new RegisterGateway()
+                .setPublicKey(Base64.encodeBase64String(clientPublicKey.getEncoded()))
+                .setGatewayId(clientId)
+
+                .setId(UUID.randomUUID().toString());
+        RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway);
+        Assertions.assertNotNull(registerGatewayReceived);
+
+
+        ApproveGatewaysRequest approve = new ApproveGatewaysRequest()
+                .setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId)));
+        ParameterizedTypeReference<PaginationResponse<Gateway>> t= new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<PaginationResponse<Gateway>> gatewayResponse = this.restTemplate.exchange("/plugins/Gateway/approveGateways", HttpMethod.POST, new HttpEntity<>(approve), t);
+        Assertions.assertEquals(200, gatewayResponse.getStatusCodeValue());
+        PaginationResponse<Gateway> gateway = gatewayResponse.getBody();
+        Assertions.assertNotNull(gateway);
+        Assertions.assertEquals(1,gateway.getList().size());
+        return gateway.getList().get(0);
     }
 
     private void stopKeepAlive() {

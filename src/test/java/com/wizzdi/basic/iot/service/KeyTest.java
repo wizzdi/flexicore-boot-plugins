@@ -46,17 +46,27 @@ public class KeyTest {
 
     @Test
     public void testKey() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException {
-        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\test2\\public.pem");
+        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\pubkey.pem");
         String s = Base64.encodeBase64String(publicKey.getEncoded());
         System.out.println(s);
     }
 
     @Test
+    public void testSignatureValidity() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\pubkey.pem");
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+        signature.initVerify(publicKey);
+        boolean verify = signature.verify("61fb419a-b66d-11ec-b909-0242ac120002".getBytes(StandardCharsets.UTF_8));
+        System.out.println("Verify:"+verify);
+
+    }
+
+    @Test
     public void testSignature() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        PrivateKey key=KeyUtils.readPrivateKey("C:\\Users\\Asaf\\certs\\client-key.pem");
+        PrivateKey key=KeyUtils.readPrivateKey("C:\\Users\\Asaf\\Desktop\\rsakey-test.pem");
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(key);
-        signature.update("847a198f-2646-4f2b-bc84-6f7843f32375".getBytes(StandardCharsets.UTF_8));
+        signature.update("61fb419a-b66d-11ec-b909-0242ac120002".getBytes(StandardCharsets.UTF_8));
         byte[] sign = signature.sign();
         System.out.println(java.util.Base64.getEncoder().encodeToString(sign));
     }

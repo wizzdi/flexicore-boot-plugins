@@ -39,7 +39,7 @@ public class TestEntities {
     private String keyPath;
     @Value("${basic.iot.test.publicKeyPath}")
     private String publicKeyPath;
-    @Value("${basic.iot.test.id:iot-client}")
+    @Value("${basic.iot.test.id}")
     private String clientId;
     @Value("${basic.iot.test.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;

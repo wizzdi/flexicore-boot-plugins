@@ -5,8 +5,7 @@ package com.wizzdi.basic.iot.service.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
-import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.model.Device_;
+import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -23,6 +22,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Extension
 @Component
@@ -60,6 +60,17 @@ public class DeviceRepository implements Plugin {
     public <T extends Device> void addDevicePredicates(DeviceFilter filtering,
                                                            CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
         remoteRepository.addRemotePredicates(filtering,cb,q,r,preds,securityContext);
+        if(filtering.getGateways()!=null&&!filtering.getGateways().isEmpty()){
+            Set<String> ids=filtering.getGateways().stream().map(f->f.getId()).collect(Collectors.toSet());
+            Join<T, Gateway> join=r.join(Device_.gateway);
+            preds.add(join.get(Gateway_.id).in(ids));
+        }
+
+        if(filtering.getDeviceTypes()!=null&&!filtering.getDeviceTypes().isEmpty()){
+            Set<String> ids=filtering.getDeviceTypes().stream().map(f->f.getId()).collect(Collectors.toSet());
+            Join<T, DeviceType> join=r.join(Device_.deviceType);
+            preds.add(join.get(DeviceType_.id).in(ids));
+        }
 
 
 
