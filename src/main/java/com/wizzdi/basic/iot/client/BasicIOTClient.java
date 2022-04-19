@@ -77,29 +77,34 @@ public class BasicIOTClient implements MessageHandler {
 
 
     private void parseAndCallSubscribers(Message<?> message) {
-        IOTMessage iotMessage = parseMessage(message, IOTMessage.class);
-        if(iotMessage.getGatewayId().equals(id)){
-            logger.debug("ignoring self message");
-            return;
-        }
         try {
-            if (!verifyMessage(iotMessage)) {
-                iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
+            IOTMessage iotMessage = parseMessage(message, IOTMessage.class);
+            if (iotMessage.getGatewayId().equals(id)) {
+                logger.debug("ignoring self message");
+                return;
             }
-        } catch (VerificationException e) {
-            iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with exception " + e.getMessage());
-        }
-
-
-        for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
-            requestResponseMessageHandler.onIOTMessage(iotMessage);
-        }
-        for (IOTMessageSubscriber subscriber : subscribers) {
             try {
-                subscriber.onIOTMessage(iotMessage);
-            } catch (Throwable e) {
-                logger.error("IOTMessageSubscriber failed", e);
+                if (!verifyMessage(iotMessage)) {
+                    iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
+                }
+            } catch (VerificationException e) {
+                iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with exception " + e.getMessage());
             }
+
+
+            for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
+                requestResponseMessageHandler.onIOTMessage(iotMessage);
+            }
+            for (IOTMessageSubscriber subscriber : subscribers) {
+                try {
+                    subscriber.onIOTMessage(iotMessage);
+                } catch (Throwable e) {
+                    logger.error("IOTMessageSubscriber failed", e);
+                }
+            }
+        }
+        catch (Throwable e){
+            logger.error("failed handling message",e);
         }
 
 
@@ -133,17 +138,14 @@ public class BasicIOTClient implements MessageHandler {
 
     }
 
-    private <T extends IOTMessage> T parseMessage(Message message, Class<T> type) {
+    private <T extends IOTMessage> T parseMessage(Message message, Class<T> type) throws JsonProcessingException {
         String payload = (String) message.getPayload();
 
-        try {
             String mqtt_receivedTopic = message.getHeaders().get(MQTT_RECEIVED_TOPIC, String.class);
             logger.debug("in (" + mqtt_receivedTopic + "): " + payload);
             T t = objectMapper.readValue(payload, type);
             return t.setMessage(message);
-        } catch (Exception e) {
-            throw new RuntimeException("failed parsing message", e);
-        }
+
     }
 
     private BadMessage getBadMessage(Message message, String payload, String error) {
