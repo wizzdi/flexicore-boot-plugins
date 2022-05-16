@@ -31,6 +31,8 @@ public class DeviceRepository implements Plugin {
     private EntityManager em;
     @Autowired
     private RemoteRepository remoteRepository;
+    @Autowired
+    private DeviceTypeRepository deviceTypeRepository;
 
     public List<Device> getAllDevices(SecurityContextBase securityContext,
                                            DeviceFilter filtering) {
@@ -70,6 +72,10 @@ public class DeviceRepository implements Plugin {
             Set<String> ids=filtering.getDeviceTypes().stream().map(f->f.getId()).collect(Collectors.toSet());
             Join<T, DeviceType> join=r.join(Device_.deviceType);
             preds.add(join.get(DeviceType_.id).in(ids));
+        }
+        if(filtering.getDeviceTypeFilter()!=null){
+            Join<T, DeviceType> join=r.join(Device_.deviceType);
+            deviceTypeRepository.addDeviceTypePredicates(filtering.getDeviceTypeFilter(),cb,q,join,preds,securityContext);
         }
 
 

@@ -43,6 +43,8 @@ public class DeviceService implements Plugin {
     @Autowired
     private RemoteService remoteService;
 
+    @Autowired
+    private DeviceTypeService deviceTypeService;
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
@@ -84,6 +86,9 @@ public class DeviceService implements Plugin {
     public void validateFiltering(DeviceFilter deviceFilter,
                                   SecurityContextBase securityContext) {
         remoteService.validateFiltering(deviceFilter, securityContext);
+        if(deviceFilter.getDeviceTypeFilter()!=null){
+            deviceTypeService.validateFiltering(deviceFilter.getDeviceTypeFilter(),securityContext);
+        }
         Set<String> gatewayIds = deviceFilter.getGatewayIds();
         Map<String, Gateway> gatewayMap = gatewayIds.isEmpty() ? new HashMap<>() : listByIds(Gateway.class, gatewayIds, Remote_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         gatewayIds.removeAll(gatewayMap.keySet());

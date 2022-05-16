@@ -17,6 +17,7 @@ public class DeviceFilter extends RemoteFilter {
     private Set<String> deviceTypeIds=new HashSet<>();
     @JsonIgnore
     private List<DeviceType> deviceTypes;
+    private DeviceTypeFilter deviceTypeFilter;
 
     public Set<String> getGatewayIds() {
         return gatewayIds;
@@ -53,6 +54,15 @@ public class DeviceFilter extends RemoteFilter {
 
     public <T extends DeviceFilter> T setDeviceTypes(List<DeviceType> deviceTypes) {
         this.deviceTypes = deviceTypes;
+        return (T) this;
+    }
+
+    public DeviceTypeFilter getDeviceTypeFilter() {
+        return deviceTypeFilter;
+    }
+
+    public <T extends DeviceFilter> T setDeviceTypeFilter(DeviceTypeFilter deviceTypeFilter) {
+        this.deviceTypeFilter = deviceTypeFilter;
         return (T) this;
     }
 }
