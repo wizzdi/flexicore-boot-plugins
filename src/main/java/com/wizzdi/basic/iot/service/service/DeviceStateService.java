@@ -4,9 +4,12 @@ package com.wizzdi.basic.iot.service.service;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.client.ChangeState;
+import com.wizzdi.basic.iot.client.ChangeStateReceived;
+import com.wizzdi.basic.iot.client.StateChanged;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.service.request.ChangeStateRequest;
 import com.wizzdi.basic.iot.service.response.ChangeStateResponse;
+import com.wizzdi.basic.iot.service.response.ChangeStateResponseEntry;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -17,11 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Extension
 @Component
@@ -55,20 +54,37 @@ public class DeviceStateService implements Plugin {
 
 
     public ChangeStateResponse changeState(SecurityContextBase securityContext, ChangeStateRequest changeStateRequest) {
-        Set<String> deviceIds=new HashSet<>();
+        Map<String, ChangeStateResponseEntry> responseEntryMap=new HashMap<>();
         List<Device> devices = deviceService.listAllDevices(securityContext, changeStateRequest.getDeviceFilter());
         for (Device device : devices) {
-            ChangeState changeState=getChangeStateMessage(changeStateRequest.getValues(),device);
+            long tries= changeStateRequest.getRetries()+1;
+            StateChanged changeStateReceived=null;
             String remoteId = device.getGateway().getRemoteId();
-            try {
-                basicIOTClient.sendMessage(changeState, remoteId);
-                deviceIds.add(remoteId);
+            String deviceId=device.getRemoteId();
+            int attempt = 0;
+            for (attempt = 0; attempt < tries; attempt++) {
+                ChangeState changeState=getChangeStateMessage(changeStateRequest.getValues(),device);
+                try {
+                    changeStateReceived=basicIOTClient.request(changeState, remoteId);
+                    if(changeStateReceived!=null){
+                       break;
+                    }
+
+                }
+                catch (Exception e){
+                    logger.error("failed sending message to gateway "+ remoteId,e);
+                }
+
             }
-            catch (Exception e){
-                logger.error("failed sending message to gateway "+ remoteId);
+            if(changeStateReceived!=null){
+                responseEntryMap.put(deviceId,new ChangeStateResponseEntry().setRemoteId(deviceId).setOnTry(attempt));
             }
+            else{
+                logger.error("did not receive response for device "+device.getRemoteId()+"("+device.getId()+") , after "+tries +" tries");
+            }
+
         }
-        return new ChangeStateResponse(deviceIds);
+        return new ChangeStateResponse(new ArrayList<>(responseEntryMap.values()));
     }
 
     private ChangeState getChangeStateMessage(Map<String, Object> values, Device device) {

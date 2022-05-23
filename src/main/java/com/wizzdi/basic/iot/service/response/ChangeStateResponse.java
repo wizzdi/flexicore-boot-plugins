@@ -1,24 +1,26 @@
 package com.wizzdi.basic.iot.service.response;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ChangeStateResponse {
 
-    private Set<String> devicesExecutedOn=new HashSet<>();
+    private List<ChangeStateResponseEntry> devicesExecutedOn=new ArrayList<>();
 
-    public ChangeStateResponse(Set<String> devicesExecutedOn) {
+    public ChangeStateResponse(List<ChangeStateResponseEntry> devicesExecutedOn) {
         this.devicesExecutedOn = devicesExecutedOn;
     }
 
     public ChangeStateResponse() {
     }
 
-    public Set<String> getDevicesExecutedOn() {
+    public List<ChangeStateResponseEntry> getDevicesExecutedOn() {
         return devicesExecutedOn;
     }
 
-    public <T extends ChangeStateResponse> T setDevicesExecutedOn(Set<String> devicesExecutedOn) {
+    public <T extends ChangeStateResponse> T setDevicesExecutedOn(List<ChangeStateResponseEntry> devicesExecutedOn) {
         this.devicesExecutedOn = devicesExecutedOn;
         return (T) this;
     }

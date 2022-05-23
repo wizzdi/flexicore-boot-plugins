@@ -11,6 +11,7 @@ import java.util.Map;
 public class ChangeStateRequest {
 
     private DeviceFilter deviceFilter;
+    private long retries;
 
     private final Map<String,Object> otherProperties =new HashMap<>();
 
@@ -33,6 +34,15 @@ public class ChangeStateRequest {
 
     public <T extends ChangeStateRequest> T setDeviceFilter(DeviceFilter deviceFilter) {
         this.deviceFilter = deviceFilter;
+        return (T) this;
+    }
+
+    public long getRetries() {
+        return retries;
+    }
+
+    public <T extends ChangeStateRequest> T setRetries(long retries) {
+        this.retries = retries;
         return (T) this;
     }
 }
