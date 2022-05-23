@@ -46,4 +46,14 @@ public class StateChanged extends IOTMessage{
         this.otherProperties = otherProperties;
         return (T) this;
     }
+
+
+    @Override
+    public String toString() {
+        return "StateChanged{" +
+                "deviceId='" + deviceId + '\'' +
+                ", otherProperties=" + otherProperties +
+                ", deviceType='" + deviceType + '\'' +
+                "} " + super.toString();
+    }
 }

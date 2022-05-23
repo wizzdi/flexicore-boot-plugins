@@ -35,4 +35,12 @@ public class ChangeState extends IOTMessage{
        this.otherProperties=otherProperties;
         return (T) this;
     }
+
+    @Override
+    public String toString() {
+        return "ChangeState{" +
+                "deviceId='" + deviceId + '\'' +
+                ", otherProperties=" + otherProperties +
+                "} " + super.toString();
+    }
 }
