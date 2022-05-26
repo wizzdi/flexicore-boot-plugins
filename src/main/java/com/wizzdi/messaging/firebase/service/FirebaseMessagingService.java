@@ -1,10 +1,6 @@
 package com.wizzdi.messaging.firebase.service;
 
-import com.google.firebase.messaging.BatchResponse;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.messaging.connectors.firebase.model.FirebaseEnabledDevice;
 import com.wizzdi.messaging.events.NewMessageEvent;
@@ -78,6 +74,8 @@ public class FirebaseMessagingService implements Plugin {
                     .builder()
                     .addAllTokens(tokens)
                     .setNotification(notification)
+                    .setApnsConfig(ApnsConfig.builder().setAps(Aps.builder().setSound("default").build()).build())
+                    .setAndroidConfig(AndroidConfig.builder().setPriority(AndroidConfig.Priority.HIGH).setNotification(AndroidNotification.builder().setSound("default").build()).build())
                     .putAllData(stringProps)
                     .build();
 
