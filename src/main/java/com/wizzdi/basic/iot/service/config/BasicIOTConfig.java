@@ -125,7 +125,7 @@ public class BasicIOTConfig implements Plugin {
             logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
             return null;
         }
-        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-server-in", mqttServerFactory, BasicIOTClient.IOT_MESSAGES_SUBJECT);
+        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-server-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         messageProducer.setQos(1);
         return messageProducer;
     }

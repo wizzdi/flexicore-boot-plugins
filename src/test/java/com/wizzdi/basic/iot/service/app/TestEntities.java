@@ -33,7 +33,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Configuration
 public class TestEntities {
     private static final Logger logger = LoggerFactory.getLogger(TestEntities.class);
-    public static final String IOT_MESSAGES_SUBJECT = "IOT_MESSAGES_SUBJECT";
 
     @Value("${basic.iot.test.keyPath}")
     private String keyPath;
@@ -85,7 +84,7 @@ public class TestEntities {
 
     @Bean
     public MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient(MqttPahoClientFactory mqttClientFactory) {
-        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-client-in", mqttClientFactory,BasicIOTClient.IOT_MESSAGES_SUBJECT);
+        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-client-in", mqttClientFactory,BasicIOTClient.getInTopic(clientId));
         messageProducer.setQos(1);
         return messageProducer;
     }
