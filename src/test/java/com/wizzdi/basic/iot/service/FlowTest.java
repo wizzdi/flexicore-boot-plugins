@@ -185,7 +185,7 @@ public class FlowTest {
     @Test
     @Order(5)
     public void testDeviceStateChange() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
-        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setGatewayIds(Collections.singleton(gateway.getId()))).setValue("dim", 94);
+        ChangeStateRequest changeStateRequest = new ChangeStateRequest().setDeviceFilter(new DeviceFilter().setGatewayIds(new HashSet<>(Collections.singleton(gateway.getId())))).setValue("dim", 94);
         deviceStateService.validate(changeStateRequest, adminSecurityContext);
         AtomicBoolean received = new AtomicBoolean(false);
         synchronized (changeStateRequest) {
