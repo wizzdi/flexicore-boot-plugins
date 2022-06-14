@@ -24,7 +24,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class BasicIOTClient implements MessageHandler {
     public static final String MAIN_TOPIC_PATH = "GATEWAY";
-    public static final String IOT_MESSAGES_SUBJECT = MAIN_TOPIC_PATH + "/#";
+    public static final String IN_SUFFIX = "IN";
+    public static final String OUT_SUFFIX = "OUT";
+    public static final String MAIN_TOPIC_PATH_OUT = MAIN_TOPIC_PATH + "/+/"+OUT_SUFFIX;
+
+
+
+    public static String getInTopic(String gatewayId){
+        return MAIN_TOPIC_PATH+"/"+gatewayId+"/"+ IN_SUFFIX;
+    }
+    public static String getOutTopic(String gatewayId){
+        return MAIN_TOPIC_PATH+"/"+gatewayId+"/"+ OUT_SUFFIX;
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
     public static final String MQTT_TOPIC = "mqtt_topic";
     public static final String SIGNATURE_ALGORITHM = "SHA1WithRSA";
@@ -186,7 +198,7 @@ public class BasicIOTClient implements MessageHandler {
 
 
     public void sendMessage(IOTMessage iotMessage, String targetGatewayId) throws JsonProcessingException {
-        reply(iotMessage, MAIN_TOPIC_PATH + "/" + targetGatewayId);
+        reply(iotMessage, getOutTopic(targetGatewayId));
 
     }
 
@@ -216,7 +228,7 @@ public class BasicIOTClient implements MessageHandler {
                 try {
                     String jsonString = objectMapper.writeValueAsString(request);
                     logger.debug("out ( " + targetGatewayId + ") reply to " + replyTo + ":" + jsonString);
-                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, MAIN_TOPIC_PATH + "/" + targetGatewayId, MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
+                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, getInTopic(targetGatewayId), MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
                     outbound.getInputChannel().send(message);
                 } catch (Exception e) {
                     logger.error("error", e);
