@@ -228,7 +228,7 @@ public class BasicIOTClient implements MessageHandler {
                 try {
                     String jsonString = objectMapper.writeValueAsString(request);
                     logger.debug("out ( " + targetGatewayId + ") reply to " + replyTo + ":" + jsonString);
-                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, getInTopic(targetGatewayId), MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
+                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, getOutTopic(targetGatewayId), MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
                     outbound.getInputChannel().send(message);
                 } catch (Exception e) {
                     logger.error("error", e);
