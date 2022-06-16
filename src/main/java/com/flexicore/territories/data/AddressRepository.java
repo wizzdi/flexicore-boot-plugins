@@ -82,20 +82,32 @@ public class AddressRepository implements Plugin {
 
 			Set<String> ids = filtering.getStreets().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
 			Join<T, Street> join = r.join(Address_.street);
-			preds.add(join.get(Street_.id).in(ids));
+			Predicate in = join.get(Street_.id).in(ids);
+			preds.add(filtering.isStreetsExclude()?cb.not(in):in);
 		}
 		if (filtering.getCities() != null && !filtering.getCities().isEmpty()) {
 
 			Set<String> ids = filtering.getCities().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
 			Join<T, Street> join = r.join(Address_.street);
 			Join<Street, City> join2 = join.join(Street_.city);
-			preds.add(join2.get(City_.id).in(ids));
+			Predicate in = join2.get(City_.id).in(ids);
+			preds.add(filtering.isCitiesExclude()?cb.not(in):in);
 		}
 		if (filtering.getNeighbourhoods() != null && !filtering.getNeighbourhoods().isEmpty()) {
 
 			Set<String> ids = filtering.getNeighbourhoods().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
 			Join<T, Neighbourhood> join = r.join(Address_.neighbourhood);
-			preds.add(join.get(Neighbourhood_.id).in(ids));
+			Predicate in = join.get(Neighbourhood_.id).in(ids);
+			preds.add(filtering.isNeighbourhoodsExclude()?cb.not(in):in);
+		}
+		if (filtering.getStates() != null && !filtering.getStates().isEmpty()) {
+
+			Set<String> ids = filtering.getCities().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
+			Join<T, Street> join = r.join(Address_.street);
+			Join<Street, City> join2 = join.join(Street_.city);
+			Join<City, State> join3 = join2.join(City_.state);
+			Predicate in = join3.get(State_.id).in(ids);
+			preds.add(filtering.isStatesExclude()?cb.not(in):in);
 		}
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);

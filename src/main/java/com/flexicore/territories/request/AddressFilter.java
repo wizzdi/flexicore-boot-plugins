@@ -18,20 +18,30 @@ public class AddressFilter extends PaginationFilter {
     @JsonIgnore
     @TypeRetention(Street.class)
     private List<Street> streets;
+    private boolean streetsExclude;
+
     private Set<Integer> numbers;
     private Set<String> zipCodes;
     private Set<String> externalIds = new HashSet<>();
     private Set<String> stateIds=new HashSet<>();
     @JsonIgnore
     private List<State> states;
+    private boolean statesExclude;
+
     private Set<String> countryIds=new HashSet<>();
     @JsonIgnore
     private List<Country> countries;
+    private boolean countriesExclude;
+
     private Set<String> citiesIds=new HashSet<>();
     @JsonIgnore
     private List<City> cities;
+    private boolean citiesExclude;
+
     @JsonIgnore
     private List<Neighbourhood> neighbourhoods;
+    private boolean neighbourhoodsExclude;
+
     private Set<String> neighbourhoodIds=new HashSet<>();
     private BasicPropertiesFilter basicPropertiesFilter;
 
@@ -173,6 +183,51 @@ public class AddressFilter extends PaginationFilter {
 
     public <T extends AddressFilter> T setCountries(List<Country> countries) {
         this.countries = countries;
+        return (T) this;
+    }
+
+    public boolean isStreetsExclude() {
+        return streetsExclude;
+    }
+
+    public <T extends AddressFilter> T setStreetsExclude(boolean streetsExclude) {
+        this.streetsExclude = streetsExclude;
+        return (T) this;
+    }
+
+    public boolean isStatesExclude() {
+        return statesExclude;
+    }
+
+    public <T extends AddressFilter> T setStatesExclude(boolean statesExclude) {
+        this.statesExclude = statesExclude;
+        return (T) this;
+    }
+
+    public boolean isCountriesExclude() {
+        return countriesExclude;
+    }
+
+    public <T extends AddressFilter> T setCountriesExclude(boolean countriesExclude) {
+        this.countriesExclude = countriesExclude;
+        return (T) this;
+    }
+
+    public boolean isCitiesExclude() {
+        return citiesExclude;
+    }
+
+    public <T extends AddressFilter> T setCitiesExclude(boolean citiesExclude) {
+        this.citiesExclude = citiesExclude;
+        return (T) this;
+    }
+
+    public boolean isNeighbourhoodsExclude() {
+        return neighbourhoodsExclude;
+    }
+
+    public <T extends AddressFilter> T setNeighbourhoodsExclude(boolean neighbourhoodsExclude) {
+        this.neighbourhoodsExclude = neighbourhoodsExclude;
         return (T) this;
     }
 }
