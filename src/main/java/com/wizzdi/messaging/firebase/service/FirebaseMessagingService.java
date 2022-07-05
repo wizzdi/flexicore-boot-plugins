@@ -32,6 +32,8 @@ public class FirebaseMessagingService implements Plugin {
     public static final String CHAT_ID = "chatID";
     public static final String MESSAGE_ID = "messageId";
     public static final String TIME = "time";
+    public static final String TITLE = "title";
+
 
     @Autowired
     private ChatToChatUserService chatToChatUserService;
@@ -69,6 +71,7 @@ public class FirebaseMessagingService implements Plugin {
             stringProps.put(CHAT_ID, chat.getId());
             stringProps.put(MESSAGE_ID, message.getId());
             stringProps.put(TIME, dateTimeFormatter.format(message.getUpdateDate()));
+            stringProps.put(TITLE, chat.getName());
 
             MulticastMessage fbMessage = MulticastMessage
                     .builder()
