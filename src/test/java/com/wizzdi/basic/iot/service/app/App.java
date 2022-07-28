@@ -16,7 +16,7 @@ import org.springframework.integration.config.EnableIntegration;
 
 import java.util.Arrays;
 
-@SpringBootApplication(scanBasePackages = "com.wizzdi.basic.iot")
+@SpringBootApplication(scanBasePackages = {"com.wizzdi.basic.iot","com.wizzdi.flexicore"})
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins

@@ -146,12 +146,7 @@ public class DeviceService implements Plugin {
             device.setGateway(deviceCreate.getGateway());
             update = true;
         }
-        Map<String, Object> mergedValues = DynamicPropertiesUtils.updateDynamic(deviceCreate.getOther(), device.getOther());
 
-        if (mergedValues != null) {
-            device.setOther(mergedValues);
-            update = true;
-        }
 
         return update;
     }

@@ -17,8 +17,7 @@ public class DeviceCreate extends RemoteCreate {
     private String deviceTypeId;
     @JsonIgnore
     private DeviceType deviceType;
-    @JsonIgnore
-    private Map<String, Object> other = new HashMap<>();
+
 
     public String getGatewayId() {
         return gatewayId;
@@ -56,16 +55,5 @@ public class DeviceCreate extends RemoteCreate {
         return (T) this;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getOther() {
-        return other;
-    }
-    public <T extends DeviceCreate> T setOther(Map<String, Object> other) {
-        this.other = other;
-        return (T) this;
-    }
-    @JsonAnySetter
-    public void set(String key, Object val) {
-        other.put(key, val);
-    }
+
 }

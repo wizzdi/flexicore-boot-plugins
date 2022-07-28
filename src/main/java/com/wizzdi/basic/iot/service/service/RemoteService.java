@@ -10,6 +10,7 @@ import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteUpdate;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.metamodel.SingularAttribute;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Extension
@@ -126,6 +128,16 @@ public class RemoteService implements Plugin {
             remote.setRemoteId(remoteCreate.getRemoteId());
             update = true;
         }
+        if (remoteCreate.getVersion() != null && !remoteCreate.getVersion().equals(remote.getVersion())) {
+            remote.setVersion(remoteCreate.getVersion());
+            update = true;
+        }
+        Map<String, Object> mergedValues = DynamicPropertiesUtils.updateDynamic(remoteCreate.getOther(), remote.getOther());
+
+        if (mergedValues != null) {
+            remote.setOther(mergedValues);
+            update = true;
+        }
         return update;
     }
 
@@ -165,5 +177,15 @@ public class RemoteService implements Plugin {
     public void validate(RemoteCreate remoteCreate,
                          SecurityContextBase securityContext) {
         basicService.validate(remoteCreate, securityContext);
+    }
+
+    public Gateway getGateway(Remote remote){
+        if(remote instanceof Gateway ){
+            return (Gateway) remote;
+        }
+        if(remote instanceof Device){
+            return ((Device) remote).getGateway();
+        }
+        return null;
     }
 }

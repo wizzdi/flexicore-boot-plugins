@@ -2,8 +2,13 @@ package com.wizzdi.basic.iot.service.app;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
+import com.wizzdi.basic.iot.service.ObjectHolder;
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
+import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.file.service.FileResourceService;
+import com.wizzdi.flexicore.file.service.MD5Service;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.slf4j.Logger;
@@ -11,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
@@ -18,16 +24,14 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Configuration
@@ -113,6 +117,19 @@ public class TestEntities {
     @Bean
     public BasicIOTConnection testBasicIOTConnection(BasicIOTClient testBasicIOTClient,IntegrationFlow clientOutputIntegrationFlow,IntegrationFlow clientInputIntegrationFlow,MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient) {
         return testBasicIOTClient.open(clientInputIntegrationFlow,clientOutputIntegrationFlow,mqttPahoMessageDrivenChannelAdapterClient);
+    }
+
+    @Bean
+    @Lazy
+    public ObjectHolder<FileResource> firmwareFile(MD5Service md5Service, FileResourceService fileResourceService, SecurityContextBase adminSecurityContext) throws IOException {
+        Random rd = new Random();
+        byte[] data = new byte[80000];
+        rd.nextBytes(data);
+        String md5=md5Service.generateMD5(data);
+        try(ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(data)){
+            return new ObjectHolder<>(fileResourceService.uploadFileResource("test.jpg", adminSecurityContext, md5, md5, true, byteArrayInputStream));
+
+        }
     }
 
 
