@@ -11,6 +11,8 @@
         <class>com.wizzdi.basic.iot.model.PendingGateway</class>
         <class>com.wizzdi.basic.iot.model.Remote</class>
         <class>com.flexicore.model.SecurityUser</class>
+        <class>com.wizzdi.basic.iot.model.FirmwareUpdate</class>
+        <class>com.wizzdi.basic.iot.model.FirmwareUpdateInstallation</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

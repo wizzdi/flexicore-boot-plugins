@@ -5,11 +5,12 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>basic-iot-model</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
 
     <name>basic-iot-model</name>
     <description>Basic IoT model</description>
     <url>https://wizzdi.com</url>
+
 
     <licenses>
         <license>
@@ -22,10 +23,22 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <spring-boot-dependencies.version>2.5.2</spring-boot-dependencies.version>
-        <flexicore-boot-dependencies.version>2.1.4</flexicore-boot-dependencies.version>
+        <spring-boot-dependencies.version>2.6.6</spring-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>2.2.4</flexicore-boot-dependencies.version>
         <version.eclipselink>2.7.7</version.eclipselink>
     </properties>
+    <repositories>
+        <repository>
+            <id>flexicore-local</id>
+            <name>flexicore-local</name>
+            <url>https://artifactory.wizzdi.com/artifactory/flexicore-local</url>
+        </repository>
+        <repository>
+            <id>datatech-local</id>
+            <name>flexicore-local</name>
+            <url>https://artifactory.wizzdi.com/artifactory/datatech-local</url>
+        </repository>
+    </repositories>
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
@@ -36,6 +49,7 @@
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
             </url>
         </repository>
+
     </distributionManagement>
     <developers>
         <developer>
@@ -87,11 +101,7 @@
             <artifactId>flexicore-security-service</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>dynamic-properties-database-converter</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
 
     </dependencies>
     <build>
