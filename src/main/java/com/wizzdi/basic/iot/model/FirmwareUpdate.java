@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.FileResource;
 import com.flexicore.model.SecuredBasic;
+import com.wizzdi.flexicore.file.model.FileResource;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;

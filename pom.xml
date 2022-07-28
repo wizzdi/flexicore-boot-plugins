@@ -93,6 +93,17 @@
     <dependencies>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-file-model</artifactId>
+            <version>1.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-security-model</artifactId>
             <scope>provided</scope>
         </dependency>

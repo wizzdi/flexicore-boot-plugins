@@ -3,8 +3,8 @@ package com.wizzdi.basic.iot.model;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.converters.JsonConverter;
 import com.flexicore.model.SecuredBasic;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
