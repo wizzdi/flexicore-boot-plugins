@@ -43,7 +43,7 @@ public class Remote extends SecuredBasic {
         return other;
     }
 
-    public <T extends Device> T setOther(Map<String, Object> other) {
+    public <T extends Remote> T setOther(Map<String, Object> other) {
         this.other = other;
         return (T) this;
     }
