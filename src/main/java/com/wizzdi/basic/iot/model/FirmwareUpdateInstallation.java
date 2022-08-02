@@ -15,9 +15,14 @@ public class FirmwareUpdateInstallation extends SecuredBasic {
     @ManyToOne(targetEntity = Remote.class)
     private Remote targetRemote;
     @Column(columnDefinition = "timestamp with time zone")
-    private OffsetDateTime installationDateStart;
+    private OffsetDateTime targetInstallationDate;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime nextTimeForReminder;
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime dateInstalled;
+
+    private FirmwareInstallationState firmwareInstallationState;
+
 
     @ManyToOne(targetEntity = Remote.class)
     public Remote getTargetRemote() {
@@ -29,12 +34,12 @@ public class FirmwareUpdateInstallation extends SecuredBasic {
         return (T) this;
     }
 
-    public OffsetDateTime getInstallationDateStart() {
-        return installationDateStart;
+    public OffsetDateTime getTargetInstallationDate() {
+        return targetInstallationDate;
     }
 
-    public <T extends FirmwareUpdateInstallation> T setInstallationDateStart(OffsetDateTime installationDate) {
-        this.installationDateStart = installationDate;
+    public <T extends FirmwareUpdateInstallation> T setTargetInstallationDate(OffsetDateTime installationDate) {
+        this.targetInstallationDate = installationDate;
         return (T) this;
     }
 
@@ -54,6 +59,24 @@ public class FirmwareUpdateInstallation extends SecuredBasic {
 
     public <T extends FirmwareUpdateInstallation> T setFirmwareUpdate(FirmwareUpdate firmwareUpdate) {
         this.firmwareUpdate = firmwareUpdate;
+        return (T) this;
+    }
+
+    public OffsetDateTime getNextTimeForReminder() {
+        return nextTimeForReminder;
+    }
+
+    public <T extends FirmwareUpdateInstallation> T setNextTimeForReminder(OffsetDateTime lastReminderSent) {
+        this.nextTimeForReminder = lastReminderSent;
+        return (T) this;
+    }
+
+    public FirmwareInstallationState getFirmwareInstallationState() {
+        return firmwareInstallationState;
+    }
+
+    public <T extends FirmwareUpdateInstallation> T setFirmwareInstallationState(FirmwareInstallationState firmwareInstallationState) {
+        this.firmwareInstallationState = firmwareInstallationState;
         return (T) this;
     }
 }

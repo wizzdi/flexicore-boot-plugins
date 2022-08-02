@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 public class FirmwareUpdate extends SecuredBasic {
 
     private String version;
+    private String crc;
 
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource fileResource;
@@ -30,6 +31,15 @@ public class FirmwareUpdate extends SecuredBasic {
 
     public <T extends FirmwareUpdate> T setVersion(String version) {
         this.version = version;
+        return (T) this;
+    }
+
+    public String getCrc() {
+        return crc;
+    }
+
+    public <T extends FirmwareUpdate> T setCrc(String crc) {
+        this.crc = crc;
         return (T) this;
     }
 }

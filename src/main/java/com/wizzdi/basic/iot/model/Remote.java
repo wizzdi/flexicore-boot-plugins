@@ -19,6 +19,7 @@ public class Remote extends SecuredBasic {
     @ManyToOne(targetEntity = ConnectivityChange.class)
     private ConnectivityChange lastConnectivityChange;
     private String remoteId;
+    private String version;
 
     @Convert(converter = JsonConverter.class)
     @JsonIgnore
@@ -64,6 +65,15 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setRemoteId(String remoteId) {
         this.remoteId = remoteId;
+        return (T) this;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public <T extends Remote> T setVersion(String version) {
+        this.version = version;
         return (T) this;
     }
 }
