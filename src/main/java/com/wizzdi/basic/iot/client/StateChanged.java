@@ -10,6 +10,7 @@ public class StateChanged extends IOTMessage{
     private String deviceId;
     private Map<String,Object> otherProperties =new HashMap<>();
     private String deviceType;
+    private String version;
 
 
     public String getDeviceId() {
@@ -47,12 +48,21 @@ public class StateChanged extends IOTMessage{
         return (T) this;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public <T extends StateChanged> T setVersion(String version) {
+        this.version = version;
+        return (T) this;
+    }
 
     @Override
     public String toString() {
         return "StateChanged{" +
                 "deviceId='" + deviceId + '\'' +
                 ", otherProperties=" + otherProperties +
+                ", version=" + version +
                 ", deviceType='" + deviceType + '\'' +
                 "} " + super.toString();
     }

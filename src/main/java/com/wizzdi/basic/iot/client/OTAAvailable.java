@@ -5,7 +5,6 @@ import java.time.OffsetDateTime;
 public class OTAAvailable extends IOTMessage{
 
 
-    private String url;
     private String md5;
     private String crc;
     private String version;
@@ -13,15 +12,6 @@ public class OTAAvailable extends IOTMessage{
 
     private OffsetDateTime targetInstallationDate;
 
-
-    public String getUrl() {
-        return url;
-    }
-
-    public <T extends OTAAvailable> T setUrl(String url) {
-        this.url = url;
-        return (T) this;
-    }
 
     public String getMd5() {
         return md5;

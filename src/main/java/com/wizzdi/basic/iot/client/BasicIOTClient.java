@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.support.MqttHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessageHeaders;
@@ -26,15 +27,15 @@ public class BasicIOTClient implements MessageHandler {
     public static final String MAIN_TOPIC_PATH = "GATEWAY";
     public static final String IN_SUFFIX = "IN";
     public static final String OUT_SUFFIX = "OUT";
-    public static final String MAIN_TOPIC_PATH_OUT = MAIN_TOPIC_PATH + "/+/"+OUT_SUFFIX;
+    public static final String MAIN_TOPIC_PATH_OUT = MAIN_TOPIC_PATH + "/+/" + OUT_SUFFIX;
 
 
-
-    public static String getInTopic(String gatewayId){
-        return MAIN_TOPIC_PATH+"/"+gatewayId+"/"+ IN_SUFFIX;
+    public static String getInTopic(String gatewayId) {
+        return MAIN_TOPIC_PATH + "/" + gatewayId + "/" + IN_SUFFIX;
     }
-    public static String getOutTopic(String gatewayId){
-        return MAIN_TOPIC_PATH+"/"+gatewayId+"/"+ OUT_SUFFIX;
+
+    public static String getOutTopic(String gatewayId) {
+        return MAIN_TOPIC_PATH + "/" + gatewayId + "/" + OUT_SUFFIX;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
@@ -54,12 +55,18 @@ public class BasicIOTClient implements MessageHandler {
 
     private final String id;
     private PublicKeyProvider publicKeyProvider;
-
+    private final boolean client;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Collection<IOTMessageSubscriber> subscribers) {
+        this(id, key, objectMapper, subscribers, false);
+    }
+
+
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Collection<IOTMessageSubscriber> subscribers, boolean client) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
+        this.client = client;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -114,9 +121,8 @@ public class BasicIOTClient implements MessageHandler {
                     logger.error("IOTMessageSubscriber failed", e);
                 }
             }
-        }
-        catch (Throwable e){
-            logger.error("failed handling message",e);
+        } catch (Throwable e) {
+            logger.error("failed handling message", e);
         }
 
 
@@ -153,10 +159,10 @@ public class BasicIOTClient implements MessageHandler {
     private <T extends IOTMessage> T parseMessage(Message message, Class<T> type) throws JsonProcessingException {
         String payload = (String) message.getPayload();
 
-            String mqtt_receivedTopic = message.getHeaders().get(MQTT_RECEIVED_TOPIC, String.class);
-            logger.debug("in (" + mqtt_receivedTopic + "): " + payload);
-            T t = objectMapper.readValue(payload, type);
-            return t.setMessage(message);
+        String mqtt_receivedTopic = message.getHeaders().get(MQTT_RECEIVED_TOPIC, String.class);
+        logger.debug("in (" + mqtt_receivedTopic + "): " + payload);
+        T t = objectMapper.readValue(payload, type);
+        return t.setMessage(message);
 
     }
 
@@ -198,7 +204,8 @@ public class BasicIOTClient implements MessageHandler {
 
 
     public void sendMessage(IOTMessage iotMessage, String targetGatewayId) throws JsonProcessingException {
-        reply(iotMessage, getOutTopic(targetGatewayId));
+        String topicToSendTo = client ? getOutTopic(targetGatewayId) : getInTopic(targetGatewayId);
+        reply(iotMessage, topicToSendTo);
 
     }
 
@@ -228,7 +235,9 @@ public class BasicIOTClient implements MessageHandler {
                 try {
                     String jsonString = objectMapper.writeValueAsString(request);
                     logger.debug("out ( " + targetGatewayId + ") reply to " + replyTo + ":" + jsonString);
-                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MQTT_TOPIC, getOutTopic(targetGatewayId), MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
+
+                    String topicToSendTo = client ? getOutTopic(targetGatewayId) : getInTopic(targetGatewayId);
+                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MqttHeaders.TOPIC, topicToSendTo, MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
                     outbound.getInputChannel().send(message);
                 } catch (Exception e) {
                     logger.error("error", e);
@@ -250,9 +259,9 @@ public class BasicIOTClient implements MessageHandler {
     }
 
 
-    public void reply(IOTMessage iotMessage, String replyTo) throws JsonProcessingException {
+    public void reply(IOTMessage iotMessage, String topicToSendTo) throws JsonProcessingException {
         prepareMessage(iotMessage);
-        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MQTT_TOPIC, replyTo, MQTT_BY, id));
+        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MqttHeaders.TOPIC, topicToSendTo, MQTT_BY, id));
         outbound.getInputChannel().send(message);
     }
 
