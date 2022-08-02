@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -52,8 +53,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Value("${basic.iot.lastSeenThreshold:#{60*60*1000}}")
     private long lastSeenThreshold;
-    @Value("${basic.iot.firmware.update.reminderInterval:1h}")
-    private Duration reminderInterval;
+    @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*60*1000}}")
+    private long reminderInterval;
     private final Map<String, Long> gatewayToLastSeen = new ConcurrentHashMap<>();
 
     @Override
@@ -150,11 +151,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     .setMd5(firmwareUpdateInstallation.getFirmwareUpdate().getFileResource().getMd5())
                     .setCrc(firmwareUpdateInstallation.getFirmwareUpdate().getCrc());
             try {
+                logger.info(String.format("sending OTA Available version %s to remote %s ",otaAvailable.getVersion(),firmwareUpdateInstallation.getTargetRemote().getRemoteId()));
                 basicIOTClient.sendMessage(otaAvailable, gateway.getRemoteId());
             } catch (JsonProcessingException e) {
                 logger.error("failed sending reminder for firmware update installation " + firmwareUpdateInstallation.getId());
             }
-            firmwareUpdateInstallationService.updateFirmwareUpdateInstallation(new FirmwareUpdateInstallationUpdate().setFirmwareUpdateInstallation(firmwareUpdateInstallation).setNextTimeForReminder(OffsetDateTime.now().plus(reminderInterval)), null);
+            firmwareUpdateInstallationService.updateFirmwareUpdateInstallation(new FirmwareUpdateInstallationUpdate().setFirmwareUpdateInstallation(firmwareUpdateInstallation).setNextTimeForReminder(OffsetDateTime.now().plus(reminderInterval, ChronoUnit.MILLIS)), null);
 
         }
         logger.debug("done checking firmwareUpdates");

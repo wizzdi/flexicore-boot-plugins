@@ -224,6 +224,12 @@
             <artifactId>dynamic-properties-converter-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>info.schnatterer.moby-names-generator</groupId>
+            <artifactId>moby-names-generator</artifactId>
+            <version>20.10.0-r0</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <build>

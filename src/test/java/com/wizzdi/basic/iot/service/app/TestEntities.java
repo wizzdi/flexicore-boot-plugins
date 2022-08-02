@@ -1,14 +1,15 @@
 package com.wizzdi.basic.iot.service.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
+import com.wizzdi.basic.iot.service.ClientIdHolder;
 import com.wizzdi.basic.iot.service.ObjectHolder;
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.service.FileResourceService;
 import com.wizzdi.flexicore.file.service.MD5Service;
+import info.schnatterer.mobynamesgenerator.MobyNamesGenerator;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.slf4j.Logger;
@@ -42,18 +43,21 @@ public class TestEntities {
     private String keyPath;
     @Value("${basic.iot.test.publicKeyPath}")
     private String publicKeyPath;
-    @Value("${basic.iot.test.id}")
-    private String clientId;
     @Value("${basic.iot.test.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
     @Value("${basic.iot.test.mqtt.username:#{null}}")
     private String username;
     @Value("${basic.iot.test.mqtt.password:#{null}}")
     private char[] password;
-    private static final Queue<IOTMessageSubscriber> messageSubscribers=new LinkedBlockingQueue<>();
+    @Value("${basic.iot.test.id:#{null}}")
+    private String clientId;
+    private static final Queue<IOTMessageSubscriber> messageSubscribers = new LinkedBlockingQueue<>();
 
 
-
+    @Bean
+    public ClientIdHolder clientIdHolder() {
+        return new ClientIdHolder(Optional.ofNullable(clientId).orElse(MobyNamesGenerator.getRandomName()+System.currentTimeMillis()));
+    }
 
     @Bean
     public MqttPahoClientFactory mqttClientFactory() {
@@ -69,7 +73,7 @@ public class TestEntities {
 
     @Bean
     public PrivateKey clientPrivateKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
-       return KeyUtils.readPrivateKey(keyPath);
+        return KeyUtils.readPrivateKey(keyPath);
 
     }
 
@@ -87,16 +91,16 @@ public class TestEntities {
     }
 
     @Bean
-    public MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient(MqttPahoClientFactory mqttClientFactory) {
-        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-client-in", mqttClientFactory,BasicIOTClient.getInTopic(clientId));
+    public MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient(MqttPahoClientFactory mqttClientFactory,ClientIdHolder clientIdHolder) {
+        MqttPahoMessageDrivenChannelAdapter messageProducer = new MqttPahoMessageDrivenChannelAdapter("iot-client-in", mqttClientFactory, BasicIOTClient.getInTopic(clientIdHolder.getGatewayId()));
         messageProducer.setQos(1);
         return messageProducer;
     }
 
 
     @Bean
-    public BasicIOTClient testBasicIOTClient(PrivateKey clientPrivateKey, ObjectMapper objectMapper) {
-        return new BasicIOTClient(clientId, clientPrivateKey, objectMapper, messageSubscribers);
+    public BasicIOTClient testBasicIOTClient(PrivateKey clientPrivateKey, ObjectMapper objectMapper,ClientIdHolder clientIdHolder) {
+        return new BasicIOTClient(clientIdHolder.getGatewayId(), clientPrivateKey, objectMapper, messageSubscribers,true);
 
     }
 
@@ -114,9 +118,10 @@ public class TestEntities {
     public IntegrationFlow clientOutputIntegrationFlow(MqttPahoMessageHandler mqttPahoMessageHandlerClient) {
         return f -> f.handle(mqttPahoMessageHandlerClient);
     }
+
     @Bean
-    public BasicIOTConnection testBasicIOTConnection(BasicIOTClient testBasicIOTClient,IntegrationFlow clientOutputIntegrationFlow,IntegrationFlow clientInputIntegrationFlow,MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient) {
-        return testBasicIOTClient.open(clientInputIntegrationFlow,clientOutputIntegrationFlow,mqttPahoMessageDrivenChannelAdapterClient);
+    public BasicIOTConnection testBasicIOTConnection(BasicIOTClient testBasicIOTClient, IntegrationFlow clientOutputIntegrationFlow, IntegrationFlow clientInputIntegrationFlow, MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapterClient) {
+        return testBasicIOTClient.open(clientInputIntegrationFlow, clientOutputIntegrationFlow, mqttPahoMessageDrivenChannelAdapterClient);
     }
 
     @Bean
@@ -125,8 +130,8 @@ public class TestEntities {
         Random rd = new Random();
         byte[] data = new byte[80000];
         rd.nextBytes(data);
-        String md5=md5Service.generateMD5(data);
-        try(ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(data)){
+        String md5 = md5Service.generateMD5(data);
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data)) {
             return new ObjectHolder<>(fileResourceService.uploadFileResource("test.jpg", adminSecurityContext, md5, md5, true, byteArrayInputStream));
 
         }
@@ -138,13 +143,15 @@ public class TestEntities {
         return IOUtils.resourceToString("light.schema.json", StandardCharsets.UTF_8, TestEntities.class.getClassLoader());
     }
 
-    public static void addMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber){
+    public static void addMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber) {
         messageSubscribers.add(iotMessageSubscriber);
     }
-    public static void removeMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber){
+
+    public static void removeMessageSubscriber(IOTMessageSubscriber iotMessageSubscriber) {
         messageSubscribers.remove(iotMessageSubscriber);
     }
-    public static void clearMessageSubscribers(){
+
+    public static void clearMessageSubscribers() {
         messageSubscribers.clear();
     }
 

@@ -4,20 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.model.Connectivity;
-import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.app.TestEntities;
 import com.wizzdi.basic.iot.service.request.*;
-import com.wizzdi.basic.iot.service.response.ChangeStateResponse;
 import com.wizzdi.basic.iot.service.service.DeviceService;
 import com.wizzdi.basic.iot.service.service.DeviceStateService;
 import com.wizzdi.basic.iot.service.service.DeviceTypeService;
 import com.wizzdi.basic.iot.service.service.GatewayService;
-import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
-import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -32,7 +27,6 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @ExtendWith(SpringExtension.class)
@@ -61,8 +55,8 @@ public class BadMessageFlowTest {
     private String jsonSchema;
     @Autowired
     private PublicKey clientPublicKey;
-    @Value("${basic.iot.test.id:iot-client}")
-    private String clientId;
+    @Autowired
+    private ClientIdHolder clientIdHolder;
     @Autowired
     private DeviceStateService deviceStateService;
     @Value("${basic.iot.connectivityCheckInterval:60000}")
@@ -84,7 +78,7 @@ public class BadMessageFlowTest {
     public void testRegister() throws JsonProcessingException, ExecutionException, InterruptedException, TimeoutException {
         RegisterGateway registerGateway = new RegisterGateway()
                 .setPublicKey("fake")
-                .setGatewayId(clientId)
+                .setGatewayId(clientIdHolder.getGatewayId())
 
                 .setId(UUID.randomUUID().toString());
         RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway);
@@ -96,8 +90,8 @@ public class BadMessageFlowTest {
     @Test
     @Order(2)
     public void testApproveGateway() {
-        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
-        Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
+        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientIdHolder.getGatewayId()))));
+        Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientIdHolder.getGatewayId())).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertNotNull(gateway.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF,gateway.getLastConnectivityChange().getConnectivity());

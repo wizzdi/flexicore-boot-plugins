@@ -140,7 +140,7 @@ public class DeviceTypeService implements Plugin {
     }
 
     public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContextBase securityContext) {
-        DeviceType deviceType = listAllDeviceTypes(securityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().findFirst().orElse(null);
+        DeviceType deviceType = listAllDeviceTypes(null, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().filter(f->f.getSecurity().getTenant().getId().equals(securityContext.getTenantToCreateIn().getId())).findFirst().orElse(null);
         if(deviceType!=null){
             logger.info("created device type "+deviceTypeName);
             return deviceType;

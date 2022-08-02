@@ -22,19 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -64,8 +57,8 @@ public class FlowTest {
     private String jsonSchema;
     @Autowired
     private PublicKey clientPublicKey;
-    @Value("${basic.iot.test.id:iot-client}")
-    private String clientId;
+    @Autowired
+    private ClientIdHolder clientIdHolder;
     @Autowired
     private DeviceStateService deviceStateService;
     @Value("${basic.iot.connectivityCheckInterval:60000}")
@@ -103,7 +96,7 @@ public class FlowTest {
         TestEntities.addMessageSubscriber(iotMessageSubscriber);
         RegisterGateway registerGateway = new RegisterGateway()
                 .setPublicKey(Base64.encodeBase64String(clientPublicKey.getEncoded()))
-                .setGatewayId(clientId)
+                .setGatewayId(clientIdHolder.getGatewayId())
 
                 .setId(UUID.randomUUID().toString());
         RegisterGatewayReceived registerGatewayReceived = testBasicIOTClient.request(registerGateway);
@@ -115,8 +108,8 @@ public class FlowTest {
     @Test
     @Order(2)
     public void testApproveGateway() {
-        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientId))));
-        gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientId)).findFirst().orElse(null);
+        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(clientIdHolder.getGatewayId()))));
+        gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(clientIdHolder.getGatewayId())).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertNotNull(gateway.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF,gateway.getLastConnectivityChange().getConnectivity());
@@ -129,7 +122,7 @@ public class FlowTest {
             logger.info("started keep alive");
             while (!stopKeepAlive) {
                 try {
-                    testBasicIOTClient.sendMessage(new KeepAlive().setDeviceIds(keepAliveDevices), clientId);
+                    testBasicIOTClient.sendMessage(new KeepAlive().setDeviceIds(keepAliveDevices), clientIdHolder.getGatewayId());
                 } catch (JsonProcessingException e) {
                     logger.error("failed sending keep alive ", e);
                 }
@@ -213,7 +206,7 @@ public class FlowTest {
     }
 
     private void checkDevicesAndGateways(Connectivity expected) {
-        Gateway gateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(clientId))).stream().findFirst().orElse(null);
+        Gateway gateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(clientIdHolder.getGatewayId()))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertNotNull(gateway.getLastConnectivityChange());
         Assertions.assertEquals(expected,gateway.getLastConnectivityChange().getConnectivity());

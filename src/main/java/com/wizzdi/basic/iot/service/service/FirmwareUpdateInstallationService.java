@@ -111,7 +111,7 @@ public class FirmwareUpdateInstallationService implements Plugin {
             firmwareUpdateInstallationCreate.setTargetInstallationDate(OffsetDateTime.now());
         }
         if(firmwareUpdateInstallationCreate.getNextTimeForReminder()==null&&firmwareUpdateInstallation.getNextTimeForReminder()==null){
-            firmwareUpdateInstallationCreate.setNextTimeForReminder(firmwareUpdateInstallationCreate.getNextTimeForReminder());
+            firmwareUpdateInstallationCreate.setNextTimeForReminder(firmwareUpdateInstallationCreate.getTargetInstallationDate());
         }
         if(firmwareUpdateInstallationCreate.getFirmwareInstallationState()==null&&firmwareUpdateInstallation.getFirmwareInstallationState()==null){
             firmwareUpdateInstallationCreate.setFirmwareInstallationState(FirmwareInstallationState.PENDING);
