@@ -40,7 +40,7 @@ public class BasicIOTClient implements MessageHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
     public static final String MQTT_TOPIC = "mqtt_topic";
-    public static final String SIGNATURE_ALGORITHM = "SHA1WithRSA";
+    public static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     public static final String MQTT_RECEIVED_TOPIC = "mqtt_receivedTopic";
     private static final String MQTT_BY = "MQTT_BY";
     private final Signature signature;
