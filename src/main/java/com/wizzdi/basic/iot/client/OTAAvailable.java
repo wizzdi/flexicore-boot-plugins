@@ -9,6 +9,7 @@ public class OTAAvailable extends IOTMessage{
     private String crc;
     private String version;
     private String firmwareInstallationId;
+    private String baseUrl;
 
     private OffsetDateTime targetInstallationDate;
 
@@ -55,6 +56,15 @@ public class OTAAvailable extends IOTMessage{
 
     public <T extends OTAAvailable> T setTargetInstallationDate(OffsetDateTime targetInstallationDate) {
         this.targetInstallationDate = targetInstallationDate;
+        return (T) this;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl;
+    }
+
+    public <T extends OTAAvailable> T setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
         return (T) this;
     }
 }
