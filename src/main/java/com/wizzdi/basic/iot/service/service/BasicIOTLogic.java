@@ -49,6 +49,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private RemoteService remoteService;
     @Autowired
     private FirmwareUpdateInstallationService firmwareUpdateInstallationService;
+    @Value("${basic.iot.fota.baseUrl:http://localhost:8080/downloadFirmware/}")
+    private String fotaBaseUrl;
 
 
     @Value("${basic.iot.lastSeenThreshold:#{60*60*1000}}")
@@ -145,6 +147,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         for (FirmwareUpdateInstallation firmwareUpdateInstallation : toInstall) {
             Gateway gateway = remoteService.getGateway(firmwareUpdateInstallation.getTargetRemote());
             OTAAvailable otaAvailable = new OTAAvailable()
+                    .setBaseUrl(fotaBaseUrl)
                     .setVersion(firmwareUpdateInstallation.getFirmwareUpdate().getVersion())
                     .setTargetInstallationDate(firmwareUpdateInstallation.getTargetInstallationDate())
                     .setFirmwareInstallationId(firmwareUpdateInstallation.getId())

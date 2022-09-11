@@ -73,5 +73,18 @@ public class KeyTest {
 
     }
 
+    @Order(3)
+    @Test
+    public void test() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\test-public.pem");
+        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+        signature.initVerify(publicKey);
+        signature.update("6318740d-0000-1000-8000-1fb1500efdec".getBytes(StandardCharsets.UTF_8));
+        byte[] bytes = Base64.getDecoder().decode("gDflHf9qzFwd9PRzhWW2hhkFn4N9ii+gPCTo28yfnBwO9HPvNio2Paisc1tb9TTsIO07grDWItRVzMvfFH/OGWECBLrztJZR4vMnzJRlBn/iyTKPGmC6w/U9tvu9yQsW8/e4q110GHNHXZs1dZC+FMO7RYjk+pYEDdG2pxUlReH0tIFlBTeUoYGm2E4RBpYv3UjpK0mwlC1nNbf0XydZKmT0VgKYwxg4eogtqOo5I6BqciEinFILLh7VZPkAP176/Xx+E2PTQuw9QxFkdY7zMmL+Ta0obt5WXe2Y8bf0JeeaTAYOhzQndzu0vqBlW3ljp1mN7Wa1c1SVcQ5gdiFdCw==");
+        boolean verify = signature.verify(bytes);
+        Assertions.assertTrue(verify);
+
+    }
+
 
 }
