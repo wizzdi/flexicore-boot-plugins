@@ -92,6 +92,11 @@
             <artifactId>flexicore-boot-starter-data-jpa</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

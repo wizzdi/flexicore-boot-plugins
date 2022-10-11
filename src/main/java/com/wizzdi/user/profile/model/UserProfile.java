@@ -1,11 +1,20 @@
 package com.wizzdi.user.profile.model;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityUser;
+import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.file.model.FileResource;
 
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 public class UserProfile extends Basic {
@@ -16,6 +25,9 @@ public class UserProfile extends Basic {
     @ManyToOne(targetEntity = SecurityUser.class)
     private SecurityUser securityUser;
     private Gender gender;
+    @Convert(converter = JsonConverter.class)
+    @JsonIgnore
+    private Map<String, Object> other = new HashMap<>();
 
 
     @ManyToOne(targetEntity = FileResource.class)
@@ -46,4 +58,31 @@ public class UserProfile extends Basic {
         this.gender = gender;
         return (T) this;
     }
+
+
+    @JsonAnySetter
+    public void set(String key, Object val) {
+        other.put(key, val);
+    }
+
+
+    @DynamicColumnDefinition
+    @Column(columnDefinition = "jsonb")
+    @Convert(converter = JsonConverter.class)
+    @JsonIgnore
+    public Map<String, Object> getOther() {
+        return other;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> any() {
+        return other;
+    }
+
+
+    public <T extends UserProfile> T setOther(Map<String, Object> other) {
+        this.other=other;
+        return (T) this;
+    }
+
 }
