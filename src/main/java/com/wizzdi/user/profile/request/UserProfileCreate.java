@@ -1,10 +1,15 @@
 package com.wizzdi.user.profile.request;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecurityUser;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.wizzdi.user.profile.model.Gender;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserProfileCreate extends BasicCreate {
 
@@ -15,6 +20,8 @@ public class UserProfileCreate extends BasicCreate {
     @JsonIgnore
     private FileResource avatar;
     private Gender gender;
+    @JsonIgnore
+    private Map<String, Object> other = new HashMap<>();
 
     public String getUserId() {
         return userId;
@@ -59,5 +66,26 @@ public class UserProfileCreate extends BasicCreate {
     public <T extends UserProfileCreate> T setGender(Gender gender) {
         this.gender = gender;
         return (T) this;
+    }
+
+
+    @JsonIgnore
+    public Map<String, Object> getOther() {
+        return other;
+    }
+
+    public <T extends UserProfileCreate> T setOther(Map<String, Object> other) {
+        this.other = other;
+        return (T) this;
+    }
+
+    @JsonAnySetter
+    public void set(String key, Object val) {
+        other.put(key, val);
+    }
+
+    @JsonAnyGetter
+    public Object get(String key) {
+        return other.get(key);
     }
 }

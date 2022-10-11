@@ -3,6 +3,7 @@ package com.wizzdi.user.profile.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.model.FileResource_;
@@ -67,6 +68,12 @@ public class UserProfileService implements Plugin {
         }
         if (userProfileCreate.getSecurityUser() != null && (userProfile.getSecurityUser() == null || !userProfileCreate.getSecurityUser().getId().equals(userProfile.getSecurityUser().getId()))) {
             userProfile.setSecurityUser(userProfileCreate.getSecurityUser());
+            update = true;
+        }
+        Map<String, Object> mergedValues = DynamicPropertiesUtils.updateDynamic(userProfileCreate.getOther(), userProfile.getOther());
+
+        if (mergedValues != null) {
+            userProfile.setOther(mergedValues);
             update = true;
         }
         return update;

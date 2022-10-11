@@ -1,5 +1,6 @@
 package com.wizzdi.user.profile.app;
 
+import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
@@ -21,6 +22,7 @@ import java.util.Arrays;
 @EnableFlexiCoreSecurity
 @EnableFlexiCoreRESTPlugins
 @SpringBootApplication(scanBasePackages = {"com.wizzdi.user.profile","com.wizzdi.flexicore.file"})
+@EnableDynamicProperties
 public class App {
 
 
