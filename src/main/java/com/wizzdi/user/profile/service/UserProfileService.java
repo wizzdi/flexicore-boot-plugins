@@ -57,6 +57,10 @@ public class UserProfileService implements Plugin {
 
     public boolean updateUserProfileNoMerge(UserProfile userProfile, UserProfileCreate userProfileCreate) {
         boolean update = basicService.updateBasicNoMerge(userProfileCreate, userProfile);
+        if (userProfileCreate.getLastName() != null && !userProfileCreate.getLastName().equals(userProfile.getLastName())) {
+            userProfile.setLastName(userProfileCreate.getLastName());
+            update = true;
+        }
         if (userProfileCreate.getGender() != null && !userProfileCreate.getGender().equals(userProfile.getGender())) {
             userProfile.setGender(userProfileCreate.getGender());
             update = true;

@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class UserProfileCreate extends BasicCreate {
 
+    private String lastName;
     private String userId;
     @JsonIgnore
     private SecurityUser securityUser;
@@ -68,6 +69,14 @@ public class UserProfileCreate extends BasicCreate {
         return (T) this;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public <T extends UserProfileCreate> T setLastName(String lastName) {
+        this.lastName = lastName;
+        return (T) this;
+    }
 
     @JsonIgnore
     public Map<String, Object> getOther() {
