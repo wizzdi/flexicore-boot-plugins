@@ -20,6 +20,7 @@ import java.util.Map;
 public class UserProfile extends Basic {
 
 
+    private String lastName;
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource avatar;
     @ManyToOne(targetEntity = SecurityUser.class)
@@ -59,6 +60,14 @@ public class UserProfile extends Basic {
         return (T) this;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public <T extends UserProfile> T setLastName(String lastName) {
+        this.lastName = lastName;
+        return (T) this;
+    }
 
     @JsonAnySetter
     public void set(String key, Object val) {
