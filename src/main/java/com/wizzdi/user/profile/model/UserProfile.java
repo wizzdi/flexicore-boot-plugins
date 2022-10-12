@@ -27,6 +27,7 @@ public class UserProfile extends Basic {
     private SecurityUser securityUser;
     private Gender gender;
     @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "jsonb")
     @JsonIgnore
     private Map<String, Object> other = new HashMap<>();
 
@@ -75,7 +76,6 @@ public class UserProfile extends Basic {
     }
 
 
-    @DynamicColumnDefinition
     @Column(columnDefinition = "jsonb")
     @Convert(converter = JsonConverter.class)
     @JsonIgnore
