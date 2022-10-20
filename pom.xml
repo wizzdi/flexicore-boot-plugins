@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>flexicore-encryption-service</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>FlexiCore Encryption service</name>
     <description>flexicore Encryption service</description>
     <url>https://wizzdi.com</url>
@@ -52,7 +52,7 @@
         <connection>scm:git:git://wizzdi/flexicore-encryption-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/flexicore-encryption-service.git</developerConnection>
         <url>https://github.com/wizzdi/flexicore-encryption-service</url>
-        <tag>flexicore-encryption-service-${version}</tag>
+        <tag>flexicore-encryption-service-1.0.1</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
