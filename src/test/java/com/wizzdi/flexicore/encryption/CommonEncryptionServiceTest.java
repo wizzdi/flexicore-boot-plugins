@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.encryption;
 
 import com.wizzdi.flexicore.encryption.app.App;
-import com.wizzdi.flexicore.encryption.service.EncryptionService;
+import com.wizzdi.flexicore.encryption.service.CommonEncryptionService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ import java.security.GeneralSecurityException;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
 
-public class EncryptionServiceTest {
+public class CommonEncryptionServiceTest {
 
 
     @Autowired
-    private EncryptionService encryptionService;
+    private CommonEncryptionService commonEncryptionService;
 
 
     @Test
@@ -29,8 +29,8 @@ public class EncryptionServiceTest {
     public void testEncrypt() throws GeneralSecurityException {
         String plainText="test";
         byte[] associatedData = "key".getBytes();
-        byte[] encrypted = encryptionService.encrypt(plainText.getBytes(), associatedData);
-        byte[] decrypted = encryptionService.decrypt(encrypted, associatedData);
+        byte[] encrypted = commonEncryptionService.encrypt(plainText.getBytes(), associatedData);
+        byte[] decrypted = commonEncryptionService.decrypt(encrypted, associatedData);
         String output=new String(decrypted);
         Assertions.assertEquals(plainText,output);
 

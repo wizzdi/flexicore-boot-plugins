@@ -20,11 +20,11 @@ import java.security.GeneralSecurityException;
 
 @Component
 @Extension
-public class EncryptionService implements Plugin, InitializingBean {
+public class CommonEncryptionService implements Plugin, InitializingBean {
 	private KeysetHandle keysetHandle;
 
 
-	private static final Logger logger = LoggerFactory.getLogger(EncryptionService.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommonEncryptionService.class);
 
 	@Value("${flexicore.security.encryption.tinkKeySetPath:/home/flexicore/keyset.json}")
 	private String tinkKeySetPath;
