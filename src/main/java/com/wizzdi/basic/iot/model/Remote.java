@@ -21,6 +21,9 @@ public class Remote extends SecuredBasic {
     private String remoteId;
     private String version;
 
+    @ManyToOne(targetEntity = StateSchema.class)
+    private StateSchema currentSchema;
+
     @Convert(converter = JsonConverter.class)
     @JsonIgnore
     private Map<String, Object> other = new HashMap<>();
@@ -74,6 +77,16 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setVersion(String version) {
         this.version = version;
+        return (T) this;
+    }
+
+    @ManyToOne(targetEntity = StateSchema.class)
+    public StateSchema getCurrentSchema() {
+        return currentSchema;
+    }
+
+    public <T extends Remote> T setCurrentSchema(StateSchema stateSchema) {
+        this.currentSchema = stateSchema;
         return (T) this;
     }
 }
