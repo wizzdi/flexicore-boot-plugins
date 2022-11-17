@@ -23,7 +23,11 @@ import java.time.OffsetDateTime;
                 @JsonSubTypes.Type(value = UpdateStateSchema.class,name = "com.wizzdi.basic.iot.client.UpdateStateSchema"),
                 @JsonSubTypes.Type(value = UpdateStateSchemaReceived.class,name = "com.wizzdi.basic.iot.client.UpdateStateSchemaReceived"),
                 @JsonSubTypes.Type(value = OTAAvailable.class,name = "com.wizzdi.basic.iot.client.OTAAvailable"),
-                @JsonSubTypes.Type(value = OTAAvailableReceived.class,name = "com.wizzdi.basic.iot.client.OTAAvailableReceived")
+                @JsonSubTypes.Type(value = OTAAvailableReceived.class,name = "com.wizzdi.basic.iot.client.OTAAvailableReceived"),
+                @JsonSubTypes.Type(value = SetStateSchema.class,name = "com.wizzdi.basic.iot.client.SetStateSchema"),
+                @JsonSubTypes.Type(value = SetStateSchemaReceived.class,name = "com.wizzdi.basic.iot.client.SetStateSchemaReceived")
+
+
 
 
 
