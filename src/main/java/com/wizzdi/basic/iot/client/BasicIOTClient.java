@@ -48,7 +48,7 @@ public class BasicIOTClient implements MessageHandler {
 
     private IntegrationFlow inbound;
     private final ObjectMapper objectMapper;
-    private final Collection<IOTMessageSubscriber> subscribers;
+    private final Iterable<IOTMessageSubscriber> subscribers;
     private IntegrationFlow outbound;
     private MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter;
     private final Queue<IOTMessageSubscriber> requestResponseMessageHandlers = new LinkedBlockingQueue<>();
@@ -57,12 +57,12 @@ public class BasicIOTClient implements MessageHandler {
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Collection<IOTMessageSubscriber> subscribers) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
         this(id, key, objectMapper, subscribers, false);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Collection<IOTMessageSubscriber> subscribers, boolean client) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
