@@ -14,12 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -41,6 +39,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private DeviceService deviceService;
     @Autowired
     private DeviceTypeService deviceTypeService;
+
+    @Autowired
+    private StateSchemaService stateSchemaService;
     @Autowired
     private PendingGatewayService pendingGatewayService;
     @Autowired
@@ -62,7 +63,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
         logger.info("received message " + iotMessage);
-        IOTMessage response = onIOTMessageResponse(iotMessage);
+        IOTMessage response = executeLogic(iotMessage);
         if (response != null) {
             try {
                 basicIOTClient.reply(response, iotMessage);
@@ -72,7 +73,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
     }
 
-    private IOTMessage onIOTMessageResponse(IOTMessage iotMessage) {
+    public IOTMessage executeLogic(IOTMessage iotMessage) {
         if (iotMessage instanceof RegisterGateway) {
             return registerGateway((RegisterGateway) iotMessage);
         }
@@ -90,6 +91,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         Gateway gateway = gatewayOptional.get();
         if (iotMessage instanceof StateChanged) {
             return stateChanged((StateChanged) iotMessage, gateway, gatewaySecurityContext);
+        }
+
+        if (iotMessage instanceof SetStateSchema) {
+            return setStateSchema((SetStateSchema) iotMessage, gateway, gatewaySecurityContext);
         }
 
         if (iotMessage instanceof UpdateStateSchema) {
@@ -181,36 +186,38 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         logger.info("auto cancelled "+oldUnfinishedInstallations.size() +" installations ");
     }
 
+private static final class GetOrCreateDeviceResponse{
+        private final Device device;
+        private final String newVersion;
 
+    public GetOrCreateDeviceResponse(Device device, String newVersion) {
+        this.device = device;
+        this.newVersion = newVersion;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    public String getNewVersion() {
+        return newVersion;
+    }
+}
     private IOTMessage stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
         String newVersion=null;
         Remote remote=null;
-        if(stateChanged.getDeviceId()!=null){
-            DeviceCreate deviceCreate = new DeviceCreate()
-                    .setGateway(gateway)
-                    .setOther(stateChanged.getValues());
-
-            Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(stateChanged.getDeviceId()))).stream().findFirst().orElse(null);
-            if (device == null) {
-                DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(stateChanged.getDeviceType(), gatewaySecurityContext);
-                deviceCreate
-                        .setDeviceType(deviceType)
-                        .setRemoteId(stateChanged.getDeviceId())
-                        .setVersion(stateChanged.getVersion());
-
-                device=deviceService.createDevice(deviceCreate, gatewaySecurityContext);
-                newVersion= device.getVersion();
-            } else {
-                newVersion=stateChanged.getVersion()!=null&&!stateChanged.getVersion().equals(device.getVersion())?stateChanged.getVersion():null;
-                if (deviceService.updateDeviceNoMerge(device, deviceCreate)) {
-                    deviceService.merge(device);
-                }
-            }
-            remote=device;
+        Map<String, Object> values = stateChanged.getValues();
+        String version = stateChanged.getVersion();
+        String deviceId = stateChanged.getDeviceId();
+        String deviceTypeId = stateChanged.getDeviceType();
+        if(deviceId !=null){
+            GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
+            newVersion=getOrCreateDeviceResponse.getNewVersion();
+            remote=getOrCreateDeviceResponse.getDevice();
         }
         else{
-            newVersion=stateChanged.getVersion()!=null&&!stateChanged.getVersion().equals(gateway.getVersion())?stateChanged.getVersion():null;
-            gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setOther(stateChanged.getValues()).setVersion(stateChanged.getVersion()),null);
+            newVersion= version !=null&&!version.equals(gateway.getVersion())? version :null;
+            gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setOther(values).setVersion(version),null);
             remote=gateway;
         }
         if(newVersion != null){
@@ -218,6 +225,31 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
 
         return new StateChangedReceived().setStateChangedId(stateChanged.getId());
+    }
+
+    private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContextBase gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
+        String newVersion;
+        DeviceCreate deviceCreate = new DeviceCreate()
+                .setGateway(gateway)
+                .setOther(state);
+
+        Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
+        if (device == null) {
+            DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, gatewaySecurityContext);
+            deviceCreate
+                    .setDeviceType(deviceType)
+                    .setRemoteId(deviceId)
+                    .setVersion(version);
+
+            device=deviceService.createDevice(deviceCreate, gatewaySecurityContext);
+            newVersion= device.getVersion();
+        } else {
+            newVersion= version !=null&&!version.equals(device.getVersion())? version :null;
+            if (deviceService.updateDeviceNoMerge(device, deviceCreate)) {
+                deviceService.merge(device);
+            }
+        }
+        return new GetOrCreateDeviceResponse(device,newVersion);
     }
 
     private void updateVersion(String newVersion, Remote remote) {
@@ -237,13 +269,33 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private UpdateStateSchemaReceived updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
-        DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(updateStateSchema.getDeviceType(), gatewaySecurityContext);
-        DeviceTypeCreate deviceTypeCreate = new DeviceTypeCreate().setStateJsonSchema(updateStateSchema.getJsonSchema()).setVersion(updateStateSchema.getVersion());
-        if (updateStateSchema.getVersion() > deviceType.getVersion()) {
-            if (deviceTypeService.updateDeviceTypeNoMerge(deviceType, deviceTypeCreate)) {
-                deviceTypeService.merge(deviceType);
-            }
-        }
+        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, updateStateSchema.getDeviceId(), updateStateSchema.getDeviceType());
+        Device device=getOrCreateDeviceResponse.getDevice();
+        DeviceType deviceType=device.getDeviceType();
+        StateSchema stateSchema=getOrCreateStateSchema(deviceType,updateStateSchema.getVersion(),updateStateSchema.getJsonSchema(),gatewaySecurityContext);
+        deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
         return new UpdateStateSchemaReceived().setUpdateStateSchemaId(updateStateSchema.getId());
+    }
+
+    private SetStateSchemaReceived setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType());
+        Device device=getOrCreateDeviceResponse.getDevice();
+        DeviceType deviceType=device.getDeviceType();
+        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setVersion(setStateSchema.getVersion()).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
+        boolean found=stateSchema!=null;
+        //consider fallback to previous version
+        if(found){
+            deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
+        }
+        return new SetStateSchemaReceived().setSetStateSchemaId(setStateSchema.getId()).setFound(found);
+    }
+
+    private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContextBase gatewaySecurityContext) {
+        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
+        StateSchemaCreate stateSchemaCreate=new StateSchemaCreate().setDeviceType(deviceType).setVersion(version).setStateSchemaJson(jsonSchema).setName(deviceType.getName()+" Schema V"+version);
+        if(stateSchema==null){
+            stateSchema=stateSchemaService.createStateSchema(stateSchemaCreate,gatewaySecurityContext);
+        }
+        return stateSchema;
     }
 }

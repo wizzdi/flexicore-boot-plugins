@@ -166,7 +166,7 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().collect(Collectors.toList()))
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers)
                 .setPublicKeyProvider(publicKeyProvider);
     }
 

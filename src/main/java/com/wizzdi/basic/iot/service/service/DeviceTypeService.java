@@ -113,16 +113,7 @@ public class DeviceTypeService implements Plugin {
 
     public boolean updateDeviceTypeNoMerge(DeviceType deviceType,
                                         DeviceTypeCreate deviceTypeCreate) {
-        boolean update = basicService.updateBasicNoMerge(deviceTypeCreate, deviceType);
-        if (deviceTypeCreate.getVersion() != null && !deviceTypeCreate.getVersion().equals(deviceType.getVersion())) {
-            deviceType.setVersion(deviceTypeCreate.getVersion());
-            update = true;
-        }
-        if (deviceTypeCreate.getStateJsonSchema() != null && !deviceTypeCreate.getStateJsonSchema().equals(deviceType.getStateJsonSchema())) {
-            deviceType.setStateJsonSchema(deviceTypeCreate.getStateJsonSchema());
-            update = true;
-        }
-        return update;
+        return basicService.updateBasicNoMerge(deviceTypeCreate, deviceType);
     }
 
     public DeviceType updateDeviceType(DeviceTypeUpdate deviceTypeUpdate,

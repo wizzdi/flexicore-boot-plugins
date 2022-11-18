@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.request;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
 import java.util.HashMap;
@@ -14,6 +15,9 @@ public class RemoteCreate extends BasicCreate {
     private Map<String, Object> other = new HashMap<>();
     private String remoteId;
     private String version;
+
+    @JsonIgnore
+    private StateSchema currentSchema;
 
     public String getRemoteId() {
         return remoteId;
@@ -43,6 +47,16 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setVersion(String version) {
         this.version = version;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public StateSchema getCurrentSchema() {
+        return currentSchema;
+    }
+
+    public <T extends RemoteCreate> T setCurrentSchema(StateSchema currentSchema) {
+        this.currentSchema = currentSchema;
         return (T) this;
     }
 }
