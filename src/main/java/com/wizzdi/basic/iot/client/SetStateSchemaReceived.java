@@ -2,15 +2,15 @@ package com.wizzdi.basic.iot.client;
 
 public class SetStateSchemaReceived extends IOTMessage {
 
-    private String updateStateSchemaId;
+    private String setStateSchemaId;
     private boolean found;
 
-    public String getUpdateStateSchemaId() {
-        return updateStateSchemaId;
+    public String getSetStateSchemaId() {
+        return setStateSchemaId;
     }
 
-    public <T extends SetStateSchemaReceived> T setUpdateStateSchemaId(String updateStateSchemaId) {
-        this.updateStateSchemaId = updateStateSchemaId;
+    public <T extends SetStateSchemaReceived> T setSetStateSchemaId(String setStateSchemaId) {
+        this.setStateSchemaId = setStateSchemaId;
         return (T) this;
     }
 
