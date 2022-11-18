@@ -6,6 +6,8 @@ public class UpdateStateSchema extends IOTMessage{
     private String jsonSchema;
     private int version;
 
+    private String deviceId;
+
     public String getDeviceType() {
         return deviceType;
     }
@@ -30,6 +32,15 @@ public class UpdateStateSchema extends IOTMessage{
 
     public <T extends UpdateStateSchema> T setVersion(int version) {
         this.version = version;
+        return (T) this;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public <T extends UpdateStateSchema> T setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
         return (T) this;
     }
 }
