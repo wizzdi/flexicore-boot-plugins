@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.app;
 
 import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
+import com.wizzdi.flexicore.boot.base.init.FlexiCoreApplication;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
@@ -16,7 +17,7 @@ import org.springframework.integration.config.EnableIntegration;
 
 import java.util.Arrays;
 
-@SpringBootApplication(scanBasePackages = {"com.wizzdi.basic.iot","com.wizzdi.flexicore"})
+@SpringBootApplication(scanBasePackages = {"com.wizzdi.basic.iot","com.wizzdi.flexicore","com.wizzdi.maps","com.wizzdi.flexicore"})
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins
@@ -31,7 +32,7 @@ public class App {
     public static void main(String[] args) {
 
 
-        SpringApplication app = new SpringApplication(App.class);
+        SpringApplication app = new FlexiCoreApplication(App.class);
         app.addListeners(new ApplicationPidFileWriter());
         ConfigurableApplicationContext context=app.run(args);
 

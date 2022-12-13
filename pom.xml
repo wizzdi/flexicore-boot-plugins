@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>basic-iot-service</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <name>basic-iot-service</name>
     <description>FlexiCore service plugin , basic iot service</description>
     <url>https://wizzdi.com</url>
@@ -16,12 +16,19 @@
         </license>
     </licenses>
     <properties>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
-        <spring-boot-dependencies.version>2.6.6</spring-boot-dependencies.version>
-        <basic-iot-model.version>2.1.0-SNAPSHOT</basic-iot-model.version>
-        <flexicore-boot-dependencies.version>2.2.4</flexicore-boot-dependencies.version>
-        <basic-iot-client.version>3.1.0-SNAPSHOT</basic-iot-client.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <spring-boot-dependencies.version>2.7.4</spring-boot-dependencies.version>
+        <basic-iot-model.version>4.0.0-SNAPSHOT</basic-iot-model.version>
+        <flexicore-boot-dependencies.version>3.0.5</flexicore-boot-dependencies.version>
+        <basic-iot-client.version>4.0.0-SNAPSHOT</basic-iot-client.version>
+        <flexicore-file-service.version>2.0.0</flexicore-file-service.version>
+        <flexicore-file-model.version>2.0.0</flexicore-file-model.version>
+        <swagger-jaxrs2.version>2.2.2</swagger-jaxrs2.version>
+        <maps-model.version>2.0.0</maps-model.version>
+        <maps-service.version>2.0.0</maps-service.version>
+        <flexicore-territories-model.version>5.0.0</flexicore-territories-model.version>
+        <flexicore-territories-service.version>5.0.0</flexicore-territories-service.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
@@ -75,6 +82,31 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>maps-model</artifactId>
+            <version>${maps-model.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>maps-service</artifactId>
+            <version>${maps-service.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-territories-model</artifactId>
+            <version>${flexicore-territories-model.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-territories-service</artifactId>
+            <version>${flexicore-territories-service.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpg-jdk15to18</artifactId>
             <version>1.72.3</version>
@@ -83,7 +115,7 @@
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-mqtt</artifactId>
-            <version>5.5.14</version>
+            <version>5.5.15</version>
             <exclusions>
                 <exclusion>
                     <artifactId>spring-beans</artifactId>
@@ -151,13 +183,13 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-file-model</artifactId>
-            <version>1.1.0</version>
+            <version>${flexicore-file-model.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-file-service</artifactId>
-            <version>1.1.0</version>
+            <version>${flexicore-file-service.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -177,7 +209,7 @@
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2</artifactId>
-            <version>2.2.0</version>
+            <version>${swagger-jaxrs2.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -229,12 +261,6 @@
             <artifactId>dynamic-properties-converter-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>info.schnatterer.moby-names-generator</groupId>
-            <artifactId>moby-names-generator</artifactId>
-            <version>20.10.0-r0</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
     <build>
@@ -277,6 +303,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${artifactId}</Plugin-Id>
                                         <Plugin-Version>${version}</Plugin-Version>
+                                        <Plugin-Dependencies>maps-service@&gt;=${maps-service.version}, flexicore-territories-service@&gt;=${flexicore-territories-service.version}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

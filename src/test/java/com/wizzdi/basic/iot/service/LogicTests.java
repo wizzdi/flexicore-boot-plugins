@@ -17,6 +17,8 @@ import com.wizzdi.basic.iot.service.service.DeviceTypeService;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.maps.model.MapIcon;
+import com.wizzdi.maps.model.MappedPOI;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
@@ -70,14 +72,33 @@ public class LogicTests {
         Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(GATEWAY_ID)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
        Assertions.assertEquals(gateway.getRemoteId(),GATEWAY_ID);
+       validateMappedPOI(gateway.getMappedPOI());
 
+
+    }
+
+    private void validateMappedPOI(MappedPOI mappedPOI) {
+        Assertions.assertNotNull(mappedPOI);
+        Assertions.assertNotNull(mappedPOI.getRelatedId());
+        Assertions.assertNotNull(mappedPOI.getRelatedType());
+        Assertions.assertNotNull(mappedPOI.getExternalId());
+        Assertions.assertNotNull(mappedPOI.getName());
+        validateMappedPOIIcon(mappedPOI.getMapIcon());
+
+    }
+
+    private void validateMappedPOIIcon(MapIcon mapIcon) {
+        Assertions.assertNotNull(mapIcon);
+        Assertions.assertNotNull(mapIcon.getExternalId());
+        Assertions.assertNotNull(mapIcon.getRelatedType());
+        Assertions.assertNotNull(mapIcon.getName());
 
     }
 
     @Test
     @Order(2)
     public void testStateChanged() {
-        StateChangedReceived stateChangedReceived = (StateChangedReceived) basicIOTLogic.executeLogic(new StateChanged().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        StateChangedReceived stateChangedReceived = (StateChangedReceived) basicIOTLogic.executeLogic(new StateChanged().setStatus("dim").setLatitude(50D).setLatitude(50D).setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
         Assertions.assertNotNull(stateChangedReceived);
         DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
@@ -88,6 +109,7 @@ public class LogicTests {
         Assertions.assertEquals(30, device.getOther().get("dim"));
         Assertions.assertNotNull(device.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF,device.getLastConnectivityChange().getConnectivity());
+        validateMappedPOI(device.getMappedPOI());
 
     }
 

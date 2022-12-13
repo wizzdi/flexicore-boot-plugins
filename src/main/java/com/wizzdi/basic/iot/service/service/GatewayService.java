@@ -16,8 +16,12 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.SecurityUserService;
 import com.wizzdi.flexicore.security.service.TenantToUserService;
+import com.wizzdi.maps.model.MapIcon;
+import com.wizzdi.maps.service.request.MappedPOICreate;
+import com.wizzdi.maps.service.service.MappedPOIService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +48,11 @@ public class GatewayService implements Plugin {
     private SecurityUserService securityUserService;
     @Autowired
     private TenantToUserService tenantToUserService;
+    @Autowired
+    private MappedPOIService mappedPOIService;
+    @Autowired
+    @Qualifier("gatewayMapIcon")
+    private MapIcon gatewayMapIcon;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -171,6 +180,7 @@ public class GatewayService implements Plugin {
                     .setApprovingUser(securityContext.getUser())
                     .setGatewayUser(gatewaySecurityUser);
             Gateway gateway = createGateway(gatewayCreate, securityContext);
+            mappedPOIService.createMappedPOI(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()),securityContext);
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway),securityContext);
         }

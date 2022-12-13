@@ -9,10 +9,18 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
+import com.wizzdi.maps.model.MapIcon;
+import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.service.request.MapIconCreate;
+import com.wizzdi.maps.service.request.MapIconFilter;
+import com.wizzdi.maps.service.request.MappedPOICreate;
+import com.wizzdi.maps.service.service.MapIconService;
+import com.wizzdi.maps.service.service.MappedPOIService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -49,6 +57,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Autowired
     private RemoteService remoteService;
     @Autowired
+    private MappedPOIService mappedPOIService;
+    @Autowired
+    private MapIconService mapIconService;
+    @Autowired
     private FirmwareUpdateInstallationService firmwareUpdateInstallationService;
     @Value("${basic.iot.fota.baseUrl:http://localhost:8080/downloadFirmware/}")
     private String fotaBaseUrl;
@@ -59,6 +71,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*60*1000}}")
     private long reminderInterval;
     private final Map<String, Long> gatewayToLastSeen = new ConcurrentHashMap<>();
+    @Autowired
+    @Qualifier("gatewayMapIcon")
+    private MapIcon gatewayMapIcon;
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
@@ -210,6 +225,10 @@ private static final class GetOrCreateDeviceResponse{
         String version = stateChanged.getVersion();
         String deviceId = stateChanged.getDeviceId();
         String deviceTypeId = stateChanged.getDeviceType();
+        Double latitude = stateChanged.getLatitude();
+        Double longitude = stateChanged.getLongitude();
+
+
         if(deviceId !=null){
             GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
             newVersion=getOrCreateDeviceResponse.getNewVersion();
@@ -220,11 +239,66 @@ private static final class GetOrCreateDeviceResponse{
             gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setOther(values).setVersion(version),null);
             remote=gateway;
         }
+
+        String status=getStatus(remote,stateChanged.getStatus());
+        MapIcon mapIcon=getOrCreateMapIcon(status,remote);
+        MappedPOICreate mappedPOICreate = new MappedPOICreate()
+                .setExternalId(deviceId)
+                .setRelatedId(remote.getId())
+                .setRelatedType(remote.getClass().getCanonicalName())
+                .setLon(longitude)
+                .setLat(latitude)
+                .setMapIcon(mapIcon)
+                .setName(remote.getName());
+
+        MappedPOI mappedPOI = remote.getMappedPOI();
+        if(mappedPOI ==null){
+            mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
+            remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setMappedPOI(mappedPOI),gatewaySecurityContext);
+        }
+        else{
+            if(mappedPOIService.updateMappedPOINoMerge(mappedPOICreate, mappedPOI)){
+                mappedPOIService.merge(mappedPOI);
+            }
+
+        }
+
         if(newVersion != null){
             updateVersion(newVersion,remote);
         }
 
         return new StateChangedReceived().setStateChangedId(stateChanged.getId());
+    }
+
+    private String getStatus(Remote remote, String status) {
+        if(status==null){
+            //TODO: remove once implemented on HW side
+            if(remote.getOther().get("DimLevel")!=null&&remote.getOther().get("DimOnOff")!=null){
+                int dimLevel= (int) remote.getOther().get("DimLevel");
+                boolean dimOnOff= (boolean) remote.getOther().get("DimOnOff");
+                return dimOnOff&&dimLevel>0?(dimLevel<100?"dim":"on"):"off";
+
+            }
+        }
+
+        return status;
+    }
+
+    private MapIcon getOrCreateMapIcon(String status, Remote remote) {
+        if(remote instanceof Gateway){
+            return gatewayMapIcon;
+        }
+        if(status==null){
+            status="unknown";
+        }
+        if(remote instanceof Device device){
+            String externalId = device.getDeviceType().getName() + "_" + status;
+            String relatedType = device.getClass().getCanonicalName();
+            return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
+                    .setExternalId(Collections.singleton(externalId)),adminSecurityContext).stream().findFirst().orElseGet(()->mapIconService.createMapIcon(new MapIconCreate().setExternalId(externalId).setRelatedType(relatedType).setName(externalId),adminSecurityContext));
+
+        }
+        return null;
     }
 
     private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContextBase gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
@@ -283,7 +357,7 @@ private static final class GetOrCreateDeviceResponse{
         DeviceType deviceType=device.getDeviceType();
         StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setVersion(setStateSchema.getVersion()).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         boolean found=stateSchema!=null;
-        //consider fallback to previous version
+        //TODO: consider fallback to previous version
         if(found){
             deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
         }

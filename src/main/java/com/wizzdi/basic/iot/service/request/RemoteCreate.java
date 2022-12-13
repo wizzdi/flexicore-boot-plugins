@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.wizzdi.maps.model.MappedPOI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,8 @@ public class RemoteCreate extends BasicCreate {
 
     @JsonIgnore
     private StateSchema currentSchema;
+    @JsonIgnore
+    private MappedPOI mappedPOI;
 
     public String getRemoteId() {
         return remoteId;
@@ -57,6 +60,16 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setCurrentSchema(StateSchema currentSchema) {
         this.currentSchema = currentSchema;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public MappedPOI getMappedPOI() {
+        return mappedPOI;
+    }
+
+    public <T extends RemoteCreate> T setMappedPOI(MappedPOI mappedPOI) {
+        this.mappedPOI = mappedPOI;
         return (T) this;
     }
 }

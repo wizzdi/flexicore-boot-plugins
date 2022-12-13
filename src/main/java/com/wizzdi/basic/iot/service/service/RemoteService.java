@@ -136,12 +136,17 @@ public class RemoteService implements Plugin {
             remote.setCurrentSchema(remoteCreate.getCurrentSchema());
             update = true;
         }
+        if (remoteCreate.getMappedPOI() != null && (remote.getMappedPOI()==null||!remoteCreate.getMappedPOI().getId().equals(remote.getMappedPOI().getId()))) {
+            remote.setMappedPOI(remoteCreate.getMappedPOI());
+            update = true;
+        }
         Map<String, Object> mergedValues = DynamicPropertiesUtils.updateDynamic(remoteCreate.getOther(), remote.getOther());
 
         if (mergedValues != null) {
             remote.setOther(mergedValues);
             update = true;
         }
+
         return update;
     }
 
