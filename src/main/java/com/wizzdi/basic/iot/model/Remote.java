@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
+import com.wizzdi.maps.model.MappedPOI;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -20,6 +21,8 @@ public class Remote extends SecuredBasic {
     private ConnectivityChange lastConnectivityChange;
     private String remoteId;
     private String version;
+    @ManyToOne
+    private MappedPOI mappedPOI;
 
     @ManyToOne(targetEntity = StateSchema.class)
     private StateSchema currentSchema;
@@ -87,6 +90,16 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setCurrentSchema(StateSchema stateSchema) {
         this.currentSchema = stateSchema;
+        return (T) this;
+    }
+
+    @ManyToOne(targetEntity = MappedPOI.class)
+    public MappedPOI getMappedPOI() {
+        return mappedPOI;
+    }
+
+    public <T extends Remote> T setMappedPOI(MappedPOI mappedPOI) {
+        this.mappedPOI = mappedPOI;
         return (T) this;
     }
 }
