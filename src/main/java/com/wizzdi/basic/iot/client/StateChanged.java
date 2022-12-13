@@ -1,5 +1,6 @@
 package com.wizzdi.basic.iot.client;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
@@ -11,6 +12,12 @@ public class StateChanged extends IOTMessage{
     private Map<String,Object> otherProperties =new HashMap<>();
     private String deviceType;
     private String version;
+    @JsonAlias({"Longitude","lon","Lon"})
+    private Double longitude;
+    @JsonAlias({"Latitude","lat","Lat"})
+
+    private Double latitude;
+    private String status;
 
 
     public String getDeviceId() {
@@ -54,6 +61,33 @@ public class StateChanged extends IOTMessage{
 
     public <T extends StateChanged> T setVersion(String version) {
         this.version = version;
+        return (T) this;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public <T extends StateChanged> T setLongitude(Double longitude) {
+        this.longitude = longitude;
+        return (T) this;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public <T extends StateChanged> T setLatitude(Double latitude) {
+        this.latitude = latitude;
+        return (T) this;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public <T extends StateChanged> T setStatus(String status) {
+        this.status = status;
         return (T) this;
     }
 
