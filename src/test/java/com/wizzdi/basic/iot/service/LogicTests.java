@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
@@ -59,6 +60,9 @@ public class LogicTests {
     private DeviceService deviceService;
     @Autowired
     private DeviceTypeService deviceTypeService;
+    @Autowired
+    @Qualifier("gatewayMapIcon")
+    private MapIcon gatewayMapIcon;
 
 
 
@@ -73,6 +77,7 @@ public class LogicTests {
         Assertions.assertNotNull(gateway);
        Assertions.assertEquals(gateway.getRemoteId(),GATEWAY_ID);
        validateMappedPOI(gateway.getMappedPOI());
+        Assertions.assertEquals(gatewayMapIcon.getId(),gateway.getMappedPOI().getMapIcon().getId());
 
 
     }
@@ -110,6 +115,9 @@ public class LogicTests {
         Assertions.assertNotNull(device.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF,device.getLastConnectivityChange().getConnectivity());
         validateMappedPOI(device.getMappedPOI());
+        Assertions.assertEquals(Device.class.getCanonicalName(),device.getMappedPOI().getMapIcon().getRelatedType());
+        Assertions.assertTrue(device.getMappedPOI().getMapIcon().getExternalId().contains("light"));
+        Assertions.assertTrue(device.getMappedPOI().getMapIcon().getName().contains("dim"));
 
     }
 
