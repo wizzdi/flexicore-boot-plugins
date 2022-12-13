@@ -7,10 +7,7 @@ import com.flexicore.model.SecuredBasic;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.maps.model.MappedPOI;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +18,7 @@ public class Remote extends SecuredBasic {
     private ConnectivityChange lastConnectivityChange;
     private String remoteId;
     private String version;
-    @ManyToOne
+    @ManyToOne(targetEntity = MappedPOI.class,cascade = CascadeType.MERGE)
     private MappedPOI mappedPOI;
 
     @ManyToOne(targetEntity = StateSchema.class)
@@ -93,7 +90,7 @@ public class Remote extends SecuredBasic {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = MappedPOI.class)
+    @ManyToOne(targetEntity = MappedPOI.class,cascade = CascadeType.MERGE)
     public MappedPOI getMappedPOI() {
         return mappedPOI;
     }
