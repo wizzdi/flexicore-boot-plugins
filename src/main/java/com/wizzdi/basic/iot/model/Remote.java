@@ -18,7 +18,7 @@ public class Remote extends SecuredBasic {
     private ConnectivityChange lastConnectivityChange;
     private String remoteId;
     private String version;
-    @ManyToOne(targetEntity = MappedPOI.class,cascade = CascadeType.MERGE)
+    @ManyToOne(targetEntity = MappedPOI.class)
     private MappedPOI mappedPOI;
 
     @ManyToOne(targetEntity = StateSchema.class)
@@ -90,7 +90,7 @@ public class Remote extends SecuredBasic {
         return (T) this;
     }
 
-    @ManyToOne(targetEntity = MappedPOI.class,cascade = CascadeType.MERGE)
+    @ManyToOne(targetEntity = MappedPOI.class)
     public MappedPOI getMappedPOI() {
         return mappedPOI;
     }
