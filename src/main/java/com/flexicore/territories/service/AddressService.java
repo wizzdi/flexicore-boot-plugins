@@ -1,7 +1,5 @@
 package com.flexicore.territories.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
@@ -19,27 +17,16 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.metamodel.SingularAttribute;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,7 +60,7 @@ public class AddressService implements Plugin {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	private static final XmlMapper xmlMapper= XmlMapper.builder().build();
+//	private static final XmlMapper xmlMapper= XmlMapper.builder().build();
 
 
 
@@ -241,7 +228,7 @@ public class AddressService implements Plugin {
 			StreetEntry[] data;
 			try {
 				InputStream dataS = response.getBody().getInputStream();
-				data = xmlMapper.readValue(dataS, StreetEntry[].class);
+				data = new StreetEntry[0];//xmlMapper.readValue(dataS, StreetEntry[].class);
 			} catch (IOException e) {
 				throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"failed parsing external url data",e);
 			}
