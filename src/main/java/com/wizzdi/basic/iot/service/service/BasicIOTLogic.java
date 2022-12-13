@@ -305,7 +305,8 @@ private static final class GetOrCreateDeviceResponse{
         String newVersion;
         DeviceCreate deviceCreate = new DeviceCreate()
                 .setGateway(gateway)
-                .setOther(state);
+                .setOther(state)
+                .setName(deviceId);
 
         Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
         if (device == null) {

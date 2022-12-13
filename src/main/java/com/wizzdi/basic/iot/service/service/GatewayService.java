@@ -5,6 +5,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.security.SecurityContextBase;
+import com.google.common.collect.Lists;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
@@ -17,6 +18,7 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.SecurityUserService;
 import com.wizzdi.flexicore.security.service.TenantToUserService;
 import com.wizzdi.maps.model.MapIcon;
+import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.service.MappedPOIService;
 import org.pf4j.Extension;
@@ -179,8 +181,10 @@ public class GatewayService implements Plugin {
             GatewayCreate gatewayCreate=getGatwayCreate(pendingGateway)
                     .setApprovingUser(securityContext.getUser())
                     .setGatewayUser(gatewaySecurityUser);
-            Gateway gateway = createGateway(gatewayCreate, securityContext);
-            mappedPOIService.createMappedPOI(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()),securityContext);
+            Gateway gateway = createGatewayNoMerge(gatewayCreate, securityContext);
+            MappedPOI mappedPOI = mappedPOIService.createMappedPOI(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()), securityContext);
+            gateway.setMappedPOI(mappedPOI);
+            massMerge(List.of(gateway,mappedPOI));
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway),securityContext);
         }
