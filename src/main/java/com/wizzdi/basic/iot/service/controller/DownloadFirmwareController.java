@@ -22,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/downloadFirmware")
@@ -43,7 +45,8 @@ public class DownloadFirmwareController implements Plugin {
                                              @RequestHeader(value = "offset", defaultValue = "0") long offset,
                                              @RequestHeader(value = "size", defaultValue = "0") long size,
                                              @PathVariable("gatewayId") String gatewayId, @PathVariable("firmwareInstallationId") String firmwareInstallationId, @PathVariable("signedId") String signedId, HttpServletRequest req) {
-        return downloadFirmwareService.download(offset, size,gatewayId, firmwareInstallationId,signedId, req.getRemoteAddr());
+        String decodedSignedId = URLDecoder.decode(signedId, StandardCharsets.UTF_8);
+        return downloadFirmwareService.download(offset, size,gatewayId, firmwareInstallationId,decodedSignedId, req.getRemoteAddr());
 
     }
 }

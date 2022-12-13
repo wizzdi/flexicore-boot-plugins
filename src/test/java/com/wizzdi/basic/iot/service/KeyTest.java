@@ -16,13 +16,16 @@ import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 
 public class KeyTest {
 
-    public static final String toSign = "61fb419a-b66d-11ec-b909-0242ac120002";
+    public static final String toSign = "cwVEXt9GSdOMVuvoEWQ4QQ";
     private String signed;
 
     @Order(1)
     @Test
     public void testSign() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        PrivateKey key=KeyUtils.readPrivateKey("C:\\Users\\Asaf\\Desktop\\private.pem");
+        java.security.Security.addProvider(
+                new org.bouncycastle.jce.provider.BouncyCastleProvider()
+        );
+        PrivateKey key=KeyUtils.readPrivateKey("C:\\Users\\Asaf\\Desktop\\test-private.pem");
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initSign(key);
         signature.update(toSign.getBytes(StandardCharsets.UTF_8));
@@ -47,11 +50,14 @@ public class KeyTest {
     @Order(3)
     @Test
     public void test() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        java.security.Security.addProvider(
+                new org.bouncycastle.jce.provider.BouncyCastleProvider()
+        );
         PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\test-public.pem");
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initVerify(publicKey);
-        signature.update("6318740d-0000-1000-8000-1fb1500efdec".getBytes(StandardCharsets.UTF_8));
-        byte[] bytes = Base64.getDecoder().decode("gDflHf9qzFwd9PRzhWW2hhkFn4N9ii+gPCTo28yfnBwO9HPvNio2Paisc1tb9TTsIO07grDWItRVzMvfFH/OGWECBLrztJZR4vMnzJRlBn/iyTKPGmC6w/U9tvu9yQsW8/e4q110GHNHXZs1dZC+FMO7RYjk+pYEDdG2pxUlReH0tIFlBTeUoYGm2E4RBpYv3UjpK0mwlC1nNbf0XydZKmT0VgKYwxg4eogtqOo5I6BqciEinFILLh7VZPkAP176/Xx+E2PTQuw9QxFkdY7zMmL+Ta0obt5WXe2Y8bf0JeeaTAYOhzQndzu0vqBlW3ljp1mN7Wa1c1SVcQ5gdiFdCw==");
+        signature.update("cwVEXt9GSdOMVuvoEWQ4QQ".getBytes(StandardCharsets.UTF_8));
+        byte[] bytes = Base64.getDecoder().decode("FQZOdDycAAfp2OC22oW75QWZdPi3kTT4SD1HywtbS4tHwnXoALanewwd9T+ykVzf9reKbZkXKYkBbKezVipWDnOaADyHbA2L4WQC7kavckG6Zxme+Ib6H+Yp2ngdoOJFOcz4kiyo+rcUjciZY1vRPRwV7HnRwLAWBRiQTg++rcTlfAWpYdyOwg7JpdG+qETRRNE9lCNxTaWgUaclxteYRjSqlNaqAHlob5YrduLRjeDV+GCHJs9mce7cC7m/gErRuWdT6JPDV0LPguo+YPTup+OfYfGJ1G6dckH2jgJ8QLJMwrzv1cVLh6bTHKPa21f7T6kR78ax9EH6ZcT9n+zlAQ==");
         boolean verify = signature.verify(bytes);
         Assertions.assertTrue(verify);
 
