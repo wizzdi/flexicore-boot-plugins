@@ -7,14 +7,8 @@ import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.app.App;
-import com.wizzdi.basic.iot.service.request.ApproveGatewaysRequest;
-import com.wizzdi.basic.iot.service.request.DeviceFilter;
-import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
-import com.wizzdi.basic.iot.service.request.PendingGatewayFilter;
-import com.wizzdi.basic.iot.service.service.BasicIOTLogic;
-import com.wizzdi.basic.iot.service.service.DeviceService;
-import com.wizzdi.basic.iot.service.service.DeviceTypeService;
-import com.wizzdi.basic.iot.service.service.GatewayService;
+import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.service.*;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MapIcon;
@@ -31,6 +25,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @ExtendWith(SpringExtension.class)
@@ -43,7 +38,7 @@ public class LogicTests {
 
     private static final Logger logger = LoggerFactory.getLogger(LogicTests.class);
 
-    private static final String GATEWAY_ID="test_gateway";
+    private static final String GATEWAY_ID = "test_gateway";
     public static final String DEVICE_ID = "test";
     public static final String DEVICE_TYPE = "light";
     public static final String JSON_SCHEMA_V2 = "v2";
@@ -63,21 +58,20 @@ public class LogicTests {
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
-
-
-
+    @Autowired
+    private SchemaActionService schemaActionService;
 
 
     @Test
     @Order(1)
-    public void testRegister()  {
+    public void testRegister() {
         RegisterGatewayReceived test = (RegisterGatewayReceived) basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID));
         PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(GATEWAY_ID))));
         Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(GATEWAY_ID)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
-       Assertions.assertEquals(gateway.getRemoteId(),GATEWAY_ID);
-       validateMappedPOI(gateway.getMappedPOI());
-        Assertions.assertEquals(gatewayMapIcon.getId(),gateway.getMappedPOI().getMapIcon().getId());
+        Assertions.assertEquals(gateway.getRemoteId(), GATEWAY_ID);
+        validateMappedPOI(gateway.getMappedPOI());
+        Assertions.assertEquals(gatewayMapIcon.getId(), gateway.getMappedPOI().getMapIcon().getId());
 
 
     }
@@ -113,27 +107,41 @@ public class LogicTests {
         Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
         Assertions.assertEquals(30, device.getOther().get("dim"));
         Assertions.assertNotNull(device.getLastConnectivityChange());
-        Assertions.assertEquals(Connectivity.OFF,device.getLastConnectivityChange().getConnectivity());
+        Assertions.assertEquals(Connectivity.OFF, device.getLastConnectivityChange().getConnectivity());
         validateMappedPOI(device.getMappedPOI());
-        Assertions.assertEquals(Device.class.getCanonicalName(),device.getMappedPOI().getMapIcon().getRelatedType());
+        Assertions.assertEquals(Device.class.getCanonicalName(), device.getMappedPOI().getMapIcon().getRelatedType());
         Assertions.assertTrue(device.getMappedPOI().getMapIcon().getExternalId().contains("light"));
         Assertions.assertTrue(device.getMappedPOI().getMapIcon().getName().contains("dim"));
 
     }
 
-   
+
     @Test
     @Order(4)
     public void testUpdateSchema() throws InterruptedException {
-        UpdateStateSchemaReceived updateStateSchemaReceived = (UpdateStateSchemaReceived) basicIOTLogic.executeLogic(new UpdateStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(1).setJsonSchema(JSON_SCHEMA_V1).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        UpdateStateSchema updateStateSchema = new UpdateStateSchema()
+                .setDeviceId(DEVICE_ID)
+                .setDeviceType(DEVICE_TYPE)
+                .setVersion(1)
+                .setJsonSchema(JSON_SCHEMA_V1)
+                .setSchemaActions(List.of(new SchemaAction().setJsonSchema("action").setName("action").setId("action")))
+                .setGatewayId(GATEWAY_ID)
+                .setId(UUID.randomUUID().toString());
+        UpdateStateSchemaReceived updateStateSchemaReceived = (UpdateStateSchemaReceived) basicIOTLogic.executeLogic(updateStateSchema);
         Assertions.assertNotNull(updateStateSchemaReceived);
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(device);
         Assertions.assertNotNull(device.getCurrentSchema());
         Assertions.assertEquals(JSON_SCHEMA_V1, device.getCurrentSchema().getStateJsonSchema());
+        com.wizzdi.basic.iot.model.SchemaAction schemaAction = schemaActionService.listAllSchemaActions(adminSecurityContext, new SchemaActionFilter().setStateSchemas(Collections.singletonList(device.getCurrentSchema()))).stream().findFirst().orElse(null);
+        Assertions.assertNotNull(schemaAction);
+        Assertions.assertEquals("action",schemaAction.getName());
+        Assertions.assertEquals("action",schemaAction.getExternalId());
+        Assertions.assertEquals("action",schemaAction.getActionSchema());
 
 
     }
+
     @Test
     @Order(5)
     public void testUpdateSchemaV2() throws InterruptedException {
@@ -146,6 +154,7 @@ public class LogicTests {
 
 
     }
+
     @Test
     @Order(6)
     public void testSetJsonSchema() throws InterruptedException {
@@ -156,7 +165,6 @@ public class LogicTests {
         Assertions.assertNotNull(device);
         Assertions.assertNotNull(device.getCurrentSchema());
         Assertions.assertEquals(JSON_SCHEMA_V1, device.getCurrentSchema().getStateJsonSchema());
-
 
 
     }

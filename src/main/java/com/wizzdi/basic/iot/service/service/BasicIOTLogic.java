@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
+import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -62,6 +63,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private MapIconService mapIconService;
     @Autowired
     private FirmwareUpdateInstallationService firmwareUpdateInstallationService;
+    @Autowired
+    private SchemaActionService schemaActionService;
     @Value("${basic.iot.fota.baseUrl:http://localhost:8080/downloadFirmware/}")
     private String fotaBaseUrl;
 
@@ -349,6 +352,15 @@ private static final class GetOrCreateDeviceResponse{
         DeviceType deviceType=device.getDeviceType();
         StateSchema stateSchema=getOrCreateStateSchema(deviceType,updateStateSchema.getVersion(),updateStateSchema.getJsonSchema(),gatewaySecurityContext);
         deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
+        Set<String> externalIds=updateStateSchema.getSchemaActions().stream().map(f->f.getId()).collect(Collectors.toSet());
+        Map<String, com.wizzdi.basic.iot.model.SchemaAction> schemaActionMap=externalIds.isEmpty()?Collections.emptyMap():schemaActionService.listAllSchemaActions(null,new SchemaActionFilter().setStateSchemas(Collections.singletonList(stateSchema)).setExternalIds(externalIds)).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+        for (SchemaAction incomingSchemaAction : updateStateSchema.getSchemaActions()) {
+            com.wizzdi.basic.iot.model.SchemaAction schemaAction = schemaActionMap.get(incomingSchemaAction.getId());
+            if(schemaAction==null){
+                schemaAction=schemaActionService.createSchemaAction(new SchemaActionCreate().setActionSchema(incomingSchemaAction.getJsonSchema()).setStateSchema(stateSchema).setExternalId(incomingSchemaAction.getId()).setName(incomingSchemaAction.getName()),gatewaySecurityContext);
+                schemaActionMap.put(schemaAction.getExternalId(),schemaAction);
+            }
+        }
         return new UpdateStateSchemaReceived().setUpdateStateSchemaId(updateStateSchema.getId());
     }
 
@@ -366,7 +378,7 @@ private static final class GetOrCreateDeviceResponse{
     }
 
     private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContextBase gatewaySecurityContext) {
-        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
+        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         StateSchemaCreate stateSchemaCreate=new StateSchemaCreate().setDeviceType(deviceType).setVersion(version).setStateSchemaJson(jsonSchema).setName(deviceType.getName()+" Schema V"+version);
         if(stateSchema==null){
             stateSchema=stateSchemaService.createStateSchema(stateSchemaCreate,gatewaySecurityContext);
