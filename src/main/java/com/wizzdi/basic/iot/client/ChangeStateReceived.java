@@ -12,4 +12,11 @@ public class ChangeStateReceived extends IOTMessage{
         this.changeStateId = changeStateId;
         return (T) this;
     }
+
+    @Override
+    public String toString() {
+        return "ChangeStateReceived{" +
+                "changeStateId='" + changeStateId + '\'' +
+                "} " + super.toString();
+    }
 }

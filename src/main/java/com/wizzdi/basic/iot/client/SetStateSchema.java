@@ -1,9 +1,8 @@
 package com.wizzdi.basic.iot.client;
 
-public class UpdateStateSchema extends IOTMessage{
+public class SetStateSchema extends IOTMessage{
 
     private String deviceType;
-    private String jsonSchema;
     private int version;
 
     private String deviceId;
@@ -12,25 +11,17 @@ public class UpdateStateSchema extends IOTMessage{
         return deviceType;
     }
 
-    public <T extends UpdateStateSchema> T setDeviceType(String deviceType) {
+    public <T extends SetStateSchema> T setDeviceType(String deviceType) {
         this.deviceType = deviceType;
         return (T) this;
     }
 
-    public String getJsonSchema() {
-        return jsonSchema;
-    }
-
-    public <T extends UpdateStateSchema> T setJsonSchema(String jsonSchema) {
-        this.jsonSchema = jsonSchema;
-        return (T) this;
-    }
 
     public int getVersion() {
         return version;
     }
 
-    public <T extends UpdateStateSchema> T setVersion(int version) {
+    public <T extends SetStateSchema> T setVersion(int version) {
         this.version = version;
         return (T) this;
     }
@@ -39,7 +30,7 @@ public class UpdateStateSchema extends IOTMessage{
         return deviceId;
     }
 
-    public <T extends UpdateStateSchema> T setDeviceId(String deviceId) {
+    public <T extends SetStateSchema> T setDeviceId(String deviceId) {
         this.deviceId = deviceId;
         return (T) this;
     }
