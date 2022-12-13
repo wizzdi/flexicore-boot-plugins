@@ -24,8 +24,8 @@ public class TerritoriesConfig implements Plugin {
 
 	@Primary
 	@Bean
-	@Qualifier("objectMapper")
-	public ObjectMapper objectMapper(){
+	@Qualifier("territoriesObjectMapper")
+	public ObjectMapper territoriesObjectMapper(){
 		return new ObjectMapper()
 				.registerModule(new JavaTimeModule())
 				.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);

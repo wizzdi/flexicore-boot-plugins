@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="flexicore-territories-service" target="11" />
+      <module name="flexicore-territories-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

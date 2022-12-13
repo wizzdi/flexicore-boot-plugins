@@ -22,6 +22,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,7 +51,8 @@ public class CountryService implements Plugin {
 	@Value("${flexicore.territories.countriesImportUrl:https://pkgstore.datahub.io/core/country-list/data_json/data/8c458f2d15d9f2119654b29ede6e45b8/data_json.json}")
 	private String countriesImportUrl;
 	@Autowired
-	private ObjectMapper objectMapper;
+	@Qualifier("territoriesObjectMapper")
+	private ObjectMapper territoriesObjectMapper;
 
 
 	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
@@ -105,7 +106,7 @@ public class CountryService implements Plugin {
 		return country;
 	}
 
-	private Country createCountryNoMerge(
+	public Country createCountryNoMerge(
 			CountryCreate creationContainer,
 			SecurityContextBase securityContextBase) {
 		Country country = new Country().setId(Baseclass.getBase64ID());
@@ -135,7 +136,7 @@ public class CountryService implements Plugin {
 		if (response.getStatusCode().is2xxSuccessful()) {
 			try {
 				String body = response.getBody();
-				ImportedCountry[] importedCountries = objectMapper.readValue(body, ImportedCountry[].class);
+				ImportedCountry[] importedCountries = territoriesObjectMapper.readValue(body, ImportedCountry[].class);
 				List<Object> toMerge = new ArrayList<>();
 				Map<String, Country> existingCountries = listAllCountries(securityContextBase, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
 				for (ImportedCountry importedCountry : importedCountries) {
