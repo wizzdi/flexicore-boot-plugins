@@ -1,5 +1,8 @@
 package com.wizzdi.basic.iot.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UpdateStateSchema extends IOTMessage{
 
     private String deviceType;
@@ -7,6 +10,7 @@ public class UpdateStateSchema extends IOTMessage{
     private int version;
 
     private String deviceId;
+    private List<SchemaAction> schemaActions=new ArrayList<>();
 
     public String getDeviceType() {
         return deviceType;
@@ -41,6 +45,15 @@ public class UpdateStateSchema extends IOTMessage{
 
     public <T extends UpdateStateSchema> T setDeviceId(String deviceId) {
         this.deviceId = deviceId;
+        return (T) this;
+    }
+
+    public List<SchemaAction> getSchemaActions() {
+        return schemaActions;
+    }
+
+    public <T extends UpdateStateSchema> T setSchemaActions(List<SchemaAction> schemaActions) {
+        this.schemaActions = schemaActions;
         return (T) this;
     }
 }
