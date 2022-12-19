@@ -5,6 +5,7 @@ import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.FirmwareUpdateInstallation;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationFilter;
+import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationMassCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationUpdate;
 import com.wizzdi.basic.iot.service.service.FirmwareUpdateInstallationService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -19,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @OperationsInside
@@ -54,6 +56,17 @@ public class FirmwareUpdateInstallationController implements Plugin {
             @RequestAttribute SecurityContextBase securityContext) {
 
         return service.createFirmwareUpdateInstallation(firmwareUpdateInstallationCreate, securityContext);
+    }
+
+    @PostMapping("/massCreateFirmwareUpdateInstallation")
+    @Operation(summary = "massCreateFirmwareUpdateInstallation", description = "Mass Creates FirmwareUpdateInstallation")
+
+    public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody @Valid FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate,
+            @RequestAttribute SecurityContextBase securityContext) {
+
+        return service.massCreateFirmwareUpdateInstallation(firmwareUpdateInstallationMassCreate, securityContext);
     }
 
 

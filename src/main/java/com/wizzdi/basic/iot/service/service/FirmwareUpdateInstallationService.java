@@ -6,9 +6,11 @@ import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.FirmwareInstallationState;
 import com.wizzdi.basic.iot.model.FirmwareUpdateInstallation;
+import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.data.FirmwareUpdateInstallationRepository;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationFilter;
+import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationMassCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationUpdate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -25,6 +27,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Extension
 @Component
@@ -38,6 +41,8 @@ public class FirmwareUpdateInstallationService implements Plugin {
 
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private RemoteService remoteService;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -159,5 +164,12 @@ public class FirmwareUpdateInstallationService implements Plugin {
     }
 
 
+    public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate, SecurityContextBase securityContext) {
+        List<Remote> remotes = remoteService.listAllRemotes(securityContext, firmwareUpdateInstallationMassCreate.getRemoteFilter());
+        return remotes.stream().map(f->createFirmwareUpdateInstallation(new FirmwareUpdateInstallationCreate()
+                .setTargetRemote(f)
+                .setFirmwareUpdate(firmwareUpdateInstallationMassCreate.getFirmwareUpdate())
+                .setTargetInstallationDate(firmwareUpdateInstallationMassCreate.getTargetInstallationDate()),securityContext)).collect(Collectors.toList());
 
+    }
 }
