@@ -4,6 +4,7 @@ public class ChangeStateResponseEntry {
 
     private String remoteId;
     private int onTry;
+    private boolean success;
 
 
     public String getRemoteId() {
@@ -21,6 +22,15 @@ public class ChangeStateResponseEntry {
 
     public <T extends ChangeStateResponseEntry> T setOnTry(int onTry) {
         this.onTry = onTry;
+        return (T) this;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public <T extends ChangeStateResponseEntry> T setSuccess(boolean success) {
+        this.success = success;
         return (T) this;
     }
 }

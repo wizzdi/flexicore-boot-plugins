@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 @Extension
 @Component
@@ -28,6 +29,7 @@ import java.util.*;
 public class DeviceStateService implements Plugin {
 
     private static final Logger logger= LoggerFactory.getLogger(DeviceStateService.class);
+    private static ExecutorService executorService= Executors.newCachedThreadPool();
 
     @Autowired
     @Lazy
@@ -56,35 +58,51 @@ public class DeviceStateService implements Plugin {
     public ChangeStateResponse changeState(SecurityContextBase securityContext, ChangeStateRequest changeStateRequest) {
         Map<String, ChangeStateResponseEntry> responseEntryMap=new HashMap<>();
         List<Device> devices = deviceService.listAllDevices(securityContext, changeStateRequest.getDeviceFilter());
+        List<Future<ChangeStateResponseEntry>> tasks=new ArrayList<>();
         for (Device device : devices) {
-            long tries= changeStateRequest.getRetries()+1;
-            StateChanged changeStateReceived=null;
-            String remoteId = device.getGateway().getRemoteId();
-            String deviceId=device.getRemoteId();
-            int attempt = 0;
-            for (attempt = 0; attempt < tries; attempt++) {
-                ChangeState changeState=getChangeStateMessage(changeStateRequest.getValues(),device);
-                try {
-                    changeStateReceived=basicIOTClient.request(changeState, remoteId);
-                    if(changeStateReceived!=null){
-                       break;
-                    }
+            Future<ChangeStateResponseEntry> submit = executorService.submit(() -> changeDeviceState(changeStateRequest, device));
+            tasks.add(submit);
 
-                }
-                catch (Exception e){
-                    logger.error("failed sending message to gateway "+ remoteId,e);
+        }
+        for (Future<ChangeStateResponseEntry> task : tasks) {
+            try {
+                ChangeStateResponseEntry changeStateResponseEntry = task.get(1, TimeUnit.MINUTES);
+                responseEntryMap.put(changeStateResponseEntry.getRemoteId(),changeStateResponseEntry);
+            } catch (Throwable e) {
+                logger.error("failed executing change state task",e);
+            }
+        }
+        return new ChangeStateResponse(new ArrayList<>(responseEntryMap.values()));
+    }
+
+    private ChangeStateResponseEntry changeDeviceState(ChangeStateRequest changeStateRequest, Device device) {
+        long tries= changeStateRequest.getRetries()+1;
+        ChangeStateReceived changeStateReceived=null;
+        String remoteId = device.getGateway().getRemoteId();
+        String deviceId= device.getRemoteId();
+        int attempt = 0;
+        boolean success=false;
+        for (attempt = 0; attempt < tries; attempt++) {
+            ChangeState changeState=getChangeStateMessage(changeStateRequest.getValues(), device);
+            try {
+                changeStateReceived=basicIOTClient.request(changeState, remoteId);
+                if(changeStateReceived!=null){
+                    break;
                 }
 
             }
-            if(changeStateReceived!=null){
-                responseEntryMap.put(deviceId,new ChangeStateResponseEntry().setRemoteId(deviceId).setOnTry(attempt));
-            }
-            else{
-                logger.error("did not receive response for device "+device.getRemoteId()+"("+device.getId()+") , after "+tries +" tries");
+            catch (Throwable e){
+                logger.error("failed sending message to gateway "+ remoteId,e);
             }
 
         }
-        return new ChangeStateResponse(new ArrayList<>(responseEntryMap.values()));
+        if(changeStateReceived!=null){
+            success=true;
+        }
+        else{
+            logger.error("did not receive response for device "+ device.getRemoteId()+"("+ device.getId()+") , after "+tries +" tries");
+        }
+        return new ChangeStateResponseEntry().setRemoteId(deviceId).setOnTry(attempt).setSuccess(success);
     }
 
     private ChangeState getChangeStateMessage(Map<String, Object> values, Device device) {
