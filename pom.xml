@@ -25,8 +25,8 @@
         <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
 
         <spring-boot-dependencies.version>3.0.0</spring-boot-dependencies.version>
-        <flexicore-boot-dependencies.version>4.0.0-SNAPSHOT</flexicore-boot-dependencies.version>
-        <ui-component-model.version>4.0.0-SNAPSHOT</ui-component-model.version>
+        <flexicore-boot-dependencies.version>4.0.0</flexicore-boot-dependencies.version>
+        <ui-component-model.version>4.0.0</ui-component-model.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
