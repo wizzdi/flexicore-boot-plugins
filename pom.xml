@@ -21,9 +21,9 @@
         <maven.compiler.source>17</maven.compiler.source>
 
         <version.eclipselink>4.0.0</version.eclipselink>
-        <flexicore-boot-dependencies.version>4.0.0-SNAPSHOT</flexicore-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>4.0.0</flexicore-boot-dependencies.version>
         <spring-boot-dependencies.version>3.0.0</spring-boot-dependencies.version>
-        <category-model.version>3.0.0-SNAPSHOT</category-model.version>
+        <category-model.version>3.0.0</category-model.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
