@@ -46,7 +46,7 @@ public class UIComponentControllerTest {
     private final AtomicReference<String> authenticationKey = new AtomicReference<>(null);
 
     @BeforeAll
-    private void init() {
+    public void init() {
         authenticationKey.set(ADMIN);
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
