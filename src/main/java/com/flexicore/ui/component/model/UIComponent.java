@@ -9,7 +9,7 @@ package com.flexicore.ui.component.model;
 
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class UIComponent extends SecuredBasic {
