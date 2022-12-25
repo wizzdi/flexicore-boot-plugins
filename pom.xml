@@ -19,11 +19,10 @@
     <properties>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <flexicore-boot-dependencies.version>4.0.0-SNAPSHOT</flexicore-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>4.0.0</flexicore-boot-dependencies.version>
         <spring-boot-dependencies.version>3.0.0</spring-boot-dependencies.version>
-        <org.eclipse.persistence.jpa.modelgen.processor.version>4.0.0
-        </org.eclipse.persistence.jpa.modelgen.processor.version>
-        <metamodel-inheritence-fix-processor.version>3.0.0-SNAPSHOT</metamodel-inheritence-fix-processor.version>
+        <org.eclipse.persistence.jpa.modelgen.processor.version>4.0.0</org.eclipse.persistence.jpa.modelgen.processor.version>
+        <metamodel-inheritence-fix-processor.version>3.0.0</metamodel-inheritence-fix-processor.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
