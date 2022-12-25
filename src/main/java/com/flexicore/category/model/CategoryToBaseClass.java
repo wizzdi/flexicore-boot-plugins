@@ -9,8 +9,8 @@ package com.flexicore.category.model;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 @SuppressWarnings("serial")
 @Entity
