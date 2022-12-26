@@ -58,6 +58,8 @@ public class PendingGatewayControllerTest {
 
     }
 
+
+
     @Test
     @Order(2)
     public void testGetAllPendingGateways() {
@@ -94,5 +96,6 @@ public class PendingGatewayControllerTest {
         assertPendingGateway(request, pendingGateway);
 
     }
+
 
 }

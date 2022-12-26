@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.security.SecurityContextBase;
 import com.google.common.collect.Lists;
@@ -10,7 +11,9 @@ import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
 import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.SecurityUserCreate;
 import com.wizzdi.flexicore.security.request.TenantToUserCreate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -21,7 +24,12 @@ import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.service.MappedPOIService;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -30,15 +38,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.metamodel.SingularAttribute;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Extension
 @Component
 
 public class GatewayService implements Plugin {
 
+    private static final Logger logger= LoggerFactory.getLogger(GatewayService.class);
     @Autowired
     private GatewayRepository repository;
 
@@ -174,8 +187,12 @@ public class GatewayService implements Plugin {
     }
 
     public PaginationResponse<Gateway> approveGateways(SecurityContextBase securityContext, ApproveGatewaysRequest approveGatewaysRequest) {
-        List<Gateway> response=new ArrayList<>();
         List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, approveGatewaysRequest.getPendingGatewayFilter());
+        return approveGateways(securityContext, pendingGateways);
+    }
+
+    private PaginationResponse<Gateway> approveGateways(SecurityContextBase securityContext, List<PendingGateway> pendingGateways) {
+        List<Gateway> response=new ArrayList<>();
         for (PendingGateway pendingGateway : pendingGateways) {
             SecurityUser gatewaySecurityUser=createGatewaySecurityUser(securityContext,pendingGateway.getGatewayId());
             GatewayCreate gatewayCreate=getGatwayCreate(pendingGateway)
@@ -186,9 +203,9 @@ public class GatewayService implements Plugin {
             gateway.setMappedPOI(mappedPOI);
             massMerge(List.of(gateway,mappedPOI));
             response.add(gateway);
-            pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway),securityContext);
+            pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway), securityContext);
         }
-        return new PaginationResponse<>(response,response.size(),response.size());
+        return new PaginationResponse<>(response, response.size(), response.size());
     }
 
     private SecurityUser createGatewaySecurityUser(SecurityContextBase securityContext, String gatewayId) {
@@ -208,4 +225,39 @@ public class GatewayService implements Plugin {
                 .setDescription(pendingGateway.getDescription());
     }
 
+    public void validate(ImportGatewaysRequest importGatewaysRequest, SecurityContextBase securityContext) {
+
+        String csvId= importGatewaysRequest.getCsvId();;
+        FileResource csv=csvId!=null?getByIdOrNull(csvId,FileResource.class, SecuredBasic_.security,securityContext):null;
+        if(csv==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"csvId must be provided");
+        }
+        importGatewaysRequest.setCsv(csv);
+    }
+
+    public ImportGatewaysResponse importGateways(SecurityContextBase securityContext, ImportGatewaysRequest importGatewaysRequest) {
+        String fullPath = importGatewaysRequest.getCsv()
+                .getFullPath();
+        try (Reader in = new InputStreamReader(new FileInputStream(fullPath),
+                StandardCharsets.UTF_8)) {
+            Map<String,PendingGatewayCreate> pendingGatewayCreates=new HashMap<>();
+
+            CSVParser records = CSVFormat.DEFAULT.withFirstRecordAsHeader()
+                    .parse(in);
+            for (CSVRecord record : records) {
+                String gatewayId = record.get("gatewayId");
+                String publicKey = record.get("publicKey");
+                pendingGatewayCreates.put(gatewayId,new PendingGatewayCreate().setPublicKey(publicKey).setGatewayId(gatewayId));
+
+            }
+            Map<String,Gateway> existing=pendingGatewayCreates.isEmpty()?new HashMap<>():listAllGateways(securityContext,new GatewayFilter().setRemoteIds(pendingGatewayCreates.keySet())).stream().collect(Collectors.toMap(f->f.getRemoteId(),f->f,(a,b)->a));
+            List<PendingGateway> pendingGateways = pendingGatewayCreates.values().stream().filter(f->!existing.containsKey(f.getGatewayId())).map(f -> pendingGatewayService.createPendingGateway(f, securityContext)).collect(Collectors.toList());
+            PaginationResponse<Gateway> gatewayPaginationResponse = approveGateways(securityContext, pendingGateways);
+
+            return new ImportGatewaysResponse(gatewayPaginationResponse);
+        } catch (IOException e) {
+            logger.error("unable to open file " + fullPath,e);
+        }
+        return new ImportGatewaysResponse();
+    }
 }

@@ -5,10 +5,8 @@ import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.Gateway_;
-import com.wizzdi.basic.iot.service.request.ApproveGatewaysRequest;
-import com.wizzdi.basic.iot.service.request.GatewayCreate;
-import com.wizzdi.basic.iot.service.request.GatewayFilter;
-import com.wizzdi.basic.iot.service.request.GatewayUpdate;
+import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -87,5 +85,15 @@ public class GatewayController implements Plugin {
         gatewayUpdate.setGateway(gateway);
 
         return service.updateGateway(gatewayUpdate, securityContext);
+    }
+
+    @Operation(summary = "importGateways", description = "imports Gateways from CSV")
+    @PostMapping("/importGateways")
+    public ImportGatewaysResponse importGateways(
+
+            @RequestHeader(value = "authenticationKey", required = false) String key,
+            @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
+        service.validate(importGatewaysRequest, securityContext);
+        return service.importGateways(securityContext, importGatewaysRequest);
     }
 }
