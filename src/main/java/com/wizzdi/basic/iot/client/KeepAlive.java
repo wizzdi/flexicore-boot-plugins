@@ -21,7 +21,7 @@ public class KeepAlive extends IOTMessage{
     public String toString() {
         return "KeepAlive{" +
                 "gatewayId=" + getGatewayId()+
-                "deviceIds=" + deviceIds +
+                ",deviceIds=" + deviceIds +
                 "} " ;
     }
 }
