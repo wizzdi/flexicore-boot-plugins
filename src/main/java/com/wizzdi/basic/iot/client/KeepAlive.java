@@ -16,4 +16,12 @@ public class KeepAlive extends IOTMessage{
         this.deviceIds = deviceIds;
         return (T) this;
     }
+
+    @Override
+    public String toString() {
+        return "KeepAlive{" +
+                "gatewayId=" + getGatewayId()+
+                "deviceIds=" + deviceIds +
+                "} " ;
+    }
 }

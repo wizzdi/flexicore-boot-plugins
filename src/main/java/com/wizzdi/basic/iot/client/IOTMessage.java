@@ -95,4 +95,6 @@ public class IOTMessage {
     public boolean isRequireAuthentication(){
         return true;
     }
+
+
 }
