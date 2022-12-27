@@ -21,6 +21,7 @@ public class RemoteCreate extends BasicCreate {
     private StateSchema currentSchema;
     @JsonIgnore
     private MappedPOI mappedPOI;
+    private Boolean lockLocation;
 
     public String getRemoteId() {
         return remoteId;
@@ -70,6 +71,15 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setMappedPOI(MappedPOI mappedPOI) {
         this.mappedPOI = mappedPOI;
+        return (T) this;
+    }
+
+    public Boolean getLockLocation() {
+        return lockLocation;
+    }
+
+    public <T extends RemoteCreate> T setLockLocation(Boolean lockLocation) {
+        this.lockLocation = lockLocation;
         return (T) this;
     }
 }

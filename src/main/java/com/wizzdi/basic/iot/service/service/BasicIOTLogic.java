@@ -249,10 +249,14 @@ private static final class GetOrCreateDeviceResponse{
                 .setExternalId(deviceId)
                 .setRelatedId(remote.getId())
                 .setRelatedType(remote.getClass().getCanonicalName())
-                .setLon(longitude)
-                .setLat(latitude)
+
                 .setMapIcon(mapIcon)
                 .setName(remote.getName());
+        if(!remote.isLockLocation()){
+            mappedPOICreate
+                    .setLon(longitude)
+                    .setLat(latitude);
+        }
 
         MappedPOI mappedPOI = remote.getMappedPOI();
         if(mappedPOI ==null){
