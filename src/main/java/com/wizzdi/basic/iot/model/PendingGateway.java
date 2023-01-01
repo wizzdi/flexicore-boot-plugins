@@ -2,11 +2,12 @@ package com.wizzdi.basic.iot.model;
 
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "pending_gateway_idx",columnList = "gatewayId,registeredGateway_id")
+})
 public class PendingGateway extends SecuredBasic {
 
     @Lob

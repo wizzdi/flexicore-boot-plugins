@@ -3,14 +3,14 @@ package com.wizzdi.basic.iot.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "state_schema_idx",columnList = "deviceType_id,version,name")
+})
 public class StateSchema extends SecuredBasic {
 
     private int version;

@@ -2,12 +2,13 @@ package com.wizzdi.basic.iot.model;
 
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.OffsetDateTime;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "firmware_installation_idx",columnList = "targetRemote_id,firmwareUpdate_id,firmwareInstallationState")
+})
 public class FirmwareUpdateInstallation extends SecuredBasic {
 
     @ManyToOne(targetEntity = FirmwareUpdate.class)

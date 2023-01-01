@@ -12,10 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "remote_idx",columnList = "remoteId,gateway_id,dtype")
+})
 public class Remote extends SecuredBasic {
 
     @ManyToOne(targetEntity = ConnectivityChange.class)
     private ConnectivityChange lastConnectivityChange;
+    @Column(unique = true)
     private String remoteId;
     private String version;
     @ManyToOne(targetEntity = MappedPOI.class)
@@ -27,6 +31,7 @@ public class Remote extends SecuredBasic {
     @Convert(converter = JsonConverter.class)
     @JsonIgnore
     private Map<String, Object> other = new HashMap<>();
+    private boolean lockLocation;
 
 
     @JsonAnySetter
@@ -97,6 +102,15 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setMappedPOI(MappedPOI mappedPOI) {
         this.mappedPOI = mappedPOI;
+        return (T) this;
+    }
+
+    public boolean isLockLocation() {
+        return lockLocation;
+    }
+
+    public <T extends Remote> T setLockLocation(boolean lockLocation) {
+        this.lockLocation = lockLocation;
         return (T) this;
     }
 }

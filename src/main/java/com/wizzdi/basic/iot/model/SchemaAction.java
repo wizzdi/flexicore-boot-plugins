@@ -2,11 +2,12 @@ package com.wizzdi.basic.iot.model;
 
 import com.flexicore.model.SecuredBasic;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "schema_Action_idx",columnList = "stateSchema_id,externalId,name")
+})
 public class SchemaAction extends SecuredBasic {
 
     @ManyToOne(targetEntity = StateSchema.class)
