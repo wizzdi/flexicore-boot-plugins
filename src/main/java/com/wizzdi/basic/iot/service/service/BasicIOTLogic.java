@@ -92,8 +92,19 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     public IOTMessage executeLogic(IOTMessage iotMessage) {
-        if (iotMessage instanceof RegisterGateway) {
-            return registerGateway((RegisterGateway) iotMessage);
+        if (iotMessage instanceof RegisterGateway registerGateway) {
+            return registerGateway(registerGateway);
+        }
+        if(iotMessage instanceof BadMessage badMessage){
+            if(logger.isDebugEnabled()){
+                logger.warn("bad message: "+badMessage.getError() , " original message: "+badMessage.getOriginalMessage());
+
+            }
+            else{
+                logger.warn("bad message: "+badMessage.getError());
+
+            }
+            return null;
         }
         Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
         if (gatewayOptional.isEmpty()) {
