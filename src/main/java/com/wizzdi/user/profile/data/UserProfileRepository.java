@@ -6,6 +6,8 @@ import com.flexicore.model.SecurityUser_;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.SoftDeleteOption;
 import com.wizzdi.user.profile.model.UserProfile;
 import com.wizzdi.user.profile.model.UserProfile_;
 import com.wizzdi.user.profile.request.UserProfileFilter;
@@ -52,6 +54,7 @@ public class UserProfileRepository implements Plugin {
     public <T extends UserProfile> void addUserProfilesPredicates(
             UserProfileFilter userProfileFilter, From<?,T> r,
             CriteriaBuilder cb,CommonAbstractCriteria q, List<Predicate> preds) {
+        BasicRepository.addBasicPropertiesFilter(new BasicPropertiesFilter(),cb,q,r,preds);
         if (userProfileFilter.getUsers() != null&&!userProfileFilter.getUsers().isEmpty()) {
             Set<String> ids=userProfileFilter.getUsers().stream().map(f->f.getId()).collect(Collectors.toSet());
             Join<T, SecurityUser> join=r.join(UserProfile_.securityUser);
