@@ -81,6 +81,7 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
@@ -247,11 +248,7 @@
             <artifactId>dynamic-properties-converter-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-service</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
 
     </dependencies>
     <build>
