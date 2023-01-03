@@ -105,7 +105,7 @@ public class FirmwareUpdateService implements Plugin {
     public FirmwareUpdate createFirmwareUpdateNoMerge(FirmwareUpdateCreate creationContainer,
                                       SecurityContextBase securityContext) {
         FirmwareUpdate firmwareUpdate = new FirmwareUpdate();
-        firmwareUpdate.setId(Baseclass.getBase64ID());
+        firmwareUpdate.setId(UUID.randomUUID().toString());
 
         updateFirmwareUpdateNoMerge(firmwareUpdate, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(firmwareUpdate, securityContext);

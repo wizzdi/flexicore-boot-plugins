@@ -27,6 +27,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Extension
@@ -103,7 +104,7 @@ public class FirmwareUpdateInstallationService implements Plugin {
     public FirmwareUpdateInstallation createFirmwareUpdateInstallationNoMerge(FirmwareUpdateInstallationCreate creationContainer,
                                       SecurityContextBase securityContext) {
         FirmwareUpdateInstallation firmwareUpdateInstallation = new FirmwareUpdateInstallation();
-        firmwareUpdateInstallation.setId(Baseclass.getBase64ID());
+        firmwareUpdateInstallation.setId(UUID.randomUUID().toString());
 
         updateFirmwareUpdateInstallationNoMerge(firmwareUpdateInstallation, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(firmwareUpdateInstallation, securityContext);

@@ -127,7 +127,7 @@ public class DeviceService implements Plugin {
     public Device createDeviceNoMerge(DeviceCreate creationContainer,
                                       SecurityContextBase securityContext) {
         Device device = new Device();
-        device.setId(Baseclass.getBase64ID());
+        device.setId(UUID.randomUUID().toString());
 
         updateDeviceNoMerge(device, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(device, securityContext);

@@ -108,7 +108,7 @@ public class ConnectivityChangeService implements Plugin {
     public ConnectivityChange createConnectivityChangeNoMerge(ConnectivityChangeCreate creationContainer,
                                         SecurityContextBase securityContext) {
         ConnectivityChange connectivityChange = new ConnectivityChange();
-        connectivityChange.setId(Baseclass.getBase64ID());
+        connectivityChange.setId(UUID.randomUUID().toString());
 
         updateConnectivityChangeNoMerge(connectivityChange, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(connectivityChange, securityContext);

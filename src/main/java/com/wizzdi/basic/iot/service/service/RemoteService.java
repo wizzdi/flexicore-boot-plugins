@@ -31,6 +31,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -114,7 +115,7 @@ public class RemoteService implements Plugin {
     public Remote createRemoteNoMerge(RemoteCreate creationContainer,
                                         SecurityContextBase securityContext) {
         Remote remote = new Remote();
-        remote.setId(Baseclass.getBase64ID());
+        remote.setId(UUID.randomUUID().toString());
 
         updateRemoteNoMerge(remote, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(remote, securityContext);

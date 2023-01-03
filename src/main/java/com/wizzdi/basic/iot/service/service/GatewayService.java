@@ -141,7 +141,7 @@ public class GatewayService implements Plugin {
     public Gateway createGatewayNoMerge(GatewayCreate creationContainer,
                                         SecurityContextBase securityContext) {
         Gateway gateway = new Gateway();
-        gateway.setId(Baseclass.getBase64ID());
+        gateway.setId(UUID.randomUUID().toString());
 
         updateGatewayNoMerge(gateway, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(gateway, securityContext);
@@ -199,9 +199,9 @@ public class GatewayService implements Plugin {
                     .setApprovingUser(securityContext.getUser())
                     .setGatewayUser(gatewaySecurityUser);
             Gateway gateway = createGatewayNoMerge(gatewayCreate, securityContext);
-            MappedPOI mappedPOI = mappedPOIService.createMappedPOI(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()), securityContext);
+            MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()), securityContext);
             gateway.setMappedPOI(mappedPOI);
-            massMerge(List.of(gateway,mappedPOI));
+            massMerge(List.of(mappedPOI,gateway));
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway), securityContext);
         }

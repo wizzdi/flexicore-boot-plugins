@@ -33,6 +33,7 @@ import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannel
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableScheduling
 @EnableIntegration
+@EnableTransactionManagement(proxyTargetClass = true)
 public class BasicIOTConfig implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);

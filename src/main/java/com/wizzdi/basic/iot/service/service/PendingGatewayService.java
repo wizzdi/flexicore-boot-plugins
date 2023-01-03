@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -104,7 +105,7 @@ public class PendingGatewayService implements Plugin {
     public PendingGateway createPendingGatewayNoMerge(PendingGatewayCreate creationContainer,
                                         SecurityContextBase securityContext) {
         PendingGateway pendingGateway = new PendingGateway();
-        pendingGateway.setId(Baseclass.getBase64ID());
+        pendingGateway.setId(UUID.randomUUID().toString());
 
         updatePendingGatewayNoMerge(pendingGateway, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(pendingGateway, securityContext);

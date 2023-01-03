@@ -113,7 +113,7 @@ public class StateSchemaService implements Plugin {
     public StateSchema createStateSchemaNoMerge(StateSchemaCreate creationContainer,
                                         SecurityContextBase securityContext) {
         StateSchema stateSchema = new StateSchema();
-        stateSchema.setId(Baseclass.getBase64ID());
+        stateSchema.setId(UUID.randomUUID().toString());
 
         updateStateSchemaNoMerge(stateSchema, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(stateSchema, securityContext);

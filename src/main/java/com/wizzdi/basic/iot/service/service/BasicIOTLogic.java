@@ -166,8 +166,15 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
             ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now()), remoteSecurityContext);
             remote.setLastConnectivityChange(connectivityChange);
+
             gatewayService.merge(remote);
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
+            if(remote instanceof Device device){
+                if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){
+                    device.getMappedPOI().setMapIcon(device.getDeviceType().getDefaultMapIcon());
+                    gatewayService.merge(device.getMappedPOI());
+                }
+            }
         }
         logger.debug("done checking connectivity");
     }
@@ -310,14 +317,16 @@ private static final class GetOrCreateDeviceResponse{
             status="unknown";
         }
         if(remote instanceof Device device){
-            String externalId = device.getDeviceType().getName() + "_" + status;
-            String relatedType = device.getClass().getCanonicalName();
-            return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
-                    .setExternalId(Collections.singleton(externalId)),adminSecurityContext).stream().findFirst().orElseGet(()->mapIconService.createMapIcon(new MapIconCreate().setExternalId(externalId).setRelatedType(relatedType).setName(externalId),adminSecurityContext));
+            DeviceType deviceType = device.getDeviceType();
+            Class<? extends Device> deviceClass = device.getClass();
+
+            return deviceTypeService.getOrCreateMapIcon(status, deviceType.getName(), deviceClass,adminSecurityContext);
 
         }
         return null;
     }
+
+
 
     private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContextBase gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
         String newVersion;

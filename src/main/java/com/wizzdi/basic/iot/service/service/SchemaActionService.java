@@ -122,7 +122,7 @@ public class SchemaActionService implements Plugin {
     public SchemaAction createSchemaActionNoMerge(SchemaActionCreate creationContainer,
                                         SecurityContextBase securityContext) {
         SchemaAction schemaAction = new SchemaAction();
-        schemaAction.setId(Baseclass.getBase64ID());
+        schemaAction.setId(UUID.randomUUID().toString());
 
         updateSchemaActionNoMerge(schemaAction, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(schemaAction, securityContext);
