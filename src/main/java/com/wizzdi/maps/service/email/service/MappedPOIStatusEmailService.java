@@ -10,12 +10,10 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.StatusHistory;
-import com.wizzdi.maps.service.email.context.EmailContext;
 import com.wizzdi.maps.service.email.context.EmailEntry;
 import com.wizzdi.maps.service.email.request.SendStatusEmailRequest;
 import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;
 import com.wizzdi.maps.service.request.StatusHistoryForDateRequest;
-import com.wizzdi.maps.service.request.StatusHistoryGroupedRequest;
 import com.wizzdi.maps.service.service.StatusHistoryGroupedService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -28,9 +26,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -57,15 +55,16 @@ public class MappedPOIStatusEmailService implements Plugin {
 
 
     public SendStatusEmailResponse sendEmail(SendStatusEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
+        ZoneOffset zoneOffset=sendStatusEmailRequest.getZoneOffset()!=null?sendStatusEmailRequest.getZoneOffset():ZoneOffset.UTC;
         List<StatusHistory> statusHistories = statusHistoryGroupedService.getAllStatusHistoriesForDate(new StatusHistoryForDateRequest().setMappedPOIFilter(sendStatusEmailRequest.getMappedPOIFilter()).setStatusAtDate(OffsetDateTime.now()), securityContext).getList();
         List<EmailEntry> emailEntries=new ArrayList<>();
         for (int i = 0; i < statusHistories.size(); i++) {
-            emailEntries.add(new EmailEntry(statusHistories.get(i),i));
+            emailEntries.add(new EmailEntry(statusHistories.get(i),i,zoneOffset));
         }
-        return sendEmail(emailEntries,sendStatusEmailRequest.getEmails());
+        return sendEmail(emailEntries,sendStatusEmailRequest.getEmails(),zoneOffset);
     }
 
-    public SendStatusEmailResponse sendEmail(List<EmailEntry> entries, Set<String> emails) {
+    public SendStatusEmailResponse sendEmail(List<EmailEntry> entries, Set<String> emails, ZoneOffset zoneOffset) {
 
             try {
                 Request request = new Request();
@@ -80,7 +79,7 @@ public class MappedPOIStatusEmailService implements Plugin {
 
                 }
                 personalization.addDynamicTemplateData("entries",entries);
-                personalization.addDynamicTemplateData("date",OffsetDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+                personalization.addDynamicTemplateData("date",OffsetDateTime.now().withOffsetSameInstant(zoneOffset).format(DateTimeFormatter.ISO_DATE_TIME));
 
 
                 mail.setFrom(new Email(from, "Notification Manager"));

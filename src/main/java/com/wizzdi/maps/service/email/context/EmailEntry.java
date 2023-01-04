@@ -1,10 +1,10 @@
 package com.wizzdi.maps.service.email.context;
 
-import com.flexicore.model.SecurityTenant;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.model.StatusHistory;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -12,7 +12,7 @@ public class EmailEntry {
 
 
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("hh:mmXXXX");
+    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mmXXXX");
     private String date;
     private String time;
     private String tenant;
@@ -20,8 +20,9 @@ public class EmailEntry {
     private String statusName;
     private boolean even;
 
-    public EmailEntry(StatusHistory statusHistory,int index) {
-        OffsetDateTime dateAtStatus = statusHistory.getDateAtStatus();
+    public EmailEntry(StatusHistory statusHistory, int index, ZoneOffset zoneOffset) {
+        OffsetDateTime dateAtStatus = statusHistory.getDateAtStatus().withOffsetSameInstant(zoneOffset);
+
         this.date=dateAtStatus.format(DATE_FORMATTER);
         this.time=dateAtStatus.format(TIME_FORMATTER);
         MappedPOI mappedPOI = statusHistory.getMappedPOI();
