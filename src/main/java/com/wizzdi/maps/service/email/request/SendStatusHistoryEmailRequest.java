@@ -1,16 +1,16 @@
 package com.wizzdi.maps.service.email.request;
 
-import com.wizzdi.maps.service.request.MappedPOIFilter;
+import com.wizzdi.maps.service.request.StatusHistoryFilter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneOffset;
 import java.util.Set;
 
-public class SendStatusEmailRequest {
+public class SendStatusHistoryEmailRequest {
 
     @NotNull
-    private MappedPOIFilter mappedPOIFilter;
+    private StatusHistoryFilter statusHistoryFilter;
     @NotNull
     @NotEmpty
     private Set<String> emails;
@@ -19,12 +19,13 @@ public class SendStatusEmailRequest {
 
     private String title;
 
-    public MappedPOIFilter getMappedPOIFilter() {
-        return mappedPOIFilter;
+
+    public StatusHistoryFilter getStatusHistoryFilter() {
+        return statusHistoryFilter;
     }
 
-    public <T extends SendStatusEmailRequest> T setMappedPOIFilter(MappedPOIFilter mappedPOIFilter) {
-        this.mappedPOIFilter = mappedPOIFilter;
+    public <T extends SendStatusHistoryEmailRequest> T setStatusHistoryFilter(StatusHistoryFilter statusHistoryFilter) {
+        this.statusHistoryFilter = statusHistoryFilter;
         return (T) this;
     }
 
@@ -32,7 +33,7 @@ public class SendStatusEmailRequest {
         return emails;
     }
 
-    public <T extends SendStatusEmailRequest> T setEmails(Set<String> emails) {
+    public <T extends SendStatusHistoryEmailRequest> T setEmails(Set<String> emails) {
         this.emails = emails;
         return (T) this;
     }
@@ -41,7 +42,7 @@ public class SendStatusEmailRequest {
         return zoneOffset;
     }
 
-    public <T extends SendStatusEmailRequest> T setZoneOffset(ZoneOffset zoneOffset) {
+    public <T extends SendStatusHistoryEmailRequest> T setZoneOffset(ZoneOffset zoneOffset) {
         this.zoneOffset = zoneOffset;
         return (T) this;
     }
@@ -50,7 +51,7 @@ public class SendStatusEmailRequest {
         return title;
     }
 
-    public <T extends SendStatusEmailRequest> T setTitle(String title) {
+    public <T extends SendStatusHistoryEmailRequest> T setTitle(String title) {
         this.title = title;
         return (T) this;
     }

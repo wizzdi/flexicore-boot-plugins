@@ -11,10 +11,9 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.StatusHistory;
 import com.wizzdi.maps.service.email.context.EmailEntry;
-import com.wizzdi.maps.service.email.request.SendStatusEmailRequest;
+import com.wizzdi.maps.service.email.request.SendStatusHistoryEmailRequest;
 import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;
-import com.wizzdi.maps.service.request.StatusHistoryForDateRequest;
-import com.wizzdi.maps.service.service.StatusHistoryGroupedService;
+import com.wizzdi.maps.service.service.StatusHistoryService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +35,12 @@ import java.util.Set;
 @Component
 @Extension
 
-public class MappedPOIStatusEmailService implements Plugin {
+public class MappedPOIStatusHistoryEmailService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(MappedPOIStatusEmailService.class);
+    private static final Logger logger= LoggerFactory.getLogger(MappedPOIStatusHistoryEmailService.class);
+    public static final DateTimeFormatter PERIOD_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    @Value("${wizzdi.maps.status.sendgrid.template.id}")
+    @Value("${wizzdi.maps.status.history.sendgrid.template.id}")
     private String templateId;
     @Value("${wizzdi.maps.status.sendgrid.from}")
     private String from;
@@ -48,19 +48,21 @@ public class MappedPOIStatusEmailService implements Plugin {
     private String replyTo;
 
     @Autowired
-    private StatusHistoryGroupedService statusHistoryGroupedService;
+    private StatusHistoryService statusHistoryService;
     @Autowired
     @Qualifier("mappedPOISendGrid")
     @Lazy
     private SendGrid sendGrid;
 
 
-    public SendStatusEmailResponse sendEmail(SendStatusEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
+    public SendStatusEmailResponse sendEmail(SendStatusHistoryEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
         ZoneOffset zoneOffset=sendStatusEmailRequest.getZoneOffset()!=null?sendStatusEmailRequest.getZoneOffset():ZoneOffset.UTC;
-        List<StatusHistory> statusHistories = statusHistoryGroupedService.getAllStatusHistoriesForDate(new StatusHistoryForDateRequest().setMappedPOIFilter(sendStatusEmailRequest.getMappedPOIFilter()).setStatusAtDate(OffsetDateTime.now()), securityContext).getList().stream().filter(f->f.getMappedPOI().getName()!=null).sorted(Comparator.comparing(f->f.getMappedPOI().getName())).toList();
-        String title=sendStatusEmailRequest.getTitle()!=null?sendStatusEmailRequest.getTitle():"Status Report "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
-
+        List<StatusHistory> statusHistories = statusHistoryService.listAllStatusHistories(sendStatusEmailRequest.getStatusHistoryFilter(), securityContext);
         List<EmailEntry> emailEntries=new ArrayList<>();
+        OffsetDateTime startDate = sendStatusEmailRequest.getStatusHistoryFilter().getStartDate().withOffsetSameInstant(zoneOffset);
+        OffsetDateTime endDate = sendStatusEmailRequest.getStatusHistoryFilter().getEndDate().withOffsetSameInstant(zoneOffset);;
+
+        String title=sendStatusEmailRequest.getTitle()!=null?sendStatusEmailRequest.getTitle():String.format("Status History Report %s - %s", startDate.format(PERIOD_DATE_TIME_FORMATTER),endDate.format(PERIOD_DATE_TIME_FORMATTER));
         for (int i = 0; i < statusHistories.size(); i++) {
             emailEntries.add(new EmailEntry(statusHistories.get(i),i,zoneOffset));
         }
