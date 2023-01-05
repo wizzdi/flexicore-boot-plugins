@@ -29,8 +29,9 @@ public class EmailEntry {
         if(mappedPOI!=null){
             this.tenant= Optional.ofNullable(mappedPOI.getSecurity()).map(f->f.getTenant()).map(f->f.getName()).orElse(null);
             this.externalId=mappedPOI.getExternalId();
-            this.statusName=Optional.ofNullable(mappedPOI.getMapIcon()).map(f->f.getName()).orElse(null);
         }
+        this.statusName=Optional.ofNullable(statusHistory.getMapIcon()).map(f->f.getName()).orElse(null);
+
 
         this.even=index%2==0;
 
