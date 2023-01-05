@@ -76,6 +76,9 @@ public class CityRepository implements Plugin {
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
+		if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
+			preds.add(r.get(City_.externalId).in(filtering.getExternalIds()));
+		}
 		if(securityContextBase!=null){
 			Join<City, Baseclass> join=r.join(City_.security);
 			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);

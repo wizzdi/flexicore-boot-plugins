@@ -21,6 +21,8 @@ public class CityFilter extends PaginationFilter {
 	@TypeRetention(Country.class)
 	private List<Country> countries;
 
+	private Set<String> externalIds;
+
 
 
 	private Set<String> statesIds =new HashSet<>();
@@ -78,6 +80,15 @@ public class CityFilter extends PaginationFilter {
 
 	public <T extends CityFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
 		this.basicPropertiesFilter = basicPropertiesFilter;
+		return (T) this;
+	}
+
+	public Set<String> getExternalIds() {
+		return externalIds;
+	}
+
+	public <T extends CityFilter> T setExternalIds(Set<String> externalIds) {
+		this.externalIds = externalIds;
 		return (T) this;
 	}
 }

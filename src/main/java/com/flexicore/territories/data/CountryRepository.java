@@ -69,6 +69,9 @@ public class CountryRepository implements Plugin {
 			Join<Country, Baseclass> join=r.join(Country_.security);
 			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
 		}
+		if(filtering.getCountryCodes()!=null&&!filtering.getCountryCodes().isEmpty()){
+			preds.add(r.get(Country_.countryCode).in(filtering.getCountryCodes()));
+		}
 
 	}
 
