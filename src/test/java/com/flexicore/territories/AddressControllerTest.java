@@ -106,7 +106,7 @@ public class AddressControllerTest {
         AddressCreate request = new AddressCreate()
                 .setExternalId(name)
                 .setFloor(1)
-                .setNumber(3)
+                .setHouseNumber("3")
                 .setZipCode(name)
                 .setStreetId(street.getId())
                 .setNeighbourhoodId(neighbourhood.getId())
@@ -156,8 +156,8 @@ public class AddressControllerTest {
             Assertions.assertEquals(request.getFloor(), address.getFloorForAddress());
 
         }
-        if(request.getNumber()!=null){
-            Assertions.assertEquals(request.getNumber(), address.getNumber());
+        if(request.getHouseNumber()!=null){
+            Assertions.assertEquals(request.getHouseNumber(), address.getHouseNumber());
 
         }
 

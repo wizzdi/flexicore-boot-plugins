@@ -74,14 +74,6 @@ public class AddressFilter extends PaginationFilter {
         return (T) this;
     }
 
-    public Set<Integer> getNumbers() {
-        return numbers;
-    }
-
-    public <T extends AddressFilter> T setNumbers(Set<Integer> numbers) {
-        this.numbers = numbers;
-        return (T) this;
-    }
 
     public Set<String> getZipCodes() {
         return zipCodes;

@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-territories-model</artifactId>
-            <version>3.0.1</version>
+            <version>5.0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

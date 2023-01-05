@@ -159,8 +159,8 @@ public class AddressService implements Plugin {
 			update = true;
 		}
 
-		if (creationContainer.getNumber() != null && !creationContainer.getNumber().equals(address.getNumber())) {
-			address.setNumber(creationContainer.getNumber());
+		if (creationContainer.getHouseNumber() != null && !creationContainer.getHouseNumber().equals(address.getHouseNumber())) {
+			address.setHouseNumber(creationContainer.getHouseNumber());
 			update = true;
 		}
 		if (creationContainer.getNeighbourhood() != null && (address.getNeighbourhood() == null || !creationContainer.getNeighbourhood().getId().equals(address.getNeighbourhood().getId()))) {

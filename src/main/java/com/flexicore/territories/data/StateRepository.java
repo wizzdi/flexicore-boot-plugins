@@ -71,6 +71,9 @@ public class StateRepository implements Plugin {
 			Join<State, Country> countryJoin=r.join(State_.country);
 			preds.add(countryJoin.get(Country_.id).in(ids));
 		}
+		if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
+			preds.add(r.get(State_.externalId).in(filtering.getExternalIds()));
+		}
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}

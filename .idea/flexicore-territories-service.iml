@@ -53,7 +53,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.13.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.13.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.13.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:3.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-territories-model:5.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.wizzdi:flexicore-boot:2.0.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.pf4j:pf4j:3.7.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />

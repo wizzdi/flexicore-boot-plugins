@@ -11,7 +11,7 @@ public class AddressCreate extends BasicCreate {
 	private String streetId;
 	@JsonIgnore
 	private Street street;
-	private Integer number;
+	private String houseNumber;
 	private String neighbourhoodId;
 	@JsonIgnore
 	private Neighbourhood neighbourhood;
@@ -46,12 +46,12 @@ public class AddressCreate extends BasicCreate {
 		return (T) this;
 	}
 
-	public Integer getNumber() {
-		return number;
+	public String getHouseNumber() {
+		return houseNumber;
 	}
 
-	public <T extends AddressCreate> T setNumber(Integer number) {
-		this.number = number;
+	public <T extends AddressCreate> T setHouseNumber(String houseNumber) {
+		this.houseNumber = houseNumber;
 		return (T) this;
 	}
 

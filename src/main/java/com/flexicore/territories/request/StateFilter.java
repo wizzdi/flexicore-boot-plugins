@@ -18,6 +18,8 @@ public class StateFilter extends PaginationFilter {
 
 	private BasicPropertiesFilter basicPropertiesFilter;
 	private Set<String> countriesIds =new HashSet<>();
+
+	private Set<String> externalIds;
 	@JsonIgnore
 	@TypeRetention(Country.class)
 	private List<Country> countries;
@@ -48,6 +50,15 @@ public class StateFilter extends PaginationFilter {
 
 	public <T extends StateFilter> T setCountries(List<Country> countries) {
 		this.countries = countries;
+		return (T) this;
+	}
+
+	public Set<String> getExternalIds() {
+		return externalIds;
+	}
+
+	public <T extends StateFilter> T setExternalIds(Set<String> externalIds) {
+		this.externalIds = externalIds;
 		return (T) this;
 	}
 }

@@ -71,9 +71,7 @@ public class AddressRepository implements Plugin {
 		if (filtering.getFloors() != null && !filtering.getFloors().isEmpty()) {
 			preds.add(r.get(Address_.floorForAddress).in(filtering.getFloors()));
 		}
-		if (filtering.getNumbers() != null && !filtering.getNumbers().isEmpty()) {
-			preds.add(r.get(Address_.number).in(filtering.getNumbers()));
-		}
+
 		if (filtering.getZipCodes() != null
 				&& !filtering.getZipCodes().isEmpty()) {
 			preds.add(r.get(Address_.zipCode).in(filtering.getZipCodes()));
