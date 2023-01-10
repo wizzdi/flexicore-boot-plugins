@@ -87,7 +87,7 @@ public class DynamicInvokerCSVEmailService implements Plugin {
 
 
                 mail.setFrom(new Email(from, "Notification Manager"));
-                Content content = new Content("text/plain", "Exported CSV is Attached");
+                mail.addContent(new Content("text/plain", "Exported CSV is Attached"));
                 mail.setReplyTo(new Email(replyTo, "No Reply"));
 
                 mail.setSubject(title);
