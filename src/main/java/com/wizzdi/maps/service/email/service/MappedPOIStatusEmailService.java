@@ -57,7 +57,8 @@ public class MappedPOIStatusEmailService implements Plugin {
 
     public SendStatusEmailResponse sendEmail(SendStatusEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
         ZoneOffset zoneOffset=sendStatusEmailRequest.getZoneOffset()!=null?sendStatusEmailRequest.getZoneOffset():ZoneOffset.UTC;
-        List<StatusHistory> statusHistories = statusHistoryGroupedService.getAllStatusHistoriesForDate(new StatusHistoryForDateRequest().setMappedPOIFilter(sendStatusEmailRequest.getMappedPOIFilter()).setStatusAtDate(OffsetDateTime.now()), securityContext).getList().stream().filter(f->f.getMappedPOI().getName()!=null).sorted(Comparator.comparing(f->f.getMappedPOI().getName())).toList();
+        StatusHistoryForDateRequest statusHistoryForDateRequest = sendStatusEmailRequest.getStatusHistoryForDateRequest();
+        List<StatusHistory> statusHistories = statusHistoryGroupedService.getAllStatusHistoriesForDate(statusHistoryForDateRequest, securityContext).getList().stream().filter(f->f.getMappedPOI().getName()!=null).sorted(Comparator.comparing(f->f.getMappedPOI().getName())).toList();
         String title=sendStatusEmailRequest.getTitle()!=null?sendStatusEmailRequest.getTitle():"Status Report "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
 
         List<EmailEntry> emailEntries=new ArrayList<>();

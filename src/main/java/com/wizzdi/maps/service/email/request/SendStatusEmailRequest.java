@@ -1,6 +1,7 @@
 package com.wizzdi.maps.service.email.request;
 
 import com.wizzdi.maps.service.request.MappedPOIFilter;
+import com.wizzdi.maps.service.request.StatusHistoryForDateRequest;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -10,7 +11,7 @@ import java.util.Set;
 public class SendStatusEmailRequest {
 
     @NotNull
-    private MappedPOIFilter mappedPOIFilter;
+    private StatusHistoryForDateRequest statusHistoryForDateRequest;
     @NotNull
     @NotEmpty
     private Set<String> emails;
@@ -19,12 +20,12 @@ public class SendStatusEmailRequest {
 
     private String title;
 
-    public MappedPOIFilter getMappedPOIFilter() {
-        return mappedPOIFilter;
+    public StatusHistoryForDateRequest getStatusHistoryForDateRequest() {
+        return statusHistoryForDateRequest;
     }
 
-    public <T extends SendStatusEmailRequest> T setMappedPOIFilter(MappedPOIFilter mappedPOIFilter) {
-        this.mappedPOIFilter = mappedPOIFilter;
+    public <T extends SendStatusEmailRequest> T setStatusHistoryForDateRequest(StatusHistoryForDateRequest statusHistoryForDateRequest) {
+        this.statusHistoryForDateRequest = statusHistoryForDateRequest;
         return (T) this;
     }
 
