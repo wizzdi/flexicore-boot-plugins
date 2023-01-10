@@ -2,6 +2,7 @@ package com.wizzdi.flexicore.dynamic.invoker.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.interfaces.dynamic.Invoker;
+import com.flexicore.security.SecurityContext;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.service.impl.DynamicInvokersService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -36,7 +37,7 @@ public class DynamicInvokerEmailController implements Plugin, Invoker {
     public SendStatusEmailResponse sendEmail(
             @Valid @RequestBody SendDynamicInvokerRequest sendDynamicInvokerRequest,
             @RequestAttribute SecurityContextBase securityContext) {
-        dynamicInvokersService.validate(sendDynamicInvokerRequest.getExportDynamicExecution(),securityContext);
+        dynamicInvokersService.validateExportDynamicExecution(sendDynamicInvokerRequest.getExportDynamicExecution(), (SecurityContext) securityContext);
 
         return dynamicInvokerEmailService.sendEmail(sendDynamicInvokerRequest, securityContext);
     }

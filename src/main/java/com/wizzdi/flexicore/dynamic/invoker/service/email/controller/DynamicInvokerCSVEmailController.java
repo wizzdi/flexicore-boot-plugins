@@ -35,7 +35,7 @@ public class DynamicInvokerCSVEmailController implements Plugin, Invoker {
     public SendStatusEmailResponse sendEmail(
             @Valid @RequestBody SendDynamicInvokerRequest sendDynamicInvokerRequest,
             @RequestAttribute SecurityContextBase securityContext) {
-        dynamicInvokersService.validate(sendDynamicInvokerRequest.getExportDynamicExecution(),securityContext);
+        dynamicInvokersService.validateExportDynamicExecution(sendDynamicInvokerRequest.getExportDynamicExecution(), (SecurityContext) securityContext);
         return invokerCSVEmailService.sendEmail(sendDynamicInvokerRequest, (SecurityContext) securityContext);
     }
 

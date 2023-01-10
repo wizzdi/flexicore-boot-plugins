@@ -9,6 +9,7 @@ import com.sendgrid.Response;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Attachments;
+import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -86,7 +87,7 @@ public class DynamicInvokerCSVEmailService implements Plugin {
 
 
                 mail.setFrom(new Email(from, "Notification Manager"));
-
+                Content content = new Content("text/plain", "Exported CSV is Attached");
                 mail.setReplyTo(new Email(replyTo, "No Reply"));
 
                 mail.setSubject(title);
