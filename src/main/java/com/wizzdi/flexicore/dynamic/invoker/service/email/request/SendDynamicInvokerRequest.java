@@ -1,6 +1,6 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.request;
 
-import com.flexicore.request.ExportDynamicExecution;
+import com.flexicore.request.ExportDynamicInvoker;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -10,7 +10,7 @@ import java.util.Set;
 public class SendDynamicInvokerRequest {
 
     @NotNull
-    private ExportDynamicExecution exportDynamicExecution;
+    private ExportDynamicInvoker exportDynamicInvoker;
     @NotNull
     @NotEmpty
     private Set<String> emails;
@@ -19,12 +19,12 @@ public class SendDynamicInvokerRequest {
 
     private String title;
 
-    public ExportDynamicExecution getExportDynamicExecution() {
-        return exportDynamicExecution;
+    public ExportDynamicInvoker getExportDynamicInvoker() {
+        return exportDynamicInvoker;
     }
 
-    public <T extends SendDynamicInvokerRequest> T setExportDynamicExecution(ExportDynamicExecution exportDynamicExecution) {
-        this.exportDynamicExecution = exportDynamicExecution;
+    public <T extends SendDynamicInvokerRequest> T setExportDynamicInvoker(ExportDynamicInvoker exportDynamicInvoker) {
+        this.exportDynamicInvoker = exportDynamicInvoker;
         return (T) this;
     }
 

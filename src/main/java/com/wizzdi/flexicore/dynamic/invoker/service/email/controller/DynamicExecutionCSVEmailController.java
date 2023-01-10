@@ -7,9 +7,8 @@ import com.flexicore.security.SecurityContextBase;
 import com.flexicore.service.impl.DynamicInvokersService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
-import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
-import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicExecutionRequest;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.service.DynamicInvokerCSVEmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("DynamicInvokerCSVEmail")
-@Tag(name = "DynamicInvokerCSVEmail")
+@RequestMapping("DynamicExecutionCSVEmail")
+@Tag(name = "DynamicExecutionCSVEmail")
 @OperationsInside
 @Extension
-public class DynamicInvokerCSVEmailController implements Plugin, Invoker {
+public class DynamicExecutionCSVEmailController implements Plugin, Invoker {
 
     @Autowired
     private DynamicInvokerCSVEmailService invokerCSVEmailService;
@@ -34,9 +33,9 @@ public class DynamicInvokerCSVEmailController implements Plugin, Invoker {
     @PostMapping("sendEmail")
     @Operation(summary = "sendEmail", description = "Sends CSV email")
     public SendDynamicEmailResponse sendEmail(
-            @Valid @RequestBody SendDynamicInvokerRequest sendDynamicExecutionRequest,
+            @Valid @RequestBody SendDynamicExecutionRequest sendDynamicExecutionRequest,
             @RequestAttribute SecurityContextBase securityContext) {
-        dynamicInvokersService.validateExportDynamicInvoker(sendDynamicExecutionRequest.getExportDynamicInvoker(), (SecurityContext) securityContext);
+        dynamicInvokersService.validateExportDynamicExecution(sendDynamicExecutionRequest.getExportDynamicExecution(), (SecurityContext) securityContext);
         return invokerCSVEmailService.sendEmail(sendDynamicExecutionRequest, (SecurityContext) securityContext);
     }
 

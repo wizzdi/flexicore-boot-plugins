@@ -1,6 +1,7 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.service;
 
 import com.flexicore.request.ExportDynamicExecution;
+import com.flexicore.request.ExportDynamicInvoker;
 import com.flexicore.security.SecurityContext;
 import com.flexicore.service.impl.DynamicInvokersService;
 import com.sendgrid.Method;
@@ -13,8 +14,9 @@ import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicExecutionRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
-import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendStatusEmailResponse;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import com.wizzdi.flexicore.file.model.FileResource;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -54,16 +56,16 @@ public class DynamicInvokerCSVEmailService implements Plugin {
     private SendGrid sendGrid;
 
 
-    public SendStatusEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicInvokerRequest, SecurityContext securityContext) {
-        ZoneOffset zoneOffset= sendDynamicInvokerRequest.getZoneOffset()!=null? sendDynamicInvokerRequest.getZoneOffset():ZoneOffset.UTC;
-        ExportDynamicExecution exportDynamicExecution = sendDynamicInvokerRequest.getExportDynamicExecution();
+    public SendDynamicEmailResponse sendEmail(SendDynamicExecutionRequest sendDynamicExecutionRequest, SecurityContext securityContext) {
+        ZoneOffset zoneOffset= sendDynamicExecutionRequest.getZoneOffset()!=null? sendDynamicExecutionRequest.getZoneOffset():ZoneOffset.UTC;
+        ExportDynamicExecution exportDynamicExecution = sendDynamicExecutionRequest.getExportDynamicExecution();
         FileResource fileResource = dynamicInvokersService.exportDynamicExecutionResultToCSV(exportDynamicExecution, securityContext);
-        String title= sendDynamicInvokerRequest.getTitle()!=null? sendDynamicInvokerRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
+        String title= sendDynamicExecutionRequest.getTitle()!=null? sendDynamicExecutionRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
         File file=new File(fileResource.getFullPath());
-        return sendEmail(file, sendDynamicInvokerRequest.getEmails(),title);
+        return sendEmail(file, sendDynamicExecutionRequest.getEmails(),title);
     }
 
-    public SendStatusEmailResponse sendEmail(File file, Set<String> emails, String title) {
+    public SendDynamicEmailResponse sendEmail(File file, Set<String> emails, String title) {
 
             try {
                 Request request = new Request();
@@ -98,10 +100,18 @@ public class DynamicInvokerCSVEmailService implements Plugin {
                 logger.info(String.format("send invoker csv emails , status was: %d , message was : %s",response.getStatusCode(), response.getBody()));
             } catch (IOException e) {
                 logger.error("failed sending mail ",e);
-                return new SendStatusEmailResponse().setSent(false);
+                return new SendDynamicEmailResponse().setSent(false);
             }
 
-        return new SendStatusEmailResponse().setSent(true);
+        return new SendDynamicEmailResponse().setSent(true);
     }
 
+    public SendDynamicEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicExecutionRequest, SecurityContext securityContext) {
+        ZoneOffset zoneOffset= sendDynamicExecutionRequest.getZoneOffset()!=null? sendDynamicExecutionRequest.getZoneOffset():ZoneOffset.UTC;
+        ExportDynamicInvoker exportDynamicExecution = sendDynamicExecutionRequest.getExportDynamicInvoker();
+        FileResource fileResource = dynamicInvokersService.exportDynamicInvokerToCSV(exportDynamicExecution, securityContext);
+        String title= sendDynamicExecutionRequest.getTitle()!=null? sendDynamicExecutionRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
+        File file=new File(fileResource.getFullPath());
+        return sendEmail(file, sendDynamicExecutionRequest.getEmails(),title);
+    }
 }

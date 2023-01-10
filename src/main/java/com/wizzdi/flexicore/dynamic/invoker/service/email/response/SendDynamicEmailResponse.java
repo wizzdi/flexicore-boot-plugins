@@ -1,6 +1,6 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.response;
 
-public class SendStatusEmailResponse {
+public class SendDynamicEmailResponse {
 
     private boolean sent;
 
@@ -8,7 +8,7 @@ public class SendStatusEmailResponse {
         return sent;
     }
 
-    public <T extends SendStatusEmailResponse> T setSent(boolean sent) {
+    public <T extends SendDynamicEmailResponse> T setSent(boolean sent) {
         this.sent = sent;
         return (T) this;
     }

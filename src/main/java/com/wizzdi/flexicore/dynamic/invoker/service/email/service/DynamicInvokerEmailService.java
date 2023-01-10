@@ -2,6 +2,7 @@ package com.wizzdi.flexicore.dynamic.invoker.service.email.service;
 
 import com.flexicore.data.jsoncontainers.PaginationResponse;
 import com.flexicore.request.ExportDynamicExecution;
+import com.flexicore.request.ExportDynamicInvoker;
 import com.flexicore.request.FieldProperties;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.service.impl.DynamicInvokersService;
@@ -15,9 +16,10 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokersResponse;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
+import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicExecutionRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
-import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendStatusEmailResponse;
-import com.wizzdi.flexicore.dynamic.invoker.service.email.context.EmailEntry;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,21 +52,23 @@ public class DynamicInvokerEmailService implements Plugin {
     @Autowired
     private DynamicExecutionService dynamicExecutionService;
     @Autowired
+    private DynamicInvokerService dynamicInvokerService;
+    @Autowired
     @Qualifier("mappedPOISendGrid")
     @Lazy
     private SendGrid sendGrid;
 
 
-    public SendStatusEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
-        ZoneOffset zoneOffset=sendDynamicInvokerRequest.getZoneOffset()!=null?sendDynamicInvokerRequest.getZoneOffset():ZoneOffset.UTC;
-        ExportDynamicExecution exportDynamicExecution = sendDynamicInvokerRequest.getExportDynamicExecution();
+    public SendDynamicEmailResponse sendEmail(SendDynamicExecutionRequest sendDynamicExecutionRequest, SecurityContextBase securityContext) {
+        ZoneOffset zoneOffset= sendDynamicExecutionRequest.getZoneOffset()!=null? sendDynamicExecutionRequest.getZoneOffset():ZoneOffset.UTC;
+        ExportDynamicExecution exportDynamicExecution = sendDynamicExecutionRequest.getExportDynamicExecution();
         ExecuteInvokersResponse executeInvokersResponse = dynamicExecutionService.executeDynamicExecution(exportDynamicExecution, securityContext);
         String[] headersArr = exportDynamicExecution.getFieldToName().values().stream().sorted(Comparator.comparing(FieldProperties::getOrdinal)).map(FieldProperties::getName).toArray(String[]::new);
         Map<String, java.lang.reflect.Method> fieldNameToMethod = new HashMap<>();
         List<List<Object>> entries= executeInvokersResponse.getResponses().stream().map(f->f.getResponse()).map(f->getCollection(f)).filter(f->f!=null).map(f->correctOffset(DynamicInvokersService.toExpendedRecordSet(exportDynamicExecution.getFieldToName(),fieldNameToMethod,f),zoneOffset)).flatMap(List::stream).toList();
-        String title= sendDynamicInvokerRequest.getTitle()!=null? sendDynamicInvokerRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
+        String title= sendDynamicExecutionRequest.getTitle()!=null? sendDynamicExecutionRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
 
-        return sendEmail(entries,headersArr,sendDynamicInvokerRequest.getEmails(),title);
+        return sendEmail(entries,headersArr, sendDynamicExecutionRequest.getEmails(),title);
     }
 
     private List<List<Object>> correctOffset(List<List<Object>> recordSet, ZoneOffset zoneOffset) {
@@ -84,7 +86,7 @@ public class DynamicInvokerEmailService implements Plugin {
         return f;
     }
 
-    public SendStatusEmailResponse sendEmail(List<List<Object>> entries,String[] headersArr, Set<String> emails, String title) {
+    public SendDynamicEmailResponse sendEmail(List<List<Object>> entries, String[] headersArr, Set<String> emails, String title) {
 
             try {
                 Request request = new Request();
@@ -116,10 +118,10 @@ public class DynamicInvokerEmailService implements Plugin {
                 logger.info(String.format("send invoker template email , status was: %d , message was : %s",response.getStatusCode(), response.getBody()));
             } catch (IOException e) {
                 logger.error("failed sending mail ",e);
-                return new SendStatusEmailResponse().setSent(false);
+                return new SendDynamicEmailResponse().setSent(false);
             }
 
-        return new SendStatusEmailResponse().setSent(true);
+        return new SendDynamicEmailResponse().setSent(true);
     }
 
     public Collection<?> getCollection(Object response) {
@@ -133,5 +135,17 @@ public class DynamicInvokerEmailService implements Plugin {
             return ((com.wizzdi.flexicore.security.response.PaginationResponse<?>) response).getList();
         }
         return null;
+    }
+
+    public SendDynamicEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
+        ZoneOffset zoneOffset= sendDynamicInvokerRequest.getZoneOffset()!=null? sendDynamicInvokerRequest.getZoneOffset():ZoneOffset.UTC;
+        ExportDynamicInvoker exportDynamicInvoker = sendDynamicInvokerRequest.getExportDynamicInvoker();
+        ExecuteInvokersResponse executeInvokersResponse = dynamicInvokerService.executeInvoker(exportDynamicInvoker, securityContext);
+        String[] headersArr = exportDynamicInvoker.getFieldProperties().values().stream().sorted(Comparator.comparing(FieldProperties::getOrdinal)).map(FieldProperties::getName).toArray(String[]::new);
+        Map<String, java.lang.reflect.Method> fieldNameToMethod = new HashMap<>();
+        List<List<Object>> entries= executeInvokersResponse.getResponses().stream().map(f->f.getResponse()).map(f->getCollection(f)).filter(f->f!=null).map(f->correctOffset(DynamicInvokersService.toExpendedRecordSet(exportDynamicInvoker.getFieldProperties(),fieldNameToMethod,f),zoneOffset)).flatMap(List::stream).toList();
+        String title= sendDynamicInvokerRequest.getTitle()!=null? sendDynamicInvokerRequest.getTitle():"CSV Export "+OffsetDateTime.now().atZoneSameInstant(zoneOffset);
+
+        return sendEmail(entries,headersArr, sendDynamicInvokerRequest.getEmails(),title);
     }
 }

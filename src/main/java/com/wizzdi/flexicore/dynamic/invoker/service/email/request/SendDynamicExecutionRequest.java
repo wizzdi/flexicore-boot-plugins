@@ -1,16 +1,16 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.request;
 
-import com.wizzdi.maps.service.request.StatusHistoryFilter;
+import com.flexicore.request.ExportDynamicExecution;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneOffset;
 import java.util.Set;
 
-public class SendStatusHistoryEmailRequest {
+public class SendDynamicExecutionRequest {
 
     @NotNull
-    private StatusHistoryFilter statusHistoryFilter;
+    private ExportDynamicExecution exportDynamicExecution;
     @NotNull
     @NotEmpty
     private Set<String> emails;
@@ -19,13 +19,12 @@ public class SendStatusHistoryEmailRequest {
 
     private String title;
 
-
-    public StatusHistoryFilter getStatusHistoryFilter() {
-        return statusHistoryFilter;
+    public ExportDynamicExecution getExportDynamicExecution() {
+        return exportDynamicExecution;
     }
 
-    public <T extends SendStatusHistoryEmailRequest> T setStatusHistoryFilter(StatusHistoryFilter statusHistoryFilter) {
-        this.statusHistoryFilter = statusHistoryFilter;
+    public <T extends SendDynamicExecutionRequest> T setExportDynamicExecution(ExportDynamicExecution exportDynamicExecution) {
+        this.exportDynamicExecution = exportDynamicExecution;
         return (T) this;
     }
 
@@ -33,7 +32,7 @@ public class SendStatusHistoryEmailRequest {
         return emails;
     }
 
-    public <T extends SendStatusHistoryEmailRequest> T setEmails(Set<String> emails) {
+    public <T extends SendDynamicExecutionRequest> T setEmails(Set<String> emails) {
         this.emails = emails;
         return (T) this;
     }
@@ -42,7 +41,7 @@ public class SendStatusHistoryEmailRequest {
         return zoneOffset;
     }
 
-    public <T extends SendStatusHistoryEmailRequest> T setZoneOffset(ZoneOffset zoneOffset) {
+    public <T extends SendDynamicExecutionRequest> T setZoneOffset(ZoneOffset zoneOffset) {
         this.zoneOffset = zoneOffset;
         return (T) this;
     }
@@ -51,7 +50,7 @@ public class SendStatusHistoryEmailRequest {
         return title;
     }
 
-    public <T extends SendStatusHistoryEmailRequest> T setTitle(String title) {
+    public <T extends SendDynamicExecutionRequest> T setTitle(String title) {
         this.title = title;
         return (T) this;
     }
