@@ -29,6 +29,7 @@ public class Remote extends SecuredBasic {
     private StateSchema currentSchema;
 
     @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "jsonb")
     @JsonIgnore
     private Map<String, Object> other = new HashMap<>();
     private boolean lockLocation;
