@@ -186,7 +186,7 @@ public class BasicIOTConfig implements Plugin {
             logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
             return null;
         }
-        MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter("iot-server-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
+        MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(mqttPahoMessageDrivenChannelAdapter)
                 .handle(basicIOTClient)
@@ -210,7 +210,7 @@ public class BasicIOTConfig implements Plugin {
             return null;
         }
 
-        MqttPahoMessageHandler someMqttClient = new MqttPahoMessageHandler("iot-server-out", mqttServerFactory);
+        MqttPahoMessageHandler someMqttClient = new MqttPahoMessageHandler(iotId+"-out", mqttServerFactory);
         someMqttClient.setDefaultQos(1);
         return f -> f.handle(someMqttClient);
 
