@@ -157,7 +157,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     }
 
-    @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}")
+    @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
     public void checkConnectivity() {
         logger.debug("checking connectivity");
         Set<String> actuallyConnectedRemotes = gatewayToLastSeen.entrySet().stream().filter(f -> System.currentTimeMillis() - f.getValue() < lastSeenThreshold).map(f -> f.getKey()).collect(Collectors.toSet());
@@ -314,7 +314,7 @@ private static final class GetOrCreateDeviceResponse{
             return gatewayMapIcon;
         }
         if(status==null){
-            status="unknown";
+            status=DeviceTypeService.UNKNOWN_STATUS_SUFFIX;
         }
         if(remote instanceof Device device){
             DeviceType deviceType = device.getDeviceType();

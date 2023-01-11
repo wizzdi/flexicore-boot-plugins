@@ -41,6 +41,7 @@ import java.util.UUID;
 public class DeviceTypeService implements Plugin {
 
     private static final Logger logger= LoggerFactory.getLogger(DeviceTypeService.class);
+    public static final String UNKNOWN_STATUS_SUFFIX = "UNKNOWN";
 
     @Autowired
     private DeviceTypeRepository repository;
@@ -172,7 +173,7 @@ public class DeviceTypeService implements Plugin {
             logger.info("created device type "+deviceTypeName);
             return deviceType;
         }
-        MapIcon unknown = mapIconService.createMapIcon(getMapIconCreate("UNKNOWN", deviceTypeName, Device.class), securityContext);
+        MapIcon unknown = mapIconService.createMapIcon(getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class), securityContext);
         deviceType = createDeviceType(new DeviceTypeCreate().setDefaultMapIcon(unknown).setName(deviceTypeName), securityContext);
         return deviceType;
     }
