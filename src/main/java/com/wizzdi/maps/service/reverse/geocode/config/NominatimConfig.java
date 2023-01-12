@@ -16,8 +16,9 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 @Configuration
 @Extension
 public class NominatimConfig implements Plugin {
-    @Value("${wizzdi.maps.reverse.geocode.nominatim:https://nominatim.openstreetmap.org/}")
+    @Value("${wizzdi.maps.reverse.geocode.nominatim.url:https://nominatim.openstreetmap.org/}")
     private String baseAddress;
+
 
     @Bean
     @Qualifier("nominatimRestTemplate")

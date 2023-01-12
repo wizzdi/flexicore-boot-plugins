@@ -9,7 +9,7 @@ public class ReverseGeoCodeResponse {
     private String license;
     @JsonProperty("osm_type")
     private String osmType;
-    @JsonProperty("osm_od")
+    @JsonProperty("osm_id")
     private String osmId;
 
     private double lat;

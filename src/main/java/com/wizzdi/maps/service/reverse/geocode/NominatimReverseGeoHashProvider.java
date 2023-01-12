@@ -6,6 +6,8 @@ import com.wizzdi.maps.service.interfaces.ReverseGeoHashProvider;
 import com.wizzdi.maps.service.reverse.geocode.response.Address;
 import com.wizzdi.maps.service.reverse.geocode.response.ReverseGeoCodeResponse;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,20 +21,30 @@ import java.util.Optional;
 @Extension
 public class NominatimReverseGeoHashProvider implements ReverseGeoHashProvider, Plugin {
 
+    private static final Logger logger= LoggerFactory.getLogger(NominatimReverseGeoHashProvider.class);
+
+    @Value("${wizzdi.maps.reverse.geocode.nominatim.lang:en}")
+    private String lang;
     @Autowired
     @Qualifier("nominatimRestTemplate")
     private RestTemplate nominatimRestTemplate;
     @Override
     public AddressInfo getAddress(double lat, double lon) {
-        ResponseEntity<ReverseGeoCodeResponse> response = nominatimRestTemplate.getForEntity("/reverse?lat={lat}&lon={lon}&format=json", ReverseGeoCodeResponse.class, lat, lon);
-        if(!response.getStatusCode().is2xxSuccessful()){
+        try {
+            ResponseEntity<ReverseGeoCodeResponse> response = nominatimRestTemplate.getForEntity("/reverse?lat={lat}&lon={lon}&format=json&accept-language={lang}", ReverseGeoCodeResponse.class, lat, lon, lang);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                return null;
+            }
+            ReverseGeoCodeResponse body = response.getBody();
+            if (body == null) {
+                return null;
+            }
+            return toAddressInfo(body);
+        }
+        catch (Throwable e){
+            logger.error("failed getting reverse geocoding for "+lat+","+lon,e);
             return null;
         }
-        ReverseGeoCodeResponse body = response.getBody();
-        if(body==null){
-            return null;
-        }
-        return toAddressInfo(body);
     }
 
     private AddressInfo toAddressInfo(ReverseGeoCodeResponse body) {
