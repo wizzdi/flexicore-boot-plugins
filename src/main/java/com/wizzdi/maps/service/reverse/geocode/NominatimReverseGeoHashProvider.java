@@ -11,10 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Component
@@ -31,7 +32,10 @@ public class NominatimReverseGeoHashProvider implements ReverseGeoHashProvider, 
     @Override
     public AddressInfo getAddress(double lat, double lon) {
         try {
-            ResponseEntity<ReverseGeoCodeResponse> response = nominatimRestTemplate.getForEntity("/reverse?lat={lat}&lon={lon}&format=json&accept-language={lang}", ReverseGeoCodeResponse.class, lat, lon, lang);
+            HttpHeaders httpHeaders=new HttpHeaders();
+            httpHeaders.setAccept(Collections.singletonList(MediaType.ALL));
+            HttpEntity<Void> requestEntity=new HttpEntity<>(httpHeaders);
+            ResponseEntity<ReverseGeoCodeResponse> response = nominatimRestTemplate.exchange("/reverse?lat={lat}&lon={lon}&format=json&accept-language={lang}",HttpMethod.GET,requestEntity, ReverseGeoCodeResponse.class, lat, lon, lang);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 return null;
             }
