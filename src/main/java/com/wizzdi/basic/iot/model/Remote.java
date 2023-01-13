@@ -19,6 +19,7 @@ public class Remote extends SecuredBasic {
 
     @ManyToOne(targetEntity = ConnectivityChange.class)
     private ConnectivityChange lastConnectivityChange;
+
     @Column(unique = true)
     private String remoteId;
     private String version;
@@ -30,31 +31,36 @@ public class Remote extends SecuredBasic {
 
     @Convert(converter = JsonConverter.class)
     @Column(columnDefinition = "jsonb")
-    @JsonIgnore
-    private Map<String, Object> other = new HashMap<>();
+    private Map<String, Object> deviceProperties = new HashMap<>();
+
+    @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "jsonb")
+    private Map<String, Object> userAddedProperties = new HashMap<>();
     private boolean lockLocation;
 
-
-    @JsonAnySetter
-    public void set(String key, Object val) {
-        other.put(key, val);
-    }
 
 
     @Column(columnDefinition = "jsonb")
     @Convert(converter = JsonConverter.class)
-    @JsonIgnore
-    public Map<String, Object> getOther() {
-        return other;
+    public Map<String, Object> getDeviceProperties() {
+        return deviceProperties;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> any() {
-        return other;
+
+
+    public <T extends Remote> T setDeviceProperties(Map<String, Object> other) {
+        this.deviceProperties = other;
+        return (T) this;
     }
 
-    public <T extends Remote> T setOther(Map<String, Object> other) {
-        this.other = other;
+    @Convert(converter = JsonConverter.class)
+    @Column(columnDefinition = "jsonb")
+    public Map<String, Object> getUserAddedProperties() {
+        return userAddedProperties;
+    }
+
+    public <T extends Remote> T setUserAddedProperties(Map<String, Object> userAddedProperties) {
+        this.userAddedProperties = userAddedProperties;
         return (T) this;
     }
 

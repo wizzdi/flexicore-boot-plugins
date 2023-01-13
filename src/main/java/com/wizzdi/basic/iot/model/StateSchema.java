@@ -14,6 +14,7 @@ import java.util.List;
 public class StateSchema extends SecuredBasic {
 
     private int version;
+    private boolean userAddedSchema;
     @Lob
     private String stateJsonSchema;
     @ManyToOne(targetEntity = DeviceType.class)
@@ -59,6 +60,15 @@ public class StateSchema extends SecuredBasic {
 
     public <T extends StateSchema> T setRemotes(List<Remote> remotes) {
         this.remotes = remotes;
+        return (T) this;
+    }
+
+    public boolean isUserAddedSchema() {
+        return userAddedSchema;
+    }
+
+    public <T extends StateSchema> T setUserAddedSchema(boolean userAddedSchema) {
+        this.userAddedSchema = userAddedSchema;
         return (T) this;
     }
 }
