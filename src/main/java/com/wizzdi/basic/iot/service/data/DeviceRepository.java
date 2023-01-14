@@ -41,7 +41,7 @@ public class DeviceRepository implements Plugin {
         Root<Device> r = q.from(Device.class);
         List<Predicate> preds = new ArrayList<>();
         addDevicePredicates(filtering, cb, q, r, preds, securityContext);
-        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.desc(r.get(Device_.name)));
+        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(Device_.remoteId)));
         TypedQuery<Device> query = em.createQuery(q);
         BasicRepository.addPagination(filtering, query);
         return query.getResultList();
