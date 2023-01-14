@@ -1,7 +1,5 @@
 package com.wizzdi.basic.iot.service.request;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
@@ -13,7 +11,9 @@ import java.util.Map;
 public class RemoteCreate extends BasicCreate {
 
     @JsonIgnore
-    private Map<String, Object> other = new HashMap<>();
+    private Map<String, Object> deviceProperties = new HashMap<>();
+    private Map<String, Object> userAddedProperties = new HashMap<>();
+
     private String remoteId;
     private String version;
 
@@ -32,18 +32,15 @@ public class RemoteCreate extends BasicCreate {
         return (T) this;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getOther() {
-        return other;
+    @JsonIgnore
+    public Map<String, Object> getDeviceProperties() {
+        return deviceProperties;
     }
-    public <T extends RemoteCreate> T setOther(Map<String, Object> other) {
-        this.other = other;
+    public <T extends RemoteCreate> T setDeviceProperties(Map<String, Object> deviceProperties) {
+        this.deviceProperties = deviceProperties;
         return (T) this;
     }
-    @JsonAnySetter
-    public void set(String key, Object val) {
-        other.put(key, val);
-    }
+
 
     public String getVersion() {
         return version;
@@ -80,6 +77,15 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setLockLocation(Boolean lockLocation) {
         this.lockLocation = lockLocation;
+        return (T) this;
+    }
+
+    public Map<String, Object> getUserAddedProperties() {
+        return userAddedProperties;
+    }
+
+    public <T extends RemoteCreate> T setUserAddedProperties(Map<String, Object> userAddedProperties) {
+        this.userAddedProperties = userAddedProperties;
         return (T) this;
     }
 }

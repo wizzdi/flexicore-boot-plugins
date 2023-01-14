@@ -12,8 +12,6 @@ import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
-import com.wizzdi.maps.service.request.MapIconCreate;
-import com.wizzdi.maps.service.request.MapIconFilter;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
@@ -257,7 +255,7 @@ private static final class GetOrCreateDeviceResponse{
         }
         else{
             newVersion= version !=null&&!version.equals(gateway.getVersion())? version :null;
-            gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setOther(values).setVersion(version),null);
+            gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setDeviceProperties(values).setVersion(version),null);
             remote=gateway;
         }
 
@@ -298,9 +296,9 @@ private static final class GetOrCreateDeviceResponse{
     private String getStatus(Remote remote, String status) {
         if(status==null){
             //TODO: remove once implemented on HW side
-            if(remote.getOther().get("DimLevel")!=null&&remote.getOther().get("DimOnOff")!=null){
-                int dimLevel= (int) remote.getOther().get("DimLevel");
-                boolean dimOnOff= (boolean) remote.getOther().get("DimOnOff");
+            if(remote.getDeviceProperties().get("DimLevel")!=null&&remote.getDeviceProperties().get("DimOnOff")!=null){
+                int dimLevel= (int) remote.getDeviceProperties().get("DimLevel");
+                boolean dimOnOff= (boolean) remote.getDeviceProperties().get("DimOnOff");
                 return dimOnOff&&dimLevel>0?(dimLevel<100?"dim":"on"):"off";
 
             }
@@ -332,7 +330,7 @@ private static final class GetOrCreateDeviceResponse{
         String newVersion;
         DeviceCreate deviceCreate = new DeviceCreate()
                 .setGateway(gateway)
-                .setOther(state)
+                .setDeviceProperties(state)
                 .setName(deviceId);
 
         Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
@@ -392,7 +390,7 @@ private static final class GetOrCreateDeviceResponse{
         GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType());
         Device device=getOrCreateDeviceResponse.getDevice();
         DeviceType deviceType=device.getDeviceType();
-        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setVersion(setStateSchema.getVersion()).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
+        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(gatewaySecurityContext,new StateSchemaFilter().setUserAddedSchema(false).setVersion(setStateSchema.getVersion()).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         boolean found=stateSchema!=null;
         //TODO: consider fallback to previous version
         if(found){
@@ -402,7 +400,7 @@ private static final class GetOrCreateDeviceResponse{
     }
 
     private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContextBase gatewaySecurityContext) {
-        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
+        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setUserAddedSchema(false).setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         StateSchemaCreate stateSchemaCreate=new StateSchemaCreate().setDeviceType(deviceType).setVersion(version).setStateSchemaJson(jsonSchema).setName(deviceType.getName()+" Schema V"+version);
         if(stateSchema==null){
             stateSchema=stateSchemaService.createStateSchema(stateSchemaCreate,gatewaySecurityContext);

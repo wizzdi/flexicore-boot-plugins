@@ -105,7 +105,7 @@ public class LogicTests {
         Assertions.assertNotNull(device);
         Assertions.assertEquals(deviceType.getId(), device.getDeviceType().getId());
         Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
-        Assertions.assertEquals(30, device.getOther().get("dim"));
+        Assertions.assertEquals(30, device.getDeviceProperties().get("dim"));
         Assertions.assertNotNull(device.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.OFF, device.getLastConnectivityChange().getConnectivity());
         validateMappedPOI(device.getMappedPOI());

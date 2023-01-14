@@ -11,6 +11,7 @@ public class StateSchemaCreate extends BasicCreate {
     private String deviceTypeId;
     @JsonIgnore
     private DeviceType deviceType;
+    private Boolean userAddedSchema;
 
     public Integer getVersion() {
         return version;
@@ -46,6 +47,15 @@ public class StateSchemaCreate extends BasicCreate {
 
     public <T extends StateSchemaCreate> T setDeviceType(DeviceType deviceType) {
         this.deviceType = deviceType;
+        return (T) this;
+    }
+
+    public Boolean getUserAddedSchema() {
+        return userAddedSchema;
+    }
+
+    public <T extends StateSchemaCreate> T setUserAddedSchema(Boolean userAddedSchema) {
+        this.userAddedSchema = userAddedSchema;
         return (T) this;
     }
 }

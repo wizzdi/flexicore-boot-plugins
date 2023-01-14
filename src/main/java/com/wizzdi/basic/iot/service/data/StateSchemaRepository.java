@@ -75,6 +75,10 @@ public class StateSchemaRepository implements Plugin {
         if(filtering.getLessThenVersion()!=null){
             preds.add(cb.lessThan(r.get(StateSchema_.version),filtering.getLessThenVersion()));
         }
+        if(filtering.getUserAddedSchema()!=null){
+            Path<Boolean> userStateSchema = r.get(StateSchema_.userAddedSchema);
+            preds.add(filtering.getUserAddedSchema()?cb.isTrue(userStateSchema):cb.isFalse(userStateSchema));
+        }
 
     }
 

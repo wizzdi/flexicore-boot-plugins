@@ -131,6 +131,10 @@ public class StateSchemaService implements Plugin {
             stateSchema.setVersion(stateSchemaCreate.getVersion());
             updated=true;
         }
+        if(stateSchemaCreate.getUserAddedSchema()!=null&&!stateSchemaCreate.getUserAddedSchema().equals(stateSchema.isUserAddedSchema())){
+            stateSchema.setUserAddedSchema(stateSchemaCreate.getUserAddedSchema());
+            updated=true;
+        }
 
         if(stateSchemaCreate.getDeviceType()!=null&&(stateSchema.getDeviceType()==null||!stateSchemaCreate.getDeviceType().getId().equals(stateSchema.getDeviceType().getId()))){
             stateSchema.setDeviceType(stateSchemaCreate.getDeviceType());

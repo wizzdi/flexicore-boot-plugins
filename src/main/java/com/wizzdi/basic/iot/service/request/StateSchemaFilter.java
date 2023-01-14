@@ -17,6 +17,7 @@ public class StateSchemaFilter extends PaginationFilter {
     private List<DeviceType> deviceTypes;
     private Integer version;
     private Integer lessThenVersion;
+    private Boolean  userAddedSchema;
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -62,6 +63,15 @@ public class StateSchemaFilter extends PaginationFilter {
 
     public <T extends StateSchemaFilter> T setLessThenVersion(Integer lessThenVersion) {
         this.lessThenVersion = lessThenVersion;
+        return (T) this;
+    }
+
+    public Boolean getUserAddedSchema() {
+        return userAddedSchema;
+    }
+
+    public <T extends StateSchemaFilter> T setUserAddedSchema(Boolean userAddedSchema) {
+        this.userAddedSchema = userAddedSchema;
         return (T) this;
     }
 }
