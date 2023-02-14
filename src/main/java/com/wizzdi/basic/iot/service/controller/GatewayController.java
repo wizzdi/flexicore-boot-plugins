@@ -1,6 +1,5 @@
 package com.wizzdi.basic.iot.service.controller;
 
-import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Gateway;
@@ -9,6 +8,7 @@ import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 
+
 @OperationsInside
 
 @RequestMapping("/plugins/Gateway")
@@ -26,7 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Tag(name = "Gateway")
 @Extension
 @RestController
-public class GatewayController implements Plugin {
+public class GatewayController implements Plugin, Invoker {
 
     @Autowired
     private GatewayService service;
@@ -95,5 +96,10 @@ public class GatewayController implements Plugin {
             @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
         service.validate(importGatewaysRequest, securityContext);
         return service.importGateways(securityContext, importGatewaysRequest);
+    }
+
+    @Override
+    public Class<?> getHandlingClass() {
+        return Gateway.class;
     }
 }

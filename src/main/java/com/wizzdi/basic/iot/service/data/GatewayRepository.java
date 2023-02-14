@@ -39,7 +39,7 @@ public class GatewayRepository implements Plugin {
         Root<Gateway> r = q.from(Gateway.class);
         List<Predicate> preds = new ArrayList<>();
         addGatewayPredicates(filtering, cb, q, r, preds, securityContext);
-        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.desc(r.get(Gateway_.name)));
+        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(Gateway_.remoteId)));
         TypedQuery<Gateway> query = em.createQuery(q);
         BasicRepository.addPagination(filtering, query);
         return query.getResultList();
