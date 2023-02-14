@@ -74,6 +74,9 @@ public class RemoteRepository implements Plugin {
         if(filtering.getNotIds()!=null&&!filtering.getNotIds().isEmpty()){
             preds.add(cb.not(r.get(Remote_.id).in(filtering.getNotIds())));
         }
+        if(filtering.getLastSeenTo()!=null){
+            preds.add(cb.or(cb.lessThanOrEqualTo(r.get(Remote_.lastSeen),filtering.getLastSeenTo()),r.get(Remote_.lastSeen).isNull()));
+        }
 
 
 

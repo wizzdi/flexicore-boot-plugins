@@ -5,6 +5,7 @@ import com.wizzdi.basic.iot.model.Connectivity;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ public class RemoteFilter extends PaginationFilter {
     private Set<String> remoteIds;
     private Set<Connectivity> connectivity;
     private Set<String> notIds;
+    private OffsetDateTime lastSeenTo;
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -50,6 +52,15 @@ public class RemoteFilter extends PaginationFilter {
 
     public <T extends RemoteFilter> T setNotIds(Set<String> notIds) {
         this.notIds = notIds;
+        return (T) this;
+    }
+
+    public OffsetDateTime getLastSeenTo() {
+        return lastSeenTo;
+    }
+
+    public <T extends RemoteFilter> T setLastSeenTo(OffsetDateTime lastSeenTo) {
+        this.lastSeenTo = lastSeenTo;
         return (T) this;
     }
 }

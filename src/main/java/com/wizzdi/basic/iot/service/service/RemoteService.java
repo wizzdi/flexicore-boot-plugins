@@ -133,6 +133,10 @@ public class RemoteService implements Plugin {
             remote.setVersion(remoteCreate.getVersion());
             update = true;
         }
+        if (remoteCreate.getLastSeen() != null && !remoteCreate.getLastSeen().equals(remote.getLastSeen())) {
+            remote.setLastSeen(remoteCreate.getLastSeen());
+            update = true;
+        }
         if (remoteCreate.getLockLocation() != null && !remoteCreate.getLockLocation().equals(remote.isLockLocation())) {
             remote.setLockLocation(remoteCreate.getLockLocation());
             update = true;

@@ -5,6 +5,7 @@ import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.wizzdi.maps.model.MappedPOI;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ public class RemoteCreate extends BasicCreate {
     @JsonIgnore
     private MappedPOI mappedPOI;
     private Boolean lockLocation;
+    @JsonIgnore
+    private OffsetDateTime lastSeen;
 
     public String getRemoteId() {
         return remoteId;
@@ -86,6 +89,16 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setUserAddedProperties(Map<String, Object> userAddedProperties) {
         this.userAddedProperties = userAddedProperties;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public OffsetDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public <T extends RemoteCreate> T setLastSeen(OffsetDateTime lastSeen) {
+        this.lastSeen = lastSeen;
         return (T) this;
     }
 }

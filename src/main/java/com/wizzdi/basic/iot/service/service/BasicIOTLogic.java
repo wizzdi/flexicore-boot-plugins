@@ -71,7 +71,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private long lastSeenThreshold;
     @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*60*1000}}")
     private long reminderInterval;
-    private final Map<String, Long> gatewayToLastSeen = new ConcurrentHashMap<>();
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
@@ -141,14 +140,19 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
         List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
         remotesWithKeepAlive.addAll(devices);
-        updateKeepAlive(gatewaySecurityContext, remotesWithKeepAlive);
+        updateKeepAlive(keepAlive.getSentAt(),gatewaySecurityContext, remotesWithKeepAlive);
 
 
     }
 
-    private void updateKeepAlive(SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+    private void updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+        if(lastSeen==null){
+            lastSeen=OffsetDateTime.now();
+        }
         for (Remote remote : remotesWithKeepAlive) {
-            gatewayToLastSeen.put(remote.getId(), System.currentTimeMillis());
+            if(remote.getLastSeen()==null||lastSeen.isAfter(remote.getLastSeen())){
+                remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setLastSeen(lastSeen),gatewaySecurityContext);
+            }
             if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
                 ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setConnectivity(Connectivity.ON).setRemote(remote).setDate(OffsetDateTime.now()), gatewaySecurityContext);
                 remote.setLastConnectivityChange(connectivityChange);
@@ -162,8 +166,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
     public void checkConnectivity() {
         logger.debug("checking connectivity");
-        Set<String> actuallyConnectedRemotes = gatewayToLastSeen.entrySet().stream().filter(f -> System.currentTimeMillis() - f.getValue() < lastSeenThreshold).map(f -> f.getKey()).collect(Collectors.toSet());
-        List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setNotIds(actuallyConnectedRemotes));
+        OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
+        List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
         for (Remote remote : remotesToUpdate) {
             SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
             ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now()), remoteSecurityContext);
@@ -295,7 +299,7 @@ private static final class GetOrCreateDeviceResponse{
             updateVersion(newVersion,remote);
         }
 
-        updateKeepAlive(gatewaySecurityContext,keepAlive);
+        updateKeepAlive(stateChanged.getSentAt(),gatewaySecurityContext,keepAlive);
 
         return new StateChangedReceived().setStateChangedId(stateChanged.getId());
     }
