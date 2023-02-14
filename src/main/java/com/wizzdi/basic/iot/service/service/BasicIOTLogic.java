@@ -141,6 +141,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
         List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
         remotesWithKeepAlive.addAll(devices);
+        updateKeepAlive(gatewaySecurityContext, remotesWithKeepAlive);
+
+
+    }
+
+    private void updateKeepAlive(SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
         for (Remote remote : remotesWithKeepAlive) {
             gatewayToLastSeen.put(remote.getId(), System.currentTimeMillis());
             if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
@@ -151,8 +157,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
             }
         }
-
-
     }
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
@@ -246,12 +250,13 @@ private static final class GetOrCreateDeviceResponse{
         String deviceTypeId = stateChanged.getDeviceType();
         Double latitude = stateChanged.getLatitude();
         Double longitude = stateChanged.getLongitude();
-
-
+        List<Remote> keepAlive=new ArrayList<>();
+        keepAlive.add(gateway);
         if(deviceId !=null){
             GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
             newVersion=getOrCreateDeviceResponse.getNewVersion();
             remote=getOrCreateDeviceResponse.getDevice();
+            keepAlive.add(remote);
         }
         else{
             newVersion= version !=null&&!version.equals(gateway.getVersion())? version :null;
@@ -289,6 +294,8 @@ private static final class GetOrCreateDeviceResponse{
         if(newVersion != null){
             updateVersion(newVersion,remote);
         }
+
+        updateKeepAlive(gatewaySecurityContext,keepAlive);
 
         return new StateChangedReceived().setStateChangedId(stateChanged.getId());
     }
