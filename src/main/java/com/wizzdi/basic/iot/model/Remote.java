@@ -1,24 +1,25 @@
 package com.wizzdi.basic.iot.model;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.maps.model.MappedPOI;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "remote_idx",columnList = "remoteId,gateway_id,dtype")
+        @Index(name = "remote_idx",columnList = "remoteId,lastSeen,gateway_id,dtype")
 })
 public class Remote extends SecuredBasic {
 
     @ManyToOne(targetEntity = ConnectivityChange.class)
     private ConnectivityChange lastConnectivityChange;
+
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime lastSeen;
 
     @Column(unique = true)
     private String remoteId;
@@ -118,6 +119,16 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setLockLocation(boolean lockLocation) {
         this.lockLocation = lockLocation;
+        return (T) this;
+    }
+    @Column(columnDefinition = "timestamp with time zone")
+
+    public OffsetDateTime getLastSeen() {
+        return lastSeen;
+    }
+
+    public <T extends Remote> T setLastSeen(OffsetDateTime lastKeepAlive) {
+        this.lastSeen = lastKeepAlive;
         return (T) this;
     }
 }
