@@ -23,7 +23,7 @@
         <version.eclipselink>4.0.0</version.eclipselink>
         <pf4j-spring.version>0.8.0</pf4j-spring.version>
         <spring-boot-dependencies.version>3.0.0</spring-boot-dependencies.version>
-        <flexicore-boot-dependencies.version>4.0.0</flexicore-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>4.0.2</flexicore-boot-dependencies.version>
     </properties>
     <distributionManagement>
         <snapshotRepository>
