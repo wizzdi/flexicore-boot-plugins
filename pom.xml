@@ -4,7 +4,7 @@
 
     <groupId>com.wizzdi</groupId>
     <artifactId>ui-component-service</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2-SNAPSHOT</version>
     <name>ui-component-service</name>
     <description>FlexiCore service plugin , manages ui components</description>
     <url>https://wizzdi.com</url>
@@ -58,7 +58,7 @@
         <connection>scm:git:git://wizzdi/ui-component-service.git</connection>
         <developerConnection>scm:git:git@github.com:wizzdi/ui-component-service.git</developerConnection>
         <url>https://github.com/wizzdi/ui-component-service</url>
-        <tag>ui-component-service-3.0.1</tag>
+        <tag>ui-component-service-${version}</tag>
     </scm>
     <dependencyManagement>
         <dependencies>
