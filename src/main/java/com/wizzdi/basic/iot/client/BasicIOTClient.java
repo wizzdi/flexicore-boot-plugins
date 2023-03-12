@@ -19,7 +19,6 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -131,7 +130,12 @@ public class BasicIOTClient implements MessageHandler {
     private boolean verifyMessage(IOTMessage iotMessage) throws VerificationException {
         if (iotMessage.isRequireAuthentication() && publicKeyProvider != null) {
             String gatewayId = iotMessage.getGatewayId();
-            PublicKey publicKey = publicKeyProvider.getPublicKey(gatewayId);
+            PublicKeyResponse publicKeyResponse = publicKeyProvider.getPublicKey(gatewayId);
+            PublicKey publicKey = publicKeyResponse.publicKey();
+            boolean signatureMandatory = publicKeyResponse.signatureMandatory();
+            if(!signatureMandatory){
+                return true;
+            }
             if (publicKey == null) {
                 throw new VerificationException("could not find public key for gateway " + gatewayId);
             }

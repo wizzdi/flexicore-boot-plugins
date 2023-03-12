@@ -4,5 +4,5 @@ import java.security.PublicKey;
 
 public interface PublicKeyProvider {
 
-    PublicKey getPublicKey(String id);
+    PublicKeyResponse getPublicKey(String id);
 }
