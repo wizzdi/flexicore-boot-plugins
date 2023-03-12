@@ -127,6 +127,10 @@ public class PendingGatewayService implements Plugin {
             pendingGateway.setRegisteredGateway(pendingGatewayCreate.getRegisteredGateway());
             update = true;
         }
+        if(pendingGatewayCreate.getNoSignatureCapabilities()!=null&&pendingGatewayCreate.getNoSignatureCapabilities()!=pendingGateway.isNoSignatureCapabilities()){
+            pendingGateway.setNoSignatureCapabilities(pendingGatewayCreate.getNoSignatureCapabilities());
+            update=true;
+        }
         return update;
     }
 

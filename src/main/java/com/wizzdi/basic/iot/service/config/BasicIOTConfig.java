@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.wizzdi.basic.iot.client.BasicIOTClient;
-import com.wizzdi.basic.iot.client.BasicIOTConnection;
-import com.wizzdi.basic.iot.client.IOTMessageSubscriber;
-import com.wizzdi.basic.iot.client.PublicKeyProvider;
+import com.wizzdi.basic.iot.client.*;
+import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.request.GatewayFilter;
 import com.wizzdi.basic.iot.service.response.ServerIntegrationFlowHolder;
 import com.wizzdi.basic.iot.service.service.GatewayService;
@@ -152,7 +150,14 @@ public class BasicIOTConfig implements Plugin {
         logger.info("publicKeyProvider");
 
         return f -> gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(f))).stream().findFirst()
-                .map(e -> readPublicKey(e.getPublicKey())).orElse(null);
+                .map(e -> getPublicKeyResponse(e)).orElse(null);
+    }
+
+    private PublicKeyResponse getPublicKeyResponse(Gateway e) {
+        if(e.isNoSignatureCapabilities()){
+            return new PublicKeyResponse(null,false);
+        }
+        return new PublicKeyResponse(readPublicKey(e.getPublicKey()),true);
     }
 
     @Bean

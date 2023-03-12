@@ -10,6 +10,7 @@ public class GatewayCreate extends RemoteCreate {
     private SecurityUser approvingUser;
     @JsonIgnore
     private SecurityUser gatewayUser;
+    private Boolean noSignatureCapabilities;
 
     public String getPublicKey() {
         return publicKey;
@@ -37,6 +38,15 @@ public class GatewayCreate extends RemoteCreate {
 
     public <T extends GatewayCreate> T setGatewayUser(SecurityUser gatewayUser) {
         this.gatewayUser = gatewayUser;
+        return (T) this;
+    }
+
+    public Boolean getNoSignatureCapabilities() {
+        return noSignatureCapabilities;
+    }
+
+    public <T extends GatewayCreate> T setNoSignatureCapabilities(Boolean noSignatureCapabilities) {
+        this.noSignatureCapabilities = noSignatureCapabilities;
         return (T) this;
     }
 }

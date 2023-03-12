@@ -375,7 +375,7 @@ private static final class GetOrCreateDeviceResponse{
 
 
     private RegisterGatewayReceived registerGateway(RegisterGateway registerGateway) {
-        PendingGateway pendingGateway = pendingGatewayService.createPendingGateway(new PendingGatewayCreate().setGatewayId(registerGateway.getGatewayId()).setPublicKey(registerGateway.getPublicKey()).setName(registerGateway.getGatewayId()), adminSecurityContext);
+        PendingGateway pendingGateway = pendingGatewayService.createPendingGateway(new PendingGatewayCreate().setGatewayId(registerGateway.getGatewayId()).setPublicKey(registerGateway.getPublicKey()).setNoSignatureCapabilities(registerGateway.getNoSignatureCapabilities()).setName(registerGateway.getGatewayId()), adminSecurityContext);
         return new RegisterGatewayReceived().setRegisterGatewayId(registerGateway.getId());
     }
 

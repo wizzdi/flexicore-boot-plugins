@@ -12,6 +12,8 @@ public class PendingGatewayCreate extends BasicCreate {
     @JsonIgnore
     private Gateway registeredGateway;
 
+    private Boolean noSignatureCapabilities;
+
     public String getGatewayId() {
         return gatewayId;
     }
@@ -46,6 +48,15 @@ public class PendingGatewayCreate extends BasicCreate {
 
     public <T extends PendingGatewayCreate> T setRegisteredGateway(Gateway registeredGateway) {
         this.registeredGateway = registeredGateway;
+        return (T) this;
+    }
+
+    public Boolean getNoSignatureCapabilities() {
+        return noSignatureCapabilities;
+    }
+
+    public <T extends PendingGatewayCreate> T setNoSignatureCapabilities(Boolean noSignatureCapabilities) {
+        this.noSignatureCapabilities = noSignatureCapabilities;
         return (T) this;
     }
 }

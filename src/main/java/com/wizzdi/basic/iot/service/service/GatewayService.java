@@ -163,6 +163,10 @@ public class GatewayService implements Plugin {
             gateway.setGatewayUser(gatewayCreate.getGatewayUser());
             update=true;
         }
+        if(gatewayCreate.getNoSignatureCapabilities()!=null&&gatewayCreate.getNoSignatureCapabilities()!=gateway.isNoSignatureCapabilities()){
+            gateway.setNoSignatureCapabilities(gatewayCreate.getNoSignatureCapabilities());
+            update=true;
+        }
         return update;
     }
 
@@ -219,6 +223,7 @@ public class GatewayService implements Plugin {
 
     private GatewayCreate getGatwayCreate(PendingGateway pendingGateway) {
         return new GatewayCreate()
+                .setNoSignatureCapabilities(pendingGateway.isNoSignatureCapabilities())
                 .setPublicKey(pendingGateway.getPublicKey())
                 .setRemoteId(pendingGateway.getGatewayId())
                 .setName(pendingGateway.getName())

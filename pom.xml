@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>basic-iot-service</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <name>basic-iot-service</name>
     <description>FlexiCore service plugin , basic iot service</description>
     <url>https://wizzdi.com</url>
@@ -19,9 +19,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
         <spring-boot-dependencies.version>2.7.4</spring-boot-dependencies.version>
-        <basic-iot-model.version>5.0.0-SNAPSHOT</basic-iot-model.version>
+        <basic-iot-model.version>5.1.0-SNAPSHOT</basic-iot-model.version>
         <flexicore-boot-dependencies.version>3.0.5</flexicore-boot-dependencies.version>
-        <basic-iot-client.version>4.0.0-SNAPSHOT</basic-iot-client.version>
+        <basic-iot-client.version>4.1.0-SNAPSHOT</basic-iot-client.version>
         <flexicore-file-service.version>2.0.0</flexicore-file-service.version>
         <flexicore-file-model.version>2.0.0</flexicore-file-model.version>
         <swagger-jaxrs2.version>2.2.2</swagger-jaxrs2.version>
