@@ -19,6 +19,7 @@ public class Gateway extends Remote {
     @JsonIgnore
     @ManyToOne(targetEntity = SecurityUser.class)
     private SecurityUser gatewayUser;
+    private boolean noSignatureCapabilities;
 
 
     @Lob
@@ -51,6 +52,15 @@ public class Gateway extends Remote {
 
     public <T extends Gateway> T setGatewayUser(SecurityUser gatewayUser) {
         this.gatewayUser = gatewayUser;
+        return (T) this;
+    }
+
+    public boolean isNoSignatureCapabilities() {
+        return noSignatureCapabilities;
+    }
+
+    public <T extends Gateway> T setNoSignatureCapabilities(boolean noSignatureCapabilities) {
+        this.noSignatureCapabilities = noSignatureCapabilities;
         return (T) this;
     }
 }

@@ -16,6 +16,7 @@ public class PendingGateway extends SecuredBasic {
     private String publicKey;
     @OneToOne(targetEntity = Gateway.class)
     private Gateway registeredGateway;
+    private boolean noSignatureCapabilities;
 
     public String getGatewayId() {
         return gatewayId;
@@ -42,6 +43,15 @@ public class PendingGateway extends SecuredBasic {
 
     public <T extends PendingGateway> T setRegisteredGateway(Gateway registeredGateway) {
         this.registeredGateway = registeredGateway;
+        return (T) this;
+    }
+
+    public boolean isNoSignatureCapabilities() {
+        return noSignatureCapabilities;
+    }
+
+    public <T extends PendingGateway> T setNoSignatureCapabilities(boolean noSignatureCapabilities) {
+        this.noSignatureCapabilities = noSignatureCapabilities;
         return (T) this;
     }
 }
