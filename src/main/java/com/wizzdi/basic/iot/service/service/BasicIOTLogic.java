@@ -146,7 +146,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private void updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
-        if(lastSeen==null){
+        if(lastSeen==null || lastSeen.isAfter(OffsetDateTime.now())){
             lastSeen=OffsetDateTime.now();
         }
         for (Remote remote : remotesWithKeepAlive) {
