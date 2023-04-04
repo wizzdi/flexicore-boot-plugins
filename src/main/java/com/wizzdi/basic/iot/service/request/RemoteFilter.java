@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.Connectivity;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
+import com.wizzdi.dynamic.properties.converter.postgresql.DynamicFilterItem;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class RemoteFilter extends PaginationFilter {
@@ -16,6 +18,9 @@ public class RemoteFilter extends PaginationFilter {
     private Set<Connectivity> connectivity;
     private Set<String> notIds;
     private OffsetDateTime lastSeenTo;
+
+    private Map<String,DynamicFilterItem> devicePropertiesFilter;
+    private Map<String,DynamicFilterItem> userAddedPropertiesFilter;
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -61,6 +66,24 @@ public class RemoteFilter extends PaginationFilter {
 
     public <T extends RemoteFilter> T setLastSeenTo(OffsetDateTime lastSeenTo) {
         this.lastSeenTo = lastSeenTo;
+        return (T) this;
+    }
+
+    public Map<String, DynamicFilterItem> getDevicePropertiesFilter() {
+        return devicePropertiesFilter;
+    }
+
+    public <T extends RemoteFilter> T setDevicePropertiesFilter(Map<String, DynamicFilterItem> devicePropertiesFilter) {
+        this.devicePropertiesFilter = devicePropertiesFilter;
+        return (T) this;
+    }
+
+    public Map<String, DynamicFilterItem> getUserAddedPropertiesFilter() {
+        return userAddedPropertiesFilter;
+    }
+
+    public <T extends RemoteFilter> T setUserAddedPropertiesFilter(Map<String, DynamicFilterItem> userAddedPropertiesFilter) {
+        this.userAddedPropertiesFilter = userAddedPropertiesFilter;
         return (T) this;
     }
 }
