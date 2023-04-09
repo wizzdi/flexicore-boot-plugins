@@ -79,10 +79,10 @@ public class RemoteRepository implements Plugin {
             preds.add(cb.or(cb.lessThanOrEqualTo(r.get(Remote_.lastSeen),filtering.getLastSeenTo()),r.get(Remote_.lastSeen).isNull()));
         }
         if(filtering.getDevicePropertiesFilter()!=null){
-            FilterDynamicPropertiesUtils.filterDynamic(filtering.getDevicePropertiesFilter(),cb,r.get(Remote_.deviceProperties));
+            preds.addAll(FilterDynamicPropertiesUtils.filterDynamic(filtering.getDevicePropertiesFilter(),cb,r.get(Remote_.deviceProperties)));
         }
         if(filtering.getUserAddedPropertiesFilter()!=null){
-            FilterDynamicPropertiesUtils.filterDynamic(filtering.getUserAddedPropertiesFilter(),cb,r.get(Remote_.userAddedProperties));
+            preds.addAll(FilterDynamicPropertiesUtils.filterDynamic(filtering.getUserAddedPropertiesFilter(),cb,r.get(Remote_.userAddedProperties)));
         }
 
 
