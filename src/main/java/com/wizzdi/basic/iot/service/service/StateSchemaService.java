@@ -156,6 +156,12 @@ public class StateSchemaService implements Plugin {
     public void validate(StateSchemaCreate stateSchemaCreate,
                          SecurityContextBase securityContext) {
         basicService.validate(stateSchemaCreate, securityContext);
+        String deviceTypeId = stateSchemaCreate.getDeviceTypeId();
+        DeviceType deviceType = deviceTypeId == null ? null : getByIdOrNull(deviceTypeId, DeviceType.class, SecuredBasic_.security, securityContext);
+        if (deviceTypeId != null && deviceType == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No DeviceType with id " + deviceTypeId);
+        }
+        stateSchemaCreate.setDeviceType(deviceType);
     }
 
 }
