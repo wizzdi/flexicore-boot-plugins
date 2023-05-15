@@ -64,6 +64,8 @@ public class BasicIOTConfig implements Plugin {
     private String keystorePassword;
     @Value("${basic.iot.mqtt.keyStoreType:#{null}}")
     private String keyStoreType;
+    @Value("${basic.iot.mqtt.defaultRetained:false}")
+    private boolean defaultRetained;
 
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
@@ -217,6 +219,7 @@ public class BasicIOTConfig implements Plugin {
 
         MqttPahoMessageHandler someMqttClient = new MqttPahoMessageHandler(iotId+"-out", mqttServerFactory);
         someMqttClient.setDefaultQos(1);
+        someMqttClient.setDefaultRetained(defaultRetained);
         return f -> f.handle(someMqttClient);
 
     }
