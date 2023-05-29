@@ -11,25 +11,32 @@ import com.wizzdi.basic.iot.service.response.ServerIntegrationFlowHolder;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlows;
+import org.springframework.integration.dsl.MessageChannels;
 import org.springframework.integration.dsl.StandardIntegrationFlow;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -39,6 +46,9 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Extension
@@ -122,10 +132,22 @@ public class BasicIOTConfig implements Plugin {
 
         ThreadPoolTaskScheduler threadPoolTaskScheduler
                 = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setPoolSize(3);
         threadPoolTaskScheduler.setThreadNamePrefix(
-                "mqtt-task-scheduler");
+                "connectivity-scheduler");
         return threadPoolTaskScheduler;
+    }
+
+    @Bean
+    @Qualifier("mqttTaskExecutor")
+    public TaskExecutor mqttTaskExecutor() {
+        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+        taskExecutor.setCorePoolSize(10); // number of threads to keep in the pool
+        taskExecutor.setMaxPoolSize(20); // maximum allowed number of threads
+        taskExecutor.setQueueCapacity(500); // queue capacity before new threads get created
+        taskExecutor.setThreadNamePrefix("mqtt-task-executor");
+        taskExecutor.initialize();
+        return taskExecutor;
     }
 
 
@@ -163,7 +185,7 @@ public class BasicIOTConfig implements Plugin {
     }
 
     @Bean
-    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers) throws IOException, InterruptedException {
+    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers,TimingCallback timingCallback) throws IOException, InterruptedException {
         logger.info("basicIOTClient");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -175,12 +197,28 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers)
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,timingCallback)
                 .setPublicKeyProvider(publicKeyProvider);
+    }
+    @Bean
+    public TimingCallback timingCallback(MeterRegistry meterRegistry) {
+        Map<String, Timer> timerMap=new ConcurrentHashMap<>();
+        return (type, time) -> {
+            Timer timer = timerMap.computeIfAbsent(type, e -> Timer.builder("message.processing.time")
+                    .tag("type", e)
+                    .register(meterRegistry));
+            timer.record(time, TimeUnit.NANOSECONDS);
+        };
+        }
+
+
+    @Bean
+    public MessageChannel mqttInputChannel(@Qualifier("mqttTaskExecutor") TaskExecutor mqttTaskExecutor) {
+        return MessageChannels.executor(mqttTaskExecutor).get();
     }
 
     @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, IntegrationFlow mqttOutboundFlow) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, IntegrationFlow mqttOutboundFlow,MessageChannel mqttInputChannel) {
         logger.info("serverInputIntegrationFlow");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -196,6 +234,7 @@ public class BasicIOTConfig implements Plugin {
         MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(mqttPahoMessageDrivenChannelAdapter)
+                .channel(mqttInputChannel)
                 .handle(basicIOTClient)
                 .get();
         BasicIOTConnection basicIOTConnection = basicIOTClient.open(standardIntegrationFlow, mqttOutboundFlow, mqttPahoMessageDrivenChannelAdapter);

@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.app;
 import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.base.init.FlexiCoreApplication;
+import com.wizzdi.flexicore.boot.health.annotations.EnableFlexiCoreHealthPlugins;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
@@ -24,7 +25,7 @@ import java.util.Arrays;
 @EnableFlexiCoreSecurity
 @EnableDynamicProperties
 @EnableIntegration
-
+@EnableFlexiCoreHealthPlugins
 public class App {
 
 

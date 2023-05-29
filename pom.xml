@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.wizzdi</groupId>
     <artifactId>basic-iot-service</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.1-SNAPSHOT</version>
     <name>basic-iot-service</name>
     <description>FlexiCore service plugin , basic iot service</description>
     <url>https://wizzdi.com</url>
@@ -81,6 +81,12 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-actuator</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.wizzdi</groupId>

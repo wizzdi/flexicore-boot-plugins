@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -60,6 +62,8 @@ public class LogicTests {
     private MapIcon gatewayMapIcon;
     @Autowired
     private SchemaActionService schemaActionService;
+    @Autowired
+    private TestRestTemplate testRestTemplate;
 
 
     @Test
@@ -179,6 +183,17 @@ public class LogicTests {
         Assertions.assertNotNull(device);
         Assertions.assertNotNull(device.getCurrentSchema());
         Assertions.assertEquals(JSON_SCHEMA_V1, device.getCurrentSchema().getStateJsonSchema());
+
+    }
+
+    @Test
+    @Order(8)
+    public void testActuator() throws InterruptedException {
+        ResponseEntity<String> response = testRestTemplate.getForEntity("/actuator/metrics/message.processing.time", String.class);
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful(), response.toString());
+        String body = response.getBody();
+        Assertions.assertNotNull(body);
+        System.out.println(body);
 
     }
 
