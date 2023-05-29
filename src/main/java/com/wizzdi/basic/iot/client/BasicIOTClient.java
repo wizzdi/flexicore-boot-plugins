@@ -52,20 +52,23 @@ public class BasicIOTClient implements MessageHandler {
     private MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter;
     private final Queue<IOTMessageSubscriber> requestResponseMessageHandlers = new LinkedBlockingQueue<>();
 
+    private final TimingCallback timingCallback;
+
     private final String id;
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false);
+        this(id, key, objectMapper, subscribers, false,null);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,TimingCallback timingCallback) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
+        this.timingCallback=timingCallback;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -94,12 +97,11 @@ public class BasicIOTClient implements MessageHandler {
     }
 
 
-    private void parseAndCallSubscribers(Message<?> message) {
+    private IOTMessage parseAndCallSubscribers(Message<?> message) {
         try {
             IOTMessage iotMessage = parseMessage(message, IOTMessage.class);
             if (iotMessage.getGatewayId().equals(id)) {
                 logger.debug("ignoring self message");
-                return;
             }
             try {
                 if (!verifyMessage(iotMessage)) {
@@ -120,11 +122,13 @@ public class BasicIOTClient implements MessageHandler {
                     logger.error("IOTMessageSubscriber failed", e);
                 }
             }
+            return iotMessage;
         } catch (Throwable e) {
             logger.error("failed handling message", e);
         }
 
 
+        return null;
     }
 
     private boolean verifyMessage(IOTMessage iotMessage) throws VerificationException {
@@ -282,8 +286,13 @@ public class BasicIOTClient implements MessageHandler {
 
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
-
-        parseAndCallSubscribers(message);
+        long start=System.nanoTime();
+        IOTMessage iotMessage = parseAndCallSubscribers(message);
+        long end=System.nanoTime();
+        if(timingCallback!=null){
+            String type=iotMessage!=null?iotMessage.getClass().getSimpleName():"unknown";
+            timingCallback.timeMessage(type,end-start);
+        }
 
     }
 }
