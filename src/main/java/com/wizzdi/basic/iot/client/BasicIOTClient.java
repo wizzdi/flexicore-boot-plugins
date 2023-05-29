@@ -57,18 +57,20 @@ public class BasicIOTClient implements MessageHandler {
     private final String id;
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
+    private final boolean badMessageResponse;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false,null);
+        this(id, key, objectMapper, subscribers, false, null,false);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,TimingCallback timingCallback) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback,boolean badMessageResponse) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
-        this.timingCallback=timingCallback;
+        this.timingCallback = timingCallback;
+        this.badMessageResponse=badMessageResponse;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -103,25 +105,25 @@ public class BasicIOTClient implements MessageHandler {
             if (iotMessage.getGatewayId().equals(id)) {
                 logger.debug("ignoring self message");
             }
-            try {
-                if (!verifyMessage(iotMessage)) {
-                    iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
-                }
-            } catch (VerificationException e) {
-                iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with exception " + e.getMessage());
+
+            boolean verified = verifyMessage(iotMessage);
+            if (!verified) {
+                iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
             }
 
-
-            for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
-                requestResponseMessageHandler.onIOTMessage(iotMessage);
-            }
-            for (IOTMessageSubscriber subscriber : subscribers) {
-                try {
-                    subscriber.onIOTMessage(iotMessage);
-                } catch (Throwable e) {
-                    logger.error("IOTMessageSubscriber failed", e);
+            if(verified || badMessageResponse) {
+                for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
+                    requestResponseMessageHandler.onIOTMessage(iotMessage);
+                }
+                for (IOTMessageSubscriber subscriber : subscribers) {
+                    try {
+                        subscriber.onIOTMessage(iotMessage);
+                    } catch (Throwable e) {
+                        logger.error("IOTMessageSubscriber failed", e);
+                    }
                 }
             }
+
             return iotMessage;
         } catch (Throwable e) {
             logger.error("failed handling message", e);
@@ -131,17 +133,20 @@ public class BasicIOTClient implements MessageHandler {
         return null;
     }
 
-    private boolean verifyMessage(IOTMessage iotMessage) throws VerificationException {
+    private boolean verifyMessage(IOTMessage iotMessage) {
         if (iotMessage.isRequireAuthentication() && publicKeyProvider != null) {
             String gatewayId = iotMessage.getGatewayId();
             PublicKeyResponse publicKeyResponse = publicKeyProvider.getPublicKey(gatewayId);
+            if (publicKeyResponse == null) {
+                return false;
+            }
             PublicKey publicKey = publicKeyResponse.publicKey();
             boolean signatureMandatory = publicKeyResponse.signatureMandatory();
-            if(!signatureMandatory){
+            if (!signatureMandatory) {
                 return true;
             }
             if (publicKey == null) {
-                throw new VerificationException("could not find public key for gateway " + gatewayId);
+                return false;
             }
             try {
                 Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
@@ -155,7 +160,8 @@ public class BasicIOTClient implements MessageHandler {
 
 
             } catch (Exception e) {
-                throw new VerificationException(e);
+                logger.warn("failed to verify message " + iotMessage, e);
+                return false;
             }
 
         } else {
@@ -286,12 +292,12 @@ public class BasicIOTClient implements MessageHandler {
 
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
-        long start=System.nanoTime();
+        long start = System.nanoTime();
         IOTMessage iotMessage = parseAndCallSubscribers(message);
-        long end=System.nanoTime();
-        if(timingCallback!=null){
-            String type=iotMessage!=null?iotMessage.getClass().getSimpleName():"unknown";
-            timingCallback.timeMessage(type,end-start);
+        long end = System.nanoTime();
+        if (timingCallback != null) {
+            String type = iotMessage != null ? iotMessage.getClass().getSimpleName() : "unknown";
+            timingCallback.timeMessage(type, end - start);
         }
 
     }
