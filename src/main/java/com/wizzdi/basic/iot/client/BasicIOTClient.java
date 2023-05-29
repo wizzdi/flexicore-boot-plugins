@@ -57,20 +57,18 @@ public class BasicIOTClient implements MessageHandler {
     private final String id;
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
-    private final boolean badMessageResponse;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false, null,false);
+        this(id, key, objectMapper, subscribers, false, null);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback,boolean badMessageResponse) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
         this.timingCallback = timingCallback;
-        this.badMessageResponse=badMessageResponse;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -111,19 +109,17 @@ public class BasicIOTClient implements MessageHandler {
                 iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
             }
 
-            if(verified || badMessageResponse) {
-                for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
-                    requestResponseMessageHandler.onIOTMessage(iotMessage);
-                }
-                for (IOTMessageSubscriber subscriber : subscribers) {
-                    try {
-                        subscriber.onIOTMessage(iotMessage);
-                    } catch (Throwable e) {
-                        logger.error("IOTMessageSubscriber failed", e);
-                    }
+
+            for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
+                requestResponseMessageHandler.onIOTMessage(iotMessage);
+            }
+            for (IOTMessageSubscriber subscriber : subscribers) {
+                try {
+                    subscriber.onIOTMessage(iotMessage);
+                } catch (Throwable e) {
+                    logger.error("IOTMessageSubscriber failed", e);
                 }
             }
-
             return iotMessage;
         } catch (Throwable e) {
             logger.error("failed handling message", e);
