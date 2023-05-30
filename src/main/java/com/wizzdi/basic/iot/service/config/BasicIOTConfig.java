@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -48,6 +49,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -76,11 +78,14 @@ public class BasicIOTConfig implements Plugin {
     private String keyStoreType;
     @Value("${basic.iot.mqtt.defaultRetained:false}")
     private boolean defaultRetained;
+    @Value("${basic.iot.mqtt.disableVerification:false}")
+    private boolean disableVerification;
 
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
     @Autowired
     private GatewayService gatewayService;
+
 
     @Bean
     public MqttPahoClientFactory mqttServerFactory() {
@@ -129,7 +134,6 @@ public class BasicIOTConfig implements Plugin {
     @Bean
     public ThreadPoolTaskScheduler taskScheduler() {
         logger.info("taskScheduler");
-
         ThreadPoolTaskScheduler threadPoolTaskScheduler
                 = new ThreadPoolTaskScheduler();
         threadPoolTaskScheduler.setPoolSize(3);
@@ -141,13 +145,9 @@ public class BasicIOTConfig implements Plugin {
     @Bean
     @Qualifier("mqttTaskExecutor")
     public TaskExecutor mqttTaskExecutor() {
-        ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(10); // number of threads to keep in the pool
-        taskExecutor.setMaxPoolSize(20); // maximum allowed number of threads
-        taskExecutor.setQueueCapacity(500); // queue capacity before new threads get created
-        taskExecutor.setThreadNamePrefix("mqtt-task-executor");
-        taskExecutor.initialize();
-        return taskExecutor;
+
+        return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
+
     }
 
 
@@ -197,7 +197,7 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,timingCallback)
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,timingCallback,disableVerification)
                 .setPublicKeyProvider(publicKeyProvider);
     }
     @Bean
@@ -213,12 +213,13 @@ public class BasicIOTConfig implements Plugin {
 
 
     @Bean
+    @Qualifier("mqttInputChannel")
     public MessageChannel mqttInputChannel(@Qualifier("mqttTaskExecutor") TaskExecutor mqttTaskExecutor) {
         return MessageChannels.executor(mqttTaskExecutor).get();
     }
 
     @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, IntegrationFlow mqttOutboundFlow,MessageChannel mqttInputChannel) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,@Qualifier("mqttInputChannel") MessageChannel mqttInputChannel) {
         logger.info("serverInputIntegrationFlow");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -243,12 +244,14 @@ public class BasicIOTConfig implements Plugin {
     }
 
     @Bean
+    @Qualifier("mqttInbound")
     public IntegrationFlow mqttInbound(ServerIntegrationFlowHolder serverIntegrationFlowHolder){
         return serverIntegrationFlowHolder.getIntegrationFlow();
     }
 
 
     @Bean
+    @Qualifier("mqttOutbounndFlow")
     public IntegrationFlow mqttOutboundFlow(MqttPahoClientFactory mqttServerFactory) {
         logger.info("serverOutputIntegrationFlow");
         if (mqttURLs == null || mqttURLs.length == 0) {

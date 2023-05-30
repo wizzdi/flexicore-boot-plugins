@@ -71,9 +71,16 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private long lastSeenThreshold;
     @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*60*1000}}")
     private long reminderInterval;
+    @Value("${basic.iot.mqtt.badMessageResponse:false}")
+    private boolean badMessageResponse;
+    @Value("${basic.iot.mqtt.keepAlive.bounce:#{3*60*1000}}")
+    private long keepAliveBounceThreshold;
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
+
+    private static final Map<String,Long> keepAliveBounceCache =new ConcurrentHashMap<>();
+
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
@@ -101,7 +108,15 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 logger.warn("bad message: "+badMessage.getError());
 
             }
-            return null;
+            return badMessageResponse?badMessage:null;
+        }
+        if(iotMessage instanceof KeepAlive keepAlive ){
+            if(shouldBounce(iotMessage)){
+                logger.debug("bouncing keep alive {}",keepAlive.getId());
+                return null;
+            }
+            keepAliveBounceCache.put(keepAlive.getGatewayId(),System.currentTimeMillis());
+
         }
         Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
         if (gatewayOptional.isEmpty()) {
@@ -129,11 +144,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if (iotMessage instanceof KeepAlive) {
             onKeepAlive((KeepAlive) iotMessage, gateway, gatewaySecurityContext);
         }
-        if (iotMessage instanceof BadMessage) {
-            BadMessage badMessage = (BadMessage) iotMessage;
-            return new BadMessageReceived().setOriginalMessage(badMessage.getOriginalMessage()).setError(badMessage.getError());
-        }
         return null;
+    }
+
+    private boolean shouldBounce(IOTMessage iotMessage) {
+        Long lastKeepAliveReceived = keepAliveBounceCache.computeIfAbsent(iotMessage.getGatewayId(), f -> 0L);
+        return (System.currentTimeMillis() - lastKeepAliveReceived) < keepAliveBounceThreshold;
     }
 
     private void onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
