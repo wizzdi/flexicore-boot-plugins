@@ -156,12 +156,20 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
         List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
         remotesWithKeepAlive.addAll(devices);
-        updateKeepAlive(keepAlive.getSentAt(),gatewaySecurityContext, remotesWithKeepAlive);
+        List<Remote> remotesThatChangedState = updateKeepAlive(keepAlive.getSentAt(), gatewaySecurityContext, remotesWithKeepAlive);
+        for (Remote remote : remotesThatChangedState) {
+            if(remote.getMappedPOI()!=null&&remote.getPreConnectivityLossIcon()!=null){
+                remote.getMappedPOI().setMapIcon(remote.getPreConnectivityLossIcon());
+                gatewayService.merge(remote.getMappedPOI());
+                logger.debug("remote {}({}) connected , changing status to {}({})",remote.getRemoteId(),remote.getName(),remote.getPreConnectivityLossIcon().getName(),remote.getPreConnectivityLossIcon().getId());
+            }
+        }
 
 
     }
 
-    private void updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+    private List<Remote> updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+        List<Remote> statusChanged = new ArrayList<>();
         if(lastSeen==null || lastSeen.isAfter(OffsetDateTime.now())){
             lastSeen=OffsetDateTime.now();
         }
@@ -174,9 +182,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 remote.setLastConnectivityChange(connectivityChange);
                 gatewayService.merge(remote);
                 logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
+                statusChanged.add(remote);
 
             }
         }
+        return statusChanged;
     }
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
@@ -193,8 +203,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
             if(remote instanceof Device device){
                 if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){
+                    device.setPreConnectivityLossIcon(device.getMappedPOI().getMapIcon());
                     device.getMappedPOI().setMapIcon(device.getDeviceType().getDefaultMapIcon());
-                    gatewayService.merge(device.getMappedPOI());
+                    gatewayService.massMerge(List.of(device,device.getMappedPOI()));
                 }
             }
         }
