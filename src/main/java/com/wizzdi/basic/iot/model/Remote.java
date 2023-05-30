@@ -1,7 +1,9 @@
 package com.wizzdi.basic.iot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
+import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
 
 import javax.persistence.*;
@@ -26,6 +28,10 @@ public class Remote extends SecuredBasic {
     private String version;
     @ManyToOne(targetEntity = MappedPOI.class)
     private MappedPOI mappedPOI;
+
+    @ManyToOne(targetEntity = MapIcon.class)
+    @JsonIgnore
+    private MapIcon preConnectivityLossIcon;
 
     @ManyToOne(targetEntity = StateSchema.class)
     private StateSchema currentSchema;
@@ -129,6 +135,17 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setLastSeen(OffsetDateTime lastKeepAlive) {
         this.lastSeen = lastKeepAlive;
+        return (T) this;
+    }
+
+    @ManyToOne(targetEntity = MapIcon.class)
+    @JsonIgnore
+    public MapIcon getPreConnectivityLossIcon() {
+        return preConnectivityLossIcon;
+    }
+
+    public <T extends Remote> T setPreConnectivityLossIcon(MapIcon preConnectivityLossIcon) {
+        this.preConnectivityLossIcon = preConnectivityLossIcon;
         return (T) this;
     }
 }
