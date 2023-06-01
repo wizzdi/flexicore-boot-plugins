@@ -84,7 +84,14 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
-        logger.info("received message " + iotMessage);
+        if(iotMessage instanceof KeepAlive){
+            logger.debug("received message " + iotMessage);
+
+        }
+        else{
+            logger.info("received message " + iotMessage);
+
+        }
         IOTMessage response = executeLogic(iotMessage);
         if (response != null) {
             try {

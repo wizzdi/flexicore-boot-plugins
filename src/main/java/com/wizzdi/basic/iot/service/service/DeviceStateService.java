@@ -1,7 +1,9 @@
 package com.wizzdi.basic.iot.service.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
+import com.google.common.collect.Lists;
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.client.ChangeState;
 import com.wizzdi.basic.iot.client.ChangeStateReceived;
@@ -29,7 +31,7 @@ import java.util.concurrent.*;
 public class DeviceStateService implements Plugin {
 
     private static final Logger logger= LoggerFactory.getLogger(DeviceStateService.class);
-    private static ExecutorService executorService= Executors.newCachedThreadPool();
+    private static final ExecutorService executorService= Executors.newVirtualThreadPerTaskExecutor();
 
     @Autowired
     @Lazy
@@ -59,20 +61,44 @@ public class DeviceStateService implements Plugin {
         Map<String, ChangeStateResponseEntry> responseEntryMap=new HashMap<>();
         List<Device> devices = deviceService.listAllDevices(securityContext, changeStateRequest.getDeviceFilter());
         List<Future<ChangeStateResponseEntry>> tasks=new ArrayList<>();
-        for (Device device : devices) {
-            Future<ChangeStateResponseEntry> submit = executorService.submit(() -> changeDeviceState(changeStateRequest, device));
-            tasks.add(submit);
-
-        }
-        for (Future<ChangeStateResponseEntry> task : tasks) {
-            try {
-                ChangeStateResponseEntry changeStateResponseEntry = task.get(1, TimeUnit.MINUTES);
+        if(changeStateRequest.isAsync()){
+            for (Device device : devices) {
+                ChangeStateResponseEntry changeStateResponseEntry = changeDeviceStateAsync(changeStateRequest, device);
                 responseEntryMap.put(changeStateResponseEntry.getRemoteId(),changeStateResponseEntry);
-            } catch (Throwable e) {
-                logger.error("failed executing change state task",e);
+
             }
         }
+        else{
+            for (Device device : devices) {
+                Future<ChangeStateResponseEntry> submit = executorService.submit(() -> changeDeviceState(changeStateRequest, device));
+                tasks.add(submit);
+
+            }
+            for (Future<ChangeStateResponseEntry> task : tasks) {
+                try {
+                    ChangeStateResponseEntry changeStateResponseEntry = task.get(1, TimeUnit.MINUTES);
+                    responseEntryMap.put(changeStateResponseEntry.getRemoteId(),changeStateResponseEntry);
+                } catch (Throwable e) {
+                    logger.error("failed executing change state task",e);
+                }
+            }
+        }
+
         return new ChangeStateResponse(new ArrayList<>(responseEntryMap.values()));
+    }
+
+    private ChangeStateResponseEntry changeDeviceStateAsync(ChangeStateRequest changeStateRequest, Device device) {
+        String remoteId = device.getGateway().getRemoteId();
+        String deviceId= device.getRemoteId();
+        boolean success=false;
+        ChangeState changeState=getChangeStateMessage(changeStateRequest.getValues(), device);
+        try {
+            basicIOTClient.sendMessage(changeState, remoteId);
+            success=true;
+        } catch (JsonProcessingException e) {
+            logger.error("failed sending message to gateway "+ remoteId,e);
+        }
+        return new ChangeStateResponseEntry().setRemoteId(deviceId).setOnTry(1).setSuccess(success);
     }
 
     private ChangeStateResponseEntry changeDeviceState(ChangeStateRequest changeStateRequest, Device device) {

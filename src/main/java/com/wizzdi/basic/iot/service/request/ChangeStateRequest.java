@@ -12,6 +12,7 @@ public class ChangeStateRequest {
 
     private DeviceFilter deviceFilter;
     private long retries;
+    private boolean async;
 
     private final Map<String,Object> otherProperties =new HashMap<>();
 
@@ -43,6 +44,15 @@ public class ChangeStateRequest {
 
     public <T extends ChangeStateRequest> T setRetries(long retries) {
         this.retries = retries;
+        return (T) this;
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public <T extends ChangeStateRequest> T setAsync(boolean async) {
+        this.async = async;
         return (T) this;
     }
 }
