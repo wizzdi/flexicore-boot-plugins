@@ -17,6 +17,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,9 @@ public class DeviceStateService implements Plugin {
     @Lazy
     private BasicIOTClient basicIOTClient;
 
+    @Value("${basic.iot.mqtt.changeState.forceAsyncOnSize:300}")
+    private int forceAsyncOnSize;
+
 
 
     public void validate(ChangeStateRequest changeStateRequest,
@@ -60,6 +64,7 @@ public class DeviceStateService implements Plugin {
     public ChangeStateResponse changeState(SecurityContextBase securityContext, ChangeStateRequest changeStateRequest) {
         Map<String, ChangeStateResponseEntry> responseEntryMap=new HashMap<>();
         List<Device> devices = deviceService.listAllDevices(securityContext, changeStateRequest.getDeviceFilter());
+        changeStateRequest.setAsync(changeStateRequest.isAsync()||devices.size()>forceAsyncOnSize);
         List<Future<ChangeStateResponseEntry>> tasks=new ArrayList<>();
         if(changeStateRequest.isAsync()){
             for (Device device : devices) {
