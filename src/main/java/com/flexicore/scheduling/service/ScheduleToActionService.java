@@ -2,7 +2,7 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.scheduling.model.ScheduleToAction;
+import com.flexicore.scheduling.model.*;
 import com.flexicore.scheduling.data.ScheduleToActionRepository;
 import com.flexicore.scheduling.request.ScheduleToActionCreate;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
@@ -12,12 +12,13 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -140,6 +141,22 @@ public class ScheduleToActionService implements Plugin, IScheduleToActionService
   public void validate(
       ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext) {
     basicService.validate(scheduleToActionFilter, securityContext);
+    Set<String> scheduleIds = scheduleToActionFilter.getScheduleIds();
+    Map<String, Schedule> scheduleMap = scheduleIds.isEmpty() ? new HashMap<>() : repository.listByIds(Schedule.class, scheduleIds, Schedule_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+    scheduleIds.removeAll(scheduleMap.keySet());
+    if (!scheduleIds.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule with ids " + scheduleIds + " were found, invalid schedule ids provided");
+    }
+    scheduleToActionFilter.setSchedule(new ArrayList<>(scheduleMap.values()));
+
+    Set<String> scheduleActionIds = scheduleToActionFilter.getScheduleActionIds();
+    Map<String, ScheduleAction> scheduleActionMap = scheduleActionIds.isEmpty() ? new HashMap<>() : repository.listByIds(ScheduleAction.class, scheduleActionIds, ScheduleAction_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+    scheduleActionIds.removeAll(scheduleActionMap.keySet());
+    if (!scheduleActionIds.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ScheduleAction with ids " + scheduleActionIds + " were found, invalid scheduleAction ids provided");
+    }
+    scheduleToActionFilter.setScheduleAction(new ArrayList<>(scheduleActionMap.values()));
+
   }
 
   /**
@@ -151,6 +168,19 @@ public class ScheduleToActionService implements Plugin, IScheduleToActionService
   public void validate(
       ScheduleToActionCreate scheduleToActionCreate, SecurityContextBase securityContext) {
     basicService.validate(scheduleToActionCreate, securityContext);
+    String scheduleId = scheduleToActionCreate.getScheduleId();
+    Schedule schedule = scheduleId == null ? null : repository.getByIdOrNull(scheduleId, Schedule.class, Schedule_.security, securityContext);
+    if (scheduleId != null && schedule == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId + " was found, invalid schedule id provided");
+    }
+    scheduleToActionCreate.setSchedule(schedule);
+
+    String scheduleActionId = scheduleToActionCreate.getScheduleActionId();
+    ScheduleAction scheduleAction = scheduleActionId == null ? null : repository.getByIdOrNull(scheduleActionId, ScheduleAction.class, ScheduleAction_.security, securityContext);
+    if (scheduleActionId != null && scheduleAction == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ScheduleAction with id " + scheduleActionId + " was found, invalid scheduleAction id provided");
+    }
+    scheduleToActionCreate.setScheduleAction(scheduleAction);
   }
 
   @Override
