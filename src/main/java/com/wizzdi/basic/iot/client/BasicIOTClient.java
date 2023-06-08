@@ -57,18 +57,20 @@ public class BasicIOTClient implements MessageHandler {
     private final String id;
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
+    private final boolean disableVerification;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false, null);
+        this(id, key, objectMapper, subscribers, false, null,false);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback,boolean disableVerification) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
         this.timingCallback = timingCallback;
+        this.disableVerification=disableVerification;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -130,38 +132,42 @@ public class BasicIOTClient implements MessageHandler {
     }
 
     private boolean verifyMessage(IOTMessage iotMessage) {
-        if (iotMessage.isRequireAuthentication() && publicKeyProvider != null) {
-            String gatewayId = iotMessage.getGatewayId();
-            PublicKeyResponse publicKeyResponse = publicKeyProvider.getPublicKey(gatewayId);
-            if (publicKeyResponse == null) {
-                return false;
-            }
-            PublicKey publicKey = publicKeyResponse.publicKey();
-            boolean signatureMandatory = publicKeyResponse.signatureMandatory();
-            if (!signatureMandatory) {
-                return true;
-            }
-            if (publicKey == null) {
-                return false;
-            }
-            try {
-                Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
-                sig.initVerify(publicKey);
-                sig.update(iotMessage.getId().getBytes(StandardCharsets.UTF_8));
-                boolean verify = sig.verify(Base64.getDecoder().decode(iotMessage.getSignature()));
-                if (!verify) {
-                    logger.warn("message " + iotMessage + " verify failed");
-                }
-                return verify;
-
-
-            } catch (Exception e) {
-                logger.warn("failed to verify message " + iotMessage, e);
-                return false;
-            }
-
-        } else {
+        if(disableVerification){
             return true;
+        }
+        if(!iotMessage.isRequireAuthentication()){
+            return true;
+        }
+        if(publicKeyProvider==null){
+            return true;
+        }
+        String gatewayId = iotMessage.getGatewayId();
+        PublicKeyResponse publicKeyResponse = publicKeyProvider.getPublicKey(gatewayId);
+        if (publicKeyResponse == null) {
+            return false;
+        }
+        PublicKey publicKey = publicKeyResponse.publicKey();
+        boolean signatureMandatory = publicKeyResponse.signatureMandatory();
+        if (!signatureMandatory) {
+            return true;
+        }
+        if (publicKey == null) {
+            return false;
+        }
+        try {
+            Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);
+            sig.initVerify(publicKey);
+            sig.update(iotMessage.getId().getBytes(StandardCharsets.UTF_8));
+            boolean verify = sig.verify(Base64.getDecoder().decode(iotMessage.getSignature()));
+            if (!verify) {
+                logger.warn("message " + iotMessage + " verify failed");
+            }
+            return verify;
+
+
+        } catch (Exception e) {
+            logger.warn("failed to verify message " + iotMessage, e);
+            return false;
         }
 
     }
