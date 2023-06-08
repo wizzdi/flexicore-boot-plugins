@@ -253,7 +253,7 @@ public class BasicIOTClient implements MessageHandler {
                     logger.debug("out ( " + targetGatewayId + ") reply to " + replyTo + ":" + jsonString);
 
                     String topicToSendTo = client ? getOutTopic(targetGatewayId) : getInTopic(targetGatewayId);
-                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MqttHeaders.TOPIC, topicToSendTo, MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id));
+                    GenericMessage<String> message = new GenericMessage<>(jsonString, Map.of(MqttHeaders.TOPIC, topicToSendTo, MessageHeaders.REPLY_CHANNEL, replyTo, MQTT_BY, id,MqttHeaders.RETAINED,request.isRetained()));
                     outbound.getInputChannel().send(message);
                 } catch (Exception e) {
                     logger.error("error", e);
@@ -277,7 +277,7 @@ public class BasicIOTClient implements MessageHandler {
 
     public void reply(IOTMessage iotMessage, String topicToSendTo) throws JsonProcessingException {
         prepareMessage(iotMessage);
-        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MqttHeaders.TOPIC, topicToSendTo, MQTT_BY, id));
+        GenericMessage<String> message = new GenericMessage<>(objectMapper.writeValueAsString(iotMessage), Map.of(MqttHeaders.TOPIC, topicToSendTo, MQTT_BY, id,MqttHeaders.RETAINED,iotMessage.isRetained()));
         outbound.getInputChannel().send(message);
     }
 

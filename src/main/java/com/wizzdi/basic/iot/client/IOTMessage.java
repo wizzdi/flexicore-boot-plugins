@@ -96,5 +96,10 @@ public class IOTMessage {
         return true;
     }
 
+    @JsonIgnore
+    public boolean isRetained(){
+        return true;
+    }
+
 
 }

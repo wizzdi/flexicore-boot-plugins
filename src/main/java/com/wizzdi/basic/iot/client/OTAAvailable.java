@@ -67,4 +67,9 @@ public class OTAAvailable extends IOTMessage{
         this.baseUrl = baseUrl;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }
