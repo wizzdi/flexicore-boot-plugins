@@ -1,5 +1,9 @@
 package com.flexicore.scheduling;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.annotations.EnableFlexiCoreBaseServices;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
@@ -13,9 +17,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 @SpringBootApplication(scanBasePackages = {"com.admin.service"})
 @EnableFlexiCoreHealthPlugins
@@ -33,6 +39,13 @@ public class App {
     SpringApplication app = new SpringApplication(App.class);
     app.addListeners(new ApplicationPidFileWriter());
     ConfigurableApplicationContext context = app.run(args);
+  }
+
+  @Bean
+  public RestTemplateBuilder restTemplateBuilder() {
+    ObjectMapper objectMapper=new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS).registerModule(new JavaTimeModule());
+    return new RestTemplateBuilder()
+            .messageConverters(new MappingJackson2HttpMessageConverter(objectMapper));
   }
 
   @Bean
