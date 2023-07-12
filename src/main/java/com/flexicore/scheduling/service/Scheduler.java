@@ -37,6 +37,8 @@ import java.util.stream.Collectors;
 public class Scheduler implements Plugin, InitializingBean {
     @Value("${flexicore.scheduling.fetch.intervalMs:#{5 * 60 * 1000}}")
     private long fetchInterval;
+    @Value("${flexicore.scheduling.initialDelayMs:#{1 * 60 * 1000}}")
+    private long initialDelay;
     @Value("${flexicore.scheduling.check.intervalMs:#{60 * 1000}}")
     private long checkInterval;
 
@@ -64,6 +66,14 @@ public class Scheduler implements Plugin, InitializingBean {
     public void runSchedules() {
         Map<String, List<ScheduleToAction>> actionsMap = new HashMap<>();
         Map<String, List<ScheduleTimeslot>> timeSlotsMap = new HashMap<>();
+        logger.info("Scheduler Waiting For Initial Delay");
+        if(initialDelay > 0 ){
+            try {
+                Thread.sleep(initialDelay);
+            } catch (InterruptedException e) {
+                logger.error("failed sleeping",e);
+            }
+        }
         logger.info("Scheduler Started");
         while (!stop) {
             try {
@@ -72,12 +82,17 @@ public class Scheduler implements Plugin, InitializingBean {
                 if (lastFetch == null
                         || now.isAfter(lastFetch.plus(fetchInterval,
                         ChronoUnit.MILLIS))) {
-                    List<ScheduleToAction> allScheduleToActionLinks = scheduleToActionService.listAllScheduleToActions(new ScheduleToActionFilter(), null).parallelStream().filter(f -> f.getSchedule() != null && !f.getSchedule().isSoftDelete()).collect(Collectors.toList());
-                    List<Schedule> schedules = new ArrayList<>(allScheduleToActionLinks.stream().collect(Collectors.toMap(f -> f.getSchedule().getId(), f -> f.getSchedule(), (a, b) -> a)).values());
-                    actionsMap = allScheduleToActionLinks.stream().collect(Collectors.groupingBy(f -> f.getSchedule().getId(), Collectors.toList()));
-                    timeSlotsMap = scheduleTimeslotService.listAllScheduleTimeslots(new ScheduleTimeslotFilter().setSchedule(schedules), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
-                    lastFetch = now;
-                    logger.debug("Fetched Actions");
+                    try {
+                        List<ScheduleToAction> allScheduleToActionLinks = scheduleToActionService.listAllScheduleToActions(new ScheduleToActionFilter(), null).parallelStream().filter(f -> f.getSchedule() != null && !f.getSchedule().isSoftDelete()).collect(Collectors.toList());
+                        List<Schedule> schedules = new ArrayList<>(allScheduleToActionLinks.stream().collect(Collectors.toMap(f -> f.getSchedule().getId(), f -> f.getSchedule(), (a, b) -> a)).values());
+                        actionsMap = allScheduleToActionLinks.stream().collect(Collectors.groupingBy(f -> f.getSchedule().getId(), Collectors.toList()));
+                        timeSlotsMap = scheduleTimeslotService.listAllScheduleTimeslots(new ScheduleTimeslotFilter().setSchedule(schedules), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
+                        lastFetch = now;
+                        logger.debug("Fetched Actions");
+                    }
+                    catch (Throwable e){
+                        logger.error("failed fetching actions",e);
+                    }
 
                 }
                 try {

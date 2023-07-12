@@ -1,5 +1,7 @@
 package com.flexicore.scheduling.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flexicore.request.AuthenticationRequest;
 import com.flexicore.response.AuthenticationResponse;
 import com.flexicore.scheduling.model.Schedule;
@@ -13,6 +15,7 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +29,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -63,23 +68,24 @@ public class ScheduleTimeslotControllerTest {
 
     @Test
     @Order(1)
-    public void testScheduleTimeslotCreate() {
+    public void testScheduleTimeslotCreate() throws JsonProcessingException {
         String name = UUID.randomUUID().toString();
         ScheduleTimeslotCreate request = new ScheduleTimeslotCreate()
-                .setStartTimeOfTheDayName(TimeOfTheDayName.SUNRISE)
-                .setStartTime(OffsetDateTime.now())
+                .setStartTime(ZonedDateTime.now().withZoneSameInstant(ZoneId.of("America/Bahia_Banderas")).toOffsetDateTime())
                 .setStartMillisOffset(10L)
-                .setEndTimeOfTheDayName(TimeOfTheDayName.SUNSET)
                 .setScheduleId(this.schedule.getId())
                 .setTimeOfTheDayNameEndLon(10D)
                 .setTimeOfTheDayNameEndLat(10D)
-                .setEndTime(OffsetDateTime.now())
+                .setEndTime(ZonedDateTime.now().withZoneSameInstant(ZoneId.of("America/Bahia_Banderas")).toOffsetDateTime())
                 .setCoolDownIntervalBeforeRepeat(10L)
                 .setEndMillisOffset(10L)
                 .setName(name);
         request.setTimeOfTheDayNameStartLat(10D);
 
         request.setTimeOfTheDayNameStartLon(10D);
+        ObjectMapper objectMapper = restTemplate.getRestTemplate().getMessageConverters().stream().filter(f -> f instanceof MappingJackson2HttpMessageConverter).map(f -> (MappingJackson2HttpMessageConverter) f).map(f -> f.getObjectMapper()).findFirst().orElseThrow(() -> new RuntimeException("no object mapper"));
+        String x = objectMapper.writeValueAsString(request);
+        System.out.println(x);
 
         ResponseEntity<ScheduleTimeslot> response =
                 this.restTemplate.postForEntity(
@@ -131,6 +137,7 @@ public class ScheduleTimeslotControllerTest {
         if (request.getStartTime() != null) {
 
             Assertions.assertEquals(request.getStartTime(), testScheduleTimeslot.getStartTime().atZoneSameInstant(ZoneId.of(request.getStartTime().getOffset().getId())).toOffsetDateTime());
+            Assertions.assertEquals(request.getStartTime().getOffset().getId(), testScheduleTimeslot.getStartTimeOffsetId());
         }
 
         if (request.getLastExecution() != null) {
@@ -171,6 +178,8 @@ public class ScheduleTimeslotControllerTest {
         if (request.getEndTime() != null) {
 
             Assertions.assertEquals(request.getEndTime(), testScheduleTimeslot.getEndTime().atZoneSameInstant(ZoneId.of(request.getEndTime().getOffset().getId())).toOffsetDateTime());
+            Assertions.assertEquals(request.getEndTime().getOffset().getId(), testScheduleTimeslot.getEndTimeOffsetId());
+
         }
 
         if (request.getCoolDownIntervalBeforeRepeat() != null) {
