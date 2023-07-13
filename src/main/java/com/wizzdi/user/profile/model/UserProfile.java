@@ -5,14 +5,13 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityUser;
-import com.wizzdi.dynamic.properties.converter.DynamicColumnDefinition;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.file.model.FileResource;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import java.util.HashMap;
 import java.util.Map;
 
