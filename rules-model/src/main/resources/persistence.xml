@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+             xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="primary">
+            
+                <class>com.flexicore.rules.model.ScenarioAction</class>
+            
+                <class>com.flexicore.model.SecuredBasic</class>
+            
+                <class>com.flexicore.rules.model.JSFunctionParameter</class>
+            
+                <class>com.flexicore.rules.model.ScenarioToTrigger</class>
+            
+                <class>com.flexicore.rules.model.ScenarioToDataSource</class>
+            
+                <class>com.flexicore.rules.model.Scenario</class>
+            
+                <class>com.flexicore.rules.model.JSFunction</class>
+            
+                <class>com.flexicore.rules.model.DataSource</class>
+            
+                <class>com.flexicore.rules.model.ScenarioToAction</class>
+            
+                <class>com.flexicore.rules.model.ScenarioTrigger</class>
+            
+                <class>com.flexicore.model.Basic</class>
+            
+                <class>com.flexicore.rules.model.ScenarioSavableEvent</class>
+            
+                <class>com.flexicore.rules.model.ScenarioTriggerType</class>
+            
+
+        <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    </persistence-unit>
+</persistence>
