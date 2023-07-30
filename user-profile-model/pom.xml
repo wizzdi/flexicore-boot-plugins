@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        <modelVersion>4.0.0</modelVersion>
+<parent>
+    <groupId>com.wizzdi</groupId>
+    <artifactId>flexicore-boot-plugins-parent</artifactId>
+    <version>${revision}</version>
+</parent>
+    <artifactId>user-profile-model</artifactId>
+    <name>user-profile-model</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-file-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-security-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-data-jpa</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+
+            </plugin>
+            <plugin>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>metamodel-inheritence-fix-processor</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
