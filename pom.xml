@@ -131,13 +131,6 @@
     </properties>
 
 
-    <scm>
-        <connection>scm:git:git@github.com:wizzdi/flexicore-boot.git</connection>
-        <developerConnection>scm:git:git@github.com:wizzdi/flexicore-boot.git</developerConnection>
-
-        <tag>flexicore-boot-${project.version}</tag>
-    </scm>
-
     <dependencyManagement>
         <dependencies>
 
