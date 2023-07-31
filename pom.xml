@@ -7,8 +7,8 @@
     <artifactId>flexicore-boot-plugins-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>FlexiCore Boot Dependencies</name>
-    <description>flexicore Boot Dependencies</description>
+    <name>FlexiCore Boot Plugins Parent</name>
+    <description>FlexiCore Boot Plugins Parent</description>
     <url>https://wizzdi.com</url>
 
     <licenses>
