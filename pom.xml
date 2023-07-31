@@ -7,15 +7,50 @@
     <artifactId>flexicore-boot-plugins-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>FlexiCore Boot Plugins Parent</name>
-
+    <name>FlexiCore Boot Dependencies</name>
+    <description>flexicore Boot Dependencies</description>
+    <url>https://wizzdi.com</url>
 
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <id>asafbennatan</id>
+            <name>Asaf Ben Natan</name>
+            <email>asaf@wizzdi.com</email>
+            <url>https://www.wizzdi.com</url>
+            <organization>Wizzdi</organization>
+            <organizationUrl>https://www.wizzdi.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>Israel</timezone>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:wizzdi/flexicore-boot-plugins.git</connection>
+        <developerConnection>scm:git:git@github.com:wizzdi/flexicore-boot-plugins.git</developerConnection>
+        <url>https://github.com/wizzdi/flexicore-boot-plugins</url>
+        <tag>flexicore-boot-plugins-${project.version}</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
+            </url>
+        </repository>
+    </distributionManagement>
 
     <modules>
         <module>basic-iot-client</module>
