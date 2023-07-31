@@ -89,7 +89,7 @@ public class MapGroupService implements Plugin {
   /**
    * @param mapGroupFilter Object Used to List MapGroup
    * @param securityContext
-   * @return PaginationResponse<MapGroup> containing paging information for MapGroup
+   * @return PaginationResponse containing paging information for MapGroup
    */
   public PaginationResponse<MapGroup> getAllMapGroups(
       MapGroupFilter mapGroupFilter, SecurityContextBase securityContext) {

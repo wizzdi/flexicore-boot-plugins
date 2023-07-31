@@ -110,7 +110,7 @@ public class StatusHistoryService implements Plugin {
   /**
    * @param statusHistoryFilter Object Used to List StatusHistory
    * @param securityContext
-   * @return PaginationResponse<StatusHistory> containing paging information for StatusHistory
+   * @return PaginationResponse containing paging information for StatusHistory
    */
   public PaginationResponse<StatusHistory> getAllStatusHistories(
       StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {

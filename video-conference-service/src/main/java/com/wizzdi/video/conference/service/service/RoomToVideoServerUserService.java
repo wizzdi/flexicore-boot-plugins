@@ -159,7 +159,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   /**
    * @param roomToVideoServerUserFilter Object Used to List RoomToVideoServerUser
    * @param securityContext
-   * @throws ResponseStatusException if roomToVideoServerUserFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserFilter is not valid
    */
   @Override
   public void validate(
@@ -209,7 +209,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   /**
    * @param roomToVideoServerUserCreate Object Used to Create RoomToVideoServerUser
    * @param securityContext
-   * @throws ResponseStatusException if roomToVideoServerUserCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserCreate is not valid
    */
   @Override
   public void validate(

@@ -66,7 +66,7 @@ public interface IRoomToVideoServerUserService {
   /**
    * @param roomToVideoServerUserFilter Object Used to List RoomToVideoServerUser
    * @param securityContext
-   * @throws ResponseStatusException if roomToVideoServerUserFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserFilter is not valid
    */
   void validate(
       RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContextBase securityContext);
@@ -74,7 +74,7 @@ public interface IRoomToVideoServerUserService {
   /**
    * @param roomToVideoServerUserCreate Object Used to Create RoomToVideoServerUser
    * @param securityContext
-   * @throws ResponseStatusException if roomToVideoServerUserCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserCreate is not valid
    */
   void validate(
       RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContextBase securityContext);

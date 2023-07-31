@@ -64,14 +64,14 @@ public interface IVideoServerService {
   /**
    * @param videoServerFilter Object Used to List Entity_1
    * @param securityContext
-   * @throws ResponseStatusException if videoServerFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerFilter is not valid
    */
   void validate(VideoServerFilter videoServerFilter, SecurityContextBase securityContext);
 
   /**
    * @param videoServerCreate Object Used to Create Entity_1
    * @param securityContext
-   * @throws ResponseStatusException if videoServerCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerCreate is not valid
    */
   void validate(VideoServerCreate videoServerCreate, SecurityContextBase securityContext);
 

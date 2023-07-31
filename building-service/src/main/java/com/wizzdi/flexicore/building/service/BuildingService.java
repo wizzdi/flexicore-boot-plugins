@@ -133,7 +133,7 @@ public class BuildingService implements Plugin, IBuildingService {
   /**
    * @param buildingFilter Object Used to List Entity1
    * @param securityContext
-   * @throws ResponseStatusException if buildingFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if buildingFilter is not valid
    */
   @Override
   public void validate(BuildingFilter buildingFilter, SecurityContextBase securityContext) {
@@ -161,7 +161,7 @@ public class BuildingService implements Plugin, IBuildingService {
   /**
    * @param buildingCreate Object Used to Create Entity1
    * @param securityContext
-   * @throws ResponseStatusException if buildingCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if buildingCreate is not valid
    */
   @Override
   public void validate(BuildingCreate buildingCreate, SecurityContextBase securityContext) {

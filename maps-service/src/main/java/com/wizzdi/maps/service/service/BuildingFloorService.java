@@ -97,7 +97,7 @@ public class BuildingFloorService implements Plugin {
   /**
    * @param buildingFilter Object Used to List BuildingFloor
    * @param securityContext
-   * @return PaginationResponse<BuildingFloor> containing paging information for BuildingFloor
+   * @return PaginationResponse containing paging information for BuildingFloor
    */
   public PaginationResponse<BuildingFloor> getAllBuildingFloors(
           BuildingFloorFilter buildingFilter, SecurityContextBase securityContext) {

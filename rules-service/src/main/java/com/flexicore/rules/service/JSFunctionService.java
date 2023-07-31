@@ -133,7 +133,7 @@ public class JSFunctionService implements Plugin {
   /**
    * @param jSFunctionFilter Object Used to List JSFunction
    * @param securityContext
-   * @throws ResponseStatusException if jSFunctionFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionFilter is not valid
    */
   public void validate(JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
     basicService.validate(jSFunctionFilter, securityContext);
@@ -144,7 +144,7 @@ public class JSFunctionService implements Plugin {
   /**
    * @param jSFunctionCreate Object Used to Create JSFunction
    * @param securityContext
-   * @throws ResponseStatusException if jSFunctionCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionCreate is not valid
    */
   public void validate(JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
     basicService.validate(jSFunctionCreate, securityContext);

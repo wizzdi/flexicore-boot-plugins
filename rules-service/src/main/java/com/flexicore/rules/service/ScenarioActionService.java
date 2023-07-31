@@ -126,7 +126,7 @@ public class ScenarioActionService implements Plugin {
   /**
    * @param scenarioActionFilter Object Used to List ScenarioAction
    * @param securityContext
-   * @throws ResponseStatusException if scenarioActionFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioActionFilter is not valid
    */
   public void validate(
       ScenarioActionFilter scenarioActionFilter, SecurityContextBase securityContext) {
@@ -158,7 +158,7 @@ public class ScenarioActionService implements Plugin {
   /**
    * @param scenarioActionCreate Object Used to Create ScenarioAction
    * @param securityContext
-   * @throws ResponseStatusException if scenarioActionCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioActionCreate is not valid
    */
   public void validate(
       ScenarioActionCreate scenarioActionCreate, SecurityContextBase securityContext) {

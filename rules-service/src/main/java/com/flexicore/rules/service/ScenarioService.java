@@ -140,7 +140,7 @@ public class ScenarioService implements Plugin {
   /**
    * @param scenarioFilter Object Used to List Scenario
    * @param securityContext
-   * @throws ResponseStatusException if scenarioFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioFilter is not valid
    */
   public void validate(ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
     basicService.validate(scenarioFilter, securityContext);
@@ -189,7 +189,7 @@ public class ScenarioService implements Plugin {
   /**
    * @param scenarioCreate Object Used to Create Scenario
    * @param securityContext
-   * @throws ResponseStatusException if scenarioCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioCreate is not valid
    */
   public void validate(ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioCreate, securityContext);

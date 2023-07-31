@@ -103,7 +103,7 @@ public class MapIconService implements Plugin {
   /**
    * @param mapIconFilter Object Used to List MapIcon
    * @param securityContext
-   * @return PaginationResponse<MapIcon> containing paging information for MapIcon
+   * @return PaginationResponse containing paging information for MapIcon
    */
   public PaginationResponse<MapIcon> getAllMapIcons(
       MapIconFilter mapIconFilter, SecurityContextBase securityContext) {

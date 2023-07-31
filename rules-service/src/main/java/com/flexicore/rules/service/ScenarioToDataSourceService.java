@@ -155,7 +155,7 @@ public class ScenarioToDataSourceService implements Plugin {
   /**
    * @param scenarioToDataSourceFilter Object Used to List ScenarioToDataSource
    * @param securityContext
-   * @throws ResponseStatusException if scenarioToDataSourceFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioToDataSourceFilter is not valid
    */
   public void validate(
       ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
@@ -198,7 +198,7 @@ public class ScenarioToDataSourceService implements Plugin {
   /**
    * @param scenarioToDataSourceCreate Object Used to Create ScenarioToDataSource
    * @param securityContext
-   * @throws ResponseStatusException if scenarioToDataSourceCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioToDataSourceCreate is not valid
    */
   public void validate(
       ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {

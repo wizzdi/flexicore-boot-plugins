@@ -144,7 +144,7 @@ public class JSFunctionParameterService implements Plugin {
   /**
    * @param jSFunctionParameterFilter Object Used to List JSFunctionParameter
    * @param securityContext
-   * @throws ResponseStatusException if jSFunctionParameterFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionParameterFilter is not valid
    */
   public void validate(
       JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContextBase securityContext) {
@@ -171,7 +171,7 @@ public class JSFunctionParameterService implements Plugin {
   /**
    * @param jSFunctionParameterCreate Object Used to Create JSFunctionParameter
    * @param securityContext
-   * @throws ResponseStatusException if jSFunctionParameterCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionParameterCreate is not valid
    */
   public void validate(
       JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContextBase securityContext) {

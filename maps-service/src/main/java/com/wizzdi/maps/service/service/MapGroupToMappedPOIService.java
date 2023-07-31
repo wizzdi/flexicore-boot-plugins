@@ -107,8 +107,7 @@ public class MapGroupToMappedPOIService implements Plugin {
   /**
    * @param mapGroupToMappedPOIFilter Object Used to List MapGroupToMappedPOI
    * @param securityContext
-   * @return PaginationResponse<MapGroupToMappedPOI> containing paging information for
-   *     MapGroupToMappedPOI
+   * @return PaginationResponse containing paging information for MapGroupToMappedPOI
    */
   public PaginationResponse<MapGroupToMappedPOI> getAllMapGroupToMappedPOIs(
       MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContextBase securityContext) {

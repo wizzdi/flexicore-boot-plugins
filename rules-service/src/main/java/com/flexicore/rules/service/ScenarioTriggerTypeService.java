@@ -120,7 +120,7 @@ public class ScenarioTriggerTypeService implements Plugin {
   /**
    * @param scenarioTriggerTypeFilter Object Used to List ScenarioTriggerType
    * @param securityContext
-   * @throws ResponseStatusException if scenarioTriggerTypeFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioTriggerTypeFilter is not valid
    */
   public void validate(
       ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
@@ -130,7 +130,7 @@ public class ScenarioTriggerTypeService implements Plugin {
   /**
    * @param scenarioTriggerTypeCreate Object Used to Create ScenarioTriggerType
    * @param securityContext
-   * @throws ResponseStatusException if scenarioTriggerTypeCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioTriggerTypeCreate is not valid
    */
   public void validate(
       ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {

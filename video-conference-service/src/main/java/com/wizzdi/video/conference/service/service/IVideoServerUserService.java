@@ -65,14 +65,14 @@ public interface IVideoServerUserService {
   /**
    * @param videoServerUserFilter Object Used to List Entity_3
    * @param securityContext
-   * @throws ResponseStatusException if videoServerUserFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerUserFilter is not valid
    */
   void validate(VideoServerUserFilter videoServerUserFilter, SecurityContextBase securityContext);
 
   /**
    * @param videoServerUserCreate Object Used to Create Entity_3
    * @param securityContext
-   * @throws ResponseStatusException if videoServerUserCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerUserCreate is not valid
    */
   void validate(VideoServerUserCreate videoServerUserCreate, SecurityContextBase securityContext);
 

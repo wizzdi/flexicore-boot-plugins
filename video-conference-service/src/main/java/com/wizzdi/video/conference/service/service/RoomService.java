@@ -123,7 +123,7 @@ public class RoomService implements Plugin, IRoomService {
   /**
    * @param roomFilter Object Used to List Entity_4
    * @param securityContext
-   * @throws ResponseStatusException if roomFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomFilter is not valid
    */
   @Override
   public void validate(RoomFilter roomFilter, SecurityContextBase securityContext) {
@@ -150,7 +150,7 @@ public class RoomService implements Plugin, IRoomService {
   /**
    * @param roomCreate Object Used to Create Entity_4
    * @param securityContext
-   * @throws ResponseStatusException if roomCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomCreate is not valid
    */
   @Override
   public void validate(RoomCreate roomCreate, SecurityContextBase securityContext) {

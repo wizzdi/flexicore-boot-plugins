@@ -124,7 +124,7 @@ public class DataSourceService implements Plugin {
   /**
    * @param dataSourceFilter Object Used to List DataSource
    * @param securityContext
-   * @throws ResponseStatusException if dataSourceFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if dataSourceFilter is not valid
    */
   public void validate(DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
     basicService.validate(dataSourceFilter, securityContext);
@@ -155,7 +155,7 @@ public class DataSourceService implements Plugin {
   /**
    * @param dataSourceCreate Object Used to Create DataSource
    * @param securityContext
-   * @throws ResponseStatusException if dataSourceCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if dataSourceCreate is not valid
    */
   public void validate(DataSourceCreate dataSourceCreate, SecurityContextBase securityContext) {
     basicService.validate(dataSourceCreate, securityContext);

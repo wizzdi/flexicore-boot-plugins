@@ -85,7 +85,7 @@ public class LayerTypeService implements Plugin {
   /**
    * @param layerTypeFilter Object Used to List LayerType
    * @param securityContext
-   * @return PaginationResponse<LayerType> containing paging information for LayerType
+   * @return PaginationResponse containing paging information for LayerType
    */
   public PaginationResponse<LayerType> getAllLayerTypes(
       LayerTypeFilter layerTypeFilter, SecurityContextBase securityContext) {

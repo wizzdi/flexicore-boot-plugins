@@ -65,14 +65,14 @@ public interface IScheduleTimeslotService {
   /**
    * @param scheduleTimeslotFilter Object Used to List ScheduleTimeslot
    * @param securityContext
-   * @throws ResponseStatusException if scheduleTimeslotFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotFilter is not valid
    */
   void validate(ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext);
 
   /**
    * @param scheduleTimeslotCreate Object Used to Create ScheduleTimeslot
    * @param securityContext
-   * @throws ResponseStatusException if scheduleTimeslotCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotCreate is not valid
    */
   void validate(ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext);
 

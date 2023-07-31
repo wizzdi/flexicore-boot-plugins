@@ -143,7 +143,7 @@ public class LocationHistoryService implements Plugin {
   /**
    * @param locationHistoryFilter Object Used to List LocationHistory
    * @param securityContext
-   * @return PaginationResponse<LocationHistory> containing paging information for LocationHistory
+   * @return PaginationResponse containing paging information for LocationHistory
    */
   public PaginationResponse<LocationHistory> getAllLocationHistories(
       LocationHistoryFilter locationHistoryFilter, SecurityContextBase securityContext) {

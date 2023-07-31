@@ -59,14 +59,14 @@ public interface IRoomService {
   /**
    * @param roomFilter Object Used to List Room
    * @param securityContext
-   * @throws ResponseStatusException if roomFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomFilter is not valid
    */
   void validate(RoomFilter roomFilter, SecurityContextBase securityContext);
 
   /**
    * @param roomCreate Object Used to Create Room
    * @param securityContext
-   * @throws ResponseStatusException if roomCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if roomCreate is not valid
    */
   void validate(RoomCreate roomCreate, SecurityContextBase securityContext);
 

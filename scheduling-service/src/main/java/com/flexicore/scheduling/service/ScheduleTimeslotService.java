@@ -246,7 +246,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
   /**
    * @param scheduleTimeslotFilter Object Used to List ScheduleTimeslot
    * @param securityContext
-   * @throws ResponseStatusException if scheduleTimeslotFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotFilter is not valid
    */
   @Override
   public void validate(
@@ -275,7 +275,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
   /**
    * @param scheduleTimeslotCreate Object Used to Create ScheduleTimeslot
    * @param securityContext
-   * @throws ResponseStatusException if scheduleTimeslotCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotCreate is not valid
    */
   @Override
   public void validate(

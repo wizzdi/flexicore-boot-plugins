@@ -317,7 +317,7 @@ public class MappedPOIService implements Plugin {
     /**
      * @param mappedPOIFilter
      * @param securityContext
-     * @throws ResponseStatusException if mappedPOIFilter is not valid
+     * @throws org.springframework.web.server.ResponseStatusException  if mappedPOIFilter is not valid
      */
 
     public void validate(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
@@ -379,7 +379,7 @@ public class MappedPOIService implements Plugin {
     /**
      * @param mappedPOICreate
      * @param securityContext
-     * @throws ResponseStatusException if mappedPOICreate is not valid
+     * @throws org.springframework.web.server.ResponseStatusException  if mappedPOICreate is not valid
      */
 
     public void validate(MappedPOICreate mappedPOICreate, SecurityContextBase securityContext) {

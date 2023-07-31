@@ -108,7 +108,7 @@ public class RoomService implements Plugin {
   /**
    * @param roomFilter Object Used to List Room
    * @param securityContext
-   * @return PaginationResponse<Room> containing paging information for Room
+   * @return PaginationResponse containing paging information for Room
    */
   public PaginationResponse<Room> getAllRooms(
       RoomFilter roomFilter, SecurityContextBase securityContext) {

@@ -99,7 +99,7 @@ public class LayerService implements Plugin {
   /**
    * @param layerFilter Object Used to List Layer
    * @param securityContext
-   * @return PaginationResponse<Layer> containing paging information for Layer
+   * @return PaginationResponse containing paging information for Layer
    */
   public PaginationResponse<Layer> getAllLayers(
       LayerFilter layerFilter, SecurityContextBase securityContext) {

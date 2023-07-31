@@ -96,7 +96,7 @@ public class BuildingService implements Plugin {
   /**
    * @param buildingFilter Object Used to List Building
    * @param securityContext
-   * @return PaginationResponse<Building> containing paging information for Building
+   * @return PaginationResponse containing paging information for Building
    */
   public PaginationResponse<Building> getAllBuildings(
       BuildingFilter buildingFilter, SecurityContextBase securityContext) {

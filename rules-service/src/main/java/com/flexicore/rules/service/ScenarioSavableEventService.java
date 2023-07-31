@@ -132,7 +132,7 @@ public class ScenarioSavableEventService implements Plugin {
   /**
    * @param scenarioSavableEventFilter Object Used to List ScenarioSavableEvent
    * @param securityContext
-   * @throws ResponseStatusException if scenarioSavableEventFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioSavableEventFilter is not valid
    */
   public void validate(
       ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
@@ -164,7 +164,7 @@ public class ScenarioSavableEventService implements Plugin {
   /**
    * @param scenarioSavableEventCreate Object Used to Create ScenarioSavableEvent
    * @param securityContext
-   * @throws ResponseStatusException if scenarioSavableEventCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scenarioSavableEventCreate is not valid
    */
   public void validate(
       ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContextBase securityContext) {

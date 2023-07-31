@@ -65,14 +65,14 @@ public interface IScheduleToActionService {
   /**
    * @param scheduleToActionFilter Object Used to List ScheduleToScheduleAction
    * @param securityContext
-   * @throws ResponseStatusException if scheduleToActionFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleToActionFilter is not valid
    */
   void validate(ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext);
 
   /**
    * @param scheduleToActionCreate Object Used to Create ScheduleToScheduleAction
    * @param securityContext
-   * @throws ResponseStatusException if scheduleToActionCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleToActionCreate is not valid
    */
   void validate(ScheduleToActionCreate scheduleToActionCreate, SecurityContextBase securityContext);
 

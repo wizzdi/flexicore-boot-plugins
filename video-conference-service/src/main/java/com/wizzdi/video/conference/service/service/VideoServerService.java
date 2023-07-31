@@ -119,7 +119,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
   /**
    * @param videoServerFilter Object Used to List Entity_1
    * @param securityContext
-   * @throws ResponseStatusException if videoServerFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerFilter is not valid
    */
   @Override
   public void validate(VideoServerFilter videoServerFilter, SecurityContextBase securityContext) {
@@ -129,7 +129,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
   /**
    * @param videoServerCreate Object Used to Create Entity_1
    * @param securityContext
-   * @throws ResponseStatusException if videoServerCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if videoServerCreate is not valid
    */
   @Override
   public void validate(VideoServerCreate videoServerCreate, SecurityContextBase securityContext) {

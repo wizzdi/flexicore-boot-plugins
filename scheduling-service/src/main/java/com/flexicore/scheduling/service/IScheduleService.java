@@ -62,14 +62,14 @@ public interface IScheduleService {
   /**
    * @param scheduleFilter Object Used to List Entity1
    * @param securityContext
-   * @throws ResponseStatusException if scheduleFilter is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleFilter is not valid
    */
   void validate(ScheduleFilter scheduleFilter, SecurityContextBase securityContext);
 
   /**
    * @param scheduleCreate Object Used to Create Entity1
    * @param securityContext
-   * @throws ResponseStatusException if scheduleCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if scheduleCreate is not valid
    */
   void validate(ScheduleCreate scheduleCreate, SecurityContextBase securityContext);
 
