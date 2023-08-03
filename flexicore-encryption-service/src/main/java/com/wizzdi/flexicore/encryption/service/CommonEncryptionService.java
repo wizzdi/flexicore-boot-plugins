@@ -12,9 +12,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.security.GeneralSecurityException;
 
 
@@ -111,12 +109,18 @@ public class CommonEncryptionService implements Plugin, InitializingBean {
 		AeadConfig.register();
 		File keysetFile = new File(tinkKeySetPath);
 		if (!keysetFile.exists()) {
+			if(!keysetFile.getParentFile().exists()){
+				keysetFile.getParentFile().mkdirs();
+			}
 			// 1. Generate the private key material.
 			keysetHandle = KeysetHandle.generateNew(EciesAeadHkdfPrivateKeyManager.eciesP256HkdfHmacSha256Aes128GcmTemplate());
-
-			CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withFile(keysetFile));
+			try(FileOutputStream fileOutputStream=new FileOutputStream(keysetFile)){
+				CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withOutputStream(fileOutputStream));
+			}
 		} else {
-			keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withFile(keysetFile));
+			try(FileInputStream fileInputStream=new FileInputStream(keysetFile)){
+				keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withInputStream(fileInputStream));
+			}
 		}
 
 
