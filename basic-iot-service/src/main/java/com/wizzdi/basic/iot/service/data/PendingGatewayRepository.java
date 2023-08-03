@@ -66,6 +66,9 @@ public class PendingGatewayRepository implements Plugin {
             Path<Gateway> gatewayPath = r.get(PendingGateway_.registeredGateway);
             preds.add(filtering.getRegistered()?gatewayPath.isNotNull():gatewayPath.isNull());
         }
+        if(filtering.getGatewayIds()!=null&&!filtering.getGatewayIds().isEmpty()){
+            preds.add(r.get(PendingGateway_.gatewayId).in(filtering.getGatewayIds()));
+        }
 
 
     }

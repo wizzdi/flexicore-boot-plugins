@@ -40,7 +40,7 @@ public class DeviceStateController implements Plugin {
     @PostMapping("/changeState")
     public ChangeStateResponse changeState(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChangeStateRequest changeStateRequest, @RequestAttribute SecurityContextBase securityContext) {
         service.validate(changeStateRequest, securityContext);
         return service.changeState(securityContext, changeStateRequest);

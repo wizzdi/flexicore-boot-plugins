@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
-import com.flexicore.request.AuthenticationRequest;
-import com.flexicore.response.AuthenticationResponse;
+
+
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
@@ -25,13 +25,20 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class StatusHistoryControllerTest {
 
   private StatusHistory testStatusHistory;
@@ -41,22 +48,33 @@ public class StatusHistoryControllerTest {
 
   @Autowired private MapIcon mapIcon;
 
+   private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+          .withDatabaseName("flexicore-test")
+          .withUsername("flexicore")
+          .withPassword("flexicore");
+
+  static {
+    postgresqlContainer.start();
+  }
+
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+    registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+    registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+  }
+
+
   @BeforeAll
-  private void init() {
-    ResponseEntity<AuthenticationResponse> authenticationResponse =
-        this.restTemplate.postForEntity(
-            "/FlexiCore/rest/authenticationNew/login",
-            new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"),
-            AuthenticationResponse.class);
-    String authenticationKey = authenticationResponse.getBody().getAuthenticationKey();
-    restTemplate
-        .getRestTemplate()
-        .setInterceptors(
-            Collections.singletonList(
-                (request, body, execution) -> {
-                  request.getHeaders().add("authenticationKey", authenticationKey);
-                  return execution.execute(request, body);
-                }));
+  public void init() {
+    restTemplate.getRestTemplate().setInterceptors(
+            Collections.singletonList((request, body, execution) -> {
+              request.getHeaders()
+                      .add("authenticationKey", "fake");
+              return execution.execute(request, body);
+            }));
+
   }
 
   @Test
@@ -74,7 +92,7 @@ public class StatusHistoryControllerTest {
     ResponseEntity<StatusHistory> response =
         this.restTemplate.postForEntity(
             "/StatusHistory/createStatusHistory", request, StatusHistory.class);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     testStatusHistory = response.getBody();
     assertStatusHistory(request, testStatusHistory);
   }
@@ -89,7 +107,7 @@ public class StatusHistoryControllerTest {
     ResponseEntity<PaginationResponse<StatusHistory>> response =
         this.restTemplate.exchange(
             "/StatusHistory/getAllStatusHistories", HttpMethod.POST, new HttpEntity<>(request), t);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     PaginationResponse<StatusHistory> body = response.getBody();
     Assertions.assertNotNull(body);
     List<StatusHistory> StatusHistories = body.getList();
@@ -130,7 +148,7 @@ public class StatusHistoryControllerTest {
             HttpMethod.PUT,
             new HttpEntity<>(request),
             StatusHistory.class);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     testStatusHistory = response.getBody();
     assertStatusHistory(request, testStatusHistory);
   }

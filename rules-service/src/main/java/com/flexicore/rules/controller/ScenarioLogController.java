@@ -24,7 +24,7 @@ public class ScenarioLogController implements Plugin {
     @PostMapping("clearLog")
     @Operation(summary = "clearLog", description = "clears Scenario log")
     public void clearLog(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody ClearLogRequest scenarioCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         scenarioLogService.validate(scenarioCreate, securityContext);

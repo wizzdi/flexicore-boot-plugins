@@ -43,7 +43,7 @@ public class DashboardPresetController implements Plugin {
 	@Operation(summary = "getAllDashboardPreset", description = "returns all DashboardPreset")
 	@PostMapping("getAllDashboardPreset")
 	public PaginationResponse<DashboardPreset> getAllDashboardPreset(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DashboardPresetFilter dashboardPresetFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(dashboardPresetFilter,securityContext);
@@ -56,7 +56,7 @@ public class DashboardPresetController implements Plugin {
 	@Operation(summary = "updateDashboardPreset", description = "Updates Dashbaord")
 	@PutMapping("updateDashboardPreset")
 	public DashboardPreset updateDashboardPreset(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DashboardPresetUpdate updateDashboardPreset, @RequestAttribute SecurityContextBase securityContext) {
 		DashboardPreset dashboardPreset = updateDashboardPreset.getId() != null ? service.getByIdOrNull(
 				updateDashboardPreset.getId(), DashboardPreset.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class DashboardPresetController implements Plugin {
 	@Operation(summary = "createDashboardPreset", description = "Creates DashboardPreset ")
 	@PostMapping("createDashboardPreset")
 	public DashboardPreset createDashboardPreset(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DashboardPresetCreate createDashboardPreset, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createDashboardPreset, securityContext);
 		return service.createDashboardPreset(createDashboardPreset, securityContext);

@@ -37,7 +37,7 @@ public class SchemaActionController implements Plugin {
     @PostMapping("/getAllSchemaActions")
     public PaginationResponse<SchemaAction> getAllSchemaActions(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody SchemaActionFilter schemaActionFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(schemaActionFilter, securityContext);
         return service.getAllSchemaActions(securityContext, schemaActionFilter);
@@ -48,7 +48,7 @@ public class SchemaActionController implements Plugin {
     @Operation(summary = "createSchemaAction", description = "Creates SchemaAction")
     
     public SchemaAction createSchemaAction(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody SchemaActionCreate schemaActionCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(schemaActionCreate, securityContext);
@@ -62,7 +62,7 @@ public class SchemaActionController implements Plugin {
     
     public SchemaAction updateSchemaAction(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody SchemaActionUpdate schemaActionUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(schemaActionUpdate, securityContext);

@@ -38,7 +38,7 @@ public class GatewayController implements Plugin, Invoker {
     @PostMapping("/getAllGateways")
     public PaginationResponse<Gateway> getAllGateways(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody GatewayFilter gatewayFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(gatewayFilter, securityContext);
         return service.getAllGateways(securityContext, gatewayFilter);
@@ -48,7 +48,7 @@ public class GatewayController implements Plugin, Invoker {
     @PostMapping("/approveGateways")
     public PaginationResponse<Gateway> approveGateways(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ApproveGatewaysRequest approveGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(approveGatewaysRequest, securityContext);
         return service.approveGateways(securityContext, approveGatewaysRequest);
@@ -59,7 +59,7 @@ public class GatewayController implements Plugin, Invoker {
     @Operation(summary = "createGateway", description = "Creates Gateway")
     
     public Gateway createGateway(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody GatewayCreate gatewayCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(gatewayCreate, securityContext);
@@ -73,7 +73,7 @@ public class GatewayController implements Plugin, Invoker {
     
     public Gateway updateGateway(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody GatewayUpdate gatewayUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(gatewayUpdate, securityContext);
@@ -92,7 +92,7 @@ public class GatewayController implements Plugin, Invoker {
     @PostMapping("/importGateways")
     public ImportGatewaysResponse importGateways(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
         service.validate(importGatewaysRequest, securityContext);
         return service.importGateways(securityContext, importGatewaysRequest);

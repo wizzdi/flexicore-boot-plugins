@@ -3,6 +3,7 @@ package com.wizzdi.maps.service.data;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.model.MappedPOI_;
 import com.wizzdi.maps.service.request.GeoHashRequest;
 import com.wizzdi.maps.service.response.GeoHashResponse;
 import org.pf4j.Extension;
@@ -40,6 +41,10 @@ public class GeoHashRepository implements Plugin {
 
     private void addGeoHashAreasPredicate(GeoHashRequest geoHashRequest, CriteriaBuilder cb, CriteriaQuery<GeoHashResponse> q, From<?,MappedPOI> r, List<Predicate> preds, SecurityContextBase securityContext) {
         mappedPOIRepository.addMappedPOIPredicate(geoHashRequest.getMappedPOIFilter(),cb,q,r,preds,securityContext);
+        String geoHashField="geoHash"+geoHashRequest.getPrecision();
+
+        preds.add(r.get(geoHashField).isNotNull());
+
     }
 
 }

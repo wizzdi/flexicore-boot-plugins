@@ -44,7 +44,7 @@ public class CategoryToBaseclassController implements Plugin {
 	@Operation(summary = "getAllCategoryToBaseclass", description = "Lists all CategoryToBaseclass")
 	@PostMapping("getAllCategoryToBaseclass")
 	public PaginationResponse<CategoryToBaseClass> getAllCategoryToBaseclass(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToBaseclassFilter filtering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filtering, securityContext);
@@ -56,7 +56,7 @@ public class CategoryToBaseclassController implements Plugin {
 	@PostMapping("/createCategoryToBaseclass")
 	@Operation(summary = "createCategoryToBaseclass", description = "Creates CategoryToBaseclass")
 	public CategoryToBaseClass createCategoryToBaseclass(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToBaseclassCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 
@@ -70,7 +70,7 @@ public class CategoryToBaseclassController implements Plugin {
 	@PutMapping("/updateCategoryToBaseclass")
 	@Operation(summary = "updateCategoryToBaseclass", description = "Updates CategoryToBaseclass")
 	public CategoryToBaseClass updateCategoryToBaseclass(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToBaseclassUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		CategoryToBaseClass CategoryToBaseclass = service.getByIdOrNull(updateContainer.getId(), CategoryToBaseClass.class, null, securityContext);

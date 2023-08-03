@@ -38,7 +38,7 @@ public class RecurringPriceEntryController implements Plugin {
     @PostMapping("/getAllRecurringPriceEntry")
     public PaginationResponse<RecurringPriceEntry> getAllRecurringPriceEntry(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceEntryFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllRecurringPriceEntry(securityContext, filtering);
@@ -49,7 +49,7 @@ public class RecurringPriceEntryController implements Plugin {
     @Operation(summary = "createRecurringPriceEntry", description = "Creates RecurringPriceEntry")
     @IOperation(Name = "createRecurringPriceEntry", Description = "Creates RecurringPriceEntry")
     public RecurringPriceEntry createRecurringPriceEntry(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceEntryCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class RecurringPriceEntryController implements Plugin {
     @IOperation(Name = "updateRecurringPriceEntry", Description = "Updates RecurringPriceEntry")
     public RecurringPriceEntry updateRecurringPriceEntry(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceEntryUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

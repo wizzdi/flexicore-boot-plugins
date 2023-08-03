@@ -43,7 +43,7 @@ public class GraphTemplateController implements Plugin {
 	@Operation(summary = "getAllGraphTemplate", description = "returns all GraphTemplate")
 	@PostMapping("getAllGraphTemplate")
 	public PaginationResponse<GraphTemplate> getAllGraphTemplate(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GraphTemplateFilter graphTemplateFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(graphTemplateFilter, securityContext);
@@ -56,7 +56,7 @@ public class GraphTemplateController implements Plugin {
 	@Operation(summary = "updateGraphTemplate", description = "Updates Dashbaord")
 	@PutMapping("updateGraphTemplate")
 	public GraphTemplate updateGraphTemplate(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GraphTemplateUpdate updateGraphTemplate, @RequestAttribute SecurityContextBase securityContext) {
 		GraphTemplate graphTemplate = updateGraphTemplate.getId() != null ? service.getByIdOrNull(
 				updateGraphTemplate.getId(), GraphTemplate.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class GraphTemplateController implements Plugin {
 	@Operation(summary = "createGraphTemplate", description = "Creates GraphTemplate ")
 	@PostMapping("createGraphTemplate")
 	public GraphTemplate createGraphTemplate(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GraphTemplateCreate createGraphTemplate, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createGraphTemplate, securityContext);
 		return service.createGraphTemplate(createGraphTemplate, securityContext);

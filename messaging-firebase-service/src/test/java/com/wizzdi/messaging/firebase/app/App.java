@@ -1,9 +1,20 @@
 package com.wizzdi.messaging.firebase.app;
 
+import com.flexicore.model.Baseclass;
+import com.flexicore.model.Basic;
+import com.flexicore.model.security.SecurityPolicy;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
+import com.wizzdi.dynamic.properties.converter.postgresql.PostgresqlJsonConverter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
+import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
+import com.wizzdi.messaging.connectors.firebase.model.FirebaseEnabledDevice;
+import com.wizzdi.messaging.model.Chat;
+import com.wizzdi.messaging.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -15,11 +26,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreSecurity
 @EnableFlexiCoreRESTPlugins
+@EnableDynamicProperties
 @SpringBootApplication(scanBasePackages = {"com.wizzdi.messaging"})
 public class App {
 
@@ -33,6 +46,14 @@ public class App {
 
 	}
 
+@Bean
+public GoogleCredentials googleCredentials() throws Exception {
+		return GoogleCredentials.newBuilder().build();
+}
+	@Bean
+	public EntitiesHolder entitiesHolder(PostgresqlJsonConverter postgresqlJsonConverter){
+		return new EntitiesHolder(new HashSet<>(Arrays.asList(Baseclass.class, Basic.class, SecurityPolicy.class, Chat.class, Message.class, JsonConverter.class, FirebaseEnabledDevice.class)));
+	}
 
 
 	@Bean

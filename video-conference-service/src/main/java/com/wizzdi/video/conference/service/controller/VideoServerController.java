@@ -30,7 +30,7 @@ public class VideoServerController implements Plugin {
   @PostMapping("createVideoServer")
   @Operation(summary = "createVideoServer", description = "Creates VideoServer")
   public VideoServer createVideoServer(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerCreate videoServerCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     videoServerService.validate(videoServerCreate, securityContext);
@@ -40,7 +40,7 @@ public class VideoServerController implements Plugin {
   @Operation(summary = "updateVideoServer", description = "Updates VideoServer")
   @PutMapping("updateVideoServer")
   public VideoServer updateVideoServer(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerUpdate videoServerUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String videoServerId = videoServerUpdate.getId();
@@ -59,7 +59,7 @@ public class VideoServerController implements Plugin {
   @Operation(summary = "getAllVideoServers", description = "Gets All VideoServers Filtered")
   @PostMapping("getAllVideoServers")
   public PaginationResponse<VideoServer> getAllVideoServers(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerFilter videoServerFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     videoServerService.validate(videoServerFilter, securityContext);

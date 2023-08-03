@@ -43,7 +43,7 @@ public class CategoryToClazzController implements Plugin {
 	@Operation(summary = "getAllCategoryToClazz", description = "Lists all CategoryToClazz")
 	@PostMapping("getAllCategoryToClazz")
 	public PaginationResponse<CategoryToClazz> getAllCategoryToClazz(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToClazzFilter filtering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filtering, securityContext);
@@ -55,7 +55,7 @@ public class CategoryToClazzController implements Plugin {
 	@PostMapping("/createCategoryToClazz")
 	@Operation(summary = "createCategoryToClazz", description = "Creates CategoryToClazz")
 	public CategoryToClazz createCategoryToClazz(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToClazzCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 
@@ -69,7 +69,7 @@ public class CategoryToClazzController implements Plugin {
 	@PutMapping("/updateCategoryToClazz")
 	@Operation(summary = "updateCategoryToClazz", description = "Updates CategoryToClazz")
 	public CategoryToClazz updateCategoryToClazz(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryToClazzUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		CategoryToClazz CategoryToClazz = service.getByIdOrNull(updateContainer.getId(), CategoryToClazz.class, null, securityContext);

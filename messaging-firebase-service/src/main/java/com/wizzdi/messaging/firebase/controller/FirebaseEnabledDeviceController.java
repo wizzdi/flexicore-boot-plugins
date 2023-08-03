@@ -11,6 +11,8 @@ import com.wizzdi.messaging.firebase.request.FirebaseEnabledDeviceCreate;
 import com.wizzdi.messaging.firebase.request.FirebaseEnabledDeviceFilter;
 import com.wizzdi.messaging.firebase.request.FirebaseEnabledDeviceUpdate;
 import com.wizzdi.messaging.firebase.service.FirebaseEnabledDeviceService;
+import com.wizzdi.messaging.model.ChatUser;
+import com.wizzdi.messaging.service.ChatUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -28,10 +30,12 @@ public class FirebaseEnabledDeviceController implements Plugin {
 
 	@Autowired
 	private FirebaseEnabledDeviceService firebaseEnabledDeviceService;
+	@Autowired
+	private ChatUserService chatUserService;
 
 	@PostMapping("/createFirebaseEnabledDevice")
 	@Operation(description = "creates FirebaseEnabledDevice",summary = "creates FirebaseEnabledDevice")
-	public FirebaseEnabledDevice createFirebaseEnabledDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
+	public FirebaseEnabledDevice createFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceCreate,securityContext);
 		return firebaseEnabledDeviceService.getOrCreateFirebaseEnabledDevice(firebaseEnabledDeviceCreate,securityContext);
 	}
@@ -39,7 +43,7 @@ public class FirebaseEnabledDeviceController implements Plugin {
 	@PostMapping("/getAllFirebaseEnabledDevices")
 	@Operation(description = "returns FirebaseEnabledDevices",summary = "returns FirebaseEnabledDevices")
 
-	public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices( @RequestBody FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceFilter,securityContext);
 		return firebaseEnabledDeviceService.getAllFirebaseEnabledDevices(firebaseEnabledDeviceFilter,securityContext);
 	}
@@ -47,18 +51,23 @@ public class FirebaseEnabledDeviceController implements Plugin {
 	@PutMapping("/updateFirebaseEnabledDevice")
 	@Operation(description = "updates FirebaseEnabledDevice",summary = "updates FirebaseEnabledDevice")
 
-	public FirebaseEnabledDevice updateFirebaseEnabledDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public FirebaseEnabledDevice updateFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=firebaseEnabledDeviceUpdate.getId();
 		FirebaseEnabledDevice firebaseEnabledDevice=id!=null? firebaseEnabledDeviceService.getByIdOrNull(id,FirebaseEnabledDevice.class, SecuredBasic_.security,securityContext):null;
 		if(firebaseEnabledDevice==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no FirebaseEnabledDevice with id "+id);
 		}
-		if(!firebaseEnabledDevice.getOwner().getId().equals(securityContext.getUser().getId())){
+		ChatUser chatUser = chatUserService.getChatUser(securityContext);
+		if(chatUser==null){
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"no chat user from  "+securityContext.getUser().getId());
+
+		}
+		if(!firebaseEnabledDevice.getOwner().getId().equals(chatUser.getId())){
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"not allowed to change firebaseEnabledDevice "+id);
 
 		}
-		firebaseEnabledDeviceUpdate.setFirebaseEnabledDevice(firebaseEnabledDevice);
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceUpdate,securityContext);
+		firebaseEnabledDeviceUpdate.setFirebaseEnabledDevice(firebaseEnabledDevice);
 		return firebaseEnabledDeviceService.updateFirebaseEnabledDevice(firebaseEnabledDeviceUpdate,securityContext);
 	}
 }

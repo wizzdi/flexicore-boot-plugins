@@ -39,7 +39,7 @@ public class PriceListItemController implements Plugin {
     @IOperation(Name = "getAllPriceListItems", Description = "Lists all PriceListItems")
     @PostMapping("/getAllPriceListItems")
     public PaginationResponse<PriceListItem> getAllPriceListItems(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PriceListItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPriceListItems(securityContext, filtering);
@@ -51,7 +51,7 @@ public class PriceListItemController implements Plugin {
     @IOperation(Name = "createPriceListItem", Description = "Creates PriceListItem")
     public PriceListItem createPriceListItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PriceListItemCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -65,7 +65,7 @@ public class PriceListItemController implements Plugin {
     @IOperation(Name = "updatePriceListItem", Description = "Updates PriceListItem")
     public PriceListItem updatePriceListItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PriceListItemUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

@@ -43,7 +43,7 @@ public class GridLayoutController implements Plugin {
 	@Operation(summary = "getAllGridLayout", description = "returns all GridLayout")
 	@PostMapping("getAllGridLayout")
 	public PaginationResponse<GridLayout> getAllGridLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutFilter gridLayoutFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(gridLayoutFilter, securityContext);
@@ -56,7 +56,7 @@ public class GridLayoutController implements Plugin {
 	@Operation(summary = "updateGridLayout", description = "Updates Dashbaord")
 	@PutMapping("updateGridLayout")
 	public GridLayout updateGridLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutUpdate updateGridLayout, @RequestAttribute SecurityContextBase securityContext) {
 		GridLayout gridLayout = updateGridLayout.getId() != null ? service.getByIdOrNull(
 				updateGridLayout.getId(), GridLayout.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class GridLayoutController implements Plugin {
 	@Operation(summary = "createGridLayout", description = "Creates GridLayout ")
 	@PostMapping("createGridLayout")
 	public GridLayout createGridLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutCreate createGridLayout, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createGridLayout, securityContext);
 		return service.createGridLayout(createGridLayout, securityContext);

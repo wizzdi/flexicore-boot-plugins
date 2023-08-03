@@ -32,7 +32,7 @@ public class MappedPOIController implements Plugin {
     @PostMapping("createMappedPOI")
     @Operation(summary = "createMappedPOI", description = "Creates MappedPOI")
     public MappedPOI createMappedPOI(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MappedPOICreate mappedPOICreate,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOICreate, securityContext);
@@ -42,7 +42,7 @@ public class MappedPOIController implements Plugin {
     @Operation(summary = "updateMappedPOI", description = "Updates MappedPOI")
     @PutMapping("updateMappedPOI")
     public MappedPOI updateMappedPOI(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MappedPOIUpdate mappedPOIUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         String mappedPOIId = mappedPOIUpdate.getId();
@@ -61,7 +61,7 @@ public class MappedPOIController implements Plugin {
     @Operation(summary = "getAllMappedPOIs", description = "Gets All MappedPOIs Filtered")
     @PostMapping("getAllMappedPOIs")
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);
@@ -71,7 +71,7 @@ public class MappedPOIController implements Plugin {
     @Operation(summary = "getAllMappedPOIDTOs", description = "Gets All MappedPOIDTOs Filtered")
     @PostMapping("getAllMappedPOIDTOs")
     public PaginationResponse<MappedPoiDTO> getAllMappedPOIDTOs(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);

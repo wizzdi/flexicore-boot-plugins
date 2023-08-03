@@ -26,6 +26,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.OffsetDateTime;
@@ -39,8 +44,27 @@ import java.util.concurrent.atomic.AtomicReference;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {App.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class MessageControllerTest {
+
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+
+    static {
+        postgresqlContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+    }
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -83,7 +107,7 @@ public class MessageControllerTest {
 
         ParameterizedTypeReference<Message> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<Message> response = this.restTemplate.exchange("/message/createMessage", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         message = response.getBody();
         Assertions.assertNotNull(message);
         Assertions.assertEquals(request.getName(),message.getName());
@@ -100,7 +124,7 @@ public class MessageControllerTest {
         request.setChatsIds(Collections.singleton(chat.getId()));
         ParameterizedTypeReference<PaginationResponse<Message>> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<PaginationResponse<Message>> response = this.restTemplate.exchange("/message/getAllMessages", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         PaginationResponse<Message> body = response.getBody();
         Assertions.assertNotNull(body);
         List<Message> messages = body.getList();
@@ -115,7 +139,7 @@ public class MessageControllerTest {
         request.setUnreadByIds(Collections.singleton(chatUser.getId()));
         ParameterizedTypeReference<PaginationResponse<Message>> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<PaginationResponse<Message>> response = this.restTemplate.exchange("/message/getAllMessages", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         PaginationResponse<Message> body = response.getBody();
         Assertions.assertNotNull(body);
         List<Message> messages = body.getList();
@@ -134,7 +158,7 @@ public class MessageControllerTest {
 
         ParameterizedTypeReference<Message> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<Message> response = this.restTemplate.exchange("/message/updateMessage", HttpMethod.PUT, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         message = response.getBody();
         Assertions.assertNotNull(message);
         Assertions.assertTrue(request.getChatUsers().containsKey(chatUser.getId()));
@@ -149,7 +173,7 @@ public class MessageControllerTest {
         request.setUnreadByIds(Collections.singleton(chatUser.getId()));
         ParameterizedTypeReference<PaginationResponse<Message>> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<PaginationResponse<Message>> response = this.restTemplate.exchange("/message/getAllMessages", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         PaginationResponse<Message> body = response.getBody();
         Assertions.assertNotNull(body);
         List<Message> messages = body.getList();

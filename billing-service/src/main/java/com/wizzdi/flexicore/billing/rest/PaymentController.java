@@ -38,7 +38,7 @@ public class PaymentController implements Plugin {
     @PostMapping("/getAllPayments")
     public PaginationResponse<Payment> getAllPayments(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPayments(securityContext, filtering);
@@ -50,7 +50,7 @@ public class PaymentController implements Plugin {
     @IOperation(Name = "createPayment", Description = "Creates Payment")
     public Payment createPayment(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -64,7 +64,7 @@ public class PaymentController implements Plugin {
     @IOperation(Name = "updatePayment", Description = "Updates Payment")
     public Payment updatePayment(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

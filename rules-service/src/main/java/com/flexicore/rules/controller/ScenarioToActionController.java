@@ -30,7 +30,7 @@ public class ScenarioToActionController implements Plugin {
   @PostMapping("createScenarioToAction")
   @Operation(summary = "createScenarioToAction", description = "Creates ScenarioToAction")
   public ScenarioToAction createScenarioToAction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioToActionCreate scenarioToActionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -41,7 +41,7 @@ public class ScenarioToActionController implements Plugin {
   @PutMapping("updateScenarioToAction")
   @Operation(summary = "updateScenarioToAction", description = "Updates ScenarioToAction")
   public ScenarioToAction updateScenarioToAction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioToActionUpdate scenarioToActionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -64,7 +64,7 @@ public class ScenarioToActionController implements Plugin {
   @PostMapping("getAllScenarioToActions")
   @Operation(summary = "getAllScenarioToActions", description = "lists ScenarioToActions")
   public PaginationResponse<ScenarioToAction> getAllScenarioToActions(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioToActionFilter scenarioToActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 

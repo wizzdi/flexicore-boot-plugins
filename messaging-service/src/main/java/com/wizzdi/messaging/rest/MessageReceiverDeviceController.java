@@ -31,7 +31,7 @@ public class MessageReceiverDeviceController implements Plugin {
 
 	@PostMapping("/createMessageReceiverDevice")
 	@Operation(description = "creates MessageReceiverDevice",summary = "creates MessageReceiverDevice")
-	public MessageReceiverDevice createMessageReceiverDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageReceiverDeviceCreate messageReceiverDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
+	public MessageReceiverDevice createMessageReceiverDevice( @RequestBody MessageReceiverDeviceCreate messageReceiverDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
 		messageReceiverDeviceService.validate(messageReceiverDeviceCreate,securityContext);
 		return messageReceiverDeviceService.getOrCreateMessageReceiverDevice(messageReceiverDeviceCreate,securityContext);
 	}
@@ -39,7 +39,7 @@ public class MessageReceiverDeviceController implements Plugin {
 	@PostMapping("/getAllMessageReceiverDevices")
 	@Operation(description = "returns MessageReceiverDevices",summary = "returns MessageReceiverDevices")
 
-	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageReceiverDeviceFilter messageReceiverDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices( @RequestBody MessageReceiverDeviceFilter messageReceiverDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
 		messageReceiverDeviceService.validate(messageReceiverDeviceFilter,securityContext);
 		return messageReceiverDeviceService.getAllMessageReceiverDevices(messageReceiverDeviceFilter,securityContext);
 	}
@@ -47,7 +47,7 @@ public class MessageReceiverDeviceController implements Plugin {
 	@PutMapping("/updateMessageReceiverDevice")
 	@Operation(description = "updates MessageReceiverDevice",summary = "updates MessageReceiverDevice")
 
-	public MessageReceiverDevice updateMessageReceiverDevice(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public MessageReceiverDevice updateMessageReceiverDevice( @RequestBody MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=messageReceiverDeviceUpdate.getId();
 		MessageReceiverDevice messageReceiverDevice=id!=null? messageReceiverDeviceService.getByIdOrNull(id,MessageReceiverDevice.class, SecuredBasic_.security,securityContext):null;
 		if(messageReceiverDevice==null){

@@ -29,7 +29,7 @@ public class StatusHistoryGroupedController implements Plugin, Invoker {
   @PostMapping("listAllStatusHistoriesGrouped")
   @Operation(summary = "listAllStatusHistoriesGrouped", description = "lists StatusHistories grouped")
   public PaginationResponse<StatusHistoryGroupedEntry> listAllStatusHistoriesGrouped(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody StatusHistoryGroupedRequest statusHistoryGroupedRequest,
       @RequestAttribute SecurityContextBase securityContext) {
 

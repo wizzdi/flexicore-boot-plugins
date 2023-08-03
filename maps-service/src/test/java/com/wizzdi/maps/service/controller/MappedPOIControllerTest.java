@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
-import com.flexicore.request.AuthenticationRequest;
-import com.flexicore.response.AuthenticationResponse;
+
+
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.*;
 import com.wizzdi.maps.service.App;
@@ -27,6 +27,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +39,9 @@ import org.springframework.web.bind.annotation.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class MappedPOIControllerTest {
 
   private MappedPOI testMappedPOI;
@@ -45,22 +52,33 @@ public class MappedPOIControllerTest {
   @Autowired private MapIcon mapIcon;
   @Autowired private LayerType layerType1;
   @Autowired private Layer layer1;
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+          .withDatabaseName("flexicore-test")
+          .withUsername("flexicore")
+          .withPassword("flexicore");
+
+  static {
+    postgresqlContainer.start();
+  }
+
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+    registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+    registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+  }
+
+
   @BeforeAll
-  private void init() {
-    ResponseEntity<AuthenticationResponse> authenticationResponse =
-            this.restTemplate.postForEntity(
-                    "/FlexiCore/rest/authenticationNew/login",
-                    new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"),
-                    AuthenticationResponse.class);
-    String authenticationKey = authenticationResponse.getBody().getAuthenticationKey();
-    restTemplate
-            .getRestTemplate()
-            .setInterceptors(
-                    Collections.singletonList(
-                            (request, body, execution) -> {
-                              request.getHeaders().add("authenticationKey", authenticationKey);
-                              return execution.execute(request, body);
-                            }));
+  public void init() {
+    restTemplate.getRestTemplate().setInterceptors(
+            Collections.singletonList((request, body, execution) -> {
+              request.getHeaders()
+                      .add("authenticationKey", "fake");
+              return execution.execute(request, body);
+            }));
+
   }
 
   @Test
@@ -93,7 +111,7 @@ public class MappedPOIControllerTest {
 
     ResponseEntity<MappedPOI> response =
             this.restTemplate.postForEntity("/MappedPOI/createMappedPOI", request, MappedPOI.class);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     testMappedPOI = response.getBody();
     assertMappedPOI(request, testMappedPOI);
   }
@@ -108,7 +126,7 @@ public class MappedPOIControllerTest {
     ResponseEntity<PaginationResponse<MappedPOI>> response =
             this.restTemplate.exchange(
                     "/MappedPOI/getAllMappedPOIs", HttpMethod.POST, new HttpEntity<>(request), t);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     PaginationResponse<MappedPOI> body = response.getBody();
     Assertions.assertNotNull(body);
     List<MappedPOI> MappedPOIs = body.getList();
@@ -186,7 +204,7 @@ public class MappedPOIControllerTest {
                     HttpMethod.PUT,
                     new HttpEntity<>(request),
                     MappedPOI.class);
-    Assertions.assertEquals(200, response.getStatusCodeValue());
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     testMappedPOI = response.getBody();
     assertMappedPOI(request, testMappedPOI);
   }

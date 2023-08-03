@@ -30,7 +30,7 @@ public class ChatToChatUserController implements Plugin {
 
 	@PostMapping("/createChatToChatUser")
 	@Operation(description = "creates ChatToChatUser",summary = "creates ChatToChatUser")
-	public ChatToChatUser createChatToChatUser(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody ChatToChatUserCreate chatToChatUserCreate, @RequestAttribute SecurityContextBase securityContext){
+	public ChatToChatUser createChatToChatUser( @RequestBody ChatToChatUserCreate chatToChatUserCreate, @RequestAttribute SecurityContextBase securityContext){
 		chatToChatUserService.validate(chatToChatUserCreate,securityContext);
 		return chatToChatUserService.createChatToChatUser(chatToChatUserCreate,securityContext);
 	}
@@ -38,7 +38,7 @@ public class ChatToChatUserController implements Plugin {
 	@PostMapping("/getAllChatToChatUsers")
 	@Operation(description = "returns ChatToChatUsers",summary = "returns ChatToChatUsers")
 
-	public PaginationResponse<ChatToChatUser> getAllChatToChatUsers(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody ChatToChatUserFilter chatToChatUserFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<ChatToChatUser> getAllChatToChatUsers( @RequestBody ChatToChatUserFilter chatToChatUserFilter, @RequestAttribute SecurityContextBase securityContext){
 		chatToChatUserService.validate(chatToChatUserFilter,securityContext);
 		return chatToChatUserService.getAllChatToChatUsers(chatToChatUserFilter,securityContext);
 	}

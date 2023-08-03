@@ -38,7 +38,7 @@ public class FirmwareUpdateController implements Plugin {
     @PostMapping("/getAllFirmwareUpdates")
     public PaginationResponse<FirmwareUpdate> getAllFirmwareUpdates(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Valid FirmwareUpdateFilter firmwareUpdateFilter, @RequestAttribute SecurityContextBase securityContext) {
         return service.getAllFirmwareUpdates(securityContext, firmwareUpdateFilter);
     }
@@ -49,7 +49,7 @@ public class FirmwareUpdateController implements Plugin {
     @Operation(summary = "createFirmwareUpdate", description = "Creates FirmwareUpdate")
     
     public FirmwareUpdate createFirmwareUpdate(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Validated(Create.class) FirmwareUpdateCreate firmwareUpdateCreate,
             @RequestAttribute SecurityContextBase securityContext) {
 
@@ -62,7 +62,7 @@ public class FirmwareUpdateController implements Plugin {
     
     public FirmwareUpdate updateFirmwareUpdate(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Validated(Update.class) FirmwareUpdateUpdate firmwareUpdateUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
 

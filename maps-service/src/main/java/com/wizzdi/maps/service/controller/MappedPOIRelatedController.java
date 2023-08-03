@@ -28,7 +28,7 @@ public class MappedPOIRelatedController implements Plugin, Invoker {
     @Operation(summary = "getAllMappedPOIRelated", description = "Gets All MappedPOIs related")
     @PostMapping("getAllMappedPOIRelated")
     public PaginationResponse<MappedPOIRelated> getAllMappedPOIRelated(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);

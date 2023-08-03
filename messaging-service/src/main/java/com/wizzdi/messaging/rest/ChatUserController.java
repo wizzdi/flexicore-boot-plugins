@@ -34,7 +34,7 @@ public class ChatUserController implements Plugin {
 
 	@PostMapping("/createChatUser")
 	@Operation(description = "creates ChatUser",summary = "creates ChatUser")
-	public ChatUser createChatUser(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody ChatUserCreate chatUserCreate, @RequestAttribute SecurityContextBase securityContext){
+	public ChatUser createChatUser( @RequestBody ChatUserCreate chatUserCreate, @RequestAttribute SecurityContextBase securityContext){
 		chatUserService.validate(chatUserCreate,securityContext);
 		return chatUserService.createChatUser(chatUserCreate,securityContext);
 	}
@@ -42,7 +42,7 @@ public class ChatUserController implements Plugin {
 	@PostMapping("/getAllChatUsers")
 	@Operation(description = "returns ChatUsers",summary = "returns ChatUsers")
 
-	public PaginationResponse<ChatUser> getAllChatUsers(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody ChatUserFilter chatUserFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<ChatUser> getAllChatUsers( @RequestBody ChatUserFilter chatUserFilter, @RequestAttribute SecurityContextBase securityContext){
 		chatUserService.validate(chatUserFilter,securityContext);
 		return chatUserService.getAllChatUsers(chatUserFilter,securityContext);
 	}
@@ -50,7 +50,7 @@ public class ChatUserController implements Plugin {
 	@PutMapping("/updateChatUser")
 	@Operation(description = "updates ChatUser",summary = "updates ChatUser")
 
-	public ChatUser updateChatUser(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody ChatUserUpdate chatUserUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public ChatUser updateChatUser( @RequestBody ChatUserUpdate chatUserUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=chatUserUpdate.getId();
 		ChatUser chatUser=id!=null? chatUserService.getByIdOrNull(id,ChatUser.class, ChatUser_.security,securityContext):null;
 		if(chatUser==null){

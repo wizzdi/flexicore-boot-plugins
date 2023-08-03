@@ -30,7 +30,7 @@ public class RoomToVideoServerUserController implements Plugin {
   @PostMapping("createRoomToVideoServerUser")
   @Operation(summary = "createRoomToVideoServerUser", description = "Creates RoomToVideoServerUser")
   public RoomToVideoServerUser createRoomToVideoServerUser(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomToVideoServerUserCreate roomToVideoServerUserCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     roomToVideoServerUserService.validate(roomToVideoServerUserCreate, securityContext);
@@ -41,7 +41,7 @@ public class RoomToVideoServerUserController implements Plugin {
   @Operation(summary = "updateRoomToVideoServerUser", description = "Updates RoomToVideoServerUser")
   @PutMapping("updateRoomToVideoServerUser")
   public RoomToVideoServerUser updateRoomToVideoServerUser(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomToVideoServerUserUpdate roomToVideoServerUserUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String roomToVideoServerUserId = roomToVideoServerUserUpdate.getId();
@@ -66,7 +66,7 @@ public class RoomToVideoServerUserController implements Plugin {
       description = "Gets All RoomToVideoServerUsers Filtered")
   @PostMapping("getAllRoomToVideoServerUsers")
   public PaginationResponse<RoomToVideoServerUser> getAllRoomToVideoServerUsers(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomToVideoServerUserFilter roomToVideoServerUserFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     roomToVideoServerUserService.validate(roomToVideoServerUserFilter, securityContext);

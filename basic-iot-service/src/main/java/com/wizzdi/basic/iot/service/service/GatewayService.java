@@ -190,7 +190,9 @@ public class GatewayService implements Plugin {
     }
 
     public PaginationResponse<Gateway> approveGateways(SecurityContextBase securityContext, ApproveGatewaysRequest approveGatewaysRequest) {
-        List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, approveGatewaysRequest.getPendingGatewayFilter());
+        PendingGatewayFilter pendingGatewayFilter = approveGatewaysRequest.getPendingGatewayFilter();
+        pendingGatewayFilter.setRegistered(false);
+        List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, pendingGatewayFilter);
         return approveGateways(securityContext, pendingGateways);
     }
 

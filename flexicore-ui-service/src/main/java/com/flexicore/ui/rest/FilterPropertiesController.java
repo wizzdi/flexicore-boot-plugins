@@ -46,7 +46,7 @@ public class FilterPropertiesController implements Plugin {
 	@Operation(summary = "getAllFilterProperties", description = "returns all FilterProperties")
 	@PostMapping("getAllFilterProperties")
 	public PaginationResponse<FilterProperties> getAllFilterProperties(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FilterPropertiesFiltering filterPropertiesFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filterPropertiesFiltering,securityContext);
@@ -58,7 +58,7 @@ public class FilterPropertiesController implements Plugin {
 	@Operation(summary = "updateFilterProperties", description = "Updates FilterProperties")
 	@PutMapping("updateFilterProperties")
 	public FilterProperties updateFilterProperties(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FilterPropertiesUpdate updateFilterProperties, @RequestAttribute SecurityContextBase securityContext) {
 		FilterProperties filterProperties = updateFilterProperties.getId() != null ? service.getByIdOrNull(updateFilterProperties.getId(), FilterProperties.class, FilterProperties_.security, securityContext) : null;
 		if (filterProperties == null) {
@@ -75,7 +75,7 @@ public class FilterPropertiesController implements Plugin {
 	@Operation(summary = "createFilterProperties", description = "Creates FilterProperties ")
 	@PostMapping("createFilterProperties")
 	public FilterProperties createFilterProperties(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FilterPropertiesCreate createFilterProperties, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateCreate(createFilterProperties, securityContext);
 		return service.createFilterProperties(createFilterProperties, securityContext);

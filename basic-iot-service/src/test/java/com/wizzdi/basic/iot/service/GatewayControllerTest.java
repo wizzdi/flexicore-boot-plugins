@@ -26,7 +26,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.hivemq.HiveMQContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +46,38 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 
 public class GatewayControllerTest {
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+    private final static HiveMQContainer hivemqCe = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce").withTag("2023.5"));
+
+
+
+    static {
+        postgresqlContainer.start();
+        hivemqCe.start();
+
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+
+        registry.add("basic.iot.mqtt.url", ()->"tcp://"+hivemqCe.getHost()+":"+hivemqCe.getMqttPort());
+        KeyPairForTests.KeyPair keyPair = KeyPairForTests.getKeyPair();
+        File privateKey = keyPair.privateKey();
+        registry.add("basic.iot.keyPath", privateKey::getAbsolutePath);
+
+    }
 
     private Gateway gateway;
     @Autowired

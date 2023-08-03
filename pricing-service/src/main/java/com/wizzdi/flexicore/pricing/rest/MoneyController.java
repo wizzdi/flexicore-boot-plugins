@@ -38,7 +38,7 @@ public class MoneyController implements Plugin {
     @PostMapping("/getAllMoney")
     public PaginationResponse<Money> getAllMoney(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody MoneyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllMoney(securityContext, filtering);
@@ -49,7 +49,7 @@ public class MoneyController implements Plugin {
     @Operation(summary = "createMoney", description = "Creates Money")
     @IOperation(Name = "createMoney", Description = "Creates Money")
     public Money createMoney(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody MoneyCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class MoneyController implements Plugin {
     @IOperation(Name = "updateMoney", Description = "Updates Money")
     public Money updateMoney(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody MoneyUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

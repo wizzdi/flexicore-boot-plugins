@@ -4,15 +4,24 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flexicore.annotations.EnableFlexiCoreBaseServices;
+import com.flexicore.model.SecuredBasic;
+import com.flexicore.scheduling.model.Schedule;
+import com.flexicore.scheduling.model.ScheduleAction;
+import com.flexicore.scheduling.model.ScheduleTimeslot;
+import com.flexicore.scheduling.model.ScheduleToAction;
+import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
-import com.wizzdi.flexicore.boot.health.annotations.EnableFlexiCoreHealthPlugins;
-import com.wizzdi.flexicore.boot.jaxrs.annotations.EnableFlexiCoreJAXRSPlugins;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
+import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
 import java.util.Arrays;
+import java.util.HashSet;
+
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,17 +30,17 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
-@SpringBootApplication(scanBasePackages = {"com.admin.service"})
-@EnableFlexiCoreHealthPlugins
-@EnableFlexiCoreJAXRSPlugins
+@SpringBootApplication(scanBasePackages = {"com.flexicore.scheduling"})
+
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins
 @EnableFlexiCoreSecurity
 @EnableDynamicInvokersPlugins
-@EnableFlexiCoreBaseServices
+@EnableDynamicProperties
 public class App {
 
   public static void main(String[] args) {
@@ -39,6 +48,21 @@ public class App {
     SpringApplication app = new SpringApplication(App.class);
     app.addListeners(new ApplicationPidFileWriter());
     ConfigurableApplicationContext context = app.run(args);
+  }
+
+  @Bean
+  @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+  public EntitiesHolder manualEntityHolder() {
+    return new EntitiesHolder(
+            new HashSet<>(
+                    Arrays.asList(
+                            DynamicExecution.class,
+                            ScheduleAction.class,
+                            Schedule.class,
+                            ScheduleToAction.class,
+                            ScheduleTimeslot.class,
+                            JsonConverter.class,
+                            SecuredBasic.class)));
   }
 
   @Bean

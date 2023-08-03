@@ -44,7 +44,7 @@ public class TreeNodeController implements Plugin {
 	@Operation(summary = "getAllTreeNodes", description = "lists all children nodes, parent is specified in the TreeNodeFiler")
 	@PostMapping("getAllTreeNodes")
 	public PaginationResponse<TreeNode> getAllTreeNodes(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			TreeNodeFilter treeFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeFilter,securityContext);
@@ -60,7 +60,7 @@ public class TreeNodeController implements Plugin {
 	@Operation(summary = "createTreeNode", description = "create tree node")
 	@PostMapping("createTreeNode")
 	public TreeNode createTreeNode(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			TreeNodeCreate treeNodeCreationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeNodeCreationContainer,securityContext);
@@ -73,7 +73,7 @@ public class TreeNodeController implements Plugin {
 	@Operation(summary = "updateTreeNode", description = "update tree node")
 	@PutMapping("updateTreeNode")
 	public TreeNode updateTreeNode(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			TreeNodeUpdate treeNodeCreationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		TreeNode treeNode=treeNodeCreationContainer.getNodeId()!=null?service.getByIdOrNull(treeNodeCreationContainer.getNodeId(),TreeNode.class, TreeNode_.security,securityContext):null;

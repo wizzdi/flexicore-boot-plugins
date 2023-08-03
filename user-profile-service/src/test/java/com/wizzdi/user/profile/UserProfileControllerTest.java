@@ -23,6 +23,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
@@ -33,8 +38,27 @@ import java.util.concurrent.atomic.AtomicReference;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {App.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class UserProfileControllerTest {
+
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+
+    static {
+        postgresqlContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+    }
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -74,7 +98,7 @@ public class UserProfileControllerTest {
 
         ParameterizedTypeReference<UserProfile> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<UserProfile> response = this.restTemplate.exchange("/userProfile/createUserProfile", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         userProfile = response.getBody();
         Assertions.assertNotNull(userProfile);
         assertProfile(request, userProfile);
@@ -107,7 +131,7 @@ public class UserProfileControllerTest {
         UserProfileFilter request = new UserProfileFilter();
         ParameterizedTypeReference<PaginationResponse<UserProfile>> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<PaginationResponse<UserProfile>> response = this.restTemplate.exchange("/userProfile/getAllUserProfiles", HttpMethod.POST, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         PaginationResponse<UserProfile> body = response.getBody();
         Assertions.assertNotNull(body);
         List<UserProfile> userProfiles = body.getList();
@@ -123,7 +147,7 @@ public class UserProfileControllerTest {
                 .setName("new name");
         ParameterizedTypeReference<UserProfile> t = new ParameterizedTypeReference<>() {};
         ResponseEntity<UserProfile> response = this.restTemplate.exchange("/userProfile/updateUserProfile", HttpMethod.PUT, new HttpEntity<>(request), t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         userProfile= response.getBody();
         Assertions.assertNotNull(userProfile);
         assertProfile(request, userProfile);

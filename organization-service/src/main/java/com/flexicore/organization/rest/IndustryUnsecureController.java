@@ -32,7 +32,7 @@ public class IndustryUnsecureController implements Plugin {
 	@IOperation(Name = "getAllIndustries", Description = "Lists all Industries")
 	@PostMapping("/getAllIndustries")
 	public PaginationResponse<Industry> getAllIndustries(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody IndustryFiltering filtering) {
+			 @RequestBody IndustryFiltering filtering) {
 
 		service.validateFiltering(filtering, null);
 		return service.getAllIndustries(null, filtering);

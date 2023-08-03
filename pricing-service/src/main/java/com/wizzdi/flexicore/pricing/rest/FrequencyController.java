@@ -38,7 +38,7 @@ public class FrequencyController implements Plugin {
     @PostMapping("/getAllFrequencies")
     public PaginationResponse<Frequency> getAllFrequencies(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody FrequencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllFrequencies(securityContext, filtering);
@@ -49,7 +49,7 @@ public class FrequencyController implements Plugin {
     @Operation(summary = "createFrequency", description = "Creates Frequency")
     @IOperation(Name = "createFrequency", Description = "Creates Frequency")
     public Frequency createFrequency(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody FrequencyCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class FrequencyController implements Plugin {
     @IOperation(Name = "updateFrequency", Description = "Updates Frequency")
     public Frequency updateFrequency(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody FrequencyUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

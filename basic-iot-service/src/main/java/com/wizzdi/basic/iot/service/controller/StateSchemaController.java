@@ -37,7 +37,7 @@ public class StateSchemaController implements Plugin {
     @PostMapping("/getAllStateSchemas")
     public PaginationResponse<StateSchema> getAllStateSchemas(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody StateSchemaFilter stateSchemaFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(stateSchemaFilter, securityContext);
         return service.getAllStateSchemas(securityContext, stateSchemaFilter);
@@ -48,7 +48,7 @@ public class StateSchemaController implements Plugin {
     @Operation(summary = "createStateSchema", description = "Creates StateSchema")
     
     public StateSchema createStateSchema(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody StateSchemaCreate stateSchemaCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(stateSchemaCreate, securityContext);
@@ -62,7 +62,7 @@ public class StateSchemaController implements Plugin {
     
     public StateSchema updateStateSchema(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody StateSchemaUpdate stateSchemaUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(stateSchemaUpdate, securityContext);

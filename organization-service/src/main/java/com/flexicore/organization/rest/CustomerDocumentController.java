@@ -45,7 +45,7 @@ public class CustomerDocumentController implements Plugin {
 	@PostMapping("/getAllCustomerDocuments")
 	public PaginationResponse<CustomerDocument> getAllCustomerDocuments(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody CustomerDocumentFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody CustomerDocumentFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllCustomerDocuments(securityContext, filtering);
 	}
@@ -56,7 +56,7 @@ public class CustomerDocumentController implements Plugin {
 	@IOperation(Name = "createCustomerDocument", Description = "Creates CustomerDocument")
 	public CustomerDocument createCustomerDocument(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody CustomerDocumentCreate creationContainer,
+			@RequestBody CustomerDocumentCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
@@ -69,7 +69,7 @@ public class CustomerDocumentController implements Plugin {
 	@IOperation(Name = "updateCustomerDocument", Description = "Updates CustomerDocument")
 	public CustomerDocument updateCustomerDocument(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody CustomerDocumentUpdate updateContainer,
+			@RequestBody CustomerDocumentUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		CustomerDocument customerDocument = service.getByIdOrNull(updateContainer.getId(),

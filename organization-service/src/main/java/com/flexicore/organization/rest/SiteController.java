@@ -43,7 +43,7 @@ public class SiteController implements Plugin {
 	@PostMapping("/getAllSites")
 	public PaginationResponse<Site> getAllSites(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SiteFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody SiteFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllSites(securityContext, filtering);
 	}
@@ -54,7 +54,7 @@ public class SiteController implements Plugin {
 	@IOperation(Name = "createSite", Description = "Creates Site")
 	public Site createSite(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SiteCreate creationContainer,
+			@RequestBody SiteCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
@@ -67,7 +67,7 @@ public class SiteController implements Plugin {
 	@IOperation(Name = "updateSite", Description = "Updates Site")
 	public Site updateSite(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SiteUpdate updateContainer, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody SiteUpdate updateContainer, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		Site site = service.getByIdOrNull(updateContainer.getId(), Site.class, Site_.security, securityContext);
 		if (site == null) {

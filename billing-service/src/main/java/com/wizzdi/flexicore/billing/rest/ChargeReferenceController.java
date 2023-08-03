@@ -38,7 +38,7 @@ public class ChargeReferenceController implements Plugin {
     @PostMapping("/getAllChargeReferences")
     public PaginationResponse<ChargeReference> getAllChargeReferences(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeReferenceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllChargeReferences(securityContext, filtering);
@@ -50,7 +50,7 @@ public class ChargeReferenceController implements Plugin {
     @IOperation(Name = "createChargeReference", Description = "Creates ChargeReference")
     public ChargeReference createChargeReference(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeReferenceCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -64,7 +64,7 @@ public class ChargeReferenceController implements Plugin {
     @IOperation(Name = "updateChargeReference", Description = "Updates ChargeReference")
     public ChargeReference updateChargeReference(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeReferenceUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

@@ -30,7 +30,7 @@ public class ScheduleController implements Plugin {
   @PostMapping("createSchedule")
   @Operation(summary = "createSchedule", description = "Creates Schedule")
   public Schedule createSchedule(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleCreate scheduleCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleService.validate(scheduleCreate, securityContext);
@@ -40,7 +40,7 @@ public class ScheduleController implements Plugin {
   @Operation(summary = "updateSchedule", description = "Updates Schedule")
   @PutMapping("updateSchedule")
   public Schedule updateSchedule(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleUpdate scheduleUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String scheduleId = scheduleUpdate.getId();
@@ -59,7 +59,7 @@ public class ScheduleController implements Plugin {
   @Operation(summary = "getAllSchedules", description = "Gets All Schedules Filtered")
   @PostMapping("getAllSchedules")
   public PaginationResponse<Schedule> getAllSchedules(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleFilter scheduleFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleService.validate(scheduleFilter, securityContext);

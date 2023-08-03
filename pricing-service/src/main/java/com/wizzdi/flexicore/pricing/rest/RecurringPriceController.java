@@ -38,7 +38,7 @@ public class RecurringPriceController implements Plugin {
     @PostMapping("/getAllRecurringPrice")
     public PaginationResponse<RecurringPrice> getAllRecurringPrice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllRecurringPrice(securityContext, filtering);
@@ -49,7 +49,7 @@ public class RecurringPriceController implements Plugin {
     @Operation(summary = "createRecurringPrice", description = "Creates RecurringPrice")
     @IOperation(Name = "createRecurringPrice", Description = "Creates RecurringPrice")
     public RecurringPrice createRecurringPrice(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class RecurringPriceController implements Plugin {
     @IOperation(Name = "updateRecurringPrice", Description = "Updates RecurringPrice")
     public RecurringPrice updateRecurringPrice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RecurringPriceUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

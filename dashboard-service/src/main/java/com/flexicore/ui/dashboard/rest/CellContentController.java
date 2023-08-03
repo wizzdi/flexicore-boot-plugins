@@ -43,7 +43,7 @@ public class CellContentController implements Plugin {
 	@Operation(summary = "getAllCellContent", description = "returns all CellContent")
 	@PostMapping("getAllCellContent")
 	public PaginationResponse<CellContent> getAllCellContent(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellContentFiltering cellContentFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(cellContentFiltering, securityContext);
@@ -56,7 +56,7 @@ public class CellContentController implements Plugin {
 	@Operation(summary = "updateCellContent", description = "Updates Dashbaord")
 	@PutMapping("updateCellContent")
 	public CellContent updateCellContent(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellContentUpdate updateCellContent, @RequestAttribute SecurityContextBase securityContext) {
 		CellContent cellContent = updateCellContent.getId() != null ? service.getByIdOrNull(
 				updateCellContent.getId(), CellContent.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class CellContentController implements Plugin {
 	@Operation(summary = "createCellContent", description = "Creates CellContent ")
 	@PostMapping("createCellContent")
 	public CellContent createCellContent(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellContentCreate createCellContent, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createCellContent, securityContext);
 		return service.createCellContent(createCellContent, securityContext);

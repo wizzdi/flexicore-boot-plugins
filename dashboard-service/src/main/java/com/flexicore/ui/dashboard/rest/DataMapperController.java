@@ -43,7 +43,7 @@ public class DataMapperController implements Plugin {
 	@Operation(summary = "getAllDataMapper", description = "returns all DataMapper")
 	@PostMapping("getAllDataMapper")
 	public PaginationResponse<DataMapper> getAllDataMapper(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DataMapperFilter dataMapperFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(dataMapperFilter, securityContext);
@@ -56,7 +56,7 @@ public class DataMapperController implements Plugin {
 	@Operation(summary = "updateDataMapper", description = "Updates Dashbaord")
 	@PutMapping("updateDataMapper")
 	public DataMapper updateDataMapper(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DataMapperUpdate updateDataMapper, @RequestAttribute SecurityContextBase securityContext) {
 		DataMapper dataMapper = updateDataMapper.getId() != null ? service.getByIdOrNull(
 				updateDataMapper.getId(), DataMapper.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class DataMapperController implements Plugin {
 	@Operation(summary = "createDataMapper", description = "Creates DataMapper ")
 	@PostMapping("createDataMapper")
 	public DataMapper createDataMapper(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			DataMapperCreate createDataMapper, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createDataMapper, securityContext);
 		return service.createDataMapper(createDataMapper, securityContext);

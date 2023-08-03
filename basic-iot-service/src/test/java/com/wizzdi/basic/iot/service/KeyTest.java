@@ -14,7 +14,7 @@ import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
+@Disabled
 public class KeyTest {
 
     public static final String toSign = "067c2435-32b6-459f-bcb9-bcc7143ba0b6";

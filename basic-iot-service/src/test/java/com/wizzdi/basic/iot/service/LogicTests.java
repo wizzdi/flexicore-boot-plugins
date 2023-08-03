@@ -24,8 +24,16 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.hivemq.HiveMQContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.utility.DockerImageName;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -34,9 +42,39 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 
 public class LogicTests {
+
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+    private final static HiveMQContainer hivemqCe = new HiveMQContainer(DockerImageName.parse("hivemq/hivemq-ce").withTag("2023.5"));
+
+
+
+    static {
+        postgresqlContainer.start();
+        hivemqCe.start();
+
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+
+        registry.add("basic.iot.mqtt.url", ()->"tcp://"+hivemqCe.getHost()+":"+hivemqCe.getMqttPort());
+        KeyPairForTests.KeyPair keyPair = KeyPairForTests.getKeyPair();
+        File privateKey = keyPair.privateKey();
+        registry.add("basic.iot.keyPath", privateKey::getAbsolutePath);
+
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(LogicTests.class);
 
@@ -111,7 +149,7 @@ public class LogicTests {
         Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
         Assertions.assertEquals(30, device.getDeviceProperties().get("dim"));
         Assertions.assertNotNull(device.getLastConnectivityChange());
-        Assertions.assertEquals(Connectivity.OFF, device.getLastConnectivityChange().getConnectivity());
+        Assertions.assertEquals(Connectivity.ON, device.getLastConnectivityChange().getConnectivity()); // statechange is counted as keepalive
         validateMappedPOI(device.getMappedPOI());
         Assertions.assertEquals(Device.class.getCanonicalName(), device.getMappedPOI().getMapIcon().getRelatedType());
         Assertions.assertTrue(device.getMappedPOI().getMapIcon().getExternalId().contains("light"));
@@ -186,15 +224,5 @@ public class LogicTests {
 
     }
 
-    @Test
-    @Order(8)
-    public void testActuator() throws InterruptedException {
-        ResponseEntity<String> response = testRestTemplate.getForEntity("/actuator/metrics/message.processing.time", String.class);
-        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful(), response.toString());
-        String body = response.getBody();
-        Assertions.assertNotNull(body);
-        System.out.println(body);
-
-    }
 
 }

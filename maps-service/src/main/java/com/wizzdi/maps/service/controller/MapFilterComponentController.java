@@ -34,7 +34,7 @@ public class MapFilterComponentController implements Plugin {
     @Operation(summary = "getAllMapFilterComponents", description = "Gets All MapFilterComponents related")
     @PostMapping("getAllMapFilterComponents")
     public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody MapFilterComponentRequest mapFilterComponentRequest,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mapFilterComponentRequest, securityContext);
@@ -43,7 +43,7 @@ public class MapFilterComponentController implements Plugin {
     @Operation(summary = "get all possible values for , used with the getAllMapFilterComponents API")
     @GetMapping("getAllMapFilterComponentsTypes")
     public List<String> getAllMapFilterComponentsTypes(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
 
             @RequestAttribute SecurityContextBase securityContext) {
 

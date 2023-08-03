@@ -30,7 +30,7 @@ public class ScenarioSavableEventController implements Plugin {
   @PostMapping("createScenarioSavableEvent")
   @Operation(summary = "createScenarioSavableEvent", description = "Creates ScenarioSavableEvent")
   public ScenarioSavableEvent createScenarioSavableEvent(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioSavableEventCreate scenarioSavableEventCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -42,7 +42,7 @@ public class ScenarioSavableEventController implements Plugin {
   @PutMapping("updateScenarioSavableEvent")
   @Operation(summary = "updateScenarioSavableEvent", description = "Updates ScenarioSavableEvent")
   public ScenarioSavableEvent updateScenarioSavableEvent(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioSavableEventUpdate scenarioSavableEventUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -66,7 +66,7 @@ public class ScenarioSavableEventController implements Plugin {
   @PostMapping("getAllScenarioSavableEvents")
   @Operation(summary = "getAllScenarioSavableEvents", description = "lists ScenarioSavableEvents")
   public PaginationResponse<ScenarioSavableEvent> getAllScenarioSavableEvents(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioSavableEventFilter scenarioSavableEventFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 

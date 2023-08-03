@@ -38,7 +38,7 @@ public class ContractItemChargeReferenceController implements Plugin {
     @PostMapping("/getAllContractItemChargeReferences")
     public PaginationResponse<ContractItemChargeReference> getAllContractItemChargeReferences(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemChargeReferenceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllContractItemChargeReferences(securityContext, filtering);
@@ -50,7 +50,7 @@ public class ContractItemChargeReferenceController implements Plugin {
     @IOperation(Name = "createContractItemChargeReference", Description = "Creates ContractItemChargeReference")
     public ContractItemChargeReference createContractItemChargeReference(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemChargeReferenceCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -64,7 +64,7 @@ public class ContractItemChargeReferenceController implements Plugin {
     @IOperation(Name = "updateContractItemChargeReference", Description = "Updates ContractItemChargeReference")
     public ContractItemChargeReference updateContractItemChargeReference(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemChargeReferenceUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

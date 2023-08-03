@@ -52,7 +52,7 @@ public class TableColumnController implements Plugin {
 
 	@PostMapping("getAllTableColumns")
 	public PaginationResponse<TableColumn> getAllTableColumns(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			TableColumnFiltering tableColumnFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(tableColumnFiltering, securityContext);
@@ -66,7 +66,7 @@ public class TableColumnController implements Plugin {
 	@Operation(summary = "updateTableColumn", description = "Updates Ui Field")
 	@PutMapping("updateTableColumn")
 	public TableColumn updateTableColumn(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			TableColumnUpdate tableColumnUpdate,
 			@RequestAttribute SecurityContextBase securityContext) {
 		TableColumn tableColumn = tableColumnUpdate.getId() != null ? service
@@ -87,7 +87,7 @@ public class TableColumnController implements Plugin {
 	@Operation(summary = "createTableColumn", description = "Creates Ui Field ")
 	@PostMapping("createTableColumn")
 	public TableColumn createTableColumn(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			TableColumnCreate createTableColumn,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validateCreate(createTableColumn, securityContext);

@@ -48,7 +48,7 @@ public class ConfigurationPresetController implements Plugin {
 	@Operation(summary = "getAllConfigurationPresets", description = "returns all ConfigurationPresets")
 	@PostMapping("getAllConfigurationPresets")
 	public PaginationResponse<ConfigurationPreset> getAllConfigurationPresets(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			ConfigurationPresetFiltering configurationPresetFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		return service.getAllConfigurationPresets(configurationPresetFiltering, securityContext);
@@ -59,7 +59,7 @@ public class ConfigurationPresetController implements Plugin {
 	@Operation(summary = "updateConfigurationPreset", description = "Updates Dashbaord")
 	@PutMapping("updateConfigurationPreset")
 	public ConfigurationPreset updateConfigurationPreset(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			ConfigurationPresetUpdate updateConfigurationPreset,
 			@RequestAttribute SecurityContextBase securityContext) {
 		ConfigurationPreset configurationPresetToClazz = updateConfigurationPreset.getId() != null ? service.getByIdOrNull(updateConfigurationPreset.getId(), ConfigurationPreset.class, ConfigurationPreset_.security, securityContext) : null;
@@ -75,7 +75,7 @@ public class ConfigurationPresetController implements Plugin {
 	@Operation(summary = "createConfigurationPreset", description = "Creates Ui Field ")
 	@PostMapping("createConfigurationPreset")
 	public ConfigurationPreset createConfigurationPreset(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			ConfigurationPresetCreate createConfigurationPreset,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createConfigurationPreset, securityContext);

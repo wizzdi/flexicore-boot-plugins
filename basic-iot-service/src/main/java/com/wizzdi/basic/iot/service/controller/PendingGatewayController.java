@@ -39,7 +39,7 @@ public class PendingGatewayController implements Plugin {
     @PostMapping("/getAllPendingGateways")
     public PaginationResponse<PendingGateway> getAllPendingGateways(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PendingGatewayFilter pendingGatewayFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(pendingGatewayFilter, securityContext);
         return service.getAllPendingGateways(securityContext, pendingGatewayFilter);
@@ -50,7 +50,7 @@ public class PendingGatewayController implements Plugin {
     @Operation(summary = "registerGateway", description = "registers PendingGateway")
 
     public PendingGateway registerGateway(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PendingGatewayCreate pendingGatewayCreate) {
         service.validate(pendingGatewayCreate);
 
@@ -61,7 +61,7 @@ public class PendingGatewayController implements Plugin {
     @Operation(summary = "createPendingGateway", description = "Creates PendingGateway")
     
     public PendingGateway createPendingGateway(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PendingGatewayCreate pendingGatewayCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(pendingGatewayCreate, securityContext);
@@ -75,7 +75,7 @@ public class PendingGatewayController implements Plugin {
     
     public PendingGateway updatePendingGateway(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PendingGatewayUpdate pendingGatewayUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(pendingGatewayUpdate, securityContext);

@@ -38,7 +38,7 @@ public class UIComponentController implements Plugin {
     @PostMapping("/registerAndGetAllowedUIComponents")
     @Operation(summary = "registerAndGetAllowedUIComponents", description = "registers components if not exists and returns allowed")
 
-    public List<UIComponent> registerAndGetAllowedUIComponents(@RequestHeader("authenticationkey") String authenticationkey,
+    public List<UIComponent> registerAndGetAllowedUIComponents(
                                          @RequestBody UIComponentsRegistrationContainer uiComponentsRegistrationContainer,
                                                                @RequestAttribute SecurityContextBase securityContext) {
         uiPluginService.validate(uiComponentsRegistrationContainer);

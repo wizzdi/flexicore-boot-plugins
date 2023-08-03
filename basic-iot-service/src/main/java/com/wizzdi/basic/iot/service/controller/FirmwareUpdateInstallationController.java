@@ -40,7 +40,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     @PostMapping("/getAllFirmwareUpdateInstallations")
     public PaginationResponse<FirmwareUpdateInstallation> getAllFirmwareUpdateInstallations(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Valid FirmwareUpdateInstallationFilter firmwareUpdateInstallationFilter, @RequestAttribute SecurityContextBase securityContext) {
         return service.getAllFirmwareUpdateInstallations(securityContext, firmwareUpdateInstallationFilter);
     }
@@ -51,7 +51,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     @Operation(summary = "createFirmwareUpdateInstallation", description = "Creates FirmwareUpdateInstallation")
     
     public FirmwareUpdateInstallation createFirmwareUpdateInstallation(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Validated(Create.class) FirmwareUpdateInstallationCreate firmwareUpdateInstallationCreate,
             @RequestAttribute SecurityContextBase securityContext) {
 
@@ -62,7 +62,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     @Operation(summary = "massCreateFirmwareUpdateInstallation", description = "Mass Creates FirmwareUpdateInstallation")
 
     public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Valid FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate,
             @RequestAttribute SecurityContextBase securityContext) {
 
@@ -75,7 +75,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     
     public FirmwareUpdateInstallation updateFirmwareUpdateInstallation(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody @Validated(Update.class) FirmwareUpdateInstallationUpdate firmwareUpdateInstallationUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
 

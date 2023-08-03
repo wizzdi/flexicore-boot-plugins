@@ -38,7 +38,7 @@ public class PaymentMethodTypeController implements Plugin {
     @PostMapping("/getAllPaymentMethodTypes")
     public PaginationResponse<PaymentMethodType> getAllPaymentMethodTypes(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentMethodTypeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPaymentMethodTypes(securityContext, filtering);
@@ -50,7 +50,7 @@ public class PaymentMethodTypeController implements Plugin {
     @IOperation(Name = "createPaymentMethodType", Description = "Creates PaymentMethodType")
     public PaymentMethodType createPaymentMethodType(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentMethodTypeCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -64,7 +64,7 @@ public class PaymentMethodTypeController implements Plugin {
     @IOperation(Name = "updatePaymentMethodType", Description = "Updates PaymentMethodType")
     public PaymentMethodType updatePaymentMethodType(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody PaymentMethodTypeUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

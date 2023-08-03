@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.security.request.PaginationFilter;
 public class InvoiceFiltering extends PaginationFilter {
     private BasicPropertiesFilter basicPropertiesFilter;
 
-    private boolean unpaid;
+    private Boolean unpaid;
     private Boolean automatic;
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -19,11 +19,11 @@ public class InvoiceFiltering extends PaginationFilter {
     }
 
 
-    public boolean isAutomatic() {
+    public Boolean isAutomatic() {
         return automatic;
     }
 
-    public <T extends InvoiceFiltering> T setAutomatic(boolean automatic) {
+    public <T extends InvoiceFiltering> T setAutomatic(Boolean automatic) {
         this.automatic = automatic;
         return (T) this;
     }

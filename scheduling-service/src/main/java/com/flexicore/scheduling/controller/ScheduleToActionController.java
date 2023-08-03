@@ -30,7 +30,7 @@ public class ScheduleToActionController implements Plugin {
   @PostMapping("createScheduleToAction")
   @Operation(summary = "createScheduleToAction", description = "Creates ScheduleToAction")
   public ScheduleToAction createScheduleToAction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleToActionCreate scheduleToActionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleToActionService.validate(scheduleToActionCreate, securityContext);
@@ -40,7 +40,7 @@ public class ScheduleToActionController implements Plugin {
   @Operation(summary = "updateScheduleToAction", description = "Updates ScheduleToAction")
   @PutMapping("updateScheduleToAction")
   public ScheduleToAction updateScheduleToAction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleToActionUpdate scheduleToActionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String scheduleToActionId = scheduleToActionUpdate.getId();
@@ -64,7 +64,7 @@ public class ScheduleToActionController implements Plugin {
       description = "Gets All ScheduleToActions Filtered")
   @PostMapping("getAllScheduleToActions")
   public PaginationResponse<ScheduleToAction> getAllScheduleToActions(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleToActionFilter scheduleToActionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleToActionService.validate(scheduleToActionFilter, securityContext);

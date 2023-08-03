@@ -38,7 +38,7 @@ public class TierController implements Plugin {
     @PostMapping("/getAllTier")
     public PaginationResponse<Tier> getAllTier(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody TierFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllTier(securityContext, filtering);
@@ -49,7 +49,7 @@ public class TierController implements Plugin {
     @Operation(summary = "createTier", description = "Creates Tier")
     @IOperation(Name = "createTier", Description = "Creates Tier")
     public Tier createTier(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody TierCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class TierController implements Plugin {
     @IOperation(Name = "updateTier", Description = "Updates Tier")
     public Tier updateTier(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody TierUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

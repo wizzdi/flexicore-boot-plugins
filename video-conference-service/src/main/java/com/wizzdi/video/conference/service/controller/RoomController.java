@@ -30,7 +30,7 @@ public class RoomController implements Plugin {
   @PostMapping("createRoom")
   @Operation(summary = "createRoom", description = "Creates Room")
   public Room createRoom(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomCreate roomCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     roomService.validate(roomCreate, securityContext);
@@ -40,7 +40,7 @@ public class RoomController implements Plugin {
   @Operation(summary = "updateRoom", description = "Updates Room")
   @PutMapping("updateRoom")
   public Room updateRoom(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomUpdate roomUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String roomId = roomUpdate.getId();
@@ -56,7 +56,7 @@ public class RoomController implements Plugin {
   @Operation(summary = "getAllRooms", description = "Gets All Rooms Filtered")
   @PostMapping("getAllRooms")
   public PaginationResponse<Room> getAllRooms(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody RoomFilter roomFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     roomService.validate(roomFilter, securityContext);

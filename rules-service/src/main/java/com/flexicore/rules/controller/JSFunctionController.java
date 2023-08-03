@@ -30,7 +30,7 @@ public class JSFunctionController implements Plugin {
   @PostMapping("getAllJSFunctions")
   @Operation(summary = "getAllJSFunctions", description = "lists JSFunctions")
   public PaginationResponse<JSFunction> getAllJSFunctions(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionFilter jSFunctionFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -41,7 +41,7 @@ public class JSFunctionController implements Plugin {
   @PostMapping("createJSFunction")
   @Operation(summary = "createJSFunction", description = "Creates JSFunction")
   public JSFunction createJSFunction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionCreate jSFunctionCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -52,7 +52,7 @@ public class JSFunctionController implements Plugin {
   @PutMapping("updateJSFunction")
   @Operation(summary = "updateJSFunction", description = "Updates JSFunction")
   public JSFunction updateJSFunction(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionUpdate jSFunctionUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 

@@ -38,7 +38,7 @@ public class OneTimePriceController implements Plugin {
     @PostMapping("/getAllOneTimePrice")
     public PaginationResponse<OneTimePrice> getAllOneTimePrice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody OneTimePriceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllOneTimePrice(securityContext, filtering);
@@ -49,7 +49,7 @@ public class OneTimePriceController implements Plugin {
     @Operation(summary = "createOneTimePrice", description = "Creates OneTimePrice")
     @IOperation(Name = "createOneTimePrice", Description = "Creates OneTimePrice")
     public OneTimePrice createOneTimePrice(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody OneTimePriceCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -63,7 +63,7 @@ public class OneTimePriceController implements Plugin {
     @IOperation(Name = "updateOneTimePrice", Description = "Updates OneTimePrice")
     public OneTimePrice updateOneTimePrice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody OneTimePriceUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

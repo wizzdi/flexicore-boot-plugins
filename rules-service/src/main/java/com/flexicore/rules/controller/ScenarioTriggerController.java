@@ -30,7 +30,7 @@ public class ScenarioTriggerController implements Plugin {
   @PostMapping("createScenarioTrigger")
   @Operation(summary = "createScenarioTrigger", description = "Creates ScenarioTrigger")
   public ScenarioTrigger createScenarioTrigger(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioTriggerCreate scenarioTriggerCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -41,7 +41,7 @@ public class ScenarioTriggerController implements Plugin {
   @PostMapping("getAllScenarioTriggers")
   @Operation(summary = "getAllScenarioTriggers", description = "lists ScenarioTriggers")
   public PaginationResponse<ScenarioTrigger> getAllScenarioTriggers(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioTriggerFilter scenarioTriggerFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -52,7 +52,7 @@ public class ScenarioTriggerController implements Plugin {
   @PutMapping("updateScenarioTrigger")
   @Operation(summary = "updateScenarioTrigger", description = "Updates ScenarioTrigger")
   public ScenarioTrigger updateScenarioTrigger(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScenarioTriggerUpdate scenarioTriggerUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 

@@ -7,6 +7,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.SoftDeleteOption;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.messaging.connectors.firebase.model.FirebaseEnabledDevice;
 import com.wizzdi.messaging.firebase.data.FirebaseEnabledDeviceRepository;
 import com.wizzdi.messaging.firebase.request.FirebaseEnabledDeviceCreate;
@@ -60,12 +61,12 @@ public class FirebaseEnabledDeviceService implements Plugin {
         FirebaseEnabledDevice firebaseEnabledDevice = new FirebaseEnabledDevice();
         firebaseEnabledDevice.setId(Baseclass.getBase64ID());
         updateFirebaseEnabledDeviceNoMerge(firebaseEnabledDeviceCreate, firebaseEnabledDevice);
+        BaseclassService.createSecurityObjectNoMerge(firebaseEnabledDevice, securityContext);
         return firebaseEnabledDevice;
     }
 
     public boolean updateFirebaseEnabledDeviceNoMerge(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, FirebaseEnabledDevice firebaseEnabledDevice) {
-        boolean update = messageReceiverDeviceService.updateMessageReceiverDeviceNoMerge(firebaseEnabledDeviceCreate, firebaseEnabledDevice);
-        return update;
+        return messageReceiverDeviceService.updateMessageReceiverDeviceNoMerge(firebaseEnabledDeviceCreate, firebaseEnabledDevice);
     }
 
     public FirebaseEnabledDevice updateFirebaseEnabledDevice(FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, SecurityContextBase securityContext) {

@@ -40,7 +40,7 @@ public class InvoiceController implements Plugin {
     @PostMapping("/getAllInvoices")
     public PaginationResponse<Invoice> getAllInvoices(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllInvoices(securityContext, filtering);
@@ -52,7 +52,7 @@ public class InvoiceController implements Plugin {
     @IOperation(Name = "createInvoice", Description = "Creates Invoice")
     public Invoice createInvoice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -66,7 +66,7 @@ public class InvoiceController implements Plugin {
     @IOperation(Name = "updateInvoice", Description = "Updates Invoice")
     public Invoice updateInvoice(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

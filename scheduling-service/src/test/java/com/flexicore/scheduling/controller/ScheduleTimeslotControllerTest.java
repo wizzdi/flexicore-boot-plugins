@@ -2,8 +2,8 @@ package com.flexicore.scheduling.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flexicore.request.AuthenticationRequest;
-import com.flexicore.response.AuthenticationResponse;
+
+
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
 import com.flexicore.scheduling.model.TimeOfTheDayName;
@@ -30,15 +30,21 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class ScheduleTimeslotControllerTest {
 
     private ScheduleTimeslot testScheduleTimeslot;
@@ -48,23 +54,34 @@ public class ScheduleTimeslotControllerTest {
     @Autowired
     private Schedule schedule;
 
-    @BeforeAll
-    private void init() {
-        ResponseEntity<AuthenticationResponse> authenticationResponse =
-                this.restTemplate.postForEntity(
-                        "/FlexiCore/rest/authenticationNew/login",
-                        new AuthenticationRequest().setEmail("admin@flexicore.com").setPassword("admin"),
-                        AuthenticationResponse.class);
-        String authenticationKey = authenticationResponse.getBody().getAuthenticationKey();
-        restTemplate
-                .getRestTemplate()
-                .setInterceptors(
-                        Collections.singletonList(
-                                (request, body, execution) -> {
-                                    request.getHeaders().add("authenticationKey", authenticationKey);
-                                    return execution.execute(request, body);
-                                }));
-    }
+      private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+          .withDatabaseName("flexicore-test")
+          .withUsername("flexicore")
+          .withPassword("flexicore");
+
+  static {
+    postgresqlContainer.start();
+  }
+
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+    registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+    registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+  }
+
+
+  @BeforeAll
+  public void init() {
+    restTemplate.getRestTemplate().setInterceptors(
+            Collections.singletonList((request, body, execution) -> {
+              request.getHeaders()
+                      .add("authenticationKey", "fake");
+              return execution.execute(request, body);
+            }));
+
+  }
 
     @Test
     @Order(1)
@@ -90,7 +107,7 @@ public class ScheduleTimeslotControllerTest {
         ResponseEntity<ScheduleTimeslot> response =
                 this.restTemplate.postForEntity(
                         "/ScheduleTimeslot/createScheduleTimeslot", request, ScheduleTimeslot.class);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         testScheduleTimeslot = response.getBody();
         assertScheduleTimeslot(request, testScheduleTimeslot);
     }
@@ -109,7 +126,7 @@ public class ScheduleTimeslotControllerTest {
                         HttpMethod.POST,
                         new HttpEntity<>(request),
                         t);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         PaginationResponse<ScheduleTimeslot> body = response.getBody();
         Assertions.assertNotNull(body);
         List<ScheduleTimeslot> ScheduleTimeslots = body.getList();
@@ -228,7 +245,7 @@ public class ScheduleTimeslotControllerTest {
                         HttpMethod.PUT,
                         new HttpEntity<>(request),
                         ScheduleTimeslot.class);
-        Assertions.assertEquals(200, response.getStatusCodeValue());
+        Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
         testScheduleTimeslot = response.getBody();
         assertScheduleTimeslot(request, testScheduleTimeslot);
     }

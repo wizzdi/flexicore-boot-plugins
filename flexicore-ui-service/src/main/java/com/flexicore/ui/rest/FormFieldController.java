@@ -49,7 +49,7 @@ public class FormFieldController implements Plugin {
 	@Operation(summary = "getAllFormFields", description = "List all Ui Fields")
 	@PostMapping("getAllFormFields")
 	public PaginationResponse<FormField> getAllFormFields(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormFieldFiltering formFieldFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(formFieldFiltering, securityContext);
@@ -62,7 +62,7 @@ public class FormFieldController implements Plugin {
 	@Operation(summary = "updateFormField", description = "Updates Ui Field")
 	@PutMapping("updateFormField")
 	public FormField updateFormField(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormFieldUpdate formFieldUpdate,
 			@RequestAttribute SecurityContextBase securityContext) {
 		FormField formField = formFieldUpdate.getId() != null ? service.getByIdOrNull(formFieldUpdate.getId(), FormField.class, FormField_.security, securityContext) : null;
@@ -79,7 +79,7 @@ public class FormFieldController implements Plugin {
 	@Operation(summary = "createFormField", description = "Creates Ui Field ")
 	@PostMapping("createFormField")
 	public FormField createFormField(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormFieldCreate createFormField,
 			@RequestAttribute SecurityContextBase securityContext) {
 

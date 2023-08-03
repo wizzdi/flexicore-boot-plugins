@@ -47,7 +47,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "deleteUIField", description = "delete UI Field")
     @DeleteMapping("{id}")
     public UiField deleteUIField(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @PathVariable("id") String id,
             @RequestAttribute SecurityContextBase securityContext) {
         UiField uiField=id!=null?service.getByIdOrNull(id,UiField.class,UiField_.security,securityContext):null;
@@ -61,7 +61,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "listAllUiFields", description = "List all Ui Fields")
     @PostMapping("getAllUiFields")
     public PaginationResponse<UiField> getAllUiFields(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody UiFieldFiltering uiFieldFiltering,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(uiFieldFiltering, securityContext);
@@ -73,7 +73,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "linkPresetToUser", description = "Links preset to securityUser")
     @PostMapping("linkPresetToUser")
     public PresetToUser linkPresetToUser(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody PresetToUserCreate linkPresetToUser,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(linkPresetToUser, securityContext);
@@ -85,7 +85,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "getAllPresetToRole", description = "getAllPresetToRole")
     @PostMapping("getAllPresetToRole")
     public PaginationResponse<PresetToRoleContainer> getAllPresetToRole(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody PresetToRoleFilter presetToRoleFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(presetToRoleFilter, securityContext);
@@ -97,7 +97,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "getAllPresetToUser", description = "getAllPresetToUser")
     @PostMapping("getAllPresetToUser")
     public PaginationResponse<PresetToUserContainer> getAllPresetToUser(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToUserFilter presetToUserFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(presetToUserFilter, securityContext);
@@ -109,7 +109,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "getAllPresetToTenant", description = "getAllPresetToTenant")
     @PostMapping("getAllPresetToTenant")
     public PaginationResponse<PresetToTenantContainer> getAllPresetToTenant(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToTenantFilter presetToTenantFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(presetToTenantFilter, securityContext);
@@ -122,7 +122,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "getPreferredPresets", description = "returns preferred presets")
     @PostMapping("getPreferredPresets")
     public List<Preset> getPreferredPresets(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PreferedPresetRequest linkPresetToRole,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(linkPresetToRole, securityContext);
@@ -134,7 +134,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "linkPresetToRole", description = "Links preset to Role")
     @PostMapping("linkPresetToRole")
     public PresetToRole linkPresetToRole(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToRoleCreate linkPresetToRole,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(linkPresetToRole, securityContext);
@@ -146,7 +146,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "linkPresetToTenant", description = "Links preset to SecurityTenant")
     @PostMapping("linkPresetToTenant")
     public PresetToTenant linkPresetToTenant(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToTenantCreate linkPresetToRole,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(linkPresetToRole, securityContext);
@@ -158,7 +158,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "updatePresetToTenant", description = "updates preset to SecurityTenant")
     @PutMapping("updatePresetToTenant")
     public PresetToTenant updatePresetToTenant(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToTenantUpdate updateLinkPresetToTenant,
             @RequestAttribute SecurityContextBase securityContext) {
         PresetToTenant preset = updateLinkPresetToTenant.getLinkId() != null
@@ -178,7 +178,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "updatePresetToUser", description = "updates preset to SecurityUser")
     @PutMapping("updatePresetToUser")
     public PresetToUser updatePresetToUser(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToUserUpdate updateLinkPresetToUser,
             @RequestAttribute SecurityContextBase securityContext) {
         PresetToUser preset = updateLinkPresetToUser.getLinkId() != null
@@ -198,7 +198,7 @@ public class UiFieldController implements Plugin {
     @Operation(summary = "updatePresetToRole", description = "updates preset to Role")
     @PutMapping("updatePresetToRole")
     public PresetToRole updatePresetToRole(
-            @RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+             @RequestBody
             PresetToRoleUpdate updateLinkPresetToTenant,
             @RequestAttribute SecurityContextBase securityContext) {
         PresetToRole preset = updateLinkPresetToTenant.getLinkId() != null

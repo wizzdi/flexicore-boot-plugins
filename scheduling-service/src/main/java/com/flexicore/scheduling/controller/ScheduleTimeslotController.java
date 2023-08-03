@@ -30,7 +30,7 @@ public class ScheduleTimeslotController implements Plugin {
   @PostMapping("createScheduleTimeslot")
   @Operation(summary = "createScheduleTimeslot", description = "Creates ScheduleTimeslot")
   public ScheduleTimeslot createScheduleTimeslot(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleTimeslotCreate scheduleTimeslotCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleTimeslotService.validate(scheduleTimeslotCreate, securityContext);
@@ -40,7 +40,7 @@ public class ScheduleTimeslotController implements Plugin {
   @Operation(summary = "updateScheduleTimeslot", description = "Updates ScheduleTimeslot")
   @PutMapping("updateScheduleTimeslot")
   public ScheduleTimeslot updateScheduleTimeslot(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleTimeslotUpdate scheduleTimeslotUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String scheduleTimeslotId = scheduleTimeslotUpdate.getId();
@@ -64,7 +64,7 @@ public class ScheduleTimeslotController implements Plugin {
       description = "Gets All ScheduleTimeslots Filtered")
   @PostMapping("getAllScheduleTimeslots")
   public PaginationResponse<ScheduleTimeslot> getAllScheduleTimeslots(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody ScheduleTimeslotFilter scheduleTimeslotFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleTimeslotService.validate(scheduleTimeslotFilter, securityContext);

@@ -41,7 +41,7 @@ public class CurrencyController implements Plugin {
     @PostMapping("/getAllCurrencies")
     public PaginationResponse<Currency> getAllCurrencies(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllCurrencies(securityContext, filtering);
@@ -52,7 +52,7 @@ public class CurrencyController implements Plugin {
     @Operation(summary = "createCurrency", description = "Creates Currency")
     @IOperation(Name = "createCurrency", Description = "Creates Currency")
     public Currency createCurrency(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody CurrencyCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -66,7 +66,7 @@ public class CurrencyController implements Plugin {
     @IOperation(Name = "updateCurrency", Description = "Updates Currency")
     public Currency updateCurrency(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody CurrencyUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

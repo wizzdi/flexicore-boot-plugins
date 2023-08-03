@@ -44,7 +44,7 @@ public class TreeController implements Plugin {
 	@Operation(summary = "getAllTrees", description = "lists all trees")
 	@PostMapping("getAllTrees")
 	public PaginationResponse<Tree> getAllTrees(
-			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@org.springframework.web.bind.annotation.RequestBody
 			TreeFilter treeFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeFilter,securityContext);
@@ -57,7 +57,7 @@ public class TreeController implements Plugin {
 	@Operation(summary = "updateTree", description = "update tree by tree ID")
 	@PutMapping("updateTree")
 	public Tree updateTree(
-			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Provide treeId, root node ID , tree name , tree description") TreeUpdate updateTree,
 			@RequestAttribute SecurityContextBase securityContext) {
 		Tree tree=updateTree.getTreeId()!=null?service.getByIdOrNull(updateTree.getTreeId(),Tree.class, Tree_.security,securityContext):null;
@@ -76,7 +76,7 @@ public class TreeController implements Plugin {
 	@Operation(summary = "createTree", description = "create tree, provide tree name , description and root node")
 	@PostMapping("createTree")
 	public Tree createTree(
-			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Tree name, description, root node ID , root node should be created before the tree is created") TreeCreate treeCreationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeCreationContainer,securityContext);

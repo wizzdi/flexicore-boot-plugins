@@ -37,7 +37,7 @@ public class OrganizationController implements Plugin {
 	@PostMapping("/getAllOrganizations")
 	public PaginationResponse<Organization> getAllOrganizations(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody OrganizationFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody OrganizationFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllOrganizations(securityContext, filtering);
 	}
@@ -48,7 +48,7 @@ public class OrganizationController implements Plugin {
 	@IOperation(Name = "createOrganization", Description = "Creates Organization")
 	public Organization createOrganization(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody OrganizationCreate creationContainer,
+			@RequestBody OrganizationCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
@@ -61,7 +61,7 @@ public class OrganizationController implements Plugin {
 	@IOperation(Name = "updateOrganization", Description = "Updates Organization")
 	public Organization updateOrganization(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody OrganizationUpdate updateContainer,
+			@RequestBody OrganizationUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		Organization organization = service.getByIdOrNull(updateContainer.getId(),

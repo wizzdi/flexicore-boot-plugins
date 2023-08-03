@@ -31,7 +31,7 @@ public class GeoHashController implements Plugin {
     @Operation(summary = "getAllGeoHashAreas", description = "getAllGeoHashAreas")
     @PostMapping("getAllGeoHashAreas")
     public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody GeoHashRequest geoHashRequest,
             @RequestAttribute SecurityContextBase securityContext) {
         geoHashService.validate(geoHashRequest, securityContext);
@@ -41,7 +41,7 @@ public class GeoHashController implements Plugin {
     @Operation(summary = "calculateReverseGeoHash", description = "calculateReverseGeoHash")
     @PostMapping("calculateReverseGeoHash")
     public void calculateReverseGeoHash(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody @Valid MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         geoHashService.calculateReverseGeoHash(mappedPOIFilter, securityContext);

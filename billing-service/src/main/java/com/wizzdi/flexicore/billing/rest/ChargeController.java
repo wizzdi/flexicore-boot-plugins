@@ -38,7 +38,7 @@ public class ChargeController implements Plugin {
     @PostMapping("/getAllCharges")
     public PaginationResponse<Charge> getAllCharges(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllCharges(securityContext, filtering);
@@ -50,7 +50,7 @@ public class ChargeController implements Plugin {
     @IOperation(Name = "createCharge", Description = "Creates Charge")
     public Charge createCharge(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -64,7 +64,7 @@ public class ChargeController implements Plugin {
     @IOperation(Name = "updateCharge", Description = "Updates Charge")
     public Charge updateCharge(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ChargeUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

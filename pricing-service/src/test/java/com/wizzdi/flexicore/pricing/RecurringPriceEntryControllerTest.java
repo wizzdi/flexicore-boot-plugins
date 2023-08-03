@@ -16,6 +16,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
@@ -26,10 +31,28 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 
 public class RecurringPriceEntryControllerTest {
 
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+
+    static {
+        postgresqlContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+    }
     private RecurringPriceEntry recurringPriceEntry;
     @Autowired
     private TestRestTemplate restTemplate;
@@ -60,12 +83,12 @@ public class RecurringPriceEntryControllerTest {
 
     @Test
     @Order(2)
-    public void testListAllRecurringPriceEntrys() {
+    public void testListAllRecurringPriceEntries() {
         RecurringPriceEntryFiltering request=new RecurringPriceEntryFiltering();
         ParameterizedTypeReference<PaginationResponse<RecurringPriceEntry>> t= new ParameterizedTypeReference<>() {
         };
 
-        ResponseEntity<PaginationResponse<RecurringPriceEntry>> recurringPriceEntryResponse = this.restTemplate.exchange("/plugins/RecurringPriceEntry/getAllCurrencies", HttpMethod.POST, new HttpEntity<>(request), t);
+        ResponseEntity<PaginationResponse<RecurringPriceEntry>> recurringPriceEntryResponse = this.restTemplate.exchange("/plugins/RecurringPriceEntry/getAllRecurringPriceEntry", HttpMethod.POST, new HttpEntity<>(request), t);
         Assertions.assertEquals(200, recurringPriceEntryResponse.getStatusCodeValue());
         PaginationResponse<RecurringPriceEntry> body = recurringPriceEntryResponse.getBody();
         Assertions.assertNotNull(body);

@@ -50,7 +50,7 @@ public class FormController implements Plugin {
 	@Operation(summary = "getAllForms", description = "returns all Forms")
 	@PostMapping("getAllForms")
 	public PaginationResponse<Form> getAllForms(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormFiltering formFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		return service.getAllForms(formFiltering, securityContext);
@@ -62,7 +62,7 @@ public class FormController implements Plugin {
 	@Operation(summary = "updateForm", description = "Updates Dashbaord")
 	@PutMapping("updateForm")
 	public Form updateForm(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody FormUpdate updateForm, @RequestAttribute SecurityContextBase securityContext) {
 		Form form = updateForm.getId() != null ? service.getByIdOrNull(updateForm.getId(), Form.class, Form_.security, securityContext) : null;
 		if (form == null) {
@@ -80,7 +80,7 @@ public class FormController implements Plugin {
 	@Operation(summary = "createForm", description = "Creates Form ")
 	@PostMapping("createForm")
 	public Form createForm(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormCreate createForm, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createForm, securityContext);
 		return service.createForm(createForm, securityContext);
@@ -92,7 +92,7 @@ public class FormController implements Plugin {
 	@Operation(summary = "copyForm", description = "Copies Form")
 	@PostMapping("copyForm")
 	public Form copyForm(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody
+			 @RequestBody
 			FormCopy formCopy, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(formCopy, securityContext);
 		return service.copyForm(formCopy, securityContext);

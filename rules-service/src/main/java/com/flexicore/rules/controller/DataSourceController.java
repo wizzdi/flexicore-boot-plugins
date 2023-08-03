@@ -30,7 +30,7 @@ public class DataSourceController implements Plugin {
   @PostMapping("createDataSource")
   @Operation(summary = "createDataSource", description = "Creates DataSource")
   public DataSource createDataSource(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody DataSourceCreate dataSourceCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -41,7 +41,7 @@ public class DataSourceController implements Plugin {
   @PostMapping("getAllDataSources")
   @Operation(summary = "getAllDataSources", description = "lists DataSources")
   public PaginationResponse<DataSource> getAllDataSources(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody DataSourceFilter dataSourceFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -52,7 +52,7 @@ public class DataSourceController implements Plugin {
   @PutMapping("updateDataSource")
   @Operation(summary = "updateDataSource", description = "Updates DataSource")
   public DataSource updateDataSource(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody DataSourceUpdate dataSourceUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 

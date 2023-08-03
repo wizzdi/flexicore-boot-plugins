@@ -94,7 +94,6 @@ public class MessageReceiverDeviceService implements Plugin {
 	}
 
 	public void validate(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContextBase securityContext) {
-		basicService.validate(messageReceiverDeviceCreate,securityContext);
 		String ownerId=messageReceiverDeviceCreate.getOwnerId();
 		ChatUser owner=ownerId!=null?getByIdOrNull(ownerId,ChatUser.class, ChatUser_.security,securityContext):null;
 		if(ownerId!=null&&owner==null){

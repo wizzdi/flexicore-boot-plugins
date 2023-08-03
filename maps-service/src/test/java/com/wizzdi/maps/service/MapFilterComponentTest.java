@@ -21,6 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.OffsetDateTime;
@@ -32,8 +37,28 @@ import java.util.stream.Collectors;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class MapFilterComponentTest {
+
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+
+    static {
+        postgresqlContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+    }
+
 
     @Autowired
     private MappedPOIService mappedPOIService;
@@ -79,6 +104,7 @@ public class MapFilterComponentTest {
     @Order(1)
     public void testFilterComponentByMapIcon(){
         MapFilterComponentRequest mapFilterComponentRequest = new MapFilterComponentRequest()
+                .setFilterComponentPropertyProvider(new StandardFilterComponentProvider())
                 .setMappedPOIFilter(new MappedPOIFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%test%")))
                 .setFilterComponentType(FilterComponentType.MAP_ICON);
         PaginationResponse<MapFilterComponent> allMapFilterComponents = mapFilterComponentService.getAllMapFilterComponents(mapFilterComponentRequest, securityContext);
@@ -94,6 +120,7 @@ public class MapFilterComponentTest {
     @Order(2)
     public void testFilterComponentWithNameLike(){
         MapFilterComponentRequest mapFilterComponentRequest = new MapFilterComponentRequest()
+                .setFilterComponentPropertyProvider(new StandardFilterComponentProvider())
                 .setMappedPOIFilter(new MappedPOIFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%test%")))
                 .setFilterComponentType(FilterComponentType.MAP_ICON)
                 .setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%on%"));
@@ -111,6 +138,7 @@ public class MapFilterComponentTest {
     @Order(3)
     public void testFilterComponentWithPagination(){
         MapFilterComponentRequest mapFilterComponentRequest = new MapFilterComponentRequest()
+                .setFilterComponentPropertyProvider(new StandardFilterComponentProvider())
                 .setMappedPOIFilter(new MappedPOIFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%test%")))
                 .setFilterComponentType(FilterComponentType.MAP_ICON)
                 .setPageSize(2)
@@ -140,6 +168,7 @@ public class MapFilterComponentTest {
     @Order(4)
     public void testFilterComponentByCountry(){
         MapFilterComponentRequest mapFilterComponentRequest = new MapFilterComponentRequest()
+                .setFilterComponentPropertyProvider(new StandardFilterComponentProvider())
                 .setMappedPOIFilter(new MappedPOIFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%test%")))
                 .setFilterComponentType(FilterComponentType.COUNTRY);
         PaginationResponse<MapFilterComponent> allMapFilterComponents = mapFilterComponentService.getAllMapFilterComponents(mapFilterComponentRequest, securityContext);

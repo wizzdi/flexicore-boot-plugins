@@ -35,7 +35,7 @@ public class MessageController implements Plugin {
 
 	@PostMapping("/createMessage")
 	@Operation(description = "creates Message",summary = "creates Message")
-	public Message createMessage(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageCreate messageCreate, @RequestAttribute SecurityContextBase securityContext){
+	public Message createMessage( @RequestBody MessageCreate messageCreate, @RequestAttribute SecurityContextBase securityContext){
 		messageService.validate(messageCreate,securityContext);
 		return messageService.createMessage(messageCreate,securityContext);
 	}
@@ -43,7 +43,7 @@ public class MessageController implements Plugin {
 	@PostMapping("/markRead")
 	@Operation(description = "marks messages as read",summary = "marks messages as read")
 
-	public PaginationResponse<Message> markRead(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MarkMessagesRequest markMessagesRequest, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<Message> markRead( @RequestBody MarkMessagesRequest markMessagesRequest, @RequestAttribute SecurityContextBase securityContext){
 		messageService.validate(markMessagesRequest,securityContext);
 		return messageService.markRead(markMessagesRequest,securityContext);
 	}
@@ -51,7 +51,7 @@ public class MessageController implements Plugin {
 	@PostMapping("/getMessageSummary")
 	@Operation(description = "getMessageSummary",summary = "getMessageSummary")
 
-	public UnreadMessagesSummary getMessageSummary(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageFilter messageFilter, @RequestAttribute SecurityContextBase securityContext){
+	public UnreadMessagesSummary getMessageSummary( @RequestBody MessageFilter messageFilter, @RequestAttribute SecurityContextBase securityContext){
 		messageService.validate(messageFilter,securityContext);
 		return messageService.getMessageSummary(messageFilter,securityContext);
 	}
@@ -59,7 +59,7 @@ public class MessageController implements Plugin {
 	@PostMapping("/getAllMessages")
 	@Operation(description = "returns Messages",summary = "returns Messages")
 
-	public PaginationResponse<Message> getAllMessages(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageFilter messageFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<Message> getAllMessages( @RequestBody MessageFilter messageFilter, @RequestAttribute SecurityContextBase securityContext){
 		messageService.validate(messageFilter,securityContext);
 		return messageService.getAllMessages(messageFilter,securityContext);
 	}
@@ -67,7 +67,7 @@ public class MessageController implements Plugin {
 	@PutMapping("/updateMessage")
 	@Operation(description = "updates Message",summary = "updates Message")
 
-	public Message updateMessage(@RequestHeader(value = "authenticationKey",required = false)String key, @RequestBody MessageUpdate messageUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public Message updateMessage( @RequestBody MessageUpdate messageUpdate, @RequestAttribute SecurityContextBase securityContext){
 		String id=messageUpdate.getId();
 		Message message=id!=null? messageService.findByIdOrNull(Message.class,id):null;
 		if(message==null){

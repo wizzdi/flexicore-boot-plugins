@@ -32,7 +32,7 @@ public class VideoServerUserController implements Plugin {
   @PostMapping("getJitsiToken")
   @Operation(summary = "getJitsiToken", description = "Returns Jitsi Token")
   public JitsiTokenResponse getJitsiToken(
-          @RequestHeader("authenticationKey") String authenticationKey,
+          
           @RequestBody JitsiTokenRequest jitsiTokenRequest,
           @RequestAttribute SecurityContextBase securityContext) {
     videoServerUserService.validate(jitsiTokenRequest,securityContext);
@@ -41,7 +41,7 @@ public class VideoServerUserController implements Plugin {
   @PostMapping("createVideoServerUser")
   @Operation(summary = "createVideoServerUser", description = "Creates VideoServerUser")
   public VideoServerUser createVideoServerUser(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerUserCreate videoServerUserCreate,
       @RequestAttribute SecurityContextBase securityContext) {
     videoServerUserService.validate(videoServerUserCreate, securityContext);
@@ -51,7 +51,7 @@ public class VideoServerUserController implements Plugin {
   @Operation(summary = "updateVideoServerUser", description = "Updates VideoServerUser")
   @PutMapping("updateVideoServerUser")
   public VideoServerUser updateVideoServerUser(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerUserUpdate videoServerUserUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
     String videoServerUserId = videoServerUserUpdate.getId();
@@ -70,7 +70,7 @@ public class VideoServerUserController implements Plugin {
   @Operation(summary = "getAllVideoServerUsers", description = "Gets All VideoServerUsers Filtered")
   @PostMapping("getAllVideoServerUsers")
   public PaginationResponse<VideoServerUser> getAllVideoServerUsers(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody VideoServerUserFilter videoServerUserFilter,
       @RequestAttribute SecurityContextBase securityContext) {
     videoServerUserService.validate(videoServerUserFilter, securityContext);

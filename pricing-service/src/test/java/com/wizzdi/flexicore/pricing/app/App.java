@@ -1,8 +1,17 @@
 package com.wizzdi.flexicore.pricing.app;
 
+import com.flexicore.model.Baseclass;
+import com.flexicore.model.Basic;
+import com.flexicore.model.security.SecurityPolicy;
+import com.flexicore.model.territories.Address;
+import com.flexicore.organization.model.Site;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
+import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
+import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.pricing.model.price.PriceList;
+import com.wizzdi.flexicore.pricing.model.product.PricedProduct;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,8 +22,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
-@SpringBootApplication(scanBasePackages = "com.flexicore.billing")
+@SpringBootApplication(scanBasePackages = {"com.wizzdi.flexicore.pricing","com.flexicore.organization"})
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins
@@ -30,6 +40,11 @@ public class App {
         app.addListeners(new ApplicationPidFileWriter());
         ConfigurableApplicationContext context=app.run(args);
 
+    }
+
+    @Bean
+    public EntitiesHolder entitiesHolder(){
+        return new EntitiesHolder(new HashSet<>(Arrays.asList(Baseclass.class, Basic.class, SecurityPolicy.class, FileResource.class, Site.class, Address.class, PriceList.class, PricedProduct.class)));
     }
 
     @Bean

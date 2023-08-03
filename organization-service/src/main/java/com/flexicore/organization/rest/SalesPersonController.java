@@ -41,7 +41,7 @@ public class SalesPersonController implements Plugin {
 	@PostMapping("/getAllSalesPeople")
 	public PaginationResponse<SalesPerson> getAllSalesPeople(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SalesPersonFiltering filtering,
+			@RequestBody SalesPersonFiltering filtering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllSalesPeople(securityContext, filtering);
@@ -53,7 +53,7 @@ public class SalesPersonController implements Plugin {
 	@IOperation(Name = "createSalesPerson", Description = "Creates SalesPerson")
 	public SalesPerson createSalesPerson(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SalesPersonCreate creationContainer,
+			@RequestBody SalesPersonCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 
 		return service.createSalesPerson(creationContainer, securityContext);
@@ -65,7 +65,7 @@ public class SalesPersonController implements Plugin {
 	@IOperation(Name = "updateSalesPerson", Description = "Updates SalesPerson")
 	public SalesPerson updateSalesPerson(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody SalesPersonUpdate updateContainer,
+			@RequestBody SalesPersonUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		SalesPerson salesPerson = service.getByIdOrNull(
 				updateContainer.getId(), SalesPerson.class, SalesPerson_.security,

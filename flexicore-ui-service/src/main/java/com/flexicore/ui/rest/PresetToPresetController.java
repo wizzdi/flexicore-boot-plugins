@@ -47,7 +47,7 @@ public class PresetToPresetController implements Plugin {
 	@Operation(summary = "getAllPresetToPresets", description = "returns all PresetToPresets")
 	@PostMapping("getAllPresetToPresets")
 	public PaginationResponse<PresetToPreset> getAllPresetToPresets(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody 
+			 @RequestBody 
 			PresetToPresetFiltering presetToPresetFiltering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(presetToPresetFiltering,securityContext);
@@ -60,7 +60,7 @@ public class PresetToPresetController implements Plugin {
 	@Operation(summary = "updatePresetToPreset", description = "Updates Dashbaord")
 	@PutMapping("updatePresetToPreset")
 	public PresetToPreset updatePresetToPreset(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody 
+			 @RequestBody 
 			PresetToPresetUpdate updatePresetToPreset, @RequestAttribute SecurityContextBase securityContext) {
 		PresetToPreset presetToPreset = updatePresetToPreset.getId() != null ? service.getByIdOrNull(
 				updatePresetToPreset.getId(), PresetToPreset.class, PresetToPreset_.security, securityContext) : null;
@@ -79,7 +79,7 @@ public class PresetToPresetController implements Plugin {
 	@Operation(summary = "createPresetToPreset", description = "Creates PresetToPreset ")
 	@PostMapping("createPresetToPreset")
 	public PresetToPreset createPresetToPreset(
-			@RequestHeader("authenticationKey") String authenticationKey, @RequestBody 
+			 @RequestBody 
 			PresetToPresetCreate createPresetToPreset, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createPresetToPreset, securityContext);
 		return service.createPresetToPreset(createPresetToPreset, securityContext);

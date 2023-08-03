@@ -16,6 +16,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Collections;
@@ -26,10 +31,28 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = App.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 
 public class PriceControllerTest {
 
+    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+
+            .withDatabaseName("flexicore-test")
+            .withUsername("flexicore")
+            .withPassword("flexicore");
+
+    static {
+        postgresqlContainer.start();
+    }
+
+    @DynamicPropertySource
+    static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgresqlContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgresqlContainer::getUsername);
+        registry.add("spring.datasource.password", postgresqlContainer::getPassword);
+    }
     private Price price;
     @Autowired
     private TestRestTemplate restTemplate;
@@ -65,7 +88,7 @@ public class PriceControllerTest {
         ParameterizedTypeReference<PaginationResponse<Price>> t= new ParameterizedTypeReference<>() {
         };
 
-        ResponseEntity<PaginationResponse<Price>> priceResponse = this.restTemplate.exchange("/plugins/Price/getAllCurrencies", HttpMethod.POST, new HttpEntity<>(request), t);
+        ResponseEntity<PaginationResponse<Price>> priceResponse = this.restTemplate.exchange("/plugins/Price/getAllPrice", HttpMethod.POST, new HttpEntity<>(request), t);
         Assertions.assertEquals(200, priceResponse.getStatusCodeValue());
         PaginationResponse<Price> body = priceResponse.getBody();
         Assertions.assertNotNull(body);

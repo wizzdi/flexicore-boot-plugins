@@ -43,7 +43,7 @@ public class CategoryController implements Plugin {
 	@Operation(summary = "getAllCategories", description = "Lists all Categories")
 	@PostMapping("getAllCategories")
 	public PaginationResponse<Category> getAllCategories(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryFilter filtering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(filtering, securityContext);
@@ -55,7 +55,7 @@ public class CategoryController implements Plugin {
 	@PostMapping("/createCategory")
 	@Operation(summary = "createCategory", description = "Creates Category")
 	public Category createCategory(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 
@@ -69,7 +69,7 @@ public class CategoryController implements Plugin {
 	@PutMapping("/updateCategory")
 	@Operation(summary = "updateCategory", description = "Updates Category")
 	public Category updateCategory(
-			@RequestHeader("authenticationKey") String authenticationKey,
+			
 			@RequestBody CategoryUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		Category Category = service.getByIdOrNull(updateContainer.getId(),

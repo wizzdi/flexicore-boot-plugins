@@ -45,7 +45,7 @@ public class EmployeeController implements Plugin {
 	@PostMapping("/listAllEmployees")
 	public PaginationResponse<Employee> listAllEmployees(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody EmployeeFiltering filtering,
+			@RequestBody EmployeeFiltering filtering,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.listAllEmployees(securityContext, filtering);
@@ -57,7 +57,7 @@ public class EmployeeController implements Plugin {
 	@IOperation(Name = "createEmployee", Description = "Creates Employee")
 	public Employee createEmployee(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody EmployeeCreate creationContainer,
+			@RequestBody EmployeeCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer,securityContext);
 		return service.createEmployee(creationContainer, securityContext);
@@ -69,7 +69,7 @@ public class EmployeeController implements Plugin {
 	@IOperation(Name = "updateEmployee", Description = "Updates Employee")
 	public Employee updateEmployee(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody EmployeeUpdate updateContainer,
+			@RequestBody EmployeeUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		Employee employee = service.getByIdOrNull(updateContainer.getId(),
 				Employee.class, Employee_.security, securityContext);

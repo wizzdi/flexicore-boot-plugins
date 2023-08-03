@@ -43,7 +43,7 @@ public class GridLayoutCellController implements Plugin {
 	@Operation(summary = "getAllGridLayoutCell", description = "returns all GridLayoutCell")
 	@PostMapping("getAllGridLayoutCell")
 	public PaginationResponse<GridLayoutCell> getAllGridLayoutCell(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutCellFilter gridLayoutCellFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(gridLayoutCellFilter, securityContext);
@@ -56,7 +56,7 @@ public class GridLayoutCellController implements Plugin {
 	@Operation(summary = "updateGridLayoutCell", description = "Updates Dashbaord")
 	@PutMapping("updateGridLayoutCell")
 	public GridLayoutCell updateGridLayoutCell(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutCellUpdate updateGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
 		GridLayoutCell gridLayoutCell = updateGridLayoutCell.getId() != null ? service.getByIdOrNull(
 				updateGridLayoutCell.getId(), GridLayoutCell.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class GridLayoutCellController implements Plugin {
 	@Operation(summary = "createGridLayoutCell", description = "Creates GridLayoutCell ")
 	@PostMapping("createGridLayoutCell")
 	public GridLayoutCell createGridLayoutCell(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			GridLayoutCellCreate createGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createGridLayoutCell, securityContext);
 		return service.createGridLayoutCell(createGridLayoutCell, securityContext);

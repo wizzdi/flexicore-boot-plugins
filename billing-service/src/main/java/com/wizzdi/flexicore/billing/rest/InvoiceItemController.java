@@ -40,7 +40,7 @@ public class InvoiceItemController implements Plugin {
     @PostMapping("/getAllInvoiceItems")
     public PaginationResponse<InvoiceItem> getAllInvoiceItems(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllInvoiceItems(securityContext, filtering);
@@ -52,7 +52,7 @@ public class InvoiceItemController implements Plugin {
     @IOperation(Name = "createInvoiceItem", Description = "Creates InvoiceItem")
     public InvoiceItem createInvoiceItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceItemCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -66,7 +66,7 @@ public class InvoiceItemController implements Plugin {
     @IOperation(Name = "updateInvoiceItem", Description = "Updates InvoiceItem")
     public InvoiceItem updateInvoiceItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody InvoiceItemUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

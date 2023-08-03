@@ -30,7 +30,7 @@ public class JSFunctionParameterController implements Plugin {
   @PostMapping("createJSFunctionParameter")
   @Operation(summary = "createJSFunctionParameter", description = "Creates JSFunctionParameter")
   public JSFunctionParameter createJSFunctionParameter(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionParameterCreate jSFunctionParameterCreate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -42,7 +42,7 @@ public class JSFunctionParameterController implements Plugin {
   @PutMapping("updateJSFunctionParameter")
   @Operation(summary = "updateJSFunctionParameter", description = "Updates JSFunctionParameter")
   public JSFunctionParameter updateJSFunctionParameter(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionParameterUpdate jSFunctionParameterUpdate,
       @RequestAttribute SecurityContextBase securityContext) {
 
@@ -66,7 +66,7 @@ public class JSFunctionParameterController implements Plugin {
   @PostMapping("getAllJSFunctionParameters")
   @Operation(summary = "getAllJSFunctionParameters", description = "lists JSFunctionParameters")
   public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameters(
-      @RequestHeader("authenticationKey") String authenticationKey,
+      
       @RequestBody JSFunctionParameterFilter jSFunctionParameterFilter,
       @RequestAttribute SecurityContextBase securityContext) {
 

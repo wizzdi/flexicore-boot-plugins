@@ -43,7 +43,7 @@ public class CellToLayoutController implements Plugin {
 	@Operation(summary = "getAllCellToLayout", description = "returns all CellToLayout")
 	@PostMapping("getAllCellToLayout")
 	public PaginationResponse<CellToLayout> getAllCellToLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellToLayoutFilter cellToLayoutFilter,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(cellToLayoutFilter,securityContext);
@@ -56,7 +56,7 @@ public class CellToLayoutController implements Plugin {
 	@Operation(summary = "updateCellToLayout", description = "Updates Dashbaord")
 	@PutMapping("updateCellToLayout")
 	public CellToLayout updateCellToLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellToLayoutUpdate updateCellToLayout, @RequestAttribute SecurityContextBase securityContext) {
 		CellToLayout cellToLayout = updateCellToLayout.getId() != null ? service.getByIdOrNull(
 				updateCellToLayout.getId(), CellToLayout.class, SecuredBasic_.security, securityContext) : null;
@@ -76,7 +76,7 @@ public class CellToLayoutController implements Plugin {
 	@Operation(summary = "createCellToLayout", description = "Creates CellToLayout ")
 	@PostMapping("createCellToLayout")
 	public CellToLayout createCellToLayout(
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody
+			@RequestBody
 			CellToLayoutCreate createCellToLayout, @RequestAttribute SecurityContextBase securityContext) {
 		service.validate(createCellToLayout, securityContext);
 		return service.createCellToLayout(createCellToLayout, securityContext);

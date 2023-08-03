@@ -38,7 +38,7 @@ public class DeviceTypeController implements Plugin {
     @PostMapping("/getAllDeviceTypes")
     public PaginationResponse<DeviceType> getAllDeviceTypes(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody DeviceTypeFilter deviceTypeFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(deviceTypeFilter, securityContext);
         return service.getAllDeviceTypes(securityContext, deviceTypeFilter);
@@ -49,7 +49,7 @@ public class DeviceTypeController implements Plugin {
     @Operation(summary = "createDeviceType", description = "Creates DeviceType")
     
     public DeviceType createDeviceType(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody DeviceTypeCreate deviceTypeCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(deviceTypeCreate, securityContext);
@@ -63,7 +63,7 @@ public class DeviceTypeController implements Plugin {
     
     public DeviceType updateDeviceType(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody DeviceTypeUpdate deviceTypeUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(deviceTypeUpdate, securityContext);

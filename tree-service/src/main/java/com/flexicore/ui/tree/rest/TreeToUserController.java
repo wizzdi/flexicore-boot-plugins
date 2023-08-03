@@ -42,7 +42,7 @@ public class TreeToUserController implements Plugin {
 	@Operation(summary = "saveTreeNodeStatus", description = "save Tree node Status, the TreeNode Status saves the status for the current user and allows a client to show the tree in the same expansion collapsing saved")
 	@PostMapping("saveTreeNodeStatus")
 	public SaveTreeNodeStatusResponse saveTreeNodeStatus(
-			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Stores  a list of NodeID,boolean pairs") SaveTreeNodeStatusRequest saveTreeNodeStatusRequest,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(saveTreeNodeStatusRequest,securityContext);
@@ -57,7 +57,7 @@ public class TreeToUserController implements Plugin {
 	@Operation(summary = "getTreeNodeStatus", description = "get Tree nodes Status, get the stored values for the list of nodes stored in saveTreeNodeStatus")
 	@PostMapping("getTreeNodeStatus")
 	public TreeNodeStatusResponse getTreeNodeStatus(
-			@RequestHeader("authenticationKey") String authenticationKey,@org.springframework.web.bind.annotation.RequestBody
+			@org.springframework.web.bind.annotation.RequestBody
 			TreeNodeStatusRequest treeNodeStatusRequest,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(treeNodeStatusRequest,securityContext);

@@ -1,11 +1,9 @@
 package com.flexicore.rules;
 
-import com.flexicore.annotations.EnableFlexiCoreBaseServices;
 import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
-import com.wizzdi.flexicore.boot.health.annotations.EnableFlexiCoreHealthPlugins;
-import com.wizzdi.flexicore.boot.jaxrs.annotations.EnableFlexiCoreJAXRSPlugins;
+
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
@@ -19,14 +17,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication(scanBasePackages = {"com.flexicore.rules"})
-@EnableFlexiCoreHealthPlugins
-@EnableFlexiCoreJAXRSPlugins
+
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
 @EnableFlexiCoreRESTPlugins
 @EnableFlexiCoreSecurity
 @EnableDynamicInvokersPlugins
-@EnableFlexiCoreBaseServices
 @EnableDynamicProperties
 public class App {
 

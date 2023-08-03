@@ -36,7 +36,7 @@ public class BranchController implements Plugin {
 	@PostMapping("/getAllBranches")
 	public PaginationResponse<Branch> getAllBranchs(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody BranchFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody BranchFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllBranches(securityContext, filtering);
 	}
@@ -46,7 +46,7 @@ public class BranchController implements Plugin {
 	@IOperation(Name = "createBranch", Description = "Creates Branch")
 	public Branch createBranch(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody BranchCreate creationContainer,
+			@RequestBody BranchCreate creationContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(creationContainer, securityContext);
 
@@ -58,7 +58,7 @@ public class BranchController implements Plugin {
 	@IOperation(Name = "updateBranch", Description = "Updates Branch")
 	public Branch updateBranch(
 
-			@RequestHeader("authenticationKey") String authenticationKey,@RequestBody BranchUpdate updateContainer,
+			@RequestBody BranchUpdate updateContainer,
 			@RequestAttribute SecurityContextBase securityContext) {
 		service.validate(updateContainer, securityContext);
 		Branch branch = service.getByIdOrNull(updateContainer.getId(),

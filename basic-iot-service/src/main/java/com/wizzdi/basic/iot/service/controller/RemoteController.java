@@ -38,7 +38,7 @@ public class RemoteController implements Plugin {
     @PostMapping("/getAllRemotes")
     public PaginationResponse<Remote> getAllRemotes(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(remoteFilter, securityContext);
         return service.getAllRemotes(securityContext, remoteFilter);
@@ -49,7 +49,7 @@ public class RemoteController implements Plugin {
     @Operation(summary = "createRemote", description = "Creates Remote")
     
     public Remote createRemote(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RemoteCreate remoteCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(remoteCreate, securityContext);
@@ -63,7 +63,7 @@ public class RemoteController implements Plugin {
     
     public Remote updateRemote(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody RemoteUpdate remoteUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(remoteUpdate, securityContext);

@@ -38,7 +38,7 @@ public class ConnectivityChangeController implements Plugin {
     @PostMapping("/getAllConnectivityChanges")
     public PaginationResponse<ConnectivityChange> getAllConnectivityChanges(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ConnectivityChangeFilter connectivityChangeFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(connectivityChangeFilter, securityContext);
         return service.getAllConnectivityChanges(securityContext, connectivityChangeFilter);
@@ -49,7 +49,7 @@ public class ConnectivityChangeController implements Plugin {
     @Operation(summary = "createConnectivityChange", description = "Creates ConnectivityChange")
     
     public ConnectivityChange createConnectivityChange(
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ConnectivityChangeCreate connectivityChangeCreate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(connectivityChangeCreate, securityContext);
@@ -63,7 +63,7 @@ public class ConnectivityChangeController implements Plugin {
     
     public ConnectivityChange updateConnectivityChange(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ConnectivityChangeUpdate connectivityChangeUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(connectivityChangeUpdate, securityContext);

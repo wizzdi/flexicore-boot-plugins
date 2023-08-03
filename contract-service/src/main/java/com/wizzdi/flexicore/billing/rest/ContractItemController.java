@@ -40,7 +40,7 @@ public class ContractItemController implements Plugin {
     @PostMapping("/getAllContractItems")
     public PaginationResponse<ContractItem> getAllContractItems(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllContractItems(securityContext, filtering);
@@ -52,7 +52,7 @@ public class ContractItemController implements Plugin {
     @IOperation(Name = "createContractItem", Description = "Creates ContractItem")
     public ContractItem createContractItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemCreate creationContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(creationContainer, securityContext);
@@ -66,7 +66,7 @@ public class ContractItemController implements Plugin {
     @IOperation(Name = "updateContractItem", Description = "Updates ContractItem")
     public ContractItem updateContractItem(
 
-            @RequestHeader(value = "authenticationKey", required = false) String key,
+            
             @RequestBody ContractItemUpdate updateContainer,
             @RequestAttribute SecurityContextBase securityContext) {
         service.validate(updateContainer, securityContext);

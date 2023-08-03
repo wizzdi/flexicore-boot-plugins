@@ -28,7 +28,7 @@ public class LightMappedPOIController implements Plugin {
     @Operation(summary = "getAllMapFilterComponents", description = "Gets All MapFilterComponents related")
     @PostMapping("getAllMapFilterComponents")
     public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody LightMapFilterComponentRequest mapFilterComponentRequest,
             @RequestAttribute SecurityContextBase securityContext) {
         lightMappedPOIService.validate(mapFilterComponentRequest, securityContext);
@@ -38,7 +38,7 @@ public class LightMappedPOIController implements Plugin {
     @Operation(summary = "getAllGeoHashAreas", description = "getAllGeoHashAreas")
     @PostMapping("getAllGeoHashAreas")
     public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody ExtendedGeoHashRequest geoHashRequest,
             @RequestAttribute SecurityContextBase securityContext) {
         lightMappedPOIService.validate(geoHashRequest, securityContext);
@@ -48,7 +48,7 @@ public class LightMappedPOIController implements Plugin {
     @Operation(summary = "getAllMappedPOIs", description = "Gets All MappedPOIs Filtered")
     @PostMapping("getAllMappedPOIs")
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
-            @RequestHeader("authenticationKey") String authenticationKey,
+            
             @RequestBody ExtendedMappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         lightMappedPOIService.validate(mappedPOIFilter, securityContext);
