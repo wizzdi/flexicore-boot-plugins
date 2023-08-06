@@ -212,7 +212,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
-                                        <Plugin-Dependencies>maps-service@&gt;=${maps-service.version}, flexicore-territories-service@&gt;=${flexicore-territories-service.version}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>maps-service@&gt;=${revision},flexicore-territories-service@&gt;=${revision}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

@@ -151,7 +151,6 @@
                 <groupId>com.wizzdi</groupId>
                 <artifactId>basic-iot-client</artifactId>
                 <version>${revision}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>

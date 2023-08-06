@@ -124,7 +124,7 @@
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
                                         <!--suppress UnresolvedMavenProperty -->
-                                        <Plugin-Dependencies>messaging-service@&gt;=${project.version}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>messaging-service@&gt;=${revision}</Plugin-Dependencies>
                                     </manifestEntries>
 
                                 </transformer>

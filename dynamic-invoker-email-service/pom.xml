@@ -187,7 +187,7 @@
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
                                         <!--suppress UnresolvedMavenProperty -->
-                                        <Plugin-Dependencies>flexicore-territories-service@&gt;=${flexicore-territories-service.version},maps-service@&gt;=${maps-service.version}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>flexicore-territories-service@&gt;=${revision},maps-service@&gt;=${revision}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

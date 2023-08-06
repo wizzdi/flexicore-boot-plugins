@@ -27,18 +27,13 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.integration.channel.PublishSubscribeChannel;
 import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlows;
-import org.springframework.integration.dsl.MessageChannels;
-import org.springframework.integration.dsl.StandardIntegrationFlow;
+import org.springframework.integration.dsl.*;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -215,12 +210,12 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     @Qualifier("mqttInputChannel")
-    public MessageChannel mqttInputChannel(@Qualifier("mqttTaskExecutor") TaskExecutor mqttTaskExecutor) {
-        return MessageChannels.executor(mqttTaskExecutor).get();
+    public ExecutorChannelSpec mqttInputChannel(@Qualifier("mqttTaskExecutor") TaskExecutor mqttTaskExecutor) {
+        return MessageChannels.executor(mqttTaskExecutor);
     }
 
     @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,@Qualifier("mqttInputChannel") MessageChannel mqttInputChannel) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,@Qualifier("mqttInputChannel") ExecutorChannelSpec mqttInputChannel) {
         logger.info("serverInputIntegrationFlow");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -235,7 +230,7 @@ public class BasicIOTConfig implements Plugin {
         }
         MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
-        StandardIntegrationFlow standardIntegrationFlow = IntegrationFlows.from(mqttPahoMessageDrivenChannelAdapter)
+        StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter)
                 .channel(mqttInputChannel)
                 .handle(basicIOTClient)
                 .get();
