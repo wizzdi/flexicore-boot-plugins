@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>com.wizzdi</groupId>
-            <artifactId>dynamic-properties-database-converter</artifactId>
+            <artifactId>dynamic-properties-converter-postgresql</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

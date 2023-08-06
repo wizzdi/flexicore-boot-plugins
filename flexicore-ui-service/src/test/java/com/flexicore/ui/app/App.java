@@ -1,9 +1,19 @@
 package com.flexicore.ui.app;
 
+import com.flexicore.category.model.Category;
+import com.flexicore.model.Baseclass;
+import com.flexicore.model.Basic;
+import com.flexicore.model.Clazz;
+import com.flexicore.model.security.SecurityPolicy;
+import com.flexicore.ui.model.Preset;
 import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
+import com.wizzdi.dynamic.properties.converter.JsonConverter;
+import com.wizzdi.dynamic.properties.converter.JsonConverterImplementationHolder;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.EnableDynamicInvokersPlugins;
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.jpa.annotations.EnableFlexiCoreJPAPlugins;
+import com.wizzdi.flexicore.boot.jpa.service.EntitiesHolder;
 import com.wizzdi.flexicore.boot.rest.annotations.EnableFlexiCoreRESTPlugins;
 import com.wizzdi.flexicore.security.annotations.EnableFlexiCoreSecurity;
 import org.springframework.boot.CommandLineRunner;
@@ -15,6 +25,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 @SpringBootApplication(scanBasePackages = {"com.flexicore.ui","com.flexicore.category"})
 @EnableDynamicProperties
@@ -34,6 +45,11 @@ public class App {
         app.addListeners(new ApplicationPidFileWriter());
         ConfigurableApplicationContext context=app.run(args);
 
+    }
+
+    @Bean
+    public EntitiesHolder entitiesHolder(JsonConverterImplementationHolder jsonConverterImplementationHolder){
+        return new EntitiesHolder(new HashSet<>(Arrays.asList(Baseclass.class, Basic.class, SecurityPolicy.class, Clazz.class, Preset.class, DynamicExecution.class, Category.class, JsonConverter.class)));
     }
 
     @Bean
