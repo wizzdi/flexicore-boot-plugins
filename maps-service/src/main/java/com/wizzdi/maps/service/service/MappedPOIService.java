@@ -345,6 +345,14 @@ public class MappedPOIService implements Plugin {
         }
         mappedPOIFilter.setRoom(new ArrayList<>(room.values()));
 
+        Set<String> mapGroupIds = mappedPOIFilter.getMapGroupIds() == null ? new HashSet<>() : mappedPOIFilter.getMapGroupIds();
+        Map<String, MapGroup> mapGroups = mapGroupIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(MapGroup.class, mapGroupIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        mapGroupIds.removeAll(mapGroups.keySet());
+        if (!mapGroupIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapGroup with ids " + mapGroupIds);
+        }
+        mappedPOIFilter.setMapGroups(new ArrayList<>(mapGroups.values()));
+
         Set<String> buildingFloorIds = mappedPOIFilter.getBuildingFloorIds() == null ? new HashSet<>() : mappedPOIFilter.getBuildingFloorIds();
         Map<String, BuildingFloor> buildingFloorMap = buildingFloorIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(BuildingFloor.class, buildingFloorIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         buildingFloorIds.removeAll(buildingFloorMap.keySet());

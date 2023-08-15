@@ -60,6 +60,12 @@ public class MappedPOIFilter extends PaginationFilter {
     private Set<String> externalId;
     private String externalIdLike;
     private boolean externalIdExclude;
+    private Set<String> mapGroupIds = new HashSet<>();
+    @JsonIgnore
+    @TypeRetention(MapGroup.class)
+    private List<MapGroup> mapGroups;
+
+    private boolean mapGroupExclude;
 
     private Set<String> relatedType;
     private boolean relatedTypeExclude;
@@ -86,6 +92,10 @@ public class MappedPOIFilter extends PaginationFilter {
     @TypeRetention(Layer.class)
     private List<Layer> layers;
     private boolean layerExclude;
+
+    private Boolean withIcon;
+
+    private Boolean hasLocation;
 
     public MappedPOIFilter() {
     }
@@ -116,6 +126,17 @@ public class MappedPOIFilter extends PaginationFilter {
         this.predicateAdder = other.predicateAdder;
         this.externalIdLike = other.externalIdLike;
         this.inBuilding =other.inBuilding;
+        this.mapGroups=other.mapGroups;
+        this.mapGroupIds=other.mapGroupIds;
+        this.mapGroupExclude=other.mapGroupExclude;
+        this.buildingFloorExclude=other.buildingFloorExclude;
+        this.buildingFloorIds=other.buildingFloorIds;
+        this.buildingFloors=other.buildingFloors;
+        this.layerExclude=other.layerExclude;
+        this.layerIds=other.layerIds;
+        this.layers=other.layers;
+        this.withIcon=other.withIcon;
+        this.hasLocation=other.hasLocation;
     }
 
     public Set<String> getAddressIds() {
@@ -414,5 +435,50 @@ public class MappedPOIFilter extends PaginationFilter {
     public <T extends MappedPOIFilter> T setInBuilding(Boolean inBuilding) {
         this.inBuilding = inBuilding;
         return (T) this;
+    }
+
+    public Set<String> getMapGroupIds() {
+        return mapGroupIds;
+    }
+
+    public <T extends MappedPOIFilter> T setMapGroupIds(Set<String> mapGroupIds) {
+        this.mapGroupIds = mapGroupIds;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    @TypeRetention(MapGroup.class)
+    public List<MapGroup> getMapGroups() {
+        return mapGroups;
+    }
+
+    public <T extends MappedPOIFilter> T setMapGroups(List<MapGroup> mapGroups) {
+        this.mapGroups = mapGroups;
+        return (T) this;
+    }
+
+    public boolean isMapGroupExclude() {
+        return mapGroupExclude;
+    }
+
+    public <T extends MappedPOIFilter> T setMapGroupExclude(boolean mapGroupExclude) {
+        this.mapGroupExclude = mapGroupExclude;
+        return (T) this;
+    }
+
+    public Boolean getWithIcon() {
+        return withIcon;
+    }
+
+    public void setWithIcon(Boolean withIcon) {
+        this.withIcon = withIcon;
+    }
+
+    public Boolean getHasLocation() {
+        return hasLocation;
+    }
+
+    public void setHasLocation(Boolean hasLocation) {
+        this.hasLocation = hasLocation;
     }
 }

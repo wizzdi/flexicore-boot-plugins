@@ -5,6 +5,7 @@ import com.wizzdi.basic.iot.model.Connectivity;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.wizzdi.dynamic.properties.converter.postgresql.DynamicFilterItem;
+import com.wizzdi.maps.service.request.MappedPOIFilter;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -21,6 +22,9 @@ public class RemoteFilter extends PaginationFilter {
 
     private Map<String,DynamicFilterItem> devicePropertiesFilter;
     private Map<String,DynamicFilterItem> userAddedPropertiesFilter;
+
+
+    private MappedPOIFilter mappedPOIFilter;
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -84,6 +88,15 @@ public class RemoteFilter extends PaginationFilter {
 
     public <T extends RemoteFilter> T setUserAddedPropertiesFilter(Map<String, DynamicFilterItem> userAddedPropertiesFilter) {
         this.userAddedPropertiesFilter = userAddedPropertiesFilter;
+        return (T) this;
+    }
+
+    public MappedPOIFilter getMappedPOIFilter() {
+        return mappedPOIFilter;
+    }
+
+    public <T extends RemoteFilter> T setMappedPOIFilter(MappedPOIFilter mappedPOIFilter) {
+        this.mappedPOIFilter = mappedPOIFilter;
         return (T) this;
     }
 }

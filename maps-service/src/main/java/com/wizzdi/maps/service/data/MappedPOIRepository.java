@@ -118,6 +118,14 @@ public class MappedPOIRepository implements Plugin {
             Predicate in = join.get(Basic_.id).in(ids);
             preds.add(filtering.isRoomExclude()?cb.not(in):in);
         }
+        if (filtering.getMapGroups() != null && !filtering.getMapGroups().isEmpty()) {
+            Set<String> ids =
+                    filtering.getMapGroups().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
+            JoinType joinType = filtering.isMapGroupExclude() ? JoinType.LEFT : JoinType.INNER;
+            Join<MapGroupToMappedPOI, MapGroup> join = r.join(MappedPOI_.mapGroupToMappedPOIS, joinType).join(MapGroupToMappedPOI_.mapGroup,joinType);
+            Predicate in = join.get(Basic_.id).in(ids);
+            preds.add(filtering.isMapGroupExclude()?cb.not(in):in);
+        }
         if (filtering.getTenants() != null && !filtering.getTenants().isEmpty()) {
             Set<String> ids =
                     filtering.getTenants().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
@@ -157,6 +165,10 @@ public class MappedPOIRepository implements Plugin {
             }
 
         }
+        if(filtering.getHasLocation()!=null&&filtering.getHasLocation()){
+            preds.add(cb.isNotNull(r.get(MappedPOI_.lat)));
+            preds.add(cb.isNotNull(r.get(MappedPOI_.lon)));
+        }
 
         if (filtering.getMapGroupFilter() != null) {
             Join<T, MapGroupToMappedPOI> join1 = r.join(MappedPOI_.mapGroupToMappedPOIS);
@@ -165,10 +177,17 @@ public class MappedPOIRepository implements Plugin {
             preds.add(cb.isFalse(join1.get(Basic_.softDelete)));
         }
         if(filtering.getExternalId()!=null&&!filtering.getExternalId().isEmpty()){
-            preds.add(r.get(MappedPOI_.externalId).in(filtering.getExternalId()));
+            Predicate in = r.get(MappedPOI_.externalId).in(filtering.getExternalId());
+            preds.add(filtering.isExternalIdExclude()?cb.not(in):in);
         }
         if(filtering.getExternalIdLike()!=null&&!filtering.getExternalIdLike().isEmpty()){
             preds.add(cb.like(r.get(MappedPOI_.externalId),filtering.getExternalIdLike()));
+        }
+        if(filtering.getWithIcon()!=null&&filtering.getWithIcon()){
+            Join<T,MapIcon> join=r.join(MappedPOI_.mapIcon);
+            Join<MapIcon,FileResource> frJoin=join.join(MapIcon_.fileResource);
+
+            preds.add(cb.and(cb.isNotNull(join.get(MapIcon_.id)),cb.isFalse(join.get(MapIcon_.softDelete)),cb.isNotNull(frJoin.get(FileResource_.id)),cb.isFalse(frJoin.get(FileResource_.softDelete))));
         }
         if(filtering.getPredicateAdder()!=null){
             filtering.getPredicateAdder().addPredicates(filtering,cb,q,r,preds,securityContext);

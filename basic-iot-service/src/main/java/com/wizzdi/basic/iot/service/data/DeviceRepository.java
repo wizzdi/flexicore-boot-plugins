@@ -60,7 +60,7 @@ public class DeviceRepository implements Plugin {
     }
 
     public <T extends Device> void addDevicePredicates(DeviceFilter filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CriteriaQuery<?> q,From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
         remoteRepository.addRemotePredicates(filtering,cb,q,r,preds,securityContext);
         if(filtering.getGateways()!=null&&!filtering.getGateways().isEmpty()){
             Set<String> ids=filtering.getGateways().stream().map(f->f.getId()).collect(Collectors.toSet());

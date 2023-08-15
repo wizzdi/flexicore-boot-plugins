@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.request.GatewayFilter;
@@ -21,17 +23,22 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.integration.channel.PublishSubscribeChannel;
+import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.config.EnableIntegration;
 import org.springframework.integration.dsl.*;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
+import org.springframework.messaging.Message;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -46,7 +53,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Extension
@@ -81,6 +90,21 @@ public class BasicIOTConfig implements Plugin {
     private String[] mqttURLs;
     @Autowired
     private GatewayService gatewayService;
+
+
+    private final Cache<String,PublicKeyResponse> publicKeyCache=Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10000).build();
+
+
+    private final AtomicBoolean isAppStarted=new AtomicBoolean(false);
+
+    @Value("${spring.datasource.hikari.maximum-pool-size}")
+    private int maximumPoolSize;
+
+    @Bean
+    public Semaphore virtualThreadsLogicSemaphore(){
+        return new Semaphore((int) (maximumPoolSize*2/3D));
+    }
+
 
 
     @Bean
@@ -127,24 +151,21 @@ public class BasicIOTConfig implements Plugin {
         publishSubscribeChannel.setIgnoreFailures(true);
         return publishSubscribeChannel;
     }
+
     @Bean
-    public TaskScheduler taskScheduler() {
-        logger.info("taskScheduler");
-        ThreadPoolTaskScheduler threadPoolTaskScheduler
-                = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(3);
-        threadPoolTaskScheduler.setThreadNamePrefix(
-                "connectivity-scheduler");
-        return threadPoolTaskScheduler;
+    public QueueChannel bufferChannel() {
+        return new QueueChannel();
     }
 
     @Bean
-    @Qualifier("mqttTaskExecutor")
-    public TaskExecutor mqttTaskExecutor() {
+    @Primary
+    public TaskExecutor taskExecutor() {
 
-        return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
+        return new TaskExecutorAdapter(Executors.newCachedThreadPool());
 
     }
+
+
 
 
 
@@ -169,8 +190,8 @@ public class BasicIOTConfig implements Plugin {
     public PublicKeyProvider publicKeyProvider() {
         logger.info("publicKeyProvider");
 
-        return f -> gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(f))).stream().findFirst()
-                .map(e -> getPublicKeyResponse(e)).orElse(null);
+        return f -> publicKeyCache.get(f,g->gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(g))).stream().findFirst()
+                .map(e -> getPublicKeyResponse(e)).orElse(null));
     }
 
     private PublicKeyResponse getPublicKeyResponse(Gateway e) {
@@ -209,13 +230,7 @@ public class BasicIOTConfig implements Plugin {
 
 
     @Bean
-    @Qualifier("mqttInputChannel")
-    public ExecutorChannelSpec mqttInputChannel(@Qualifier("mqttTaskExecutor") TaskExecutor mqttTaskExecutor) {
-        return MessageChannels.executor(mqttTaskExecutor);
-    }
-
-    @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,@Qualifier("mqttInputChannel") ExecutorChannelSpec mqttInputChannel) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,Semaphore virtualThreadsLogicSemaphore) {
         logger.info("serverInputIntegrationFlow");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -231,8 +246,20 @@ public class BasicIOTConfig implements Plugin {
         MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter)
-                .channel(mqttInputChannel)
-                .handle(basicIOTClient)
+                .channel(MessageChannels.executor("mqtt-in-executor",new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor())))
+                .handle(f->{
+                    try {
+                        virtualThreadsLogicSemaphore.acquire();
+                        basicIOTClient.handleMessage(f);
+                    }
+                    catch (Exception e){
+                        logger.error("error handling message",e);
+                    }
+                    finally {
+                        virtualThreadsLogicSemaphore.release();
+                    }
+
+                })
                 .get();
         BasicIOTConnection basicIOTConnection = basicIOTClient.open(standardIntegrationFlow, mqttOutboundFlow, mqttPahoMessageDrivenChannelAdapter);
 

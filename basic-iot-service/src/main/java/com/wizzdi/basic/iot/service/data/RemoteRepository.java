@@ -14,6 +14,8 @@ import com.wizzdi.dynamic.properties.converter.postgresql.FilterDynamicPropertie
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
+import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.service.data.MappedPOIRepository;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,8 @@ public class RemoteRepository implements Plugin {
     private EntityManager em;
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
+    @Autowired
+    private MappedPOIRepository mappedPOIRepository;
 
     public List<Remote> getAllRemotes(SecurityContextBase securityContext,
                                            RemoteFilter filtering) {
@@ -62,7 +66,7 @@ public class RemoteRepository implements Plugin {
     }
 
     public <T extends Remote> void addRemotePredicates(RemoteFilter filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
         if(filtering.getRemoteIds()!=null&&!filtering.getRemoteIds().isEmpty()){
@@ -83,6 +87,10 @@ public class RemoteRepository implements Plugin {
         }
         if(filtering.getUserAddedPropertiesFilter()!=null){
             preds.addAll(FilterDynamicPropertiesUtils.filterDynamic(filtering.getUserAddedPropertiesFilter(),cb,(Root)r,"userAddedProperties"));
+        }
+        if(filtering.getMappedPOIFilter()!=null){
+            Join<T, MappedPOI> join = r.join(Remote_.mappedPOI);
+            mappedPOIRepository.addMappedPOIPredicate(filtering.getMappedPOIFilter(),cb,q, join,preds,securityContext);
         }
 
 
