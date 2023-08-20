@@ -10,6 +10,7 @@ import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;
 import com.wizzdi.maps.service.email.service.MappedPOIStatusHistoryEmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.csv.CSVFormat;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,9 @@ public class MappedPOIStatusHistoryEmailController implements Plugin, Invoker {
         }
         if(sendStatusEmailRequest.getStatusHistoryFilter().getEndDate()==null){
             sendStatusEmailRequest.getStatusHistoryFilter().setEndDate(OffsetDateTime.now());
+        }
+        if(sendStatusEmailRequest.getCsvFormat()==null){
+            sendStatusEmailRequest.setCsvFormat(CSVFormat.EXCEL);
         }
         return mappedPOIStatusEmailService.sendEmail(sendStatusEmailRequest, securityContext);
     }

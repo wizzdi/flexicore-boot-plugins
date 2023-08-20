@@ -6,15 +6,21 @@ import com.sendgrid.Request;
 import com.sendgrid.Response;
 import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Attachments;
+import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.StatusHistory;
 import com.wizzdi.maps.service.email.context.EmailEntry;
+import com.wizzdi.maps.service.email.context.StatusEmailHeaders;
+import com.wizzdi.maps.service.email.request.SendCSVMailRequest;
 import com.wizzdi.maps.service.email.request.SendStatusEmailRequest;
 import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;
 import com.wizzdi.maps.service.request.StatusHistoryForDateRequest;
 import com.wizzdi.maps.service.service.StatusHistoryGroupedService;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +30,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 @Extension
@@ -46,13 +52,16 @@ public class MappedPOIStatusEmailService implements Plugin {
     private String from;
     @Value("${wizzdi.maps.status.sendgrid.replyTo}")
     private String replyTo;
-
-    @Autowired
-    private StatusHistoryGroupedService statusHistoryGroupedService;
     @Autowired
     @Qualifier("mappedPOISendGrid")
     @Lazy
     private SendGrid sendGrid;
+
+    @Autowired
+    private StatusHistoryGroupedService statusHistoryGroupedService;
+    @Autowired
+    private MappedPOICsvMailService mappedPOICsvMailService;
+
 
 
     public SendStatusEmailResponse sendEmail(SendStatusEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
@@ -65,8 +74,11 @@ public class MappedPOIStatusEmailService implements Plugin {
         for (int i = 0; i < statusHistories.size(); i++) {
             emailEntries.add(new EmailEntry(statusHistories.get(i),i,zoneOffset));
         }
-        return sendEmail(emailEntries,sendStatusEmailRequest.getEmails(),title);
+
+        return sendStatusEmailRequest.isDirect()?sendEmail(emailEntries,sendStatusEmailRequest.getEmails(),title):mappedPOICsvMailService.sendEmailAsCSV(new SendCSVMailRequest(emailEntries,sendStatusEmailRequest.getEmails(),sendStatusEmailRequest.getCsvFormat(),sendStatusEmailRequest.getTitle(),sendStatusEmailRequest.getHeaderNames()));
     }
+
+
 
     public SendStatusEmailResponse sendEmail(List<EmailEntry> entries, Set<String> emails, String title) {
 

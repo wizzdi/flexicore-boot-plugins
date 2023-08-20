@@ -17,6 +17,7 @@ public class EmailEntry {
     private String time;
     private String tenant;
     private String externalId;
+    private String name;
     private String statusName;
     private boolean even;
 
@@ -29,6 +30,7 @@ public class EmailEntry {
         if(mappedPOI!=null){
             this.tenant= Optional.ofNullable(mappedPOI.getSecurity()).map(f->f.getTenant()).map(f->f.getName()).orElse(null);
             this.externalId=mappedPOI.getExternalId();
+            this.name=mappedPOI.getName();
         }
         this.statusName=Optional.ofNullable(statusHistory.getMapIcon()).map(f->f.getName()).orElse(null);
 
@@ -92,6 +94,15 @@ public class EmailEntry {
 
     public <T extends EmailEntry> T setEven(boolean even) {
         this.even = even;
+        return (T) this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public <T extends EmailEntry> T setName(String name) {
+        this.name = name;
         return (T) this;
     }
 }

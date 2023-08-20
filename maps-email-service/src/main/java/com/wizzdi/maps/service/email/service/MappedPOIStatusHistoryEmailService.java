@@ -11,6 +11,7 @@ import com.sendgrid.helpers.mail.objects.Personalization;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.StatusHistory;
 import com.wizzdi.maps.service.email.context.EmailEntry;
+import com.wizzdi.maps.service.email.request.SendCSVMailRequest;
 import com.wizzdi.maps.service.email.request.SendStatusHistoryEmailRequest;
 import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;
 import com.wizzdi.maps.service.service.StatusHistoryService;
@@ -54,6 +55,9 @@ public class MappedPOIStatusHistoryEmailService implements Plugin {
     @Lazy
     private SendGrid sendGrid;
 
+    @Autowired
+    private MappedPOICsvMailService mappedPOICsvMailService;
+
 
     public SendStatusEmailResponse sendEmail(SendStatusHistoryEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
         ZoneOffset zoneOffset=sendStatusEmailRequest.getZoneOffset()!=null?sendStatusEmailRequest.getZoneOffset():ZoneOffset.UTC;
@@ -66,7 +70,7 @@ public class MappedPOIStatusHistoryEmailService implements Plugin {
         for (int i = 0; i < statusHistories.size(); i++) {
             emailEntries.add(new EmailEntry(statusHistories.get(i),i,zoneOffset));
         }
-        return sendEmail(emailEntries,sendStatusEmailRequest.getEmails(),title);
+        return sendStatusEmailRequest.isDirect()?sendEmail(emailEntries,sendStatusEmailRequest.getEmails(),title):mappedPOICsvMailService.sendEmailAsCSV(new SendCSVMailRequest(emailEntries,sendStatusEmailRequest.getEmails(),sendStatusEmailRequest.getCsvFormat(),sendStatusEmailRequest.getTitle(),sendStatusEmailRequest.getHeaderNames()));
     }
 
     public SendStatusEmailResponse sendEmail(List<EmailEntry> entries, Set<String> emails, String title) {
