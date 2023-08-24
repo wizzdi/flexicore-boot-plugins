@@ -45,6 +45,8 @@ public class Remote extends SecuredBasic {
     private Map<String, Object> userAddedProperties = new HashMap<>();
     private boolean lockLocation;
 
+    private boolean lockName;
+
 
 
     @Column(columnDefinition = "jsonb")
@@ -146,6 +148,15 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setPreConnectivityLossIcon(MapIcon preConnectivityLossIcon) {
         this.preConnectivityLossIcon = preConnectivityLossIcon;
+        return (T) this;
+    }
+
+    public boolean isLockName() {
+        return lockName;
+    }
+
+    public <T extends Remote> T setLockName(boolean lockName) {
+        this.lockName = lockName;
         return (T) this;
     }
 }

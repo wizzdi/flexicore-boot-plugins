@@ -309,12 +309,15 @@ private static final class GetOrCreateDeviceResponse{
                 .setRelatedId(remote.getId())
                 .setRelatedType(remote.getClass().getCanonicalName())
 
-                .setMapIcon(mapIcon)
-                .setName(remote.getName());
+                .setMapIcon(mapIcon);
+
         if(!remote.isLockLocation()){
             mappedPOICreate
                     .setLon(longitude)
                     .setLat(latitude);
+        }
+        if(!remote.isLockName()){
+            mappedPOICreate.setName(remote.getName());
         }
 
         MappedPOI mappedPOI = remote.getMappedPOI();
@@ -377,6 +380,7 @@ private static final class GetOrCreateDeviceResponse{
                 .setGateway(gateway)
                 .setDeviceProperties(state)
                 .setName(deviceId);
+
 
         Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
         if (device == null) {

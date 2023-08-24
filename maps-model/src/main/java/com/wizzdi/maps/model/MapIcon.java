@@ -2,6 +2,7 @@ package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.SecurityTenant;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 import jakarta.persistence.*;
@@ -102,6 +103,11 @@ public class MapIcon extends SecuredBasic {
   public <T extends MapIcon> T setExternalId(String externalId) {
     this.externalId = externalId;
     return (T) this;
+  }
+
+  @Transient
+  public SecurityTenant relatedTenant(){
+    return getSecurity()!=null?getSecurity().getTenant():null;
   }
 
 

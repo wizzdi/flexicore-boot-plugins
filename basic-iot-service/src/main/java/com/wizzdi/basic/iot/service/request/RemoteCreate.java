@@ -23,6 +23,7 @@ public class RemoteCreate extends BasicCreate {
     @JsonIgnore
     private MappedPOI mappedPOI;
     private Boolean lockLocation;
+    private Boolean lockName;
     @JsonIgnore
     private OffsetDateTime lastSeen;
 
@@ -99,6 +100,15 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setLastSeen(OffsetDateTime lastSeen) {
         this.lastSeen = lastSeen;
+        return (T) this;
+    }
+
+    public Boolean getLockName() {
+        return lockName;
+    }
+
+    public <T extends RemoteCreate> T setLockName(Boolean lockName) {
+        this.lockName = lockName;
         return (T) this;
     }
 }
