@@ -17,6 +17,7 @@ import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
+import com.wizzdi.maps.service.service.MappedPOIService;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,8 @@ public class RemoteService implements Plugin {
     @Autowired
     @Lazy
     private SecurityContextProvider securityContextProvider;
+    @Autowired
+    private MappedPOIService mappedPOIService;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
@@ -92,6 +95,9 @@ public class RemoteService implements Plugin {
     public void validateFiltering(RemoteFilter remoteFilter,
                                   SecurityContextBase securityContext) {
         basicService.validate(remoteFilter, securityContext);
+        if(remoteFilter.getMappedPOIFilter()!=null){
+            mappedPOIService.validate(remoteFilter.getMappedPOIFilter(),securityContext);
+        }
     }
 
     public PaginationResponse<Remote> getAllRemotes(

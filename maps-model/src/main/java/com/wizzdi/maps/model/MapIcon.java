@@ -106,7 +106,7 @@ public class MapIcon extends SecuredBasic {
   }
 
   @Transient
-  public SecurityTenant relatedTenant(){
+  public SecurityTenant getRelatedTenant(){
     return getSecurity()!=null?getSecurity().getTenant():null;
   }
 

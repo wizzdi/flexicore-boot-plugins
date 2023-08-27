@@ -90,6 +90,8 @@ public class BasicIOTConfig implements Plugin {
     private String[] mqttURLs;
     @Autowired
     private GatewayService gatewayService;
+    @Value("${basic.iot.mqtt.jdbcRatio:0.6666}")
+    private float mqttJdbcRatio;
 
 
     private final Cache<String,PublicKeyResponse> publicKeyCache=Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10000).build();
@@ -102,7 +104,7 @@ public class BasicIOTConfig implements Plugin {
 
     @Bean
     public Semaphore virtualThreadsLogicSemaphore(){
-        return new Semaphore((int) (maximumPoolSize*2/3D));
+        return new Semaphore((int) (maximumPoolSize*mqttJdbcRatio));
     }
 
 
