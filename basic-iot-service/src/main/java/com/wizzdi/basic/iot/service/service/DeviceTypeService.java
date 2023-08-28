@@ -130,6 +130,10 @@ public class DeviceTypeService implements Plugin {
             deviceType.setDefaultMapIcon(deviceTypeCreate.getDefaultMapIcon());
             updated=true;
         }
+        if(deviceTypeCreate.getKeepStateHistory()!=null&&deviceTypeCreate.getKeepStateHistory()!=deviceType.isKeepStateHistory()){
+            deviceType.setKeepStateHistory(deviceTypeCreate.getKeepStateHistory());
+            updated=true;
+        }
         return updated;
     }
 

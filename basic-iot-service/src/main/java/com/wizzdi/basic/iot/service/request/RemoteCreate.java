@@ -27,6 +27,8 @@ public class RemoteCreate extends BasicCreate {
     @JsonIgnore
     private OffsetDateTime lastSeen;
 
+    private Boolean keepStateHistory;
+
     public String getRemoteId() {
         return remoteId;
     }
@@ -109,6 +111,15 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setLockName(Boolean lockName) {
         this.lockName = lockName;
+        return (T) this;
+    }
+
+    public Boolean getKeepStateHistory() {
+        return keepStateHistory;
+    }
+
+    public <T extends RemoteCreate> T setKeepStateHistory(Boolean keepStateHistory) {
+        this.keepStateHistory = keepStateHistory;
         return (T) this;
     }
 }

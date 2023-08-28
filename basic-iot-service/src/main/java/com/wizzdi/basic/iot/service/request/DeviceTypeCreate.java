@@ -10,6 +10,8 @@ public class DeviceTypeCreate extends BasicCreate {
     @JsonIgnore
     private MapIcon defaultMapIcon;
 
+    private Boolean keepStateHistory;
+
     public String getDefaultMapIconId() {
         return defaultMapIconId;
     }
@@ -26,6 +28,15 @@ public class DeviceTypeCreate extends BasicCreate {
 
     public <T extends DeviceTypeCreate> T setDefaultMapIcon(MapIcon defaultMapIcon) {
         this.defaultMapIcon = defaultMapIcon;
+        return (T) this;
+    }
+
+    public Boolean getKeepStateHistory() {
+        return keepStateHistory;
+    }
+
+    public <T extends DeviceTypeCreate> T setKeepStateHistory(Boolean keepStateHistory) {
+        this.keepStateHistory = keepStateHistory;
         return (T) this;
     }
 }

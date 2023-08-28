@@ -47,6 +47,8 @@ public class Remote extends SecuredBasic {
 
     private boolean lockName;
 
+    private boolean keepStateHistory;
+
 
 
     @Column(columnDefinition = "jsonb")
@@ -157,6 +159,15 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setLockName(boolean lockName) {
         this.lockName = lockName;
+        return (T) this;
+    }
+
+    public boolean isKeepStateHistory() {
+        return keepStateHistory;
+    }
+
+    public <T extends Remote> T setKeepStateHistory(boolean keepStateHistory) {
+        this.keepStateHistory = keepStateHistory;
         return (T) this;
     }
 }

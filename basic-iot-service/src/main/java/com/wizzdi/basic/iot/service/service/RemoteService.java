@@ -147,6 +147,10 @@ public class RemoteService implements Plugin {
             remote.setLockLocation(remoteCreate.getLockLocation());
             update = true;
         }
+        if (remoteCreate.getKeepStateHistory() != null && !remoteCreate.getKeepStateHistory().equals(remote.isKeepStateHistory())) {
+            remote.setKeepStateHistory(remoteCreate.getKeepStateHistory());
+            update = true;
+        }
         if (remoteCreate.getLockName() != null && !remoteCreate.getLockName().equals(remote.isLockName())) {
             remote.setLockName(remoteCreate.getLockName());
             update = true;

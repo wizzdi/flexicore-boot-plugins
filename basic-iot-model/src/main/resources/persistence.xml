@@ -15,6 +15,7 @@
         <class>com.wizzdi.basic.iot.model.FirmwareUpdateInstallation</class>
         <class>com.wizzdi.basic.iot.model.StateSchema</class>
         <class>com.wizzdi.basic.iot.model.SchemaAction</class>
+        <class>com.wizzdi.basic.iot.model.StateHistory</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

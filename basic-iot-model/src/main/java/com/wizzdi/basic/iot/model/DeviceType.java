@@ -16,6 +16,7 @@ public class DeviceType extends SecuredBasic {
 
     @ManyToOne(targetEntity = MapIcon.class)
     private MapIcon defaultMapIcon;
+    private boolean keepStateHistory;
 
     @ManyToOne(targetEntity = MapIcon.class)
     public MapIcon getDefaultMapIcon() {
@@ -24,6 +25,15 @@ public class DeviceType extends SecuredBasic {
 
     public <T extends DeviceType> T setDefaultMapIcon(MapIcon defaultMapIcon) {
         this.defaultMapIcon = defaultMapIcon;
+        return (T) this;
+    }
+
+    public boolean isKeepStateHistory() {
+        return keepStateHistory;
+    }
+
+    public <T extends DeviceType> T setKeepStateHistory(boolean supportStateHistory) {
+        this.keepStateHistory = supportStateHistory;
         return (T) this;
     }
 }
