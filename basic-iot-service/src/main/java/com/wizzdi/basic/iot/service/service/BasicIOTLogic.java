@@ -210,7 +210,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
             if(remote instanceof Device device){
                 if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){
-                    device.setPreConnectivityLossIcon(device.getMappedPOI().getMapIcon());
+                    if(device.getMappedPOI().getMapIcon()!=null&&!device.getMappedPOI().getMapIcon().getId().equals(device.getDeviceType().getDefaultMapIcon().getId())){
+                        device.setPreConnectivityLossIcon(device.getMappedPOI().getMapIcon());
+                    }
                     device.getMappedPOI().setMapIcon(device.getDeviceType().getDefaultMapIcon());
                     gatewayService.massMerge(List.of(device,device.getMappedPOI()));
                 }

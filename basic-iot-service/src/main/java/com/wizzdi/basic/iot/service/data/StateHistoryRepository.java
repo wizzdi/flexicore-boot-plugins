@@ -46,7 +46,7 @@ public class StateHistoryRepository implements Plugin {
         Root<StateHistory> r = q.from(StateHistory.class);
         List<Predicate> preds = new ArrayList<>();
         addStateHistoryPredicates(filtering, cb, q, r, preds, securityContext);
-        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.desc(r.get(StateHistory_.name)));
+        q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.desc(r.get(StateHistory_.timeAtState)));
         TypedQuery<StateHistory> query = em.createQuery(q);
         BasicRepository.addPagination(filtering, query);
         return query.getResultList();
@@ -69,10 +69,10 @@ public class StateHistoryRepository implements Plugin {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
         if(filtering.getTimeAtStateTo()!=null){
-            preds.add(cb.or(cb.lessThanOrEqualTo(r.get(StateHistory_.timeAtState),filtering.getTimeAtStateTo()),r.get(StateHistory_.timeAtState).isNull()));
+            preds.add(cb.lessThanOrEqualTo(r.get(StateHistory_.timeAtState),filtering.getTimeAtStateTo()));
         }
         if(filtering.getTimeAtStateFrom()!=null){
-            preds.add(cb.or(cb.greaterThanOrEqualTo(r.get(StateHistory_.timeAtState),filtering.getTimeAtStateTo()),r.get(StateHistory_.timeAtState).isNull()));
+            preds.add(cb.greaterThanOrEqualTo(r.get(StateHistory_.timeAtState),filtering.getTimeAtStateFrom()));
         }
         if(filtering.getDevicePropertiesFilter()!=null){
             preds.addAll(FilterDynamicPropertiesUtils.filterDynamic(filtering.getDevicePropertiesFilter(),cb,(Root)r,"deviceProperties"));
