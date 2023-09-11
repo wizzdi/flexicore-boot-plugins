@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class BasicIOTClient implements MessageHandler {
+public class BasicIOTClient {
     public static final String MAIN_TOPIC_PATH = "GATEWAY";
     public static final String IN_SUFFIX = "IN";
     public static final String OUT_SUFFIX = "OUT";
@@ -52,7 +52,6 @@ public class BasicIOTClient implements MessageHandler {
     private MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter;
     private final Queue<IOTMessageSubscriber> requestResponseMessageHandlers = new LinkedBlockingQueue<>();
 
-    private final TimingCallback timingCallback;
 
     private final String id;
     private PublicKeyProvider publicKeyProvider;
@@ -60,16 +59,15 @@ public class BasicIOTClient implements MessageHandler {
     private final boolean disableVerification;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false, null,false);
+        this(id, key, objectMapper, subscribers, false, false);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client, TimingCallback timingCallback,boolean disableVerification) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,boolean disableVerification) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
-        this.timingCallback = timingCallback;
         this.disableVerification=disableVerification;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
@@ -102,26 +100,13 @@ public class BasicIOTClient implements MessageHandler {
     private IOTMessage parseAndCallSubscribers(Message<?> message) {
         try {
             IOTMessage iotMessage = parseMessage(message, IOTMessage.class);
-            if (iotMessage.getGatewayId().equals(id)) {
-                logger.debug("ignoring self message");
-            }
-
             boolean verified = verifyMessage(iotMessage);
             if (!verified) {
                 iotMessage = getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
             }
 
 
-            for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
-                requestResponseMessageHandler.onIOTMessage(iotMessage);
-            }
-            for (IOTMessageSubscriber subscriber : subscribers) {
-                try {
-                    subscriber.onIOTMessage(iotMessage);
-                } catch (Throwable e) {
-                    logger.error("IOTMessageSubscriber failed", e);
-                }
-            }
+            callSubscribersAndHandlers(iotMessage);
             return iotMessage;
         } catch (Throwable e) {
             logger.error("failed handling message", e);
@@ -131,7 +116,20 @@ public class BasicIOTClient implements MessageHandler {
         return null;
     }
 
-    private boolean verifyMessage(IOTMessage iotMessage) {
+    public void callSubscribersAndHandlers(IOTMessage iotMessage) {
+        for (IOTMessageSubscriber requestResponseMessageHandler : requestResponseMessageHandlers) {
+            requestResponseMessageHandler.onIOTMessage(iotMessage);
+        }
+        for (IOTMessageSubscriber subscriber : subscribers) {
+            try {
+                subscriber.onIOTMessage(iotMessage);
+            } catch (Throwable e) {
+                logger.error("IOTMessageSubscriber failed", e);
+            }
+        }
+    }
+
+    public boolean verifyMessage(IOTMessage iotMessage) {
         if(disableVerification){
             return true;
         }
@@ -172,7 +170,7 @@ public class BasicIOTClient implements MessageHandler {
 
     }
 
-    private <T extends IOTMessage> T parseMessage(Message message, Class<T> type) throws JsonProcessingException {
+    public <T extends IOTMessage> T parseMessage(Message message, Class<T> type) throws JsonProcessingException {
         String payload = (String) message.getPayload();
 
         String mqtt_receivedTopic = message.getHeaders().get(MQTT_RECEIVED_TOPIC, String.class);
@@ -182,7 +180,7 @@ public class BasicIOTClient implements MessageHandler {
 
     }
 
-    private BadMessage getBadMessage(Message message, String payload, String error) {
+    public BadMessage getBadMessage(Message message, String payload, String error) {
         return new BadMessage().setOriginalMessage(payload).setError(error).setMessage(message);
     }
 
@@ -292,15 +290,6 @@ public class BasicIOTClient implements MessageHandler {
         reply(iotMessage, replyToTopic);
     }
 
-    @Override
-    public void handleMessage(Message<?> message) throws MessagingException {
-        long start = System.nanoTime();
-        IOTMessage iotMessage = parseAndCallSubscribers(message);
-        long end = System.nanoTime();
-        if (timingCallback != null) {
-            String type = iotMessage != null ? iotMessage.getClass().getSimpleName() : "unknown";
-            timingCallback.timeMessage(type, end - start);
-        }
 
-    }
+
 }

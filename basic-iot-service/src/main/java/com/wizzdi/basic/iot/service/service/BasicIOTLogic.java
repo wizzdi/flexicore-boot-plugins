@@ -305,7 +305,7 @@ private static final class GetOrCreateDeviceResponse{
         }
 
         String status=getStatus(remote,stateChanged.getStatus());
-        MapIcon mapIcon=getOrCreateMapIcon(status,remote);
+        MapIcon mapIcon=getOrCreateMapIcon(status,remote,gatewaySecurityContext);
         MappedPOICreate mappedPOICreate = new MappedPOICreate()
                 .setExternalId(deviceId)
                 .setRelatedId(remote.getId())
@@ -357,7 +357,7 @@ private static final class GetOrCreateDeviceResponse{
         return status;
     }
 
-    private MapIcon getOrCreateMapIcon(String status, Remote remote) {
+    private MapIcon getOrCreateMapIcon(String status, Remote remote, SecurityContextBase gatewaySecurityContext) {
         if(remote instanceof Gateway){
             return gatewayMapIcon;
         }
@@ -368,7 +368,7 @@ private static final class GetOrCreateDeviceResponse{
             DeviceType deviceType = device.getDeviceType();
             Class<? extends Device> deviceClass = device.getClass();
 
-            return deviceTypeService.getOrCreateMapIcon(status, deviceType.getName(), deviceClass,adminSecurityContext);
+            return deviceTypeService.getOrCreateMapIcon(status, deviceType.getName(), deviceClass,gatewaySecurityContext);
 
         }
         return null;

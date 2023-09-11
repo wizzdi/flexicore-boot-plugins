@@ -4,6 +4,7 @@ package com.wizzdi.basic.iot.service.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecuredBasic_;
+import com.flexicore.model.SecurityTenant;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
@@ -158,17 +159,19 @@ public class DeviceTypeService implements Plugin {
     }
 
     public MapIcon getOrCreateMapIcon(String status, String deviceTypeName, Class<? extends Device> deviceClass,SecurityContextBase securityContextBase) {
-        MapIconCreate mapIconCreate = getMapIconCreate(status, deviceTypeName,deviceClass);
+        MapIconCreate mapIconCreate = getMapIconCreate(status, deviceTypeName,deviceClass,securityContextBase.getTenantToCreateIn());
         String externalId =mapIconCreate.getExternalId();
         String relatedType =mapIconCreate.getRelatedType();
         return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
-                .setExternalId(Collections.singleton(externalId)), securityContextBase).stream().findFirst().orElseGet(() -> mapIconService.createMapIcon(mapIconCreate, securityContextBase));
+                .setExternalId(Collections.singleton(externalId)), null).stream().filter(f->f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
+                .findFirst().orElseGet(() -> mapIconService.createMapIcon(mapIconCreate, securityContextBase));
     }
 
-    private static MapIconCreate getMapIconCreate(String status, String deviceTypeName, Class<? extends Device> deviceClass) {
-        String externalId = deviceTypeName + "_" + status;
+    private static MapIconCreate getMapIconCreate(String status, String deviceTypeName, Class<? extends Device> deviceClass, SecurityTenant tenantToCreateIn) {
+        String name = deviceTypeName + "_" + status;
+        String externalId = name + "_" + tenantToCreateIn.getId();
         String relatedType = deviceClass.getCanonicalName();
-        return new MapIconCreate().setExternalId(externalId).setRelatedType(relatedType).setName(externalId);
+        return new MapIconCreate().setExternalId(externalId).setRelatedType(relatedType).setName(name);
     }
 
     public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContextBase securityContext) {
@@ -177,7 +180,7 @@ public class DeviceTypeService implements Plugin {
             logger.info("created device type "+deviceTypeName);
             return deviceType;
         }
-        MapIcon unknown = mapIconService.createMapIcon(getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class), securityContext);
+        MapIcon unknown = mapIconService.createMapIcon(getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn()), securityContext);
         deviceType = createDeviceType(new DeviceTypeCreate().setDefaultMapIcon(unknown).setName(deviceTypeName), securityContext);
         return deviceType;
     }

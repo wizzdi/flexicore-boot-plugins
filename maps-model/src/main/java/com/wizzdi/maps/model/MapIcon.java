@@ -27,6 +27,7 @@ public class MapIcon extends SecuredBasic {
   @ManyToOne(targetEntity = FileResource.class)
   private FileResource fileResource;
 
+  @Column(unique = true)
   private String externalId;
 
   /** @return mapIconMappedPOIs */

@@ -23,11 +23,9 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -39,9 +37,7 @@ import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.messaging.Message;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.IOException;
@@ -56,7 +52,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @Extension
 @Configuration
@@ -92,12 +87,13 @@ public class BasicIOTConfig implements Plugin {
     private GatewayService gatewayService;
     @Value("${basic.iot.mqtt.jdbcRatio:0.6666}")
     private float mqttJdbcRatio;
+    @Autowired
+    private MeterRegistry meterRegistry;
 
 
     private final Cache<String,PublicKeyResponse> publicKeyCache=Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10000).build();
 
 
-    private final AtomicBoolean isAppStarted=new AtomicBoolean(false);
 
     @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maximumPoolSize;
@@ -204,7 +200,7 @@ public class BasicIOTConfig implements Plugin {
     }
 
     @Bean
-    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers,TimingCallback timingCallback) throws IOException, InterruptedException {
+    public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers) throws IOException, InterruptedException {
         logger.info("basicIOTClient");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -216,23 +212,27 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,timingCallback,disableVerification)
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,disableVerification)
                 .setPublicKeyProvider(publicKeyProvider);
     }
-    @Bean
-    public TimingCallback timingCallback(MeterRegistry meterRegistry) {
-        Map<String, Timer> timerMap=new ConcurrentHashMap<>();
-        return (type, time) -> {
-            Timer timer = timerMap.computeIfAbsent(type, e -> Timer.builder("message.processing.time")
-                    .tag("type", e)
-                    .register(meterRegistry));
-            timer.record(time, TimeUnit.NANOSECONDS);
-        };
-        }
+
+    private static final Map<String, Timer> timerMap = new ConcurrentHashMap<>();
+
+
+
+
+    private void timeMessage(TimerType timerType, String type, long time) {
+        String timerName="message.%s.time".formatted(timerType.getTimerLogicalPart());
+        String timerNameWithType="%s.%s".formatted(timerName,type);
+        Timer timer = timerMap.computeIfAbsent(timerNameWithType, e -> Timer.builder(timerName)
+                .tag("type", e)
+                .register(meterRegistry));
+        timer.record(time, TimeUnit.NANOSECONDS);
+    }
 
 
     @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,Semaphore virtualThreadsLogicSemaphore) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow, Semaphore virtualThreadsLogicSemaphore, MeterRegistry meterRegistry) {
         logger.info("serverInputIntegrationFlow");
 
         if (mqttURLs == null || mqttURLs.length == 0) {
@@ -247,18 +247,45 @@ public class BasicIOTConfig implements Plugin {
         }
         MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
+
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter)
                 .channel(MessageChannels.executor("mqtt-in-executor",new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor())))
-                .handle(f->{
+                .handle(message->{
+                    long start = System.nanoTime();
+                   // logger.info("handling mqtt id "+message.getHeaders().getId() +" with id "+message.getPayload());
+                    String type="unknown";
                     try {
+                        IOTMessage iotMessage = basicIOTClient.parseMessage(message, IOTMessage.class);
+                        type = iotMessage != null ? iotMessage.getClass().getSimpleName() : type;
+                        timeMessage(TimerType.PARSING,type, System.nanoTime() - start);
+
+                        long waitingStart=System.nanoTime();
+
                         virtualThreadsLogicSemaphore.acquire();
-                        basicIOTClient.handleMessage(f);
+                        timeMessage(TimerType.WAITING,type, System.nanoTime() - waitingStart);
+
+                        long verifyingStart=System.nanoTime();
+
+                        boolean verified = basicIOTClient.verifyMessage(iotMessage);
+                        if (!verified) {
+                            iotMessage = basicIOTClient.getBadMessage(message, (String) message.getPayload(), "signature verification failed for message " + iotMessage.getId() + " with signature " + iotMessage.getSignature());
+                        }
+                        timeMessage(TimerType.VERIFYING,type, System.nanoTime() - verifyingStart);
+
+
+                        long processingStart=System.nanoTime();
+                        basicIOTClient.callSubscribersAndHandlers(iotMessage);
+                        timeMessage(TimerType.PROCESSING,type, System.nanoTime() - processingStart);
+
+
                     }
                     catch (Exception e){
                         logger.error("error handling message",e);
                     }
                     finally {
                         virtualThreadsLogicSemaphore.release();
+                        timeMessage(TimerType.TOTAL,type, System.nanoTime() - start);
+
                     }
 
                 })
@@ -267,6 +294,7 @@ public class BasicIOTConfig implements Plugin {
 
         return new ServerIntegrationFlowHolder(standardIntegrationFlow,basicIOTConnection);
     }
+
 
     @Bean
     @Qualifier("mqttInbound")
