@@ -28,7 +28,7 @@ public class StateHistoryCreator implements Plugin {
     @Autowired
     private StateHistoryService stateHistoryService;
 
-    @EventListener
+   /* @EventListener
     public <T extends Remote> void onRemoteCreated(BasicCreated<T> basicCreated) {
         createStateHistory(basicCreated.getBaseclass());
     }
@@ -36,7 +36,7 @@ public class StateHistoryCreator implements Plugin {
     @EventListener
     public <T extends Remote> void onRemoteUpdated(BasicUpdated<T> basicUpdated) {
         createStateHistory(basicUpdated.getBaseclass());
-    }
+    }*/
 
     private void createStateHistory(Remote remote) {
         if (!remote.isKeepStateHistory()) {

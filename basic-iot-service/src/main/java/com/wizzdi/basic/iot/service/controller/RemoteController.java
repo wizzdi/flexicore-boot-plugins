@@ -1,6 +1,5 @@
 package com.wizzdi.basic.iot.service.controller;
 
-import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Remote;
@@ -8,6 +7,7 @@ import com.wizzdi.basic.iot.model.Remote_;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteUpdate;
+import com.wizzdi.basic.iot.service.response.FixRemotesResponse;
 import com.wizzdi.basic.iot.service.service.RemoteService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -42,6 +42,16 @@ public class RemoteController implements Plugin {
             @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContextBase securityContext) {
         service.validateFiltering(remoteFilter, securityContext);
         return service.getAllRemotes(securityContext, remoteFilter);
+    }
+    @Operation(summary = "fixRemoteMapIcons", description = "fixes all Remotes map icons")
+
+    @PostMapping("/fixRemoteMapIcons")
+    public FixRemotesResponse fixRemoteMapIcons(
+
+
+            @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContextBase securityContext) {
+        service.validateFiltering(remoteFilter, securityContext);
+        return service.fixRemoteMapIcons(securityContext, remoteFilter);
     }
 
 

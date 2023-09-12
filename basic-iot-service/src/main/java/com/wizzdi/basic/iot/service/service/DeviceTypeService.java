@@ -31,10 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.metamodel.SingularAttribute;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 
 @Extension
 @Component
@@ -160,10 +158,14 @@ public class DeviceTypeService implements Plugin {
 
     public MapIcon getOrCreateMapIcon(String status, String deviceTypeName, Class<? extends Device> deviceClass,SecurityContextBase securityContextBase) {
         MapIconCreate mapIconCreate = getMapIconCreate(status, deviceTypeName,deviceClass,securityContextBase.getTenantToCreateIn());
-        String externalId =mapIconCreate.getExternalId();
-        String relatedType =mapIconCreate.getRelatedType();
+        return getOrCreateMapIcon(mapIconCreate,securityContextBase);
+    }
+
+    private MapIcon getOrCreateMapIcon( MapIconCreate mapIconCreate,SecurityContextBase securityContextBase) {
+        String externalId = mapIconCreate.getExternalId();
+        String relatedType = mapIconCreate.getRelatedType();
         return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
-                .setExternalId(Collections.singleton(externalId)), null).stream().filter(f->f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
+                        .setExternalId(Collections.singleton(externalId)), null).stream().filter(f -> f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
                 .findFirst().orElseGet(() -> mapIconService.createMapIcon(mapIconCreate, securityContextBase));
     }
 
@@ -175,13 +177,21 @@ public class DeviceTypeService implements Plugin {
     }
 
     public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContextBase securityContext) {
+        return getOrCreateDeviceType(deviceTypeName, false, securityContext);
+    }
+
+
+    public DeviceType getOrCreateDeviceType(String deviceTypeName, boolean checkMapIcon, SecurityContextBase securityContext) {
         DeviceType deviceType = listAllDeviceTypes(null, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().filter(f->f.getSecurity().getTenant().getId().equals(securityContext.getTenantToCreateIn().getId())).findFirst().orElse(null);
         if(deviceType!=null){
             logger.info("created device type "+deviceTypeName);
             return deviceType;
         }
-        MapIcon unknown = mapIconService.createMapIcon(getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn()), securityContext);
+        MapIconCreate mapIconCreate = getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn());
+        MapIcon unknown = Optional.of(checkMapIcon).filter(f->f).map(f->getOrCreateMapIcon(mapIconCreate,securityContext)).orElseGet(()->mapIconService.createMapIcon(mapIconCreate, securityContext));
         deviceType = createDeviceType(new DeviceTypeCreate().setDefaultMapIcon(unknown).setName(deviceTypeName), securityContext);
         return deviceType;
     }
+
+
 }
