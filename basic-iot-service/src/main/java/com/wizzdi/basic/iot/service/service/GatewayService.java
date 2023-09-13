@@ -241,6 +241,7 @@ public class GatewayService implements Plugin {
         importGatewaysRequest.setCsv(csv);
     }
 
+
     public ImportGatewaysResponse importGateways(SecurityContextBase securityContext, ImportGatewaysRequest importGatewaysRequest) {
         String fullPath = importGatewaysRequest.getCsv()
                 .getFullPath();
@@ -250,10 +251,12 @@ public class GatewayService implements Plugin {
 
             CSVParser records = CSVFormat.DEFAULT.withFirstRecordAsHeader()
                     .parse(in);
+            boolean noSignatureCapabilitiesHeader = records.getHeaderNames().contains("noSignatureCapabilities");
             for (CSVRecord record : records) {
                 String gatewayId = record.get("gatewayId");
                 String publicKey = record.get("publicKey");
-                pendingGatewayCreates.put(gatewayId,new PendingGatewayCreate().setPublicKey(publicKey).setGatewayId(gatewayId));
+                boolean noSignatureCapabilities = noSignatureCapabilitiesHeader && Boolean.parseBoolean(record.get("noSignatureCapabilities"));
+                pendingGatewayCreates.put(gatewayId,new PendingGatewayCreate().setPublicKey(publicKey).setGatewayId(gatewayId).setNoSignatureCapabilities(noSignatureCapabilities));
 
             }
             Map<String,Gateway> existing=pendingGatewayCreates.isEmpty()?new HashMap<>():listAllGateways(securityContext,new GatewayFilter().setRemoteIds(pendingGatewayCreates.keySet())).stream().collect(Collectors.toMap(f->f.getRemoteId(),f->f,(a,b)->a));
