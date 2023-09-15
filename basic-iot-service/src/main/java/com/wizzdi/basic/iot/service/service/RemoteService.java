@@ -138,6 +138,14 @@ public class RemoteService implements Plugin {
             remote.setRemoteId(remoteCreate.getRemoteId());
             update = true;
         }
+        if (remoteCreate.getReportedLat() != null && !remoteCreate.getReportedLat().equals(remote.getReportedLat())) {
+            remote.setReportedLat(remoteCreate.getReportedLat());
+            update = true;
+        }
+        if (remoteCreate.getReportedLon() != null && !remoteCreate.getReportedLon().equals(remote.getReportedLon())) {
+            remote.setReportedLon(remoteCreate.getReportedLon());
+            update = true;
+        }
         if (remoteCreate.getVersion() != null && !remoteCreate.getVersion().equals(remote.getVersion())) {
             remote.setVersion(remoteCreate.getVersion());
             update = true;

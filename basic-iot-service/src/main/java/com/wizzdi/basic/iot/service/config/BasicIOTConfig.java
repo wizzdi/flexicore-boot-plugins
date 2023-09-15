@@ -254,11 +254,17 @@ public class BasicIOTConfig implements Plugin {
                     long start = System.nanoTime();
                    // logger.info("handling mqtt id "+message.getHeaders().getId() +" with id "+message.getPayload());
                     String type="unknown";
+                    IOTMessage iotMessage =null;
+                  try {
+                      iotMessage = basicIOTClient.parseMessage(message, IOTMessage.class);
+                      type = iotMessage != null ? iotMessage.getClass().getSimpleName() : type;
+                      timeMessage(TimerType.PARSING, type, System.nanoTime() - start);
+                  }
+                  catch (Throwable e){
+                      logger.error("failed parsing message",e);
+                      return;
+                  }
                     try {
-                        IOTMessage iotMessage = basicIOTClient.parseMessage(message, IOTMessage.class);
-                        type = iotMessage != null ? iotMessage.getClass().getSimpleName() : type;
-                        timeMessage(TimerType.PARSING,type, System.nanoTime() - start);
-
                         long waitingStart=System.nanoTime();
 
                         virtualThreadsLogicSemaphore.acquire();

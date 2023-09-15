@@ -29,6 +29,9 @@ public class RemoteCreate extends BasicCreate {
 
     private Boolean keepStateHistory;
 
+    private Double reportedLat;
+    private Double reportedLon;
+
     public String getRemoteId() {
         return remoteId;
     }
@@ -120,6 +123,24 @@ public class RemoteCreate extends BasicCreate {
 
     public <T extends RemoteCreate> T setKeepStateHistory(Boolean keepStateHistory) {
         this.keepStateHistory = keepStateHistory;
+        return (T) this;
+    }
+
+    public Double getReportedLat() {
+        return reportedLat;
+    }
+
+    public <T extends RemoteCreate> T setReportedLat(Double reportedLat) {
+        this.reportedLat = reportedLat;
+        return (T) this;
+    }
+
+    public Double getReportedLon() {
+        return reportedLon;
+    }
+
+    public <T extends RemoteCreate> T setReportedLon(Double reportedLon) {
+        this.reportedLon = reportedLon;
         return (T) this;
     }
 }

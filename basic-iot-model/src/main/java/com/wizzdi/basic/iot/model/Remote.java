@@ -49,6 +49,9 @@ public class Remote extends SecuredBasic {
 
     private boolean keepStateHistory;
 
+    private Double reportedLat;
+    private Double reportedLon;
+
 
 
     @Column(columnDefinition = "jsonb")
@@ -168,6 +171,24 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setKeepStateHistory(boolean keepStateHistory) {
         this.keepStateHistory = keepStateHistory;
+        return (T) this;
+    }
+
+    public Double getReportedLat() {
+        return reportedLat;
+    }
+
+    public <T extends Remote> T setReportedLat(Double reportedLat) {
+        this.reportedLat = reportedLat;
+        return (T) this;
+    }
+
+    public Double getReportedLon() {
+        return reportedLon;
+    }
+
+    public <T extends Remote> T setReportedLon(Double reportedLon) {
+        this.reportedLon = reportedLon;
         return (T) this;
     }
 }
