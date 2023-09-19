@@ -146,6 +146,14 @@ public class ConnectivityChangeService implements Plugin {
         return connectivityChange;
     }
 
+    public ConnectivityChange updateConnectivityChange(ConnectivityChangeCreate connectivityChangeUpdate,
+                                                      ConnectivityChange connectivityChange) {
+        if (updateConnectivityChangeNoMerge(connectivityChange, connectivityChangeUpdate)) {
+            repository.merge(connectivityChange);
+        }
+        return connectivityChange;
+    }
+
     public void validate(ConnectivityChangeCreate connectivityChangeCreate,
                          SecurityContextBase securityContext) {
         basicService.validate(connectivityChangeCreate, securityContext);

@@ -285,7 +285,7 @@ public class BasicIOTConfig implements Plugin {
 
 
                     }
-                    catch (Exception e){
+                    catch (Throwable e){
                         logger.error("error handling message",e);
                     }
                     finally {

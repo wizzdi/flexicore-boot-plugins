@@ -45,6 +45,17 @@ public class IOTMessage {
     private String signature;
     private String gatewayId;
 
+    public IOTMessage() {
+    }
+
+    public IOTMessage(IOTMessage other) {
+        this.id = other.id;
+        this.sentAt = other.sentAt;
+        this.message = other.message;
+        this.signature = other.signature;
+        this.gatewayId = other.gatewayId;
+    }
+
     public String getId() {
         return id;
     }

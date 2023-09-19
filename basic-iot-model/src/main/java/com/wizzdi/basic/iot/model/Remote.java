@@ -49,6 +49,8 @@ public class Remote extends SecuredBasic {
 
     private boolean keepStateHistory;
 
+    private boolean keepConnectivityHistory;
+
     private Double reportedLat;
     private Double reportedLon;
 
@@ -189,6 +191,15 @@ public class Remote extends SecuredBasic {
 
     public <T extends Remote> T setReportedLon(Double reportedLon) {
         this.reportedLon = reportedLon;
+        return (T) this;
+    }
+
+    public boolean isKeepConnectivityHistory() {
+        return keepConnectivityHistory;
+    }
+
+    public <T extends Remote> T setKeepConnectivityHistory(boolean keepConnectivityHistory) {
+        this.keepConnectivityHistory = keepConnectivityHistory;
         return (T) this;
     }
 }

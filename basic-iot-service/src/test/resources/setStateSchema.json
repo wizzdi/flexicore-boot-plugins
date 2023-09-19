@@ -1,0 +1,10 @@
+{
+  "messageType":  "com.wizzdi.basic.iot.client.SetStateSchema",
+  "id":   "65005110-0000-1000-8000-741d172fa4f5",
+  "sentAt":       "2023-09-12T11:52:48.000000+02:00",
+  "signature":    "QdUXkE6FjBWDhNBezcLSRhozG4/wp+BO3D1vWmCBkpOfVmtUIk3rgYclc9Ry3KNk+GvhJmSXgnuCnQakNp1wC2MK+a8zFWZBdN9x3f5QayLI1Af2EITwr7hsgu6uZj8ee2m/vol6WJPuTOJbXmx+ATEH5yB1sLd2nTqO72d1YxmiBtOqv+J/tQcWeZQb52IdmFqutG6pztZZiZP2B4ZDqLEagxz8KRZFarhL/iGKKdicnZnkyqecWcm6hN4bqSY1w1cYCjf/IhogHXRMOxv7jhFrU4eEazWSDCHabPrZySrXPFpDxVXLHU/Xz8UjyAfEMvQPWy7TkpATRt7XAeXglg==",
+  "gatewayId":    "GIO003_15869",
+  "deviceId":     "device_15869",
+  "deviceType":   "light",
+  "version":1
+}

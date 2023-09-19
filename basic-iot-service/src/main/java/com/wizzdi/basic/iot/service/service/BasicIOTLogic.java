@@ -137,6 +137,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
 
         Gateway gateway = gatewayOptional.get();
+        if (iotMessage instanceof KeepAlive) {
+            onKeepAlive((KeepAlive) iotMessage, gateway, gatewaySecurityContext);
+            return null;
+        }
         if (iotMessage instanceof StateChanged) {
             return stateChanged((StateChanged) iotMessage, gateway, gatewaySecurityContext);
         }
@@ -148,9 +152,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if (iotMessage instanceof UpdateStateSchema) {
             return updateStateSchema((UpdateStateSchema) iotMessage, gateway, gatewaySecurityContext);
         }
-        if (iotMessage instanceof KeepAlive) {
-            onKeepAlive((KeepAlive) iotMessage, gateway, gatewaySecurityContext);
-        }
+
         return null;
     }
 
@@ -184,14 +186,22 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             if(remote.getLastSeen()==null||lastSeen.isAfter(remote.getLastSeen())){
                 remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setLastSeen(lastSeen),gatewaySecurityContext);
             }
-            if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
-                ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setConnectivity(Connectivity.ON).setRemote(remote).setDate(OffsetDateTime.now()), gatewaySecurityContext);
-                remote.setLastConnectivityChange(connectivityChange);
-                gatewayService.merge(remote);
-                logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
-                statusChanged.add(remote);
+            if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
+                if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
+                    ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.ON).setRemote(remote).setDate(OffsetDateTime.now());
+                    boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
+                    ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChange(connectivityChangeCreate, gatewaySecurityContext): connectivityChangeService.updateConnectivityChange(connectivityChangeCreate, remote.getLastConnectivityChange());
+                    if(createConnectivityChange){
+                        remote.setLastConnectivityChange(connectivityChange);
+                        gatewayService.merge(remote);
+                    }
 
+                    logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
+                    statusChanged.add(remote);
+
+                }
             }
+
         }
         return statusChanged;
     }
@@ -203,10 +213,14 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
         for (Remote remote : remotesToUpdate) {
             SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
-            ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now()), remoteSecurityContext);
-            remote.setLastConnectivityChange(connectivityChange);
+            ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now());
+            boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
+            ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChange(connectivityChangeCreate, remoteSecurityContext):connectivityChangeService.updateConnectivityChange(connectivityChangeCreate, remote.getLastConnectivityChange());
+            if(createConnectivityChange){
+                remote.setLastConnectivityChange(connectivityChange);
+                gatewayService.merge(remote);
+            }
 
-            gatewayService.merge(remote);
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
             if(remote instanceof Device device){
                 if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){

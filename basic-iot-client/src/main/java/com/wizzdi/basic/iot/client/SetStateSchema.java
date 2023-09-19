@@ -7,6 +7,16 @@ public class SetStateSchema extends IOTMessage{
 
     private String deviceId;
 
+    public SetStateSchema() {
+    }
+
+    public SetStateSchema(SetStateSchema other) {
+        super(other);
+        this.deviceType = other.deviceType;
+        this.version = other.version;
+        this.deviceId = other.deviceId;
+    }
+
     public String getDeviceType() {
         return deviceType;
     }

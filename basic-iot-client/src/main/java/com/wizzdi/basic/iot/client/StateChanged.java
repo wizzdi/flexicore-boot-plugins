@@ -19,6 +19,19 @@ public class StateChanged extends IOTMessage{
     private Double latitude;
     private String status;
 
+    public StateChanged() {
+    }
+
+    public StateChanged(StateChanged other) {
+        super(other);
+        this.deviceId = other.deviceId;
+        this.otherProperties = other.otherProperties;
+        this.deviceType = other.deviceType;
+        this.version = other.version;
+        this.longitude = other.longitude;
+        this.latitude = other.latitude;
+        this.status = other.status;
+    }
 
     public String getDeviceId() {
         return deviceId;
