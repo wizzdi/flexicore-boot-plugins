@@ -339,7 +339,6 @@ private static final class GetOrCreateDeviceResponse{
         MappedPOI mappedPOI = remote.getMappedPOI();
         if(mappedPOI ==null){
             mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
-            remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setReportedLat(latitude).setReportedLon(longitude).setMappedPOI(mappedPOI),gatewaySecurityContext);
         }
         else{
             if(mappedPOIService.updateMappedPOINoMerge(mappedPOICreate, mappedPOI)){
@@ -347,6 +346,8 @@ private static final class GetOrCreateDeviceResponse{
             }
 
         }
+        remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setReportedLat(latitude).setReportedLon(longitude).setMappedPOI(mappedPOI),gatewaySecurityContext);
+
 
         if(newVersion != null){
             updateVersion(newVersion,remote);
