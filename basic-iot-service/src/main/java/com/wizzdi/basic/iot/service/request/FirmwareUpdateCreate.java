@@ -14,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 public class FirmwareUpdateCreate extends BasicCreate {
 
     @NotNull(groups = Create.class)
-    @ValidVersion(groups = {Create.class,Update.class})
     private String version;
     @JsonIgnore
     private FileResource fileResource;

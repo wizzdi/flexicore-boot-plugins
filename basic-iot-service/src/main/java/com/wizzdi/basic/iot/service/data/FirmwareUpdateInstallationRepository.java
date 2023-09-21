@@ -95,6 +95,12 @@ public class FirmwareUpdateInstallationRepository implements Plugin {
             Join<T,FirmwareUpdate> join=r.join(FirmwareUpdateInstallation_.firmwareUpdate);
             preds.add(join.get(FirmwareUpdate_.version).in(filtering.getVersions()));
         }
+        if(filtering.getNotExpiredAt()!=null){
+            preds.add(cb.or(
+                    r.get(FirmwareUpdateInstallation_.expirationDate).isNull(),
+                    cb.greaterThanOrEqualTo(r.get(FirmwareUpdateInstallation_.expirationDate),filtering.getNotExpiredAt())
+            ));
+        }
 
 
 

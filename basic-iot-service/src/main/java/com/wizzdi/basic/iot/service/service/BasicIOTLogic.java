@@ -69,7 +69,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Value("${basic.iot.lastSeenThreshold:#{60*60*1000}}")
     private long lastSeenThreshold;
-    @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*60*1000}}")
+    @Value("${basic.iot.firmware.update.reminderInterval:#{60*60*1000}}")
     private long reminderInterval;
     @Value("${basic.iot.mqtt.badMessageResponse:false}")
     private boolean badMessageResponse;
@@ -238,7 +238,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Scheduled(fixedDelayString = "${basic.iot.firmware.update.checkInterval:60000}")
     public void sendFirmwareUpdates() {
         logger.debug("checking firmwareUpdates");
-        List<FirmwareUpdateInstallation> toInstall = firmwareUpdateInstallationService.listAllFirmwareUpdateInstallations(null, new FirmwareUpdateInstallationFilter().setFirmwareInstallationStates(Collections.singleton(FirmwareInstallationState.PENDING)).setTimeForReminder(OffsetDateTime.now()));
+        List<FirmwareUpdateInstallation> toInstall = firmwareUpdateInstallationService.listAllFirmwareUpdateInstallations(null, new FirmwareUpdateInstallationFilter().setNotExpiredAt(OffsetDateTime.now()).setFirmwareInstallationStates(Collections.singleton(FirmwareInstallationState.PENDING)).setTimeForReminder(OffsetDateTime.now()));
 
 
         for (FirmwareUpdateInstallation firmwareUpdateInstallation : toInstall) {

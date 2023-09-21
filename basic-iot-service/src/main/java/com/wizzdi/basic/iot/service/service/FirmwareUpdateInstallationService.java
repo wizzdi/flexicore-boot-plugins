@@ -145,6 +145,10 @@ public class FirmwareUpdateInstallationService implements Plugin {
             firmwareUpdateInstallation.setNextTimeForReminder(firmwareUpdateInstallationCreate.getNextTimeForReminder());
             update = true;
         }
+        if (firmwareUpdateInstallationCreate.getExpirationDate() != null &&!firmwareUpdateInstallationCreate.getExpirationDate().equals(firmwareUpdateInstallation.getExpirationDate())) {
+            firmwareUpdateInstallation.setExpirationDate(firmwareUpdateInstallationCreate.getExpirationDate());
+            update = true;
+        }
         if (firmwareUpdateInstallationCreate.getFirmwareInstallationState() != null &&!firmwareUpdateInstallationCreate.getFirmwareInstallationState().equals(firmwareUpdateInstallation.getFirmwareInstallationState())) {
             firmwareUpdateInstallation.setFirmwareInstallationState(firmwareUpdateInstallationCreate.getFirmwareInstallationState());
             update = true;

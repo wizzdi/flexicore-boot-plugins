@@ -11,6 +11,7 @@ public class StateChanged extends IOTMessage{
     private String deviceId;
     private Map<String,Object> otherProperties =new HashMap<>();
     private String deviceType;
+    @JsonAlias({"FWversion"})
     private String version;
     @JsonAlias({"Longitude","lon","Lon"})
     private Double longitude;

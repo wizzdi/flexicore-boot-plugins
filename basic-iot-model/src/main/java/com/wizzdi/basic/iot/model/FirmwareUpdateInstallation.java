@@ -22,6 +22,9 @@ public class FirmwareUpdateInstallation extends SecuredBasic {
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime dateInstalled;
 
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime expirationDate;
+
     private FirmwareInstallationState firmwareInstallationState;
 
 
@@ -78,6 +81,15 @@ public class FirmwareUpdateInstallation extends SecuredBasic {
 
     public <T extends FirmwareUpdateInstallation> T setFirmwareInstallationState(FirmwareInstallationState firmwareInstallationState) {
         this.firmwareInstallationState = firmwareInstallationState;
+        return (T) this;
+    }
+
+    public OffsetDateTime getExpirationDate() {
+        return expirationDate;
+    }
+
+    public <T extends FirmwareUpdateInstallation> T setExpirationDate(OffsetDateTime expirationDate) {
+        this.expirationDate = expirationDate;
         return (T) this;
     }
 }

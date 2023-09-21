@@ -33,6 +33,7 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
     private OffsetDateTime nextTimeForReminder;
     @JsonIgnore
     private FirmwareInstallationState firmwareInstallationState;
+    private OffsetDateTime expirationDate;
 
 
     public String getFirmwareUpdateId() {
@@ -107,6 +108,15 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
 
     public <T extends FirmwareUpdateInstallationCreate> T setFirmwareInstallationState(FirmwareInstallationState firmwareInstallationState) {
         this.firmwareInstallationState = firmwareInstallationState;
+        return (T) this;
+    }
+
+    public OffsetDateTime getExpirationDate() {
+        return expirationDate;
+    }
+
+    public <T extends FirmwareUpdateInstallationCreate> T setExpirationDate(OffsetDateTime expirationDate) {
+        this.expirationDate = expirationDate;
         return (T) this;
     }
 }

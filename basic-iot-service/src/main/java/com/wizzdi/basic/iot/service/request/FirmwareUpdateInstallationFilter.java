@@ -40,6 +40,9 @@ public class FirmwareUpdateInstallationFilter extends PaginationFilter {
 
     private Set<String> versions;
 
+    @JsonIgnore
+    private OffsetDateTime notExpiredAt;
+
     public Set<String> getFirmwareUpdateIds() {
         return firmwareUpdateIds;
     }
@@ -131,6 +134,16 @@ public class FirmwareUpdateInstallationFilter extends PaginationFilter {
 
     public <T extends FirmwareUpdateInstallationFilter> T setVersions(Set<String> versions) {
         this.versions = versions;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public OffsetDateTime getNotExpiredAt() {
+        return notExpiredAt;
+    }
+
+    public <T extends FirmwareUpdateInstallationFilter> T setNotExpiredAt(OffsetDateTime notExpiredAt) {
+        this.notExpiredAt = notExpiredAt;
         return (T) this;
     }
 }
