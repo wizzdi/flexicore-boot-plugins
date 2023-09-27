@@ -79,8 +79,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
 
-    private static final Map<String,Long> keepAliveBounceCache =new ConcurrentHashMap<>();
-
+    @Autowired
+    private KeepAliveBounceService keepAliveBounceService;
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
@@ -122,7 +122,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 logger.debug("bouncing keep alive {}",keepAlive.getId());
                 return null;
             }
-            keepAliveBounceCache.put(keepAlive.getGatewayId(),System.currentTimeMillis());
+            keepAliveBounceService.setLastBounce(keepAlive.getGatewayId(),System.currentTimeMillis());
 
         }
         Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
@@ -157,7 +157,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private boolean shouldBounce(IOTMessage iotMessage) {
-        Long lastKeepAliveReceived = keepAliveBounceCache.computeIfAbsent(iotMessage.getGatewayId(), f -> 0L);
+        Long lastKeepAliveReceived = keepAliveBounceService.getLastBounce(iotMessage.getGatewayId());
         return (System.currentTimeMillis() - lastKeepAliveReceived) < keepAliveBounceThreshold;
     }
 
@@ -212,13 +212,16 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
         List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
         for (Remote remote : remotesToUpdate) {
+            Map<String,Object> toMerge=new HashMap<>();
             SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
             ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now());
+            connectivityChangeCreate.setName(ConnectivityChangeService.getConnectivityChangeName(connectivityChangeCreate));
             boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
-            ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChange(connectivityChangeCreate, remoteSecurityContext):connectivityChangeService.updateConnectivityChange(connectivityChangeCreate, remote.getLastConnectivityChange());
+            ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChangeNoMerge(connectivityChangeCreate, remoteSecurityContext):updateConnectivityChangeNoMerge(remote.getLastConnectivityChange(), connectivityChangeCreate,toMerge);
             if(createConnectivityChange){
                 remote.setLastConnectivityChange(connectivityChange);
-                gatewayService.merge(remote);
+                toMerge.put(remote.getId(),remote);
+                toMerge.put(connectivityChange.getId(),connectivityChange);
             }
 
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
@@ -228,11 +231,21 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                         device.setPreConnectivityLossIcon(device.getMappedPOI().getMapIcon());
                     }
                     device.getMappedPOI().setMapIcon(device.getDeviceType().getDefaultMapIcon());
-                    gatewayService.massMerge(List.of(device,device.getMappedPOI()));
+                    toMerge.put(device.getId(),device);
+                    toMerge.put(device.getMappedPOI().getId(),device.getMappedPOI());
                 }
             }
+            gatewayService.massMerge(new ArrayList<>(toMerge.values()));
+
         }
         logger.debug("done checking connectivity");
+    }
+
+    private ConnectivityChange updateConnectivityChangeNoMerge(ConnectivityChange lastConnectivityChange, ConnectivityChangeCreate connectivityChangeCreate, Map<String, Object> toMerge) {
+        if(connectivityChangeService.updateConnectivityChangeNoMerge(lastConnectivityChange,connectivityChangeCreate)){
+            toMerge.put(lastConnectivityChange.getId(),lastConnectivityChange);
+        }
+        return lastConnectivityChange;
     }
 
     @Scheduled(fixedDelayString = "${basic.iot.firmware.update.checkInterval:60000}")

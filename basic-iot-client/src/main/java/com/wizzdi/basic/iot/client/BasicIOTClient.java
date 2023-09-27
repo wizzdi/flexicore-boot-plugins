@@ -21,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 public class BasicIOTClient {
     public static final String MAIN_TOPIC_PATH = "GATEWAY";
@@ -57,18 +58,20 @@ public class BasicIOTClient {
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
     private final boolean disableVerification;
+    private final Consumer<IOTMessage> outgoingMessageCallback;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false, false);
+        this(id, key, objectMapper, subscribers, false, false,null);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,boolean disableVerification) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,boolean disableVerification,Consumer<IOTMessage> outgoingMessageCallback) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
         this.disableVerification=disableVerification;
+        this.outgoingMessageCallback=outgoingMessageCallback;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
             signature.initSign(key);
@@ -209,6 +212,9 @@ public class BasicIOTClient {
             iotMessage.setSignature(Base64.getEncoder().encodeToString(sign));
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        if(outgoingMessageCallback!=null){
+            outgoingMessageCallback.accept(iotMessage);
         }
     }
 

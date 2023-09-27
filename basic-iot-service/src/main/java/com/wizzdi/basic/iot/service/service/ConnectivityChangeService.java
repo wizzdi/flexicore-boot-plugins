@@ -118,7 +118,7 @@ public class ConnectivityChangeService implements Plugin {
     public boolean updateConnectivityChangeNoMerge(ConnectivityChange connectivityChange,
                                         ConnectivityChangeCreate connectivityChangeCreate) {
         if(connectivityChange.getName()==null&&connectivityChangeCreate.getName()==null&&connectivityChangeCreate.getRemote()!=null&&connectivityChangeCreate.getConnectivity()!=null&&connectivityChangeCreate.getDate()!=null){
-            connectivityChangeCreate.setName(connectivityChangeCreate.getRemote().getRemoteId() +" changed to "+connectivityChangeCreate.getConnectivity() +" at "+connectivityChangeCreate.getDate());
+            connectivityChangeCreate.setName(getConnectivityChangeName(connectivityChangeCreate));
         }
         boolean update = basicService.updateBasicNoMerge(connectivityChangeCreate, connectivityChange);
 
@@ -135,6 +135,10 @@ public class ConnectivityChangeService implements Plugin {
             update = true;
         }
         return update;
+    }
+
+    public static String getConnectivityChangeName(ConnectivityChangeCreate connectivityChangeCreate) {
+        return connectivityChangeCreate.getRemote().getRemoteId() + " changed to " + connectivityChangeCreate.getConnectivity() + " at " + connectivityChangeCreate.getDate();
     }
 
     public ConnectivityChange updateConnectivityChange(ConnectivityChangeUpdate connectivityChangeUpdate,

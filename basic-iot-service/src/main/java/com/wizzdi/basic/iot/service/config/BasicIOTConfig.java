@@ -11,10 +11,13 @@ import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.service.request.GatewayFilter;
 import com.wizzdi.basic.iot.service.response.ServerIntegrationFlowHolder;
 import com.wizzdi.basic.iot.service.service.GatewayService;
+import com.wizzdi.basic.iot.service.service.PublicKeyService;
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -23,6 +26,9 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.metrics.cache.CacheMetricsRegistrar;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -84,14 +90,11 @@ public class BasicIOTConfig implements Plugin {
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
     @Autowired
-    private GatewayService gatewayService;
+    private PublicKeyService publicKeyService;
     @Value("${basic.iot.mqtt.jdbcRatio:0.6666}")
     private float mqttJdbcRatio;
     @Autowired
     private MeterRegistry meterRegistry;
-
-
-    private final Cache<String,PublicKeyResponse> publicKeyCache=Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).maximumSize(10000).build();
 
 
 
@@ -173,31 +176,19 @@ public class BasicIOTConfig implements Plugin {
         return KeyUtils.readPrivateKey(keyPath);
     }
 
-    public static PublicKey readPublicKey(String publicKeyUnwrapped) {
 
-        try {
-            return KeyUtils.readPublicKeyUnwrapped(publicKeyUnwrapped);
-        } catch (Exception e) {
-            logger.error("failed parsing public key", e);
-            return null;
-        }
-    }
 
 
     @Bean
     public PublicKeyProvider publicKeyProvider() {
         logger.info("publicKeyProvider");
 
-        return f -> publicKeyCache.get(f,g->gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(g))).stream().findFirst()
-                .map(e -> getPublicKeyResponse(e)).orElse(null));
+        return f ->  publicKeyService.getPublicKeyForGateway(f);
     }
 
-    private PublicKeyResponse getPublicKeyResponse(Gateway e) {
-        if(e.isNoSignatureCapabilities()){
-            return new PublicKeyResponse(null,false);
-        }
-        return new PublicKeyResponse(readPublicKey(e.getPublicKey()),true);
-    }
+
+
+
 
     @Bean
     public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers) throws IOException, InterruptedException {
@@ -212,13 +203,21 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,disableVerification)
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers,false,disableVerification,f->incOutgoingMessage(f.getClass().getSimpleName()))
                 .setPublicKeyProvider(publicKeyProvider);
     }
 
     private static final Map<String, Timer> timerMap = new ConcurrentHashMap<>();
 
+    private static final Map<String,Counter> outgoingCounterMap=new ConcurrentHashMap<>();
 
+
+    private void incOutgoingMessage( String type) {
+        Counter counter = outgoingCounterMap.computeIfAbsent(type, e -> Counter.builder("outgoing.message.count")
+                .tag("type", type)
+                .register(meterRegistry));
+        counter.increment();
+    }
 
 
     private void timeMessage(TimerType timerType, String type, long time) {
