@@ -13,6 +13,7 @@ import com.wizzdi.flexicore.security.request.DateFilter;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.MappedPOICreate;
+import com.wizzdi.maps.service.request.MappedPOIUpdate;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
 import org.pf4j.Extension;
@@ -204,6 +205,23 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
         }
         return statusChanged;
+    }
+
+    /**
+     * since connectivity and device mapped POI mapIcon, there can be a situation where the connectivity is off but the status is on.
+     * this happens when the device sends stateChanged while checkConnectivity schedule runs, instead of using locks and reducing performance,
+     * and since this is not very critical or common situation, we will fix it once a day
+     */
+    @Scheduled(cron = "${basic.iot.fixInvalidStatusCron:0 0 10 * * *}")
+    public void fixInvalidStatus() {
+        logger.debug("fixing invalid status");
+        List<Device> remotesAtInvalidStatus = deviceService.listAllDevices(null, new DeviceFilter().setWithoutDefaultIcon(true).setConnectivity(Collections.singleton(Connectivity.OFF)));
+        for (Device atInvalidStatus : remotesAtInvalidStatus) {
+            MapIcon defaultMapIcon = atInvalidStatus.getDeviceType().getDefaultMapIcon();
+            mappedPOIService.updateMappedPOI(new MappedPOIUpdate().setMappedPOI(atInvalidStatus.getMappedPOI()).setMapIcon(defaultMapIcon),null);
+            logger.info("fixed invalid status for device "+atInvalidStatus.getRemoteId()+"("+atInvalidStatus.getId()+")");
+        }
+        logger.debug("done fixing invalid status");
     }
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
@@ -409,6 +427,7 @@ private static final class GetOrCreateDeviceResponse{
         DeviceCreate deviceCreate = new DeviceCreate()
                 .setGateway(gateway)
                 .setDeviceProperties(state)
+                .setVersion(version)
                 .setName(deviceId);
 
 
@@ -417,8 +436,8 @@ private static final class GetOrCreateDeviceResponse{
             DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, gatewaySecurityContext);
             deviceCreate
                     .setDeviceType(deviceType)
-                    .setRemoteId(deviceId)
-                    .setVersion(version);
+                    .setRemoteId(deviceId);
+
 
             device=deviceService.createDevice(deviceCreate, gatewaySecurityContext);
             newVersion= device.getVersion();

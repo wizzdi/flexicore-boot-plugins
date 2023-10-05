@@ -18,6 +18,9 @@ public class DeviceFilter extends RemoteFilter {
     @JsonIgnore
     private List<DeviceType> deviceTypes;
     private DeviceTypeFilter deviceTypeFilter;
+    @JsonIgnore
+    private boolean withoutDefaultIcon;
+
 
     public Set<String> getGatewayIds() {
         return gatewayIds;
@@ -63,6 +66,16 @@ public class DeviceFilter extends RemoteFilter {
 
     public <T extends DeviceFilter> T setDeviceTypeFilter(DeviceTypeFilter deviceTypeFilter) {
         this.deviceTypeFilter = deviceTypeFilter;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public boolean isWithoutDefaultIcon() {
+        return withoutDefaultIcon;
+    }
+
+    public <T extends DeviceFilter> T setWithoutDefaultIcon(boolean withoutDefaultIcon) {
+        this.withoutDefaultIcon = withoutDefaultIcon;
         return (T) this;
     }
 }

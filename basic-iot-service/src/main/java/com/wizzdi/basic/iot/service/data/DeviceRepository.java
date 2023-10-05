@@ -9,6 +9,8 @@ import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
+import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.model.MappedPOI_;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -76,6 +78,14 @@ public class DeviceRepository implements Plugin {
         if(filtering.getDeviceTypeFilter()!=null){
             Join<T, DeviceType> join=r.join(Device_.deviceType);
             deviceTypeRepository.addDeviceTypePredicates(filtering.getDeviceTypeFilter(),cb,q,join,preds,securityContext);
+        }
+        if(filtering.isWithoutDefaultIcon()){
+            Join<T,DeviceType> deviceTypeJoin=r.join(Device_.deviceType);
+            Join<T, MappedPOI> mappedPOIJoin=r.join(Device_.mappedPOI);
+            preds.add(cb.and(
+                    deviceTypeJoin.get(DeviceType_.defaultMapIcon).isNotNull(),
+                    cb.not(cb.equal(mappedPOIJoin.get(MappedPOI_.mapIcon),deviceTypeJoin.get(DeviceType_.defaultMapIcon)))
+            ));
         }
 
 
