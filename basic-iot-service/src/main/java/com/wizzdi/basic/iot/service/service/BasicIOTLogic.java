@@ -211,17 +211,20 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
      * since connectivity and device mapped POI mapIcon, there can be a situation where the connectivity is off but the status is on.
      * this happens when the device sends stateChanged while checkConnectivity schedule runs, instead of using locks and reducing performance,
      * and since this is not very critical or common situation, we will fix it once a day
+     * ${basic.iot.fixInvalidStatusCron:0 0 6 * * *}
      */
-    @Scheduled(cron = "${basic.iot.fixInvalidStatusCron:0 0 10 * * *}")
+    @Scheduled(cron = "${basic.iot.fixInvalidStatusCron:0 0 6 * * *}")
     public void fixInvalidStatus() {
         logger.debug("fixing invalid status");
+        long started=System.currentTimeMillis();
         List<Device> remotesAtInvalidStatus = deviceService.listAllDevices(null, new DeviceFilter().setWithoutDefaultIcon(true).setConnectivity(Collections.singleton(Connectivity.OFF)));
+        logger.debug("Have found {}  devices at invalid status",remotesAtInvalidStatus.size());
         for (Device atInvalidStatus : remotesAtInvalidStatus) {
             MapIcon defaultMapIcon = atInvalidStatus.getDeviceType().getDefaultMapIcon();
             mappedPOIService.updateMappedPOI(new MappedPOIUpdate().setMappedPOI(atInvalidStatus.getMappedPOI()).setMapIcon(defaultMapIcon),null);
             logger.info("fixed invalid status for device "+atInvalidStatus.getRemoteId()+"("+atInvalidStatus.getId()+")");
         }
-        logger.debug("done fixing invalid status");
+        logger.debug("done fixing invalid status {} ",System.currentTimeMillis()-started);
     }
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
