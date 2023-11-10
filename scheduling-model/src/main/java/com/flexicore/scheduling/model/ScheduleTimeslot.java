@@ -4,6 +4,7 @@ import com.flexicore.model.SecuredBasic;
 import java.time.OffsetDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -18,6 +19,8 @@ public class ScheduleTimeslot extends SecuredBasic {
   @Column(columnDefinition = "timestamp with time zone")
 
   private OffsetDateTime lastExecution;
+ @Lob
+ private String log;
 
   private Long startMillisOffset;
 
@@ -256,6 +259,15 @@ public class ScheduleTimeslot extends SecuredBasic {
   public <T extends ScheduleTimeslot> T setTimeOfTheDayNameStartLon(
       Double timeOfTheDayNameStartLon) {
     this.timeOfTheDayNameStartLon = timeOfTheDayNameStartLon;
+    return (T) this;
+  }
+
+  public String getLog() {
+    return log;
+  }
+
+  public <T extends ScheduleTimeslot> T setLog(String log) {
+    this.log = log;
     return (T) this;
   }
 }

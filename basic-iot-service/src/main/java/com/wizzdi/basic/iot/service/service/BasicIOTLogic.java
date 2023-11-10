@@ -226,6 +226,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         logger.debug("done fixing invalid status {} ",System.currentTimeMillis()-started);
     }
+    public long fixIcons(SecurityContextBase securityContext) {
+        long started=System.currentTimeMillis();
+        fixInvalidStatus();
+        return System.currentTimeMillis()-started;
+    }
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
     public void checkConnectivity() {
@@ -312,7 +317,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         logger.info("auto cancelled "+oldUnfinishedInstallations.size() +" installations ");
     }
 
-private static final class GetOrCreateDeviceResponse{
+
+    private static final class GetOrCreateDeviceResponse{
         private final Device device;
         private final String newVersion;
 

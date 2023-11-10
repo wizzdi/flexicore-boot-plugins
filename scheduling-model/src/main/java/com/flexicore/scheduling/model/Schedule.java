@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -28,6 +29,8 @@ public class Schedule extends SecuredBasic {
   private boolean holiday;
   private boolean sunday;
   private boolean thursday;
+ @Lob
+ private String log;
   private boolean friday;
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime timeFrameStart;
@@ -225,6 +228,15 @@ public class Schedule extends SecuredBasic {
 
   public <T extends Schedule> T setEndTimeOffsetId(String endTimeOffsetId) {
     this.endTimeOffsetId = endTimeOffsetId;
+    return (T) this;
+  }
+
+  public String getLog() {
+    return log;
+  }
+
+  public <T extends Schedule> T setLog(String log) {
+    this.log = log;
     return (T) this;
   }
 }

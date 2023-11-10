@@ -3,9 +3,12 @@ package com.flexicore.scheduling.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecuredBasic;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +20,8 @@ public class ScheduleAction extends SecuredBasic {
   @JsonIgnore
   @OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "scheduleAction")
   private List<ScheduleToAction> scheduleToActions = new ArrayList<>();
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime lastExecution;
 
   @JsonIgnore
   @OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "scheduleAction")
@@ -44,4 +49,13 @@ public class ScheduleAction extends SecuredBasic {
     this.dynamicExecution = dynamicExecution;
     return (T) this;
   }
+
+    public OffsetDateTime getLastExecution() {
+        return lastExecution;
+    }
+
+    public <T extends ScheduleAction> T setLastExecution(OffsetDateTime lastExecution) {
+        this.lastExecution = lastExecution;
+        return (T) this;
+    }
 }

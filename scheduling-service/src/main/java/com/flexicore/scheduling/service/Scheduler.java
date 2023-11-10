@@ -84,6 +84,7 @@ public class Scheduler implements Plugin, InitializingBean {
                         ChronoUnit.MILLIS))) {
                     try {
                         List<ScheduleToAction> allScheduleToActionLinks = scheduleToActionService.listAllScheduleToActions(new ScheduleToActionFilter(), null).parallelStream().filter(f -> f.getSchedule() != null && !f.getSchedule().isSoftDelete()).collect(Collectors.toList());
+
                         List<Schedule> schedules = new ArrayList<>(allScheduleToActionLinks.stream().collect(Collectors.toMap(f -> f.getSchedule().getId(), f -> f.getSchedule(), (a, b) -> a)).values());
                         actionsMap = allScheduleToActionLinks.stream().collect(Collectors.groupingBy(f -> f.getSchedule().getId(), Collectors.toList()));
                         timeSlotsMap = scheduleTimeslotService.listAllScheduleTimeslots(new ScheduleTimeslotFilter().setSchedule(schedules), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
@@ -112,6 +113,8 @@ public class Scheduler implements Plugin, InitializingBean {
                         if (timeslots == null) {
                             logger.debug("no timeslots for schedule " + schedule.getName() + "(" + schedule.getId() + ")");
                             continue;
+                        }else {
+                            logger.debug("found {}  timeslots for schedule {} , id {} ", timeslots.size(), schedule.getName(), schedule.getId());
                         }
                         for (ScheduleTimeslot scheduleTimeslot : timeslots.parallelStream().filter(f -> shouldRun(f, now) && !currentlyRunningSchedules.getOrDefault(f.getId(), false)).collect(Collectors.toList())) {
                             try {
@@ -167,12 +170,16 @@ public class Scheduler implements Plugin, InitializingBean {
     }
 
     private boolean shouldRun(ScheduleTimeslot scheduleTimeslot, OffsetDateTime now) {
+        logger.info("Checking schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ")");
         boolean time = isTime(scheduleTimeslot, now);
         boolean previousRun = checkPreviousRun(scheduleTimeslot, now);
         boolean shouldRun = time && previousRun;
+        logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run: " + shouldRun + " , in timespan: " + time + " , previous run: " + previousRun);
         if (!shouldRun) {
-            logger.debug("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should not run , in timespan: " + time + " , previous run: " + previousRun);
+            logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should not run , in timespan: " + time + " , previous run: " + previousRun);
 
+        }else {
+            logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run , in timespan: " + time + " , previous run: " + previousRun);
         }
         return shouldRun;
 
