@@ -5,10 +5,13 @@ import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 
+import java.time.OffsetDateTime;
+
 public class ScheduleToActionCreate extends BasicCreate {
 
   @JsonIgnore private Schedule schedule;
   private String scheduleId;
+  private OffsetDateTime lastExecution;
 
   @JsonIgnore private ScheduleAction scheduleAction;
   private String scheduleActionId;
@@ -48,6 +51,15 @@ public class ScheduleToActionCreate extends BasicCreate {
 
   public <T extends ScheduleToActionCreate> T setScheduleActionId(String scheduleActionId) {
     this.scheduleActionId = scheduleActionId;
+    return (T) this;
+  }
+
+  public OffsetDateTime getLastExecution() {
+    return lastExecution;
+  }
+
+  public <T extends ScheduleToActionCreate> T setLastExecution(OffsetDateTime lastExecution) {
+    this.lastExecution = lastExecution;
     return (T) this;
   }
 }

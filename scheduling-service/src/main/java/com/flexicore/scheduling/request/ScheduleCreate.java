@@ -26,7 +26,7 @@ public class ScheduleCreate extends BasicCreate {
   private OffsetDateTime timeFrameStart;
 
   private Boolean wednesday;
-
+  private String log;
   public Boolean isEnabled() {
     return this.enabled;
   }
@@ -123,6 +123,15 @@ public class ScheduleCreate extends BasicCreate {
 
   public <T extends ScheduleCreate> T setWednesday(Boolean wednesday) {
     this.wednesday = wednesday;
+    return (T) this;
+  }
+
+  public String getLog() {
+    return log;
+  }
+
+  public <T extends ScheduleCreate> T setLog(String log) {
+    this.log = log;
     return (T) this;
   }
 }

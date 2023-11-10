@@ -23,22 +23,24 @@ public class Schedule extends SecuredBasic {
   private boolean enabled;
   private boolean monday;
   private boolean saturday;
-  @Column(columnDefinition = "timestamp with time zone")
-  private OffsetDateTime timeFrameEnd;
+
   private boolean tuesday;
   private boolean holiday;
   private boolean sunday;
   private boolean thursday;
- @Lob
- private String log;
+  private boolean wednesday;
+
   private boolean friday;
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime timeFrameStart;
-  private boolean wednesday;
+  @Column(columnDefinition = "timestamp with time zone")
+  private OffsetDateTime timeFrameEnd;
+
   private String startTimeOffsetId;
   private String endTimeOffsetId;
 
-
+  @Lob
+  private String log;
   /** @return enabled */
   public boolean isEnabled() {
     return this.enabled;

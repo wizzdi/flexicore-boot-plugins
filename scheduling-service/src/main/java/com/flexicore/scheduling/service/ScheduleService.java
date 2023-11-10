@@ -128,7 +128,11 @@ public class ScheduleService implements Plugin, IScheduleService {
       schedule.setStartTimeOffsetId(schedule.getTimeFrameStart().getOffset().getId());
       update = true;
     }
-
+    if (scheduleCreate.getLog() != null
+            && (!scheduleCreate.getLog().equals(schedule.getLog()))) {
+      schedule.setLog(scheduleCreate.getLog());
+      update = true;
+    }
     if (scheduleCreate.getTimeFrameEnd() != null
         && (!scheduleCreate.getTimeFrameEnd().equals(schedule.getTimeFrameEnd()))) {
       schedule.setTimeFrameEnd(scheduleCreate.getTimeFrameEnd());

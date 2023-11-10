@@ -91,6 +91,10 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
       scheduleTimeslot.setEndTimeOfTheDayName(null);
       update = true;
     }
+    if (scheduleTimeslotCreate.getLog() != null &&(scheduleTimeslot.getLog()==null || !scheduleTimeslotCreate.getLog().equals(scheduleTimeslot.getLog()))) {
+           scheduleTimeslot.setLog(scheduleTimeslotCreate.getLog());
+      update = true;
+    }
     if (scheduleTimeslotCreate.getEndTimeOfTheDayName() != null
         && (!scheduleTimeslotCreate
             .getEndTimeOfTheDayName()

@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.TimeOfTheDayName;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import jakarta.persistence.Lob;
+
 import java.time.OffsetDateTime;
 
 public class ScheduleTimeslotCreate extends BasicCreate {
 
   @JsonIgnore
   private String endTimeOffsetId;
-
+  @Lob
+    private String log;
   private TimeOfTheDayName startTimeOfTheDayName;
 
   private OffsetDateTime startTime;
@@ -195,6 +198,15 @@ public class ScheduleTimeslotCreate extends BasicCreate {
   public <T extends ScheduleTimeslotCreate> T setTimeOfTheDayNameStartLon(
       Double timeOfTheDayNameStartLon) {
     this.timeOfTheDayNameStartLon = timeOfTheDayNameStartLon;
+    return (T) this;
+  }
+
+  public String getLog() {
+    return log;
+  }
+
+  public <T extends ScheduleTimeslotCreate> T setLog(String log) {
+    this.log = log;
     return (T) this;
   }
 }

@@ -87,6 +87,15 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
       scheduleAction.setDynamicExecution(scheduleActionCreate.getDynamicExecution());
       update = true;
     }
+    if (scheduleActionCreate.getLastExecution() != null
+            && (scheduleAction.getLastExecution() == null
+            || !scheduleActionCreate
+            .getLastExecution()
+
+            .equals(scheduleAction.getLastExecution()))) {
+      scheduleAction.setLastExecution(scheduleActionCreate.getLastExecution());
+      update = true;
+    }
 
     return update;
   }

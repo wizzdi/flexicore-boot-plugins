@@ -80,6 +80,15 @@ public class ScheduleToActionService implements Plugin, IScheduleToActionService
       scheduleToAction.setSchedule(scheduleToActionCreate.getSchedule());
       update = true;
     }
+    if (scheduleToActionCreate.getLastExecution() != null
+            && (scheduleToAction.getLastExecution() == null
+            || !scheduleToActionCreate
+            .getLastExecution()
+
+            .equals(scheduleToAction.getLastExecution()))) {
+      scheduleToAction.setLastExecution(scheduleToActionCreate.getLastExecution());
+      update = true;
+    }
 
     if (scheduleToActionCreate.getScheduleAction() != null
         && (scheduleToAction.getScheduleAction() == null
