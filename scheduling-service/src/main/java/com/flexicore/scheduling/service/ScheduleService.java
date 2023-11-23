@@ -4,9 +4,11 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.data.ScheduleRepository;
+import com.flexicore.scheduling.request.NullActionBody;
 import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
+import com.flexicore.scheduling.response.ActionResult;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -17,6 +19,8 @@ import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,7 +32,7 @@ public class ScheduleService implements Plugin, IScheduleService {
   @Autowired private ScheduleRepository repository;
 
   @Autowired private BasicService basicService;
-
+  private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
   /**
    * @param scheduleCreate Object Used to Create Entity1
    * @param securityContext
@@ -256,5 +260,16 @@ public class ScheduleService implements Plugin, IScheduleService {
   @Override
   public void massMerge(List<?> toMerge) {
     repository.massMerge(toMerge);
+  }
+
+  public Long fireNullAction(NullActionBody nullActionBody, SecurityContextBase securityContext) {
+    if (nullActionBody.getValue2()==null) nullActionBody.setValue2(99l);
+    if (nullActionBody.getValue1()==null) nullActionBody.setValue1("no value provided");
+    logger.info("Fired null action with value1:{} , value 2 {}",nullActionBody.getValue1(),nullActionBody.getValue2());
+    return nullActionBody.getValue2();
+  }
+
+  public ActionResult fireNullActionWithResult(NullActionBody nullActionBody, SecurityContextBase securityContext) {
+    return new ActionResult().setValue(nullActionBody.getValue1()).setExecutionTime(System.currentTimeMillis());
   }
 }

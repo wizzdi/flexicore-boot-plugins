@@ -3,12 +3,14 @@ package com.flexicore.scheduling.controller;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.Schedule_;
+import com.flexicore.scheduling.request.NullActionBody;
 import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
 import com.flexicore.scheduling.service.ScheduleService;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Extension
 @Tag(name = "Schedule")
 @OperationsInside
-public class ScheduleController implements Plugin {
+public class ScheduleController implements Plugin, Invoker {
 
   @Autowired private ScheduleService scheduleService;
 
@@ -64,5 +66,20 @@ public class ScheduleController implements Plugin {
       @RequestAttribute SecurityContextBase securityContext) {
     scheduleService.validate(scheduleFilter, securityContext);
     return scheduleService.getAllSchedules(scheduleFilter, securityContext);
+  }
+  @PostMapping("nullAction")
+  @Operation(summary = "null action for testing purposes of schedules")
+  public Long activateNullAction(
+
+          @RequestBody NullActionBody nullActionBody,
+          @RequestAttribute SecurityContextBase securityContext) {
+
+    return scheduleService.fireNullAction(nullActionBody, securityContext);
+  }
+
+
+  @Override
+  public Class<?> getHandlingClass() {
+    return Schedule.class;
   }
 }

@@ -3,6 +3,7 @@ package com.flexicore.scheduling.service;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
+import com.flexicore.scheduling.request.ScheduleUpdate;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -48,6 +49,8 @@ public class Scheduler implements Plugin, InitializingBean {
     @Autowired
     private ScheduleToActionService scheduleToActionService;
     @Autowired
+    private ScheduleActionService scheduleActionService;
+    @Autowired
     private ScheduleTimeslotService scheduleTimeslotService;
     @Autowired
     @Lazy
@@ -83,11 +86,21 @@ public class Scheduler implements Plugin, InitializingBean {
                         || now.isAfter(lastFetch.plus(fetchInterval,
                         ChronoUnit.MILLIS))) {
                     try {
+                        logger.debug("Fetching Schedule to Actions");
                         List<ScheduleToAction> allScheduleToActionLinks = scheduleToActionService.listAllScheduleToActions(new ScheduleToActionFilter(), null).parallelStream().filter(f -> f.getSchedule() != null && !f.getSchedule().isSoftDelete()).collect(Collectors.toList());
-
+                        logger.debug("Fetched {} Actions, names of schedules {} ", allScheduleToActionLinks.size(),allScheduleToActionLinks.stream().map(f->f.getSchedule().getName()).collect(Collectors.joining(",")));
                         List<Schedule> schedules = new ArrayList<>(allScheduleToActionLinks.stream().collect(Collectors.toMap(f -> f.getSchedule().getId(), f -> f.getSchedule(), (a, b) -> a)).values());
+                        schedules.stream().map(f->f.getName()).forEach(e->{
+                            logger.debug("schedule name {} found in actions",e);
+                                });
                         actionsMap = allScheduleToActionLinks.stream().collect(Collectors.groupingBy(f -> f.getSchedule().getId(), Collectors.toList()));
-                        timeSlotsMap = scheduleTimeslotService.listAllScheduleTimeslots(new ScheduleTimeslotFilter().setSchedule(schedules), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
+                        for (String id:actionsMap.keySet()) {
+                            logger.debug("schedule {} has {} actions", id, actionsMap.get(id).size());
+                            String allActions = actionsMap.get(id).stream().map(ScheduleToAction::getScheduleAction)
+                                    .map(ScheduleAction::getName).collect(Collectors.joining(","));
+                            logger.debug("schedule {} has actions {}", id, allActions);
+                        }
+                          timeSlotsMap = scheduleTimeslotService.listAllScheduleTimeslots(new ScheduleTimeslotFilter().setSchedule(schedules), null).parallelStream().collect(Collectors.groupingBy(f -> f.getSchedule().getId()));
                         lastFetch = now;
                         logger.debug("Fetched Actions");
                     }
@@ -99,7 +112,7 @@ public class Scheduler implements Plugin, InitializingBean {
                 try {
                     Map<String, Boolean> currentlyRunningSchedules = new ConcurrentHashMap<>();
                     if (actionsMap.isEmpty()) {
-                        logger.debug("No Actions");
+                        logger.info("No Actions found to execute");
                     }
                     List<Map.Entry<String, List<ScheduleToAction>>> filteredActions = actionsMap.entrySet().parallelStream().filter(f -> shouldRun(f.getValue().get(0).getSchedule(), now)).collect(Collectors.toList());
                     if (filteredActions.isEmpty() && !actionsMap.isEmpty()) {
@@ -163,9 +176,14 @@ public class Scheduler implements Plugin, InitializingBean {
         boolean inTimeFrame = isInTimeFrame(schedule, now);
         boolean day = isDay(schedule, now);
         boolean shouldRun = enabled && inTimeFrame && day;
+        logger.debug(" ******************** Schedule {},in time frame {} ,day {} ,enabled {} ,should run {} ********************* ",schedule.getName(),inTimeFrame,day,enabled,shouldRun);
         if (!shouldRun) {
+            schedule.setLog("Should not run on : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day);
             logger.debug("schedule " + schedule.getName() + "(" + schedule.getId() + ") should not run , in timespan: " + inTimeFrame + " , day: " + day + ", enabled:" + enabled);
+        }else {
+            schedule.setLog("Should run on now : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day);
         }
+        schedulingService.updateSchedule(new ScheduleUpdate().setSchedule(schedule).setLog(schedule.getLog()),null);
         return shouldRun;
     }
 
@@ -174,12 +192,15 @@ public class Scheduler implements Plugin, InitializingBean {
         boolean time = isTime(scheduleTimeslot, now);
         boolean previousRun = checkPreviousRun(scheduleTimeslot, now);
         boolean shouldRun = time && previousRun;
+        logger.debug("-------------- Checking time slot name {},time {} ,previous run {}  " , scheduleTimeslot.getName() , time , previousRun);
         logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run: " + shouldRun + " , in timespan: " + time + " , previous run: " + previousRun);
         if (!shouldRun) {
+            scheduleTimeslot.setLog("Time slot is NOT  effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
             logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should not run , in timespan: " + time + " , previous run: " + previousRun);
 
         }else {
             logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run , in timespan: " + time + " , previous run: " + previousRun);
+            scheduleTimeslot.setLog("Time slot is effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
         }
         return shouldRun;
 
@@ -275,18 +296,27 @@ public class Scheduler implements Plugin, InitializingBean {
                         .getDynamicExecution();
                 if (dynamicExecution != null) {
                     response = dynamicExecutionService.executeDynamicExecution(new ExecuteDynamicExecution().setDynamicExecution(dynamicExecution), securityContext);
+                    logger.info("Have executed schedule action "
+                            + scheduleAction.getName() + "("
+                            + scheduleAction.getId() + ") with response "
+                            + response);
+                    link.setLastExecution(OffsetDateTime.now());
+                    scheduleAction.setLastExecution(OffsetDateTime.now());
+                    scheduleActionService.merge(scheduleAction);
+                    scheduleToActionService.merge(link);
                 } else {
                     logger.warn("Schedule Action "
                             + scheduleAction.getName() + "("
                             + scheduleAction.getId()
                             + ") had null dynamic Exection");
+
                 }
             } catch (Exception e) {
                 response = e;
                 failed = true;
 
             } finally {
-                //auditSchedule(securityContext, scheduleAction, start, failed, response);
+               // auditSchedule(securityContext, scheduleAction, start, failed, response);
             }
 
         }
