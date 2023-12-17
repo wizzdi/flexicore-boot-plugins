@@ -7,6 +7,7 @@ import com.flexicore.model.territories.Address;
 import com.flexicore.territories.request.AddressFilter;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
+import com.wizzdi.flexicore.security.validation.IdValid;
 import com.wizzdi.maps.model.*;
 
 import com.wizzdi.maps.model.Room;
@@ -18,25 +19,25 @@ import java.util.Set;
 /**
  * Object Used to List MappedPOI
  */
-//@com.wizzdi.flexicore.security.validation.IdValid.List({
-//        @IdValid(
-//                targetField = "address",
-//                field = "addressIds",
-//                fieldType = com.flexicore.model.territories.Address.class),
-//        @IdValid(
-//                targetField = "mapIcons",
-//                field = "mapIconsIds",
-//                fieldType = com.wizzdi.maps.model.MapIcon.class),
-//        @IdValid(targetField = "room", field = "roomIds", fieldType = com.wizzdi.maps.model.Room.class),
-//         @IdValid(
-//                 targetField = "buildingFloors",
-//                 field = "buildingFloorIds",
-//                 fieldType = com.wizzdi.maps.model.BuildingFloor.class),
-//        @IdValid(
-//                targetField = "layers",
-//                field = "layerIds",
-//                fieldType = com.wizzdi.maps.model.Layer.class)
-//})
+@com.wizzdi.flexicore.security.validation.IdValid.List({
+        @IdValid(
+                targetField = "address",
+                field = "addressIds",
+                fieldType = com.flexicore.model.territories.Address.class),
+        @IdValid(
+                targetField = "mapIcons",
+                field = "mapIconsIds",
+                fieldType = com.wizzdi.maps.model.MapIcon.class),
+        @IdValid(targetField = "room", field = "roomIds", fieldType = com.wizzdi.maps.model.Room.class),
+         @IdValid(
+                 targetField = "buildingFloors",
+                 field = "buildingFloorIds",
+                 fieldType = com.wizzdi.maps.model.BuildingFloor.class),
+        @IdValid(
+                targetField = "layers",
+                field = "layerIds",
+                fieldType = com.wizzdi.maps.model.Layer.class)
+})
 public class MappedPOIFilter extends PaginationFilter {
 
 

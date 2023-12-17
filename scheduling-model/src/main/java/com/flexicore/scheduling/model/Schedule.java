@@ -38,6 +38,7 @@ public class Schedule extends SecuredBasic {
 
   private String startTimeOffsetId;
   private String endTimeOffsetId;
+  private String selectedTimeZone;
 
   @Lob
   private String log;
@@ -240,5 +241,14 @@ public class Schedule extends SecuredBasic {
   public <T extends Schedule> T setLog(String log) {
     this.log = log;
     return (T) this;
+  }
+
+  public String getSelectedTimeZone() {
+    return selectedTimeZone;
+  }
+
+  public Schedule setSelectedTimeZone(String selectedTimezoneId) {
+    this.selectedTimeZone = selectedTimezoneId;
+    return this;
   }
 }

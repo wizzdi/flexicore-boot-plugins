@@ -3,7 +3,6 @@ package com.flexicore.scheduling.controller;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.Schedule_;
-import com.flexicore.scheduling.request.NullActionBody;
 import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
@@ -67,15 +66,7 @@ public class ScheduleController implements Plugin, Invoker {
     scheduleService.validate(scheduleFilter, securityContext);
     return scheduleService.getAllSchedules(scheduleFilter, securityContext);
   }
-  @PostMapping("nullAction")
-  @Operation(summary = "null action for testing purposes of schedules")
-  public Long activateNullAction(
 
-          @RequestBody NullActionBody nullActionBody,
-          @RequestAttribute SecurityContextBase securityContext) {
-
-    return scheduleService.fireNullAction(nullActionBody, securityContext);
-  }
 
 
   @Override

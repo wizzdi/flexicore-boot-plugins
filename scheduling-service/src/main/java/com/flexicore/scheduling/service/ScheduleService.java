@@ -4,7 +4,6 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.data.ScheduleRepository;
-import com.flexicore.scheduling.request.NullActionBody;
 import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
@@ -14,6 +13,9 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -23,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
@@ -127,20 +128,23 @@ public class ScheduleService implements Plugin, IScheduleService {
     }
 
     if (scheduleCreate.getTimeFrameStart() != null
-        && (!scheduleCreate.getTimeFrameStart().equals(schedule.getTimeFrameStart()))) {
+        && (schedule.getTimeFrameStart()==null || !scheduleCreate.getTimeFrameStart().equals(schedule.getTimeFrameStart()))) {
       schedule.setTimeFrameStart(scheduleCreate.getTimeFrameStart());
       schedule.setStartTimeOffsetId(schedule.getTimeFrameStart().getOffset().getId());
       update = true;
     }
-    if (scheduleCreate.getLog() != null
-            && (!scheduleCreate.getLog().equals(schedule.getLog()))) {
-      schedule.setLog(scheduleCreate.getLog());
-      update = true;
-    }
     if (scheduleCreate.getTimeFrameEnd() != null
-        && (!scheduleCreate.getTimeFrameEnd().equals(schedule.getTimeFrameEnd()))) {
+            && (schedule.getTimeFrameEnd()==null || !scheduleCreate.getTimeFrameEnd().equals(schedule.getTimeFrameEnd()))) {
       schedule.setTimeFrameEnd(scheduleCreate.getTimeFrameEnd());
       schedule.setEndTimeOffsetId(schedule.getTimeFrameEnd().getOffset().getId());
+      update = true;
+    }
+
+
+    if (scheduleCreate.getSelectedTimeZone() != null
+            && (schedule.getSelectedTimeZone()==null || !scheduleCreate.getSelectedTimeZone().equals(schedule.getSelectedTimeZone()))) {
+      schedule.setSelectedTimeZone(scheduleCreate.getSelectedTimeZone());
+
 
       update = true;
     }
@@ -197,15 +201,25 @@ public class ScheduleService implements Plugin, IScheduleService {
   }
 
   /**
-   * @param scheduleCreate Object Used to Create Entity1
+   * @param sc Object Used to Create Entity1
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleCreate is not valid
    */
   @Override
-  public void validate(ScheduleCreate scheduleCreate, SecurityContextBase securityContext) {
-    basicService.validate(scheduleCreate, securityContext);
-  }
+  public void validate(ScheduleCreate sc, SecurityContextBase securityContext) {
+    basicService.validate(sc, securityContext);
+    sc.setTimeFrameStart(convertToOffsetDateTime(sc.getTimeFrameStart(),
+            sc.getSelectedTimeZone()).withHour(0).withMinute(0).withSecond(0).withNano(0));
+    sc.setTimeFrameEnd(convertToOffsetDateTime(sc.getTimeFrameEnd(),sc.getSelectedTimeZone()).withHour(23).withMinute(59).withSecond(59).withNano(999999999));
 
+
+  }
+  public OffsetDateTime convertToOffsetDateTime(OffsetDateTime offsetDateTime, String timeZone) {
+    if (timeZone==null) {
+      return offsetDateTime;
+    }
+    return (offsetDateTime.atZoneSameInstant(ZoneId.of(timeZone)).toOffsetDateTime());
+  }
   @Override
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
@@ -262,14 +276,7 @@ public class ScheduleService implements Plugin, IScheduleService {
     repository.massMerge(toMerge);
   }
 
-  public Long fireNullAction(NullActionBody nullActionBody, SecurityContextBase securityContext) {
-    if (nullActionBody.getValue2()==null) nullActionBody.setValue2(99l);
-    if (nullActionBody.getValue1()==null) nullActionBody.setValue1("no value provided");
-    logger.info("Fired null action with value1:{} , value 2 {}",nullActionBody.getValue1(),nullActionBody.getValue2());
-    return nullActionBody.getValue2();
-  }
 
-  public ActionResult fireNullActionWithResult(NullActionBody nullActionBody, SecurityContextBase securityContext) {
-    return new ActionResult().setValue(nullActionBody.getValue1()).setExecutionTime(System.currentTimeMillis());
-  }
+
+
 }

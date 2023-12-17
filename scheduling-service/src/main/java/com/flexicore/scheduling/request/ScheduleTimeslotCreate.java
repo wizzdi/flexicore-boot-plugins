@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.TimeOfTheDayName;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Lob;
 
 import java.time.OffsetDateTime;

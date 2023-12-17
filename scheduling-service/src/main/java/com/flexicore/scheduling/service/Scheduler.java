@@ -32,15 +32,21 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Extension
 public class Scheduler implements Plugin, InitializingBean {
-    @Value("${flexicore.scheduling.fetch.intervalMs:#{5 * 60 * 1000}}")
+//    @Value("${flexicore.scheduling.fetch.intervalMs:#{5 * 60 * 1000}}")
+//    private long fetchInterval;
+//    @Value("${flexicore.scheduling.initialDelayMs:#{1 * 60 * 1000}}")
+//    private long initialDelay;
+//    @Value("${flexicore.scheduling.check.intervalMs:#{30 * 1000}}")
+    @Value("${flexicore.scheduling.fetch.intervalMs:#{1 * 20 * 1000}}")
     private long fetchInterval;
-    @Value("${flexicore.scheduling.initialDelayMs:#{1 * 60 * 1000}}")
+    @Value("${flexicore.scheduling.initialDelayMs:#{1 * 1 * 1000}}")
     private long initialDelay;
-    @Value("${flexicore.scheduling.check.intervalMs:#{60 * 1000}}")
+    @Value("${flexicore.scheduling.check.intervalMs:#{10 * 1000}}")
     private long checkInterval;
 
     private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
@@ -57,14 +63,14 @@ public class Scheduler implements Plugin, InitializingBean {
     private SecurityContextProvider securityContextProvider;
     @Autowired
     @Qualifier("FCSchedulingExecutor")
-    private ExecutorService FCSchedulingExecutor;
+    private ExecutorService fCSchedulingExecutor;
     @Autowired
     private DynamicExecutionService dynamicExecutionService;
     private OffsetDateTime lastFetch = null;
     private boolean stop;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
-
+    Map<String, Boolean> currentlyRunningSchedules = new ConcurrentHashMap<>();
 
     public void runSchedules() {
         Map<String, List<ScheduleToAction>> actionsMap = new HashMap<>();
@@ -81,7 +87,6 @@ public class Scheduler implements Plugin, InitializingBean {
         while (!stop) {
             try {
                 OffsetDateTime now = OffsetDateTime.now();
-
                 if (lastFetch == null
                         || now.isAfter(lastFetch.plus(fetchInterval,
                         ChronoUnit.MILLIS))) {
@@ -109,18 +114,30 @@ public class Scheduler implements Plugin, InitializingBean {
                     }
 
                 }
+
                 try {
-                    Map<String, Boolean> currentlyRunningSchedules = new ConcurrentHashMap<>();
+
                     if (actionsMap.isEmpty()) {
                         logger.info("No Actions found to execute");
+                    }else {
+                        logger.info("Found {} Actions to execute", actionsMap.size());
                     }
-                    List<Map.Entry<String, List<ScheduleToAction>>> filteredActions = actionsMap.entrySet().parallelStream().filter(f -> shouldRun(f.getValue().get(0).getSchedule(), now)).collect(Collectors.toList());
+                    List<Map.Entry<String, List<ScheduleToAction>>> filteredActions = actionsMap.entrySet()
+                            .parallelStream().filter(f -> shouldRun(f.getValue().get(0).getSchedule(), now)).collect(Collectors.toList());
                     if (filteredActions.isEmpty() && !actionsMap.isEmpty()) {
                         logger.debug("No Filtered Actions");
 
+                    }else {
+                        logger.debug("Found {} Filtered that should run before time slot check Actions", filteredActions.size());
                     }
+                    //loop through schedules, the key is schedule id.
                     for (Map.Entry<String, List<ScheduleToAction>> entry : filteredActions) {
                         Schedule schedule = entry.getValue().get(0).getSchedule();
+                        if (currentlyRunningSchedules.getOrDefault(schedule.getId(), false)) {
+                            logger.debug("schedule {} is already running ",  schedule.getName());
+                            continue;
+                        }
+                        logger.debug("Starting to check schedule " + schedule.getName() + "(" + schedule.getId() + ")");
                         SecurityContextBase scheduleSecurityContext = securityContextProvider.getSecurityContext(schedule.getSecurity().getCreator());
                         List<ScheduleTimeslot> timeslots = timeSlotsMap.get(schedule.getId());
                         if (timeslots == null) {
@@ -129,14 +146,22 @@ public class Scheduler implements Plugin, InitializingBean {
                         }else {
                             logger.debug("found {}  timeslots for schedule {} , id {} ", timeslots.size(), schedule.getName(), schedule.getId());
                         }
-                        for (ScheduleTimeslot scheduleTimeslot : timeslots.parallelStream().filter(f -> shouldRun(f, now) && !currentlyRunningSchedules.getOrDefault(f.getId(), false)).collect(Collectors.toList())) {
+                        List<ScheduleTimeslot> timelostInAffect = timeslots.parallelStream().filter(f -> shouldRun(f, now)).toList();
+                        if (timelostInAffect.isEmpty()) {
+                            logger.debug("no effective timeslots for schedule {}", schedule.getName());
+                            continue;
+                        }else {
+                            logger.debug("found effective {} timeslots for schedule {} ",timelostInAffect.size(),schedule.getName());
+                        }
+                        for (ScheduleTimeslot scheduleTimeslot : timelostInAffect) {
+                            logger.debug("schedule timeslot " + scheduleTimeslot.getName());
                             try {
                                 scheduleTimeslot.setLastExecution(OffsetDateTime.now());
                                 schedulingService.merge(scheduleTimeslot);
-                                FCSchedulingExecutor.execute(() -> {
+                                fCSchedulingExecutor.execute(() -> {
                                     try {
                                         currentlyRunningSchedules.put(scheduleTimeslot.getId(), true);
-                                        logger.info("schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot
+                                        logger.info("executing schedule time " + schedule.getName() + "at timeslot- " + scheduleTimeslot
                                                 .getName() + " as user " + scheduleSecurityContext.getUser().getName() + "(" + scheduleSecurityContext.getUser().getId() + ")" + " has arrived");
                                         runSchedule(entry.getValue(), scheduleSecurityContext);
                                         logger.info("done running schedule " + schedule.getName() + " at timeslot " + scheduleTimeslot
@@ -176,14 +201,15 @@ public class Scheduler implements Plugin, InitializingBean {
         boolean inTimeFrame = isInTimeFrame(schedule, now);
         boolean day = isDay(schedule, now);
         boolean shouldRun = enabled && inTimeFrame && day;
+        String log;
         logger.debug(" ******************** Schedule {},in time frame {} ,day {} ,enabled {} ,should run {} ********************* ",schedule.getName(),inTimeFrame,day,enabled,shouldRun);
         if (!shouldRun) {
-            schedule.setLog("Should not run on : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day);
+            log="Should not run on : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day;
             logger.debug("schedule " + schedule.getName() + "(" + schedule.getId() + ") should not run , in timespan: " + inTimeFrame + " , day: " + day + ", enabled:" + enabled);
         }else {
-            schedule.setLog("Should run on now : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day);
+            log="Should run on now : " + now;
         }
-        schedulingService.updateSchedule(new ScheduleUpdate().setSchedule(schedule).setLog(schedule.getLog()),null);
+        schedulingService.updateSchedule(new ScheduleUpdate().setSchedule(schedule).setLog(log),null);
         return shouldRun;
     }
 
@@ -192,7 +218,7 @@ public class Scheduler implements Plugin, InitializingBean {
         boolean time = isTime(scheduleTimeslot, now);
         boolean previousRun = checkPreviousRun(scheduleTimeslot, now);
         boolean shouldRun = time && previousRun;
-        logger.debug("-------------- Checking time slot name {},time {} ,previous run {}  " , scheduleTimeslot.getName() , time , previousRun);
+        logger.debug("-------------- Checking time slot name {}, is it in time?  {} ,previous run should run ? {}  " , scheduleTimeslot.getName() , time , previousRun);
         logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run: " + shouldRun + " , in timespan: " + time + " , previous run: " + previousRun);
         if (!shouldRun) {
             scheduleTimeslot.setLog("Time slot is NOT  effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
@@ -202,12 +228,17 @@ public class Scheduler implements Plugin, InitializingBean {
             logger.info("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run , in timespan: " + time + " , previous run: " + previousRun);
             scheduleTimeslot.setLog("Time slot is effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
         }
+        if (shouldRun) {
+
+            schedulingService.merge(scheduleTimeslot);
+        }
         return shouldRun;
 
     }
 
     private boolean checkPreviousRun(ScheduleTimeslot schedule, OffsetDateTime now) {
         if (schedule.getCoolDownIntervalBeforeRepeat() > 0) {
+
             return schedule.getLastExecution() == null || schedule.getLastExecution().plus(schedule.getCoolDownIntervalBeforeRepeat(), ChronoUnit.MILLIS).isBefore(now);
         } else {
             return schedule.getLastExecution() == null || !schedule.getLastExecution().getDayOfWeek().equals(now.getDayOfWeek());
@@ -216,20 +247,24 @@ public class Scheduler implements Plugin, InitializingBean {
     }
 
     private boolean isTime(ScheduleTimeslot timeslot, OffsetDateTime now) {
+        Schedule schedule=timeslot.getSchedule();
+        if (timeslot.getId().equals("b4677ceb-f6b0-40e4-8335-341e348d87b5")) {
+            int a=3;
+        }
         if ((timeslot.getStartTime() == null && timeslot.getStartTimeOfTheDayName() == null) || (timeslot.getEndTime() == null && timeslot.getEndTimeOfTheDayName() == null)) {
             return false;
         }
 
         OffsetTime nowTime = now.toOffsetTime();
 
-        OffsetTime start = timeslot.getStartTime() != null ? timeslot.getStartTime().withOffsetSameInstant(ZoneOffset.of(timeslot.getStartTimeOffsetId())).toOffsetTime() : null;
+        OffsetTime start = timeslot.getStartTime() != null ? getOffSetTime(timeslot.getStartTime(),schedule.getSelectedTimeZone()) : null;
         if (timeslot.getStartTimeOfTheDayName() != null) {
             start = getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
         }
         start = start != null ? start.plus(timeslot.getStartMillisOffset(),
                 ChronoUnit.MILLIS) : null;
 
-        OffsetTime end = timeslot.getEndTime() != null ? timeslot.getEndTime().withOffsetSameInstant(ZoneOffset.of(timeslot.getEndTimeOffsetId())).toOffsetTime() : null;
+        OffsetTime end = timeslot.getEndTime() != null ? getOffSetTime(timeslot.getEndTime(),schedule.getSelectedTimeZone()) : null;
         if (timeslot.getEndTimeOfTheDayName() != null) {
             end = getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
@@ -238,7 +273,20 @@ public class Scheduler implements Plugin, InitializingBean {
 
         return start != null && nowTime.isAfter(start) && (end == null || nowTime.isBefore(end));
     }
+    public static OffsetTime getOffSetTime(OffsetDateTime startTime, String timezoneId) {
 
+        ZonedDateTime zonedStartTime = startTime.atZoneSameInstant(startTime.getOffset());
+
+
+        ZoneId zoneId = ZoneId.of(timezoneId);
+        LocalDate currentDate = LocalDate.now(zoneId);
+
+
+        ZonedDateTime StartZonedDateTime = ZonedDateTime.of(currentDate, zonedStartTime.toLocalTime(), zoneId);
+
+
+        return StartZonedDateTime.toOffsetDateTime().toOffsetTime();
+    }
     private boolean isInTimeFrame(Schedule schedule, OffsetDateTime now) {
         return now.isAfter(schedule.getTimeFrameStart().atZoneSameInstant(ZoneId.of(schedule.getStartTimeOffsetId())).toOffsetDateTime())
                 && now.isBefore(schedule.getTimeFrameEnd().atZoneSameInstant(ZoneId.of(schedule.getEndTimeOffsetId())).toOffsetDateTime());
@@ -285,8 +333,9 @@ public class Scheduler implements Plugin, InitializingBean {
     @Transactional
     public void runSchedule(List<ScheduleToAction> schedule,
                             SecurityContextBase securityContext) {
+        logger.debug("Starting to run scheduleToActions of size : {}", schedule.size());
         for (ScheduleToAction link : schedule) {
-
+            logger.debug("Will run scheduleToAction {} " , link.getScheduleAction().getName() );
             long start = System.currentTimeMillis();
             boolean failed = false;
             Object response = null;
@@ -296,7 +345,7 @@ public class Scheduler implements Plugin, InitializingBean {
                         .getDynamicExecution();
                 if (dynamicExecution != null) {
                     response = dynamicExecutionService.executeDynamicExecution(new ExecuteDynamicExecution().setDynamicExecution(dynamicExecution), securityContext);
-                    logger.info("Have executed schedule action "
+                    logger.info("-------------Have executed schedule action"
                             + scheduleAction.getName() + "("
                             + scheduleAction.getId() + ") with response "
                             + response);
@@ -308,7 +357,7 @@ public class Scheduler implements Plugin, InitializingBean {
                     logger.warn("Schedule Action "
                             + scheduleAction.getName() + "("
                             + scheduleAction.getId()
-                            + ") had null dynamic Exection");
+                            + ") had null dynamic Execution");
 
                 }
             } catch (Exception e) {

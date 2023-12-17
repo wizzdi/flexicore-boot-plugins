@@ -36,7 +36,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
   @Autowired private ScheduleTimeslotRepository repository;
 
   @Autowired private BasicService basicService;
-
+  @Autowired private ScheduleService scheduleService;
   /**
    * @param scheduleTimeslotCreate Object Used to Create ScheduleTimeslot
    * @param securityContext
@@ -277,16 +277,16 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
   }
 
   /**
-   * @param scheduleTimeslotCreate Object Used to Create ScheduleTimeslot
+   * @param stc Object Used to Create ScheduleTimeslot
    * @param securityContext
-   * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotCreate is not valid
+   * @throws org.springframework.web.server.ResponseStatusException  if stc is not valid
    */
   @Override
   public void validate(
-      ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext) {
-    basicService.validate(scheduleTimeslotCreate, securityContext);
+      ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
+    basicService.validate(stc, securityContext);
 
-    String scheduleId = scheduleTimeslotCreate.getScheduleId();
+    String scheduleId = stc.getScheduleId();
     Schedule schedule =
         scheduleId == null
             ? null
@@ -296,7 +296,11 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId);
     }
-    scheduleTimeslotCreate.setSchedule(schedule);
+    stc.setSchedule(schedule);
+    stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(),schedule.getSelectedTimeZone()));
+    stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(),schedule.getSelectedTimeZone()));
+    return;
+
   }
 
   @Override

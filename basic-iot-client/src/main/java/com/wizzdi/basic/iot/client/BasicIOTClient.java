@@ -167,7 +167,7 @@ public class BasicIOTClient {
 
 
         } catch (Exception e) {
-            logger.warn("failed to verify message " + iotMessage, e);
+            logger.warn("failed to verify message {} " ,iotMessage, e);
             return false;
         }
 

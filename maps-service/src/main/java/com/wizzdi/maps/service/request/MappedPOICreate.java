@@ -21,14 +21,14 @@ import com.wizzdi.maps.model.Room;
                         com.wizzdi.flexicore.security.validation.Update.class,
                         com.wizzdi.flexicore.security.validation.Create.class
                 }),
-//        @IdValid(
-//                targetField = "layer",
-//                field = "layerId",
-//                fieldType = com.wizzdi.maps.model.Layer.class,
-//                groups = {
-//                        com.wizzdi.flexicore.security.validation.Create.class,
-//                        com.wizzdi.flexicore.security.validation.Update.class
-//                }),
+        @IdValid(
+                targetField = "layer",
+                field = "layerId",
+                fieldType = com.wizzdi.maps.model.Layer.class,
+                groups = {
+                        com.wizzdi.flexicore.security.validation.Create.class,
+                        com.wizzdi.flexicore.security.validation.Update.class
+                }),
 
         @IdValid(
                 targetField = "address",

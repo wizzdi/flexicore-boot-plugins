@@ -1,6 +1,7 @@
 package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.request.StateHistoryCreate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -28,7 +29,7 @@ public class StateHistoryCreator implements Plugin {
     @Autowired
     private StateHistoryService stateHistoryService;
 
-   /* @EventListener
+    @EventListener
     public <T extends Remote> void onRemoteCreated(BasicCreated<T> basicCreated) {
         createStateHistory(basicCreated.getBaseclass());
     }
@@ -36,10 +37,11 @@ public class StateHistoryCreator implements Plugin {
     @EventListener
     public <T extends Remote> void onRemoteUpdated(BasicUpdated<T> basicUpdated) {
         createStateHistory(basicUpdated.getBaseclass());
-    }*/
+    }
 
     private void createStateHistory(Remote remote) {
-        if (!remote.isKeepStateHistory()) {
+        Device device = remote instanceof Device ? (Device) remote : null;
+        if (!remote.isKeepStateHistory() && (device != null && !device.getDeviceType().isKeepStateHistory())) {
             logger.debug("not creating state history for remote "+remote.getName()+" with id "+remote.getId()+" since keepStateHistory is false");
             return;
         }

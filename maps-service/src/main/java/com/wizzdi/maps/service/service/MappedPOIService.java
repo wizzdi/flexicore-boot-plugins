@@ -320,66 +320,77 @@ public class MappedPOIService implements Plugin {
      * @throws org.springframework.web.server.ResponseStatusException  if mappedPOIFilter is not valid
      */
 
-    public void validate(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
-        basicService.validate(mappedPOIFilter, securityContext);
+    public void validate(MappedPOIFilter fl, SecurityContextBase securityContext) {
+        basicService.validate(fl, securityContext);
+        if (fl.getAddress()==null && fl.getAddressIds()!=null && !fl.getAddressIds().isEmpty()) {
+            Set<String> addressIds = fl.getAddressIds() == null ? new HashSet<>() : fl.getAddressIds();
+            Map<String, Address> address = addressIds.isEmpty() ? new HashMap<>() : repository.listByIds(Address.class, addressIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            addressIds.removeAll(address.keySet());
+            if (!addressIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Address with ids " + addressIds);
+            }
+            fl.setAddress(new ArrayList<>(address.values()));
+        }
+        if (fl.getLayers()==null && fl.getLayerIds()!=null && !fl.getLayerIds().isEmpty()) {
+            Set<String> layerIds = fl.getLayerIds() == null ? new HashSet<>() : fl.getLayerIds();
+            Map<String, Layer> layerMap = layerIds.isEmpty() ? new HashMap<>() : repository.listByIds(Layer.class, layerIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            layerIds.removeAll(layerMap.keySet());
+            if (!layerIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Layers with ids " + layerIds);
+            }
+            fl.setLayers(new ArrayList<>(layerMap.values()));
+        }
+        if (fl.getRoom()==null && fl.getRoomIds()!=null && !fl.getRoomIds().isEmpty()) {
+            Set<String> roomIds = fl.getRoomIds() == null ? new HashSet<>() : fl.getRoomIds();
+            Map<String, Room> room = roomIds.isEmpty() ? new HashMap<>() : repository.listByIds(Room.class, roomIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            roomIds.removeAll(room.keySet());
+            if (!roomIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with ids " + roomIds);
+            }
+            fl.setRoom(new ArrayList<>(room.values()));
+        }
+        if (fl.getBuildingFloors()==null && fl.getBuildingFloorIds()!=null && !fl.getBuildingFloorIds().isEmpty()) {
+            Set<String> buildingFloorIds = fl.getBuildingFloorIds() == null ? new HashSet<>() : fl.getBuildingFloorIds();
+            Map<String, BuildingFloor> buildingFloorMap = buildingFloorIds.isEmpty() ? new HashMap<>() : repository.listByIds(BuildingFloor.class, buildingFloorIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            buildingFloorIds.removeAll(buildingFloorMap.keySet());
+            if (!buildingFloorIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No BuildingFloor with ids " + buildingFloorIds);
+            }
+            fl.setBuildingFloors(new ArrayList<>(buildingFloorMap.values()));
+        }
+        if (fl.getMapGroups()==null && fl.getMapGroupIds()!=null && !fl.getMapGroupIds().isEmpty() ) {
+            Set<String> mapGroupIds = fl.getMapGroupIds() == null ? new HashSet<>() : fl.getMapGroupIds();
+            Map<String, MapGroup> mapGroups = mapGroupIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapGroup.class, mapGroupIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            mapGroupIds.removeAll(mapGroups.keySet());
+            if (!mapGroupIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapGroup with ids " + mapGroupIds);
+            }
+            fl.setMapGroups(new ArrayList<>(mapGroups.values()));
+        }
+        if (fl.getMapIcons()==null && fl.getMapIconsIds()!=null && !fl.getMapGroupIds().isEmpty()) {
+            Set<String> mapIconIds = fl.getMapIconsIds() == null ? new HashSet<>() : fl.getMapIconsIds();
+            Map<String, MapIcon> mapIconMap = mapIconIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapIcon.class, mapIconIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            mapIconIds.removeAll(mapIconMap.keySet());
+            if (!mapIconIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapIcon with ids " + mapIconIds);
+            }
+            fl.setMapIcons(new ArrayList<>(mapIconMap.values()));
+        }
 
-        Set<String> addressIds = mappedPOIFilter.getAddressIds() == null ? new HashSet<>() : mappedPOIFilter.getAddressIds();
-        Map<String, Address> address = addressIds.isEmpty() ? new HashMap<>() : repository.listByIds(Address.class, addressIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        addressIds.removeAll(address.keySet());
-        if (!addressIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Address with ids " + addressIds);
-        }
-        mappedPOIFilter.setAddress(new ArrayList<>(address.values()));
-        Set<String> layerIds = mappedPOIFilter.getLayerIds() == null ? new HashSet<>() : mappedPOIFilter.getLayerIds();
-        Map<String, Layer> layerMap = layerIds.isEmpty() ? new HashMap<>() : repository.listByIds(Layer.class, layerIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        layerIds.removeAll(layerMap.keySet());
-        if (!layerIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Layers with ids " + layerIds);
-        }
-        mappedPOIFilter.setLayers(new ArrayList<>(layerMap.values()));
-        Set<String> roomIds = mappedPOIFilter.getRoomIds() == null ? new HashSet<>() : mappedPOIFilter.getRoomIds();
-        Map<String, Room> room = roomIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(Room.class, roomIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        roomIds.removeAll(room.keySet());
-        if (!roomIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with ids " + roomIds);
-        }
-        mappedPOIFilter.setRoom(new ArrayList<>(room.values()));
 
-        Set<String> mapGroupIds = mappedPOIFilter.getMapGroupIds() == null ? new HashSet<>() : mappedPOIFilter.getMapGroupIds();
-        Map<String, MapGroup> mapGroups = mapGroupIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(MapGroup.class, mapGroupIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        mapGroupIds.removeAll(mapGroups.keySet());
-        if (!mapGroupIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapGroup with ids " + mapGroupIds);
-        }
-        mappedPOIFilter.setMapGroups(new ArrayList<>(mapGroups.values()));
 
-        Set<String> buildingFloorIds = mappedPOIFilter.getBuildingFloorIds() == null ? new HashSet<>() : mappedPOIFilter.getBuildingFloorIds();
-        Map<String, BuildingFloor> buildingFloorMap = buildingFloorIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(BuildingFloor.class, buildingFloorIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        buildingFloorIds.removeAll(buildingFloorMap.keySet());
-        if (!buildingFloorIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No building floors with ids " + buildingFloorIds);
+        if (fl.getAddressFilter() != null) {
+            addressService.validate(fl.getAddressFilter(), securityContext);
         }
-        mappedPOIFilter.setBuildingFloors(new ArrayList<>(buildingFloorMap.values()));
-
-        if (mappedPOIFilter.getAddressFilter() != null) {
-            addressService.validate(mappedPOIFilter.getAddressFilter(), securityContext);
+        if (fl.getTenants()==null && fl.getTenantIds()!=null && !fl.getTenantIds().isEmpty() ) {
+            Set<String> tenantIds = fl.getTenantIds();
+            Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+            tenantIds.removeAll(securityTenantMap.keySet());
+            if (!tenantIds.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SecurityTenant with ids " + tenantIds);
+            }
+            fl.setTenants(new ArrayList<>(securityTenantMap.values()));
         }
-
-        Set<String> tenantIds = mappedPOIFilter.getTenantIds();
-        Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        tenantIds.removeAll(securityTenantMap.keySet());
-        if (!tenantIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SecurityTenant with ids " + tenantIds);
-        }
-        mappedPOIFilter.setTenants(new ArrayList<>(securityTenantMap.values()));
-
-        Set<String> mapIconsIds = mappedPOIFilter.getMapIconsIds();
-        Map<String, MapIcon> mapIconMap = mapIconsIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(MapIcon.class, mapIconsIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
-        mapIconsIds.removeAll(mapIconMap.keySet());
-        if (!mapIconsIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapIcon with ids " + mapIconsIds);
-        }
-        mappedPOIFilter.setMapIcons(new ArrayList<>(mapIconMap.values()));
 
 
     }

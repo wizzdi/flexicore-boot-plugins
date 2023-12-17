@@ -35,6 +35,7 @@ public class ScheduleTimeslot extends SecuredBasic {
 
   private Long coolDownIntervalBeforeRepeat;
 
+
   private String startTimeOffsetId;
 
   private Long endMillisOffset;
@@ -239,7 +240,7 @@ public class ScheduleTimeslot extends SecuredBasic {
 
   /**
    * @param timeOfTheDayNameStartLat timeOfTheDayNameStartLat to set
-   * @return ScheduleTimeslot
+   * @return ScheduleTimesloto
    */
   public <T extends ScheduleTimeslot> T setTimeOfTheDayNameStartLat(
       Double timeOfTheDayNameStartLat) {

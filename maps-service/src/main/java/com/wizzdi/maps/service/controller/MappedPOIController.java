@@ -4,6 +4,8 @@ import com.flexicore.annotations.OperationsInside;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.flexicore.security.validation.Create;
+import com.wizzdi.flexicore.security.validation.Update;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.model.MappedPOI_;
 import com.wizzdi.maps.service.request.MappedPOICreate;
@@ -13,9 +15,11 @@ import com.wizzdi.maps.service.response.MappedPoiDTO;
 import com.wizzdi.maps.service.service.MappedPOIService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,7 +37,7 @@ public class MappedPOIController implements Plugin {
     @Operation(summary = "createMappedPOI", description = "Creates MappedPOI")
     public MappedPOI createMappedPOI(
             
-            @RequestBody MappedPOICreate mappedPOICreate,
+          @Validated(Create.class) @RequestBody MappedPOICreate mappedPOICreate,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOICreate, securityContext);
         return mappedPOIService.createMappedPOI(mappedPOICreate, securityContext);
@@ -43,17 +47,9 @@ public class MappedPOIController implements Plugin {
     @PutMapping("updateMappedPOI")
     public MappedPOI updateMappedPOI(
             
-            @RequestBody MappedPOIUpdate mappedPOIUpdate,
+          @Validated(Update.class)  @RequestBody MappedPOIUpdate mappedPOIUpdate,
             @RequestAttribute SecurityContextBase securityContext) {
-        String mappedPOIId = mappedPOIUpdate.getId();
-        MappedPOI mappedPOI =
-                mappedPOIService.getByIdOrNull(
-                        mappedPOIId, MappedPOI.class, MappedPOI_.security, securityContext);
-        if (mappedPOI == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "No MappedPOI with id " + mappedPOIId);
-        }
-        mappedPOIUpdate.setMappedPOI(mappedPOI);
+
         mappedPOIService.validate(mappedPOIUpdate, securityContext);
         return mappedPOIService.updateMappedPOI(mappedPOIUpdate, securityContext);
     }
@@ -62,7 +58,7 @@ public class MappedPOIController implements Plugin {
     @PostMapping("getAllMappedPOIs")
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
             
-            @RequestBody MappedPOIFilter mappedPOIFilter,
+            @Valid @RequestBody MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);
         return mappedPOIService.getAllMappedPOIs(mappedPOIFilter, securityContext);
@@ -72,7 +68,7 @@ public class MappedPOIController implements Plugin {
     @PostMapping("getAllMappedPOIDTOs")
     public PaginationResponse<MappedPoiDTO> getAllMappedPOIDTOs(
             
-            @RequestBody MappedPOIFilter mappedPOIFilter,
+           @Valid @RequestBody MappedPOIFilter mappedPOIFilter,
             @RequestAttribute SecurityContextBase securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);
         return mappedPOIService.getAllMappedPOIDTOs(mappedPOIFilter, securityContext);

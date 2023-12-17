@@ -29,6 +29,8 @@ public class ScheduleToActionService implements Plugin, IScheduleToActionService
   @Autowired private ScheduleToActionRepository repository;
 
   @Autowired private BasicService basicService;
+  @Autowired
+  private ScheduleService scheduleService;
 
   /**
    * @param scheduleToActionCreate Object Used to Create ScheduleToScheduleAction
@@ -138,7 +140,13 @@ public class ScheduleToActionService implements Plugin, IScheduleToActionService
   @Override
   public List<ScheduleToAction> listAllScheduleToActions(
       ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext) {
-    return repository.listAllScheduleToActions(scheduleToActionFilter, securityContext);
+    List<ScheduleToAction> scheduleToActions = repository.listAllScheduleToActions(scheduleToActionFilter, securityContext);
+    scheduleToActions.stream().forEach(f->{
+      if (f.getLastExecution() != null) {
+        scheduleService.convertToOffsetDateTime(f.getLastExecution(),f.getSchedule().getSelectedTimeZone());
+      }
+    });
+    return scheduleToActions;
   }
 
   /**

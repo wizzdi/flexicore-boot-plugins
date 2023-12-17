@@ -71,7 +71,13 @@ public class App {
     return new RestTemplateBuilder()
             .messageConverters(new MappingJackson2HttpMessageConverter(objectMapper));
   }
-
+  @Bean
+  public RestTemplateBuilder timeSlotMapper() {
+    ObjectMapper objectMapper=new ObjectMapper().disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+    objectMapper.registerModule(new JavaTimeModule());
+    return new RestTemplateBuilder()
+            .messageConverters(new MappingJackson2HttpMessageConverter(objectMapper));
+  }
   @Bean
   public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
     return args -> {

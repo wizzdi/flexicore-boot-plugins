@@ -27,6 +27,7 @@ public class ScheduleCreate extends BasicCreate {
 
   private Boolean wednesday;
   private String log;
+  private String selectedTimeZone;
   public Boolean isEnabled() {
     return this.enabled;
   }
@@ -133,5 +134,14 @@ public class ScheduleCreate extends BasicCreate {
   public <T extends ScheduleCreate> T setLog(String log) {
     this.log = log;
     return (T) this;
+  }
+
+  public String getSelectedTimeZone() {
+    return selectedTimeZone;
+  }
+
+  public ScheduleCreate setSelectedTimeZone(String selectedTimeZone) {
+    this.selectedTimeZone = selectedTimeZone;
+    return this;
   }
 }
