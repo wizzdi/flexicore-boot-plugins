@@ -37,11 +37,6 @@ import java.util.stream.Stream;
 @Component
 @Extension
 public class Scheduler implements Plugin, InitializingBean {
-//    @Value("${flexicore.scheduling.fetch.intervalMs:#{5 * 60 * 1000}}")
-//    private long fetchInterval;
-//    @Value("${flexicore.scheduling.initialDelayMs:#{1 * 60 * 1000}}")
-//    private long initialDelay;
-//    @Value("${flexicore.scheduling.check.intervalMs:#{30 * 1000}}")
     @Value("${flexicore.scheduling.fetch.intervalMs:#{1 * 20 * 1000}}")
     private long fetchInterval;
     @Value("${flexicore.scheduling.initialDelayMs:#{1 * 1 * 1000}}")
