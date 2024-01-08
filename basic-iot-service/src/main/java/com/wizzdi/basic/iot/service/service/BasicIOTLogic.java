@@ -1,11 +1,13 @@
 package com.wizzdi.basic.iot.service.service;
 
+import ch.hsr.geohash.GeoHash;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.utils.DistanceUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
@@ -76,6 +78,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private boolean badMessageResponse;
     @Value("${basic.iot.mqtt.keepAlive.bounce:#{3*60*1000}}")
     private long keepAliveBounceThreshold;
+
+    @Value("${basic.iot.map.locationDistanceThresholdMeters:#{200}}")
+    private int locationDistanceThreshold;
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
@@ -359,6 +364,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
 
         String status=getStatus(remote,stateChanged.getStatus());
+        MappedPOI mappedPOI = remote.getMappedPOI();
+
         MapIcon mapIcon=getOrCreateMapIcon(status,remote,gatewaySecurityContext);
         MappedPOICreate mappedPOICreate = new MappedPOICreate()
                 .setExternalId(deviceId)
@@ -367,7 +374,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
                 .setMapIcon(mapIcon);
 
-        if(!remote.isLockLocation()){
+        if(!remote.isLockLocation()
+                &&latitude!=null&&longitude!=null
+                &&!isZeroLocation(longitude,latitude)
+                &&getDistanceFromCurrentLocation(mappedPOI,longitude,latitude)>locationDistanceThreshold){
             mappedPOICreate
                     .setLon(longitude)
                     .setLat(latitude);
@@ -376,7 +386,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             mappedPOICreate.setName(remote.getName());
         }
 
-        MappedPOI mappedPOI = remote.getMappedPOI();
         if(mappedPOI ==null){
             mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
         }
@@ -396,6 +405,19 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         updateKeepAlive(stateChanged.getSentAt(),gatewaySecurityContext,keepAlive);
 
         return new StateChangedReceived().setStateChangedId(stateChanged.getId());
+    }
+
+    private double getDistanceFromCurrentLocation(MappedPOI mappedPOI, double longitude, double latitude) {
+        if(mappedPOI.getLat()==null || mappedPOI.getLon()==null){
+            return Double.POSITIVE_INFINITY;
+        }
+        return DistanceUtils.haversineDistance(mappedPOI.getLat(),mappedPOI.getLon(),latitude,longitude);
+    }
+
+
+
+    private boolean isZeroLocation(double longitude, double latitude) {
+        return longitude==0||latitude==0;
     }
 
     private String getStatus(Remote remote, String status) {
