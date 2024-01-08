@@ -22,7 +22,7 @@ import java.time.OffsetDateTime;
 @Extension
 public class StateHistoryCreator implements Plugin {
 
-    private static final Logger logger = LoggerFactory.getLogger(StateHistoryCreator.class);
+    private static final Logger logger= LoggerFactory.getLogger(StateHistoryCreator.class);
 
     @Autowired
     private SecurityContextProvider securityContextProvider;
@@ -41,19 +41,9 @@ public class StateHistoryCreator implements Plugin {
     }
 
     private void createStateHistory(Remote remote) {
-        Device device = remote instanceof Device ? (Device) remote : null;
-        if (device == null || device.getDeviceType() == null) return;
-        DeviceType deviceType = device.getDeviceType();
-        if (deviceType.getKeepStateHistory() == null || !deviceType.getKeepStateHistory()) {
-            if (deviceType == null) {
-                logger.debug("device type is null for device " + device.getName() + " with id " + device.getId());
-            } else {
-                logger.debug("not keeping state history for device type " + deviceType.getName() + " with id " + deviceType.getId());
-            }
-            return;
-        }
-        if (device.getKeepStateHistory() != null && !device.getKeepStateHistory()) {
-            logger.debug("not keeping state history for device " + device.getName() + " with id " + device.getId());
+
+        if ( !remote.isKeepStateHistory()) {
+            logger.debug("not keeping state history for device " + remote.getName() + " with id " + remote.getId());
             return;
         }
 
@@ -65,6 +55,6 @@ public class StateHistoryCreator implements Plugin {
                 .setDeviceProperties(remote.getDeviceProperties())
                 .setUserAddedProperties(remote.getUserAddedProperties());
         stateHistoryService.createStateHistory(stateHistoryCreate, securityContext);
-        logger.debug("created state history for device " + device.getName() + " with id " + device.getId());
+        logger.debug("created state history for device " + remote.getName() + " with id " + remote.getId());
     }
 }

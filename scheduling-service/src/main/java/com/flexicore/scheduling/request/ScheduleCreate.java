@@ -1,5 +1,6 @@
 package com.flexicore.scheduling.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import java.time.OffsetDateTime;
 
@@ -26,6 +27,7 @@ public class ScheduleCreate extends BasicCreate {
   private OffsetDateTime timeFrameStart;
 
   private Boolean wednesday;
+  @JsonIgnore
   private String log;
   private String selectedTimeZone;
   public Boolean isEnabled() {
@@ -127,6 +129,7 @@ public class ScheduleCreate extends BasicCreate {
     return (T) this;
   }
 
+  @JsonIgnore
   public String getLog() {
     return log;
   }

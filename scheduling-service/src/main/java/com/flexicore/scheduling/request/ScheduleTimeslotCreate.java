@@ -13,7 +13,6 @@ public class ScheduleTimeslotCreate extends BasicCreate {
 
   @JsonIgnore
   private String endTimeOffsetId;
-  @Lob
     private String log;
   private TimeOfTheDayName startTimeOfTheDayName;
 

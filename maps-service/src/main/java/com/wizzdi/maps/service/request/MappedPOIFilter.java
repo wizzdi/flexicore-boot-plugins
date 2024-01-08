@@ -52,7 +52,7 @@ public class MappedPOIFilter extends PaginationFilter {
     private List<Room> room;
     private boolean roomExclude;
     private boolean buildingFloorExclude;
-    private Set<String> buildingFloorIds;
+    private Set<String> buildingFloorIds=new HashSet<>();
     @JsonIgnore
     @TypeRetention(BuildingFloor.class)
     private List<BuildingFloor> buildingFloors;
@@ -88,7 +88,7 @@ public class MappedPOIFilter extends PaginationFilter {
 
     @JsonIgnore
     private PredicateAdder<MappedPOIFilter> predicateAdder;
-    private Set<String> layerIds;
+    private Set<String> layerIds=new HashSet<>();
     @JsonIgnore
     @TypeRetention(Layer.class)
     private List<Layer> layers;
