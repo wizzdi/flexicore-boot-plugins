@@ -248,9 +248,7 @@ public class Scheduler implements Plugin, InitializingBean {
 
     private boolean isTime(ScheduleTimeslot timeslot, OffsetDateTime now) {
         Schedule schedule=timeslot.getSchedule();
-        if (timeslot.getId().equals("b4677ceb-f6b0-40e4-8335-341e348d87b5")) {
-            int a=3;
-        }
+
         if ((timeslot.getStartTime() == null && timeslot.getStartTimeOfTheDayName() == null) || (timeslot.getEndTime() == null && timeslot.getEndTimeOfTheDayName() == null)) {
             return false;
         }

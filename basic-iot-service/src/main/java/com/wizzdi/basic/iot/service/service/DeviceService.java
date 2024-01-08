@@ -134,7 +134,7 @@ public class DeviceService implements Plugin {
         Optional.ofNullable(deviceCreate.getKeepStateHistory())
                 .or(() ->
                         Optional.ofNullable(device.getDeviceType())
-                                .or(() -> Optional.ofNullable(deviceCreate.getDeviceType())).map(f -> f.isKeepStateHistory())
+                                .or(() -> Optional.ofNullable(deviceCreate.getDeviceType())).map(f -> f.getKeepStateHistory())
                 ).ifPresent(deviceCreate::setKeepStateHistory);
         boolean update = remoteService.updateRemoteNoMerge(device, deviceCreate);
         if (deviceCreate.getDeviceType() != null && (device.getDeviceType() == null || !deviceCreate.getDeviceType().getId().equals(device.getDeviceType().getId()))) {

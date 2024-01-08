@@ -47,7 +47,7 @@ public class Remote extends SecuredBasic {
 
     private boolean lockName;
 
-    private boolean keepStateHistory;
+    private Boolean keepStateHistory;
 
     private boolean keepConnectivityHistory;
 
@@ -167,14 +167,7 @@ public class Remote extends SecuredBasic {
         return (T) this;
     }
 
-    public boolean isKeepStateHistory() {
-        return keepStateHistory;
-    }
 
-    public <T extends Remote> T setKeepStateHistory(boolean keepStateHistory) {
-        this.keepStateHistory = keepStateHistory;
-        return (T) this;
-    }
 
     public Double getReportedLat() {
         return reportedLat;
@@ -201,5 +194,14 @@ public class Remote extends SecuredBasic {
     public <T extends Remote> T setKeepConnectivityHistory(boolean keepConnectivityHistory) {
         this.keepConnectivityHistory = keepConnectivityHistory;
         return (T) this;
+    }
+
+    public Boolean getKeepStateHistory() {
+        return keepStateHistory;
+    }
+
+    public Remote setKeepStateHistory(Boolean keepStateHistory) {
+        this.keepStateHistory = keepStateHistory;
+        return this;
     }
 }

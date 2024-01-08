@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Device;
+import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.request.StateHistoryCreate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -21,7 +22,7 @@ import java.time.OffsetDateTime;
 @Extension
 public class StateHistoryCreator implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(StateHistoryCreator.class);
+    private static final Logger logger = LoggerFactory.getLogger(StateHistoryCreator.class);
 
     @Autowired
     private SecurityContextProvider securityContextProvider;
@@ -41,10 +42,21 @@ public class StateHistoryCreator implements Plugin {
 
     private void createStateHistory(Remote remote) {
         Device device = remote instanceof Device ? (Device) remote : null;
-        if (!remote.isKeepStateHistory() && (device != null && !device.getDeviceType().isKeepStateHistory())) {
-            logger.debug("not creating state history for remote "+remote.getName()+" with id "+remote.getId()+" since keepStateHistory is false");
+        if (device == null || device.getDeviceType() == null) return;
+        DeviceType deviceType = device.getDeviceType();
+        if (deviceType.getKeepStateHistory() == null || !deviceType.getKeepStateHistory()) {
+            if (deviceType == null) {
+                logger.debug("device type is null for device " + device.getName() + " with id " + device.getId());
+            } else {
+                logger.debug("not keeping state history for device type " + deviceType.getName() + " with id " + deviceType.getId());
+            }
             return;
         }
+        if (device.getKeepStateHistory() != null && !device.getKeepStateHistory()) {
+            logger.debug("not keeping state history for device " + device.getName() + " with id " + device.getId());
+            return;
+        }
+
         SecurityContextBase securityContext = securityContextProvider.getSecurityContext(remote.getSecurity().getCreator());
         securityContext.setTenantToCreateIn(remote.getSecurity().getTenant());
         StateHistoryCreate stateHistoryCreate = new StateHistoryCreate()
@@ -52,7 +64,7 @@ public class StateHistoryCreator implements Plugin {
                 .setTimeAtState(OffsetDateTime.now())
                 .setDeviceProperties(remote.getDeviceProperties())
                 .setUserAddedProperties(remote.getUserAddedProperties());
-        stateHistoryService.createStateHistory(stateHistoryCreate,securityContext);
-        logger.debug("created state history for remote "+remote.getName()+" with id "+remote.getId());
+        stateHistoryService.createStateHistory(stateHistoryCreate, securityContext);
+        logger.debug("created state history for device " + device.getName() + " with id " + device.getId());
     }
 }
