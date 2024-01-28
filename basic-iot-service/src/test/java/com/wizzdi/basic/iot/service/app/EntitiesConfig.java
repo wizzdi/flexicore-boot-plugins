@@ -1,4 +1,4 @@
-package com.wizzdi.basic.iot.service.triggers.app;
+package com.wizzdi.basic.iot.service.app;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;

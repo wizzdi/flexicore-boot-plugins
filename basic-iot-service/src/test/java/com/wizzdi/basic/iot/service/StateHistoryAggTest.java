@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service;
 
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Remote;
-import com.wizzdi.basic.iot.service.triggers.app.App;
+import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.StateHistoryAggEntry;
 import com.wizzdi.basic.iot.service.service.RemoteService;

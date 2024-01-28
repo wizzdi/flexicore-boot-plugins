@@ -6,7 +6,7 @@ import com.wizzdi.basic.iot.model.Connectivity;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
-import com.wizzdi.basic.iot.service.triggers.app.App;
+import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.service.*;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;

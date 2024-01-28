@@ -1,4 +1,4 @@
-package com.wizzdi.basic.iot.service.triggers.app;
+package com.wizzdi.basic.iot.service.app;
 
 import com.wizzdi.dynamic.properties.converter.EnableDynamicProperties;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.EnableFlexiCorePlugins;

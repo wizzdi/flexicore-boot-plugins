@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.model.PendingGateway;
-import com.wizzdi.basic.iot.service.triggers.app.App;
+import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.PendingGatewayCreate;
 import com.wizzdi.basic.iot.service.request.PendingGatewayFilter;
 import com.wizzdi.basic.iot.service.request.PendingGatewayUpdate;

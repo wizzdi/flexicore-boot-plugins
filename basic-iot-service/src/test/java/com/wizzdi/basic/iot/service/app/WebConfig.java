@@ -1,4 +1,4 @@
-package com.wizzdi.basic.iot.service.triggers.app;
+package com.wizzdi.basic.iot.service.app;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

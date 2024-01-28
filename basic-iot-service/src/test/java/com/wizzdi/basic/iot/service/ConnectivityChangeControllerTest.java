@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.model.ConnectivityChange;
-import com.wizzdi.basic.iot.service.triggers.app.App;
+import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeFilter;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeUpdate;

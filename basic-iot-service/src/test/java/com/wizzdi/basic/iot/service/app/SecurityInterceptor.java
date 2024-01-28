@@ -1,4 +1,4 @@
-package com.wizzdi.basic.iot.service.triggers.app;
+package com.wizzdi.basic.iot.service.app;
 
 import com.flexicore.security.SecurityContextBase;
 import org.springframework.beans.factory.annotation.Autowired;
