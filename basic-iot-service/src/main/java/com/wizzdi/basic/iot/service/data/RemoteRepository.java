@@ -9,15 +9,20 @@ import com.wizzdi.basic.iot.model.ConnectivityChange;
 import com.wizzdi.basic.iot.model.ConnectivityChange_;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.Remote_;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.dynamic.properties.converter.postgresql.FilterDynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
+import com.wizzdi.flexicore.security.events.BasicCreated;
+import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.data.MappedPOIRepository;
+import org.checkerframework.checker.units.qual.A;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +33,9 @@ import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Extension
 @Component
@@ -39,6 +46,8 @@ public class RemoteRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
     @Autowired
     private MappedPOIRepository mappedPOIRepository;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public List<Remote> getAllRemotes(SecurityContextBase securityContext,
                                            RemoteFilter filtering) {
@@ -126,13 +135,39 @@ public class RemoteRepository implements Plugin {
     }
 
     @Transactional
-    public void merge(Object base) {
-        securedBasicRepository.merge(base);
+    public void merge(Remote base, RemoteUpdatedEvent remoteUpdatedEvent) {
+        boolean created = base.getUpdateDate() == null;
+        securedBasicRepository.merge(base,true,false);
+        publishRemoteEvent(base, created, remoteUpdatedEvent);
+
+
     }
 
     @Transactional
-    public void massMerge(List<?> toMerge) {
+    public void massMergePlain(List<?> toMerge) {
         securedBasicRepository.massMerge(toMerge);
+    }
+    @Transactional
+    public void massMerge(List<? extends Remote> toMerge, Map<String,RemoteUpdatedEvent> remoteUpdatedEventMap) {
+        Set<String> createdMap=toMerge.stream().filter(f->f.getUpdateDate()==null).map(f->f.getId()).collect(Collectors.toSet());
+        securedBasicRepository.massMerge(toMerge,true,false);
+        for (Remote remote : toMerge) {
+            boolean created = createdMap.contains(remote.getId());
+            RemoteUpdatedEvent remoteUpdatedEvent=remoteUpdatedEventMap.get(remote.getId());
+            publishRemoteEvent(remote, created, remoteUpdatedEvent);
+        }
+    }
+
+    private void publishRemoteEvent(Remote remote, boolean created, RemoteUpdatedEvent remoteUpdatedEvent) {
+        if(created){
+            eventPublisher.publishEvent(new BasicCreated<>(remote));
+            return;
+        }
+        if(remoteUpdatedEvent!=null){
+            eventPublisher.publishEvent(remoteUpdatedEvent);
+            return;
+        }
+        eventPublisher.publishEvent(new BasicUpdated<>(remote));
     }
 
 }

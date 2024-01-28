@@ -86,7 +86,11 @@ public class ScenarioTriggerTypeService implements Plugin {
    */
   public ScenarioTriggerType updateScenarioTriggerType(
       ScenarioTriggerTypeUpdate scenarioTriggerTypeUpdate, SecurityContextBase securityContext) {
-    ScenarioTriggerType scenarioTriggerType = scenarioTriggerTypeUpdate.getScenarioTriggerType();
+    return updateScenarioTriggerType(scenarioTriggerTypeUpdate, scenarioTriggerTypeUpdate.getScenarioTriggerType());
+  }
+
+  public ScenarioTriggerType updateScenarioTriggerType(
+          ScenarioTriggerTypeCreate scenarioTriggerTypeUpdate, ScenarioTriggerType scenarioTriggerType) {
     if (updateScenarioTriggerTypeNoMerge(scenarioTriggerType, scenarioTriggerTypeUpdate)) {
       this.repository.merge(scenarioTriggerType);
     }

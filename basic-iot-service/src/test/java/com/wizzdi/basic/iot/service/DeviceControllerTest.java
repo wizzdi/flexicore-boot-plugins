@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.service.app.App;
+import com.wizzdi.basic.iot.service.triggers.app.App;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.basic.iot.service.request.DeviceUpdate;

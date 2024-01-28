@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.model.Remote;
-import com.wizzdi.basic.iot.service.app.App;
+import com.wizzdi.basic.iot.service.triggers.app.App;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteUpdate;

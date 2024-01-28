@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service;
 
 import com.flexicore.security.SecurityContextBase;
-import com.wizzdi.basic.iot.service.app.App;
+import com.wizzdi.basic.iot.service.triggers.app.App;
 import com.wizzdi.basic.iot.service.request.GatewayCreate;
 import com.wizzdi.basic.iot.service.request.GatewayFilter;
 import com.wizzdi.basic.iot.service.request.GatewayUpdate;

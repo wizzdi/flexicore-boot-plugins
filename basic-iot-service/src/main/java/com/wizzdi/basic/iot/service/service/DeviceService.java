@@ -6,9 +6,11 @@ import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.DeviceRepository;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.basic.iot.service.request.DeviceUpdate;
+import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -68,15 +70,6 @@ public class DeviceService implements Plugin {
         return repository.findByIdOrNull(type, id);
     }
 
-    @Transactional
-    public void merge(Object base) {
-        repository.merge(base);
-    }
-
-    @Transactional
-    public void massMerge(List<?> toMerge) {
-        repository.massMerge(toMerge);
-    }
 
     public void validateFiltering(DeviceFilter deviceFilter,
                                   SecurityContextBase securityContext) {
@@ -115,7 +108,7 @@ public class DeviceService implements Plugin {
     public Device createDevice(DeviceCreate creationContainer,
                                SecurityContextBase securityContext) {
         Device device = createDeviceNoMerge(creationContainer, securityContext);
-        repository.merge(device);
+        repository.merge(device,null);
         return device;
     }
 
@@ -129,14 +122,15 @@ public class DeviceService implements Plugin {
         return device;
     }
 
-    public boolean updateDeviceNoMerge(Device device,
+    public RemoteUpdateResponse updateDeviceNoMerge(Device device,
                                        DeviceCreate deviceCreate) {
         Optional.ofNullable(deviceCreate.getKeepStateHistory())
                 .or(() ->
                         Optional.ofNullable(device.getDeviceType())
                                 .or(() -> Optional.ofNullable(deviceCreate.getDeviceType())).map(f -> f.isKeepStateHistory())
                 ).ifPresent(deviceCreate::setKeepStateHistory);
-        boolean update = remoteService.updateRemoteNoMerge(device, deviceCreate);
+        RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(device, deviceCreate);
+        boolean update = remoteUpdateResponse.updated();
         if (deviceCreate.getDeviceType() != null && (device.getDeviceType() == null || !deviceCreate.getDeviceType().getId().equals(device.getDeviceType().getId()))) {
             device.setDeviceType(deviceCreate.getDeviceType());
             update = true;
@@ -148,14 +142,15 @@ public class DeviceService implements Plugin {
         }
 
 
-        return update;
+        return new RemoteUpdateResponse(update, remoteUpdateResponse.remoteUpdatedEvent());
     }
 
     public Device updateDevice(DeviceUpdate deviceUpdate,
                                SecurityContextBase securityContext) {
         Device device = deviceUpdate.getDevice();
-        if (updateDeviceNoMerge(device, deviceUpdate)) {
-            repository.merge(device);
+        RemoteUpdateResponse remoteUpdateResponse = updateDeviceNoMerge(device, deviceUpdate);
+        if (remoteUpdateResponse.updated()) {
+            repository.merge(device,remoteUpdateResponse.remoteUpdatedEvent());
         }
         return device;
     }
@@ -182,5 +177,13 @@ public class DeviceService implements Plugin {
 
     }
 
+    @Transactional
+    public void merge(Remote base, RemoteUpdatedEvent remoteUpdatedEvent) {
+        repository.merge(base, remoteUpdatedEvent);
+    }
 
+    @Transactional
+    public void massMerge(List<? extends Remote> toMerge, Map<String, RemoteUpdatedEvent> remoteUpdatedEventMap) {
+        repository.massMerge(toMerge, remoteUpdatedEventMap);
+    }
 }

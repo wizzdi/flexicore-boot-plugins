@@ -6,11 +6,13 @@ import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.RemoteRepository;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteUpdate;
 import com.wizzdi.basic.iot.service.response.FixRemotesResponse;
+import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
@@ -85,15 +87,6 @@ public class RemoteService implements Plugin {
         return repository.findByIdOrNull(type, id);
     }
 
-    @Transactional
-    public void merge(Object base) {
-        repository.merge(base);
-    }
-
-    @Transactional
-    public void massMerge(List<?> toMerge) {
-        repository.massMerge(toMerge);
-    }
 
     public void validateFiltering(RemoteFilter remoteFilter,
                                   SecurityContextBase securityContext) {
@@ -117,7 +110,7 @@ public class RemoteService implements Plugin {
     public Remote createRemote(RemoteCreate creationContainer,
                                  SecurityContextBase securityContext) {
         Remote remote = createRemoteNoMerge(creationContainer, securityContext);
-        repository.merge(remote);
+        repository.merge(remote,null);
         return remote;
     }
 
@@ -131,8 +124,9 @@ public class RemoteService implements Plugin {
         return remote;
     }
 
-    public boolean updateRemoteNoMerge(Remote remote,
-                                        RemoteCreate remoteCreate) {
+    public RemoteUpdateResponse updateRemoteNoMerge(Remote remote,
+                                                    RemoteCreate remoteCreate) {
+        RemoteCreate previousState=getPreviousState(remote);
         boolean update = basicService.updateBasicNoMerge(remoteCreate, remote);
         if (remoteCreate.getRemoteId() != null && !remoteCreate.getRemoteId().equals(remote.getRemoteId())) {
             remote.setRemoteId(remoteCreate.getRemoteId());
@@ -188,14 +182,19 @@ public class RemoteService implements Plugin {
             update = true;
         }
 
-        return update;
+        return new RemoteUpdateResponse(update,update?new RemoteUpdatedEvent(remote,previousState):null);
+    }
+
+    private RemoteCreate getPreviousState(Remote remote) {
+        return null;
     }
 
     public Remote updateRemote(RemoteUpdate remoteUpdate,
                                  SecurityContextBase securityContext) {
         Remote remote = remoteUpdate.getRemote();
-        if (updateRemoteNoMerge(remote, remoteUpdate)) {
-            repository.merge(remote);
+        RemoteUpdateResponse remoteUpdateResponse = updateRemoteNoMerge(remote, remoteUpdate);
+        if (remoteUpdateResponse.updated()) {
+            repository.merge(remote,remoteUpdateResponse.remoteUpdatedEvent());
         }
         return remote;
     }
@@ -220,7 +219,7 @@ public class RemoteService implements Plugin {
     public void onRemoteCreated(Remote remote){
         ConnectivityChange connectivityChange = connectivityChangeService.createConnectivityChange(new ConnectivityChangeCreate().setDate(OffsetDateTime.now()).setConnectivity(Connectivity.OFF).setRemote(remote), getRemoteSecurityContext(remote));
         remote.setLastConnectivityChange(connectivityChange);
-        merge(remote);
+        repository.merge(remote,null);
         logger.info("default connectivity created for remote "+remote.getRemoteId() +"("+remote.getId()+")");
     }
 
@@ -284,7 +283,7 @@ public class RemoteService implements Plugin {
                 }
             }
         }
-        repository.massMerge(new ArrayList<>(toMerge.stream().collect(Collectors.toMap(f->f.getId(),f->f,(a,b)->a)).values()));
+        repository.massMergePlain(new ArrayList<>(toMerge.stream().collect(Collectors.toMap(f->f.getId(),f->f,(a,b)->a)).values()));
         return new FixRemotesResponse(fixedRemotes,fixedMappedPOIs,fixedRemoteDeviceTypes,fixedDeviceTypes);
     }
 }

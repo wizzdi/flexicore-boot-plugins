@@ -56,6 +56,8 @@
         <module>basic-iot-client</module>
         <module>basic-iot-model</module>
         <module>basic-iot-service</module>
+        <module>basic-iot-triggers-service</module>
+
         <module>billing-model</module>
         <module>billing-service</module>
         <module>category-model</module>
@@ -161,6 +163,12 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>basic-iot-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>basic-iot-triggers-service</artifactId>
                 <version>${revision}</version>
                 <scope>provided</scope>
             </dependency>

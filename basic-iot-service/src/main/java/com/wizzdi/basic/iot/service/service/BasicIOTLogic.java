@@ -6,7 +6,9 @@ import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
+import com.wizzdi.basic.iot.service.events.RemoteStatusChanged;
 import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.basic.iot.service.utils.DistanceUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -87,6 +90,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Autowired
     private KeepAliveBounceService keepAliveBounceService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
@@ -173,10 +178,13 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         remotesWithKeepAlive.addAll(devices);
         List<Remote> remotesThatChangedState = updateKeepAlive(keepAlive.getSentAt(), gatewaySecurityContext, remotesWithKeepAlive);
         for (Remote remote : remotesThatChangedState) {
-            if(remote.getMappedPOI()!=null&&remote.getPreConnectivityLossIcon()!=null){
-                remote.getMappedPOI().setMapIcon(remote.getPreConnectivityLossIcon());
-                gatewayService.merge(remote.getMappedPOI());
-                logger.debug("remote {}({}) connected , changing status to {}({})",remote.getRemoteId(),remote.getName(),remote.getPreConnectivityLossIcon().getName(),remote.getPreConnectivityLossIcon().getId());
+            MapIcon newStatus = remote.getPreConnectivityLossIcon();
+            if(remote.getMappedPOI()!=null&& newStatus !=null){
+                MapIcon previous=remote.getMappedPOI().getMapIcon();
+                remote.getMappedPOI().setMapIcon(newStatus);
+                mapIconService.merge(remote.getMappedPOI());
+                eventPublisher.publishEvent(new RemoteStatusChanged(remote,newStatus,previous));
+                logger.debug("remote {}({}) connected , changing status to {}({})",remote.getRemoteId(),remote.getName(), newStatus.getName(), newStatus.getId());
             }
         }
 
@@ -199,7 +207,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChange(connectivityChangeCreate, gatewaySecurityContext): connectivityChangeService.updateConnectivityChange(connectivityChangeCreate, remote.getLastConnectivityChange());
                     if(createConnectivityChange){
                         remote.setLastConnectivityChange(connectivityChange);
-                        gatewayService.merge(remote);
+                        connectivityChangeService.merge(remote);
                     }
 
                     logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
@@ -242,6 +250,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         logger.debug("checking connectivity");
         OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
         List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
+        List<RemoteStatusChanged> events=new ArrayList<>();
         for (Remote remote : remotesToUpdate) {
             Map<String,Object> toMerge=new HashMap<>();
             SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
@@ -258,15 +267,23 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
             if(remote instanceof Device device){
                 if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){
-                    if(device.getMappedPOI().getMapIcon()!=null&&!device.getMappedPOI().getMapIcon().getId().equals(device.getDeviceType().getDefaultMapIcon().getId())){
-                        device.setPreConnectivityLossIcon(device.getMappedPOI().getMapIcon());
+                    MapIcon previousStatus = device.getMappedPOI().getMapIcon();
+                    MapIcon newStatus = device.getDeviceType().getDefaultMapIcon();
+                    if(previousStatus !=null&&!previousStatus.getId().equals(newStatus.getId())){
+                        device.setPreConnectivityLossIcon(previousStatus);
                     }
-                    device.getMappedPOI().setMapIcon(device.getDeviceType().getDefaultMapIcon());
+                    device.getMappedPOI().setMapIcon(newStatus);
                     toMerge.put(device.getId(),device);
                     toMerge.put(device.getMappedPOI().getId(),device.getMappedPOI());
+                    events.add(new RemoteStatusChanged(device,newStatus,previousStatus));
                 }
             }
-            gatewayService.massMerge(new ArrayList<>(toMerge.values()));
+
+            connectivityChangeService.massMerge(new ArrayList<>(toMerge.values()));
+            for (RemoteStatusChanged event : events) {
+                eventPublisher.publishEvent(event);
+
+            }
 
         }
         logger.debug("done checking connectivity");
@@ -474,8 +491,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             newVersion= device.getVersion();
         } else {
             newVersion= version !=null&&!version.equals(device.getVersion())? version :null;
-            if (deviceService.updateDeviceNoMerge(device, deviceCreate)) {
-                deviceService.merge(device);
+            RemoteUpdateResponse remoteUpdateResponse = deviceService.updateDeviceNoMerge(device, deviceCreate);
+            if (remoteUpdateResponse.updated()) {
+                deviceService.merge(device,remoteUpdateResponse.remoteUpdatedEvent());
             }
         }
         return new GetOrCreateDeviceResponse(device,newVersion);

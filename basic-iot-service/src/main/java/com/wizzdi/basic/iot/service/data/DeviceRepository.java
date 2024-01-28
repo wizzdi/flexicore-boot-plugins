@@ -6,6 +6,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.*;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -23,6 +24,7 @@ import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,13 +123,13 @@ public class DeviceRepository implements Plugin {
     }
 
     @Transactional
-    public void merge(Object base) {
-        remoteRepository.merge(base);
+    public void merge(Remote base, RemoteUpdatedEvent remoteUpdatedEvent) {
+        remoteRepository.merge(base,remoteUpdatedEvent);
     }
 
     @Transactional
-    public void massMerge(List<?> toMerge) {
-        remoteRepository.massMerge(toMerge);
+    public void massMerge(List<? extends Remote> toMerge, Map<String,RemoteUpdatedEvent> remoteUpdatedEventMap) {
+        remoteRepository.massMerge(toMerge,remoteUpdatedEventMap);
     }
 
 }

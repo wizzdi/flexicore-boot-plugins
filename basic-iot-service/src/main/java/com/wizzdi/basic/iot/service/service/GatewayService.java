@@ -11,6 +11,7 @@ import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
+import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.SecurityUserCreate;
@@ -96,15 +97,6 @@ public class GatewayService implements Plugin {
         return repository.findByIdOrNull(type, id);
     }
 
-    @Transactional
-    public void merge(Object base) {
-        repository.merge(base);
-    }
-
-    @Transactional
-    public void massMerge(List<?> toMerge) {
-        repository.massMerge(toMerge);
-    }
 
     public void validateFiltering(GatewayFilter gatewayFilter,
                                   SecurityContextBase securityContext) {
@@ -133,7 +125,7 @@ public class GatewayService implements Plugin {
     public Gateway createGateway(GatewayCreate creationContainer,
                                  SecurityContextBase securityContext) {
         Gateway gateway = createGatewayNoMerge(creationContainer, securityContext);
-        repository.merge(gateway);
+        repository.merge(gateway,null);
         return gateway;
     }
 
@@ -147,9 +139,10 @@ public class GatewayService implements Plugin {
         return gateway;
     }
 
-    public boolean updateGatewayNoMerge(Gateway gateway,
+    public RemoteUpdateResponse updateGatewayNoMerge(Gateway gateway,
                                         GatewayCreate gatewayCreate) {
-        boolean update = remoteService.updateRemoteNoMerge(gateway, gatewayCreate);
+        RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(gateway, gatewayCreate);
+        boolean update =remoteUpdateResponse.updated();
         if (gatewayCreate.getPublicKey() != null && !gatewayCreate.getPublicKey().equals(gateway.getPublicKey())) {
             gateway.setPublicKey(gatewayCreate.getPublicKey());
             update = true;
@@ -166,14 +159,15 @@ public class GatewayService implements Plugin {
             gateway.setNoSignatureCapabilities(gatewayCreate.getNoSignatureCapabilities());
             update=true;
         }
-        return update;
+        return new RemoteUpdateResponse(update,remoteUpdateResponse.remoteUpdatedEvent());
     }
 
     public Gateway updateGateway(GatewayUpdate gatewayUpdate,
                                  SecurityContextBase securityContext) {
         Gateway gateway = gatewayUpdate.getGateway();
-        if (updateGatewayNoMerge(gateway, gatewayUpdate)) {
-            repository.merge(gateway);
+        RemoteUpdateResponse remoteUpdateResponse = updateGatewayNoMerge(gateway, gatewayUpdate);
+        if (remoteUpdateResponse.updated()) {
+            repository.merge(gateway,remoteUpdateResponse.remoteUpdatedEvent());
         }
         return gateway;
     }
@@ -206,7 +200,7 @@ public class GatewayService implements Plugin {
             Gateway gateway = createGatewayNoMerge(gatewayCreate, securityContext);
             MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()), securityContext);
             gateway.setMappedPOI(mappedPOI);
-            massMerge(List.of(mappedPOI,gateway));
+            repository.massMergePlain(List.of(mappedPOI,gateway));
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway), securityContext);
         }
