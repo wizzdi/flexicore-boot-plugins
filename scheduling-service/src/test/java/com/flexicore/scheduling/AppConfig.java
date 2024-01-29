@@ -26,7 +26,8 @@ public class AppConfig {
 
     @Bean
     public Schedule schedule() {
-        ScheduleCreate scheduleCreate = new ScheduleCreate();
+        ScheduleCreate scheduleCreate = new ScheduleCreate()
+                .setSelectedTimeZone("UTC");
         return scheduleService.createSchedule(scheduleCreate, securityContext);
     }
 

@@ -59,7 +59,7 @@ public class SalesRegionControllerTest {
     }
 
     @BeforeAll
-    private void init() {
+    public void init() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

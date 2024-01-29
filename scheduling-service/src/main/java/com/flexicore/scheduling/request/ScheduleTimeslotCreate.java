@@ -11,8 +11,6 @@ import java.time.OffsetDateTime;
 
 public class ScheduleTimeslotCreate extends BasicCreate {
 
-  @JsonIgnore
-  private String endTimeOffsetId;
     private String log;
   private TimeOfTheDayName startTimeOfTheDayName;
 
@@ -35,8 +33,6 @@ public class ScheduleTimeslotCreate extends BasicCreate {
 
   private Long coolDownIntervalBeforeRepeat;
 
-  @JsonIgnore
-  private String startTimeOffsetId;
 
   private Long endMillisOffset;
 
@@ -45,16 +41,6 @@ public class ScheduleTimeslotCreate extends BasicCreate {
   private Double timeOfTheDayNameStartLat;
 
   private Double timeOfTheDayNameStartLon;
-
-  @JsonIgnore
-  public String getEndTimeOffsetId() {
-    return this.endTimeOffsetId;
-  }
-
-  public <T extends ScheduleTimeslotCreate> T setEndTimeOffsetId(String endTimeOffsetId) {
-    this.endTimeOffsetId = endTimeOffsetId;
-    return (T) this;
-  }
 
   public TimeOfTheDayName getStartTimeOfTheDayName() {
     return this.startTimeOfTheDayName;
@@ -152,15 +138,6 @@ public class ScheduleTimeslotCreate extends BasicCreate {
     return (T) this;
   }
 
-  @JsonIgnore
-  public String getStartTimeOffsetId() {
-    return this.startTimeOffsetId;
-  }
-
-  public <T extends ScheduleTimeslotCreate> T setStartTimeOffsetId(String startTimeOffsetId) {
-    this.startTimeOffsetId = startTimeOffsetId;
-    return (T) this;
-  }
 
   public Long getEndMillisOffset() {
     return this.endMillisOffset;

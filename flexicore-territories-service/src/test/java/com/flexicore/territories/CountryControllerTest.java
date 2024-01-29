@@ -63,7 +63,7 @@ public class CountryControllerTest {
     private TestRestTemplate restTemplate;
 
     @BeforeAll
-    private void init() {
+    public void init() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

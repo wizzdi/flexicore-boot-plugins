@@ -20,6 +20,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -44,7 +45,7 @@ import java.util.UUID;
 @Testcontainers
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
-
+@DirtiesContext
 public class StateHistoryAggTest {
 
     private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
@@ -60,6 +61,8 @@ public class StateHistoryAggTest {
         hivemqCe.start();
 
     }
+
+
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -91,7 +94,7 @@ public class StateHistoryAggTest {
 
 
     @BeforeAll
-    private void init() {
+    public void init() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

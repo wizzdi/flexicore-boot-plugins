@@ -12,7 +12,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,16 +26,6 @@ public class CacheConfig implements Plugin {
         return new CacheMetricsRegistrar(meterRegistry, List.of(new CaffeineCacheMeterBinderProvider()));
     }
 
-    @Bean
-    @Primary
-    public CacheManager mainCache() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterAccess(1, TimeUnit.HOURS)
-                .maximumSize(10000)
-                .recordStats());
-        return cacheManager;
-    }
 
     @Bean
     @Qualifier("publicKeyCacheManager")

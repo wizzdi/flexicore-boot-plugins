@@ -14,13 +14,8 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
@@ -80,14 +75,12 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
 
     if (scheduleTimeslotCreate.getStartTime() != null && !scheduleTimeslotCreate.getStartTime().equals(scheduleTimeslot.getStartTime())) {
       scheduleTimeslot.setStartTime(scheduleTimeslotCreate.getStartTime());
-      scheduleTimeslot.setStartTimeOffsetId(scheduleTimeslotCreate.getStartTime().getOffset().getId());
       scheduleTimeslot.setStartTimeOfTheDayName(null);
       update = true;
     }
 
     if (scheduleTimeslotCreate.getEndTime() != null && !scheduleTimeslotCreate.getEndTime().equals(scheduleTimeslot.getEndTime())) {
       scheduleTimeslot.setEndTime(scheduleTimeslotCreate.getEndTime());
-      scheduleTimeslot.setEndTimeOffsetId(scheduleTimeslotCreate.getEndTime().getOffset().getId());
       scheduleTimeslot.setEndTimeOfTheDayName(null);
       update = true;
     }
@@ -103,21 +96,6 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
       update = true;
     }
 
-    if (scheduleTimeslotCreate.getStartTimeOffsetId() != null
-        && (!scheduleTimeslotCreate
-            .getStartTimeOffsetId()
-            .equals(scheduleTimeslot.getStartTimeOffsetId()))) {
-      scheduleTimeslot.setStartTimeOffsetId(scheduleTimeslotCreate.getStartTimeOffsetId());
-      update = true;
-    }
-
-    if (scheduleTimeslotCreate.getEndTimeOffsetId() != null
-        && (!scheduleTimeslotCreate
-            .getEndTimeOffsetId()
-            .equals(scheduleTimeslot.getEndTimeOffsetId()))) {
-      scheduleTimeslot.setEndTimeOffsetId(scheduleTimeslotCreate.getEndTimeOffsetId());
-      update = true;
-    }
 
     if (scheduleTimeslotCreate.getSchedule() != null
         && (scheduleTimeslot.getSchedule() == null
@@ -284,6 +262,17 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
   @Override
   public void validate(
       ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
+    validateBase(stc, securityContext);
+    Schedule schedule = stc.getSchedule();
+    if(schedule!=null){
+      stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(), schedule.getSelectedTimeZone()));
+      stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(), schedule.getSelectedTimeZone()));
+    }
+
+
+  }
+
+  private void validateBase(ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
     basicService.validate(stc, securityContext);
 
     String scheduleId = stc.getScheduleId();
@@ -297,9 +286,16 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
           HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId);
     }
     stc.setSchedule(schedule);
+  }
+
+  public void validateUpdate(
+          ScheduleTimeslotUpdate stc, SecurityContextBase securityContext) {
+   validateBase(stc, securityContext);
+    Schedule schedule = Optional.ofNullable(stc.getSchedule())
+            .or(() -> Optional.ofNullable(stc.getScheduleTimeslot()).map(f -> f.getSchedule()))
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule set on schedule timeslot"));
     stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(),schedule.getSelectedTimeZone()));
     stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(),schedule.getSelectedTimeZone()));
-    return;
 
   }
 

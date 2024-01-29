@@ -10,7 +10,6 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class ScheduleTimeslot extends SecuredBasic {
 
-  private String endTimeOffsetId;
 
   private TimeOfTheDayName startTimeOfTheDayName;
   @Column(columnDefinition = "timestamp with time zone")
@@ -36,8 +35,6 @@ public class ScheduleTimeslot extends SecuredBasic {
   private Long coolDownIntervalBeforeRepeat;
 
 
-  private String startTimeOffsetId;
-
   private Long endMillisOffset;
 
   @ManyToOne(targetEntity = Schedule.class)
@@ -47,19 +44,6 @@ public class ScheduleTimeslot extends SecuredBasic {
 
   private Double timeOfTheDayNameStartLon;
 
-  /** @return endTimeOffsetId */
-  public String getEndTimeOffsetId() {
-    return this.endTimeOffsetId;
-  }
-
-  /**
-   * @param endTimeOffsetId endTimeOffsetId to set
-   * @return ScheduleTimeslot
-   */
-  public <T extends ScheduleTimeslot> T setEndTimeOffsetId(String endTimeOffsetId) {
-    this.endTimeOffsetId = endTimeOffsetId;
-    return (T) this;
-  }
 
   /** @return startTimeOfTheDayName */
   public TimeOfTheDayName getStartTimeOfTheDayName() {
@@ -190,19 +174,6 @@ public class ScheduleTimeslot extends SecuredBasic {
     return (T) this;
   }
 
-  /** @return startTimeOffsetId */
-  public String getStartTimeOffsetId() {
-    return this.startTimeOffsetId;
-  }
-
-  /**
-   * @param startTimeOffsetId startTimeOffsetId to set
-   * @return ScheduleTimeslot
-   */
-  public <T extends ScheduleTimeslot> T setStartTimeOffsetId(String startTimeOffsetId) {
-    this.startTimeOffsetId = startTimeOffsetId;
-    return (T) this;
-  }
 
   /** @return endMillisOffset */
   public Long getEndMillisOffset() {

@@ -139,11 +139,6 @@ public class ScheduleTimeslotControllerTest {
             ScheduleTimeslotCreate request, ScheduleTimeslot testScheduleTimeslot) {
         Assertions.assertNotNull(testScheduleTimeslot);
 
-        if (request.getEndTimeOffsetId() != null) {
-
-            Assertions.assertEquals(
-                    request.getEndTimeOffsetId(), testScheduleTimeslot.getEndTimeOffsetId());
-        }
 
         if (request.getStartTimeOfTheDayName() != null) {
 
@@ -154,7 +149,6 @@ public class ScheduleTimeslotControllerTest {
         if (request.getStartTime() != null) {
 
             Assertions.assertEquals(request.getStartTime(), testScheduleTimeslot.getStartTime().atZoneSameInstant(ZoneId.of(request.getStartTime().getOffset().getId())).toOffsetDateTime());
-            Assertions.assertEquals(request.getStartTime().getOffset().getId(), testScheduleTimeslot.getStartTimeOffsetId());
         }
 
         if (request.getLastExecution() != null) {
@@ -195,7 +189,6 @@ public class ScheduleTimeslotControllerTest {
         if (request.getEndTime() != null) {
 
             Assertions.assertEquals(request.getEndTime(), testScheduleTimeslot.getEndTime().atZoneSameInstant(ZoneId.of(request.getEndTime().getOffset().getId())).toOffsetDateTime());
-            Assertions.assertEquals(request.getEndTime().getOffset().getId(), testScheduleTimeslot.getEndTimeOffsetId());
 
         }
 
@@ -206,11 +199,6 @@ public class ScheduleTimeslotControllerTest {
                     testScheduleTimeslot.getCoolDownIntervalBeforeRepeat());
         }
 
-        if (request.getStartTimeOffsetId() != null) {
-
-            Assertions.assertEquals(
-                    request.getStartTimeOffsetId(), testScheduleTimeslot.getStartTimeOffsetId());
-        }
 
         if (request.getEndMillisOffset() != null) {
 

@@ -79,7 +79,7 @@ public class MessageReceiverDeviceControllerTest {
 
 
     @BeforeAll
-    private void init() {
+    public void init() {
         AtomicReference<String> reference=new AtomicReference<>("admin");
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {

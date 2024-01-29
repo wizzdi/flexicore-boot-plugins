@@ -62,7 +62,7 @@ public class FormFieldControllerTest {
     private Form form;
 
     @BeforeAll
-    private void init() {
+    public void init() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

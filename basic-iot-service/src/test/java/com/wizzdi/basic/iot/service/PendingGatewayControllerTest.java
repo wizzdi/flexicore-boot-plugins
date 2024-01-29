@@ -15,6 +15,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.hivemq.HiveMQContainer;
@@ -37,7 +38,7 @@ import java.util.UUID;
 @Testcontainers
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
-
+@DirtiesContext
 public class PendingGatewayControllerTest {
 
     private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
@@ -54,6 +55,7 @@ public class PendingGatewayControllerTest {
         hivemqCe.start();
 
     }
+
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -73,7 +75,7 @@ public class PendingGatewayControllerTest {
     private TestRestTemplate restTemplate;
 
     @BeforeAll
-    private void init() {
+    public void init() {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

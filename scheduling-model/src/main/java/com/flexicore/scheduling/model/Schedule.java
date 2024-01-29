@@ -35,9 +35,6 @@ public class Schedule extends SecuredBasic {
   private OffsetDateTime timeFrameStart;
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime timeFrameEnd;
-
-  private String startTimeOffsetId;
-  private String endTimeOffsetId;
   private String selectedTimeZone;
 
   @Lob
@@ -216,23 +213,6 @@ public class Schedule extends SecuredBasic {
     return this;
   }
 
-  public String getStartTimeOffsetId() {
-    return startTimeOffsetId;
-  }
-
-  public <T extends Schedule> T setStartTimeOffsetId(String startTimeOffsetId) {
-    this.startTimeOffsetId = startTimeOffsetId;
-    return (T) this;
-  }
-
-  public String getEndTimeOffsetId() {
-    return endTimeOffsetId;
-  }
-
-  public <T extends Schedule> T setEndTimeOffsetId(String endTimeOffsetId) {
-    this.endTimeOffsetId = endTimeOffsetId;
-    return (T) this;
-  }
 
   public String getLog() {
     return log;

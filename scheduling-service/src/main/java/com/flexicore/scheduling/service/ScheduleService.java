@@ -130,13 +130,11 @@ public class ScheduleService implements Plugin, IScheduleService {
     if (scheduleCreate.getTimeFrameStart() != null
         && (schedule.getTimeFrameStart()==null || !scheduleCreate.getTimeFrameStart().equals(schedule.getTimeFrameStart()))) {
       schedule.setTimeFrameStart(scheduleCreate.getTimeFrameStart());
-      schedule.setStartTimeOffsetId(schedule.getTimeFrameStart().getOffset().getId());
       update = true;
     }
     if (scheduleCreate.getTimeFrameEnd() != null
             && (schedule.getTimeFrameEnd()==null || !scheduleCreate.getTimeFrameEnd().equals(schedule.getTimeFrameEnd()))) {
       schedule.setTimeFrameEnd(scheduleCreate.getTimeFrameEnd());
-      schedule.setEndTimeOffsetId(schedule.getTimeFrameEnd().getOffset().getId());
       update = true;
     }
 
@@ -208,9 +206,19 @@ public class ScheduleService implements Plugin, IScheduleService {
   @Override
   public void validate(ScheduleCreate sc, SecurityContextBase securityContext) {
     basicService.validate(sc, securityContext);
-    sc.setTimeFrameStart(convertToOffsetDateTime(sc.getTimeFrameStart(),
-            sc.getSelectedTimeZone()).withHour(0).withMinute(0).withSecond(0).withNano(0));
-    sc.setTimeFrameEnd(convertToOffsetDateTime(sc.getTimeFrameEnd(),sc.getSelectedTimeZone()).withHour(23).withMinute(59).withSecond(59).withNano(999999999));
+    if(sc.getSelectedTimeZone()!=null){
+      if (sc.getTimeFrameStart() != null) {
+        sc.setTimeFrameStart(convertToOffsetDateTime(sc.getTimeFrameStart(),
+                sc.getSelectedTimeZone()).withHour(0).withMinute(0).withSecond(0).withNano(0));
+
+      }
+      if(sc.getTimeFrameEnd()!=null){
+        sc.setTimeFrameEnd(convertToOffsetDateTime(sc.getTimeFrameEnd(),sc.getSelectedTimeZone()).withHour(23).withMinute(59).withSecond(59).withNano(999999999));
+
+      }
+    }
+
+
 
 
   }

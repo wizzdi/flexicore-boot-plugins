@@ -16,9 +16,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
 public class AppConfig {
@@ -85,10 +84,13 @@ public class AppConfig {
     @Qualifier("historyIcons")
     public Map<String,MapIcon> historyIcons(){
         String type="test";
+        Map<String, MapIcon> existingByExternalId = mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton("test")), securityContext).stream().collect(Collectors.toMap(f -> f.getExternalId(), f -> f));
         Map<String,MapIcon> map=new HashMap<>();
         for (String statusName : Arrays.asList(ON, OFF, UNKNOWN)) {
             String externalId=type+"_"+statusName;
-            map.put(statusName,mapIconService.createMapIcon(new MapIconCreate().setExternalId(externalId).setName(statusName),securityContext));
+            MapIcon mapIcon = Optional.ofNullable(existingByExternalId.get(externalId))
+                    .orElseGet(() -> mapIconService.createMapIcon(new MapIconCreate().setExternalId(externalId).setRelatedType(type).setName(statusName), securityContext));
+            map.put(statusName,mapIcon);
         }
         return map;
     }

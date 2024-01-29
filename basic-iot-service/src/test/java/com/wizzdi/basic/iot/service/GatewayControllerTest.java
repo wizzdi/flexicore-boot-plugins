@@ -25,6 +25,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.hivemq.HiveMQContainer;
@@ -49,7 +50,7 @@ import java.util.UUID;
 @Testcontainers
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
-
+@DirtiesContext
 public class GatewayControllerTest {
     private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
 
@@ -90,7 +91,7 @@ public class GatewayControllerTest {
     private SecurityContextBase adminSecurityContext;
 
     @BeforeAll
-    private void init() throws IOException {
+    public void init() throws IOException {
         restTemplate.getRestTemplate().setInterceptors(
                 Collections.singletonList((request, body, execution) -> {
                     request.getHeaders()

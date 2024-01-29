@@ -250,8 +250,8 @@ public class Scheduler implements Plugin, InitializingBean {
         return startTime.atZoneSameInstant(ZoneId.of(timezoneId)).toOffsetDateTime().toOffsetTime();
     }
     private boolean isInTimeFrame(Schedule schedule, OffsetDateTime now) {
-        return now.isAfter(schedule.getTimeFrameStart().atZoneSameInstant(ZoneId.of(schedule.getStartTimeOffsetId())).toOffsetDateTime())
-                && now.isBefore(schedule.getTimeFrameEnd().atZoneSameInstant(ZoneId.of(schedule.getEndTimeOffsetId())).toOffsetDateTime());
+        return now.isAfter(schedule.getTimeFrameStart().atZoneSameInstant(ZoneId.of(schedule.getSelectedTimeZone())).toOffsetDateTime())
+                && now.isBefore(schedule.getTimeFrameEnd().atZoneSameInstant(ZoneId.of(schedule.getSelectedTimeZone())).toOffsetDateTime());
     }
 
     private boolean isDay(Schedule schedule, OffsetDateTime now) {
