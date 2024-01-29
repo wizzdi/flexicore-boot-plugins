@@ -1,7 +1,7 @@
 package com.flexicore.ui.tree.data;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink_;
+
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.tree.model.TreeNode;
@@ -41,7 +41,7 @@ public class TreeNodeToUserRepository implements Plugin {
         List<Predicate> preds = new ArrayList<>();
         Join<TreeNodeToUser, TreeNode> join = r.join(TreeNodeToUser_.treeNode);
         preds.add(cb.and(
-                cb.not(cb.isTrue(r.get(Baselink_.softDelete))),
+                cb.not(cb.isTrue(r.get(TreeNodeToUser_.softDelete))),
                 join.get(TreeNode_.id).in(ids),
                 cb.equal(r.get(TreeNodeToUser_.user), securityContext.getUser())
         ));

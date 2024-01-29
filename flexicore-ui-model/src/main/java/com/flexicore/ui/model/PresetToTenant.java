@@ -1,30 +1,38 @@
 package com.flexicore.ui.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.Role;
 import com.flexicore.model.SecurityTenant;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class PresetToTenant extends PresetToEntity {
+
+	@ManyToOne(targetEntity = SecurityTenant.class, cascade = { CascadeType.MERGE,
+			CascadeType.PERSIST })
+	private SecurityTenant tenant;
 
 	public PresetToTenant() {
 	}
 
 
-	@Override
-	@ManyToOne(targetEntity = Role.class, cascade = {CascadeType.MERGE,
-			CascadeType.PERSIST})
-	public SecurityTenant getEntity() {
-		return (SecurityTenant) super.getEntity();
+	@ManyToOne(targetEntity = SecurityTenant.class, cascade = { CascadeType.MERGE,
+			CascadeType.PERSIST })
+	public SecurityTenant getTenant() {
+		return tenant;
 	}
 
-	@JsonIgnore
-	public <T extends PresetToEntity> T setEntity(SecurityTenant entity) {
-		super.setEntity(entity);
+	public <T extends PresetToTenant> T setTenant(SecurityTenant tenant) {
+		this.tenant = tenant;
 		return (T) this;
 	}
+
+	@Override
+	@Transient
+	public SecurityTenant getEntity() {
+		return tenant;
+	}
+
 }

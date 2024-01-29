@@ -22,7 +22,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 	@Autowired
 	@Qualifier("adminSecurityContext")
 	@Lazy
-	private SecurityContextBase<?,?,?,?> securityContext;
+	private SecurityContextBase securityContext;
 
 
 	@Override

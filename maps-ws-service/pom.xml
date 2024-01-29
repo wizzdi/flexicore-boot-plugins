@@ -77,6 +77,11 @@
             <artifactId>flexicore-territories-service</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-security-bearer-jwt</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
 
         <dependency>
@@ -89,17 +94,6 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>maps-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-service</artifactId>
             <scope>provided</scope>
         </dependency>
 

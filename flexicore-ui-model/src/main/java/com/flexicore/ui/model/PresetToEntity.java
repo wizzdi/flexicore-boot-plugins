@@ -3,16 +3,16 @@ package com.flexicore.ui.model;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecuredBasic;
 
+import com.flexicore.model.SecurityEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class PresetToEntity extends SecuredBasic {
 
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset preset;
-	@ManyToOne(targetEntity = Baseclass.class)
-	private Baseclass entity;
 	private int priority;
 	private boolean enabled;
 
@@ -49,14 +49,9 @@ public class PresetToEntity extends SecuredBasic {
 		this.preset = preset;
 		return (T) this;
 	}
-
-	@ManyToOne(targetEntity = Baseclass.class)
-	public Baseclass getEntity() {
-		return entity;
+	@Transient
+	public  SecurityEntity getEntity(){
+		return null;
 	}
 
-	public <T extends PresetToEntity> T setEntity(Baseclass entity) {
-		this.entity = entity;
-		return (T) this;
-	}
 }

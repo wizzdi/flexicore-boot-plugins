@@ -376,7 +376,7 @@ public class MappedPOIService implements Plugin {
             addressService.validate(mappedPOIFilter.getAddressFilter(), securityContext);
         }
         Set<String> tenantIds = mappedPOIFilter.getTenantIds();
-        Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         tenantIds.removeAll(securityTenantMap.keySet());
         if (!tenantIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SecurityTenant with ids " + tenantIds);

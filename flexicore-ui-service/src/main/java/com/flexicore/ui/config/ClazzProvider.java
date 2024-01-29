@@ -24,7 +24,7 @@ public class ClazzProvider implements Plugin {
     @Bean
     @Lazy
     public Clazz gridPresetClazz(){
-        return clazzes.getClazzes().stream().map(f->f.getClazz()).filter(f->f.getName().equals(GridPreset.class.getCanonicalName())).findFirst().orElse(null);
+        return clazzes.getClazzes().stream().filter(f->f.getName().equals(GridPreset.class.getCanonicalName())).findFirst().orElse(null);
     }
 
 
@@ -32,6 +32,6 @@ public class ClazzProvider implements Plugin {
     @Bean
     @Lazy
     public Clazz presetClazz(){
-        return clazzes.getClazzes().stream().map(f->f.getClazz()).filter(f->f.getName().equals(Preset.class.getCanonicalName())).findFirst().orElse(null);
+        return clazzes.getClazzes().stream().filter(f->f.getName().equals(Preset.class.getCanonicalName())).findFirst().orElse(null);
     }
 }

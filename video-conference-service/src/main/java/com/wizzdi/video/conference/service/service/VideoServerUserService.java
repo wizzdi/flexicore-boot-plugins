@@ -50,7 +50,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
   private String domain;
 
   public VideoServerUser getVideoServerUser(SecurityContextBase securityContext) {
-    return videoUserProviders.stream().filter(f -> f.getType().isAssignableFrom(securityContext.getUser().getClass())).findFirst().map(f -> f.getChatUser(securityContext)).orElse(null);
+    return videoUserProviders.stream().filter(f -> f.getType().isAssignableFrom(securityContext.getUser().getClass())).findFirst().map(f -> f.getVideoServerUser(securityContext)).orElse(null);
   }
 
   /**

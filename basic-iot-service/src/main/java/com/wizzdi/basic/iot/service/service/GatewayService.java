@@ -212,7 +212,7 @@ public class GatewayService implements Plugin {
                 .setDescription("Automatically Created User for Gateway "+gatewayId)
                 .setName(gatewayId+"-User");
         SecurityUser securityUser = securityUserService.createSecurityUser(securityUserCreate, securityContext);
-        tenantToUserService.createTenantToUser(new TenantToUserCreate().setSecurityUser(securityUser).setDefaultTenant(true).setTenant(securityContext.getTenantToCreateIn()),securityContext);
+        tenantToUserService.createTenantToUser(new TenantToUserCreate().setUser(securityUser).setDefaultTenant(true).setTenant(securityContext.getTenantToCreateIn()),securityContext);
         return securityUser;
     }
 

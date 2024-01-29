@@ -14,7 +14,7 @@ public class ChatUserConfig {
 	public ChatUserProvider<SecurityUser> chatUserProvider(){
 		return new ChatUserProvider<>() {
 			@Override
-			public ChatUser getChatUser(SecurityContextBase<?, SecurityUser, ?, ?> securityContextBase) {
+			public ChatUser getChatUser(SecurityContextBase securityContextBase) {
 				if (securityContextBase instanceof ChatUserSecurityContext) {
 					return ((ChatUserSecurityContext) securityContextBase).getChatUser();
 				}

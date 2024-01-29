@@ -67,6 +67,7 @@
         <module>dashboard-model</module>
         <module>dashboard-service</module>
         <module>dynamic-invoker-email-service</module>
+        <module>dynamic-invoker-export-utils</module>
         <module>flexicore-encryption-service</module>
         <module>flexicore-territories-model</module>
         <module>flexicore-territories-service</module>
@@ -108,7 +109,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <spring-boot.version>3.1.1</spring-boot.version>
-        <flexicore-boot-dependencies.version>4.1.7</flexicore-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>5.0.1</flexicore-boot-dependencies.version>
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
@@ -129,6 +130,10 @@
         <maven-shade-plugin.version>3.5.0</maven-shade-plugin.version>
         <caffeine.version>3.1.7</caffeine.version>
         <hivemq.version>1.18.3</hivemq.version>
+        <version.eclipselink>4.0.2</version.eclipselink>
+        <commons-csv.version>1.10.0</commons-csv.version>
+
+
     </properties>
 
 
@@ -235,6 +240,12 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>dynamic-invoker-email-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>dynamic-invoker-export-utils</artifactId>
                 <version>${revision}</version>
                 <scope>provided</scope>
             </dependency>
@@ -583,6 +594,15 @@
                             </configuration>
                         </execution>
                     </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.eclipse.persistence</groupId>
+                            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+                            <version>${version.eclipselink}</version>
+                        </dependency>
+
+
+                    </dependencies>
                 </plugin>
 
                 <plugin>

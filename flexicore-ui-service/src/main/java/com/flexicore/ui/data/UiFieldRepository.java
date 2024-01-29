@@ -71,7 +71,7 @@ public class UiFieldRepository implements Plugin {
         addPresetLinkPredicates(preds, cb, q, r, presetToRoleFilter, securityContextBase);
         if (presetToRoleFilter.getRoles() != null && !presetToRoleFilter.getRoles().isEmpty()) {
             Set<String> ids = presetToRoleFilter.getRoles().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-            Join<T, Role> join = cb.treat(r.join(PresetToRole_.entity), Role.class);
+            Join<T, Role> join = r.join(PresetToRole_.role);
             preds.add(join.get(Role_.id).in(ids));
         }
 
@@ -109,7 +109,7 @@ public class UiFieldRepository implements Plugin {
         addPresetLinkPredicates(preds, cb, q, r, presetToTenantFilter, securityContextBase);
         if (presetToTenantFilter.getTenants() != null && !presetToTenantFilter.getTenants().isEmpty()) {
             Set<String> ids = presetToTenantFilter.getTenants().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-            Join<T, SecurityTenant> join = cb.treat(r.join(PresetToTenant_.entity), SecurityTenant.class);
+            Join<T, SecurityTenant> join = r.join(PresetToTenant_.tenant);
             preds.add(join.get(SecurityTenant_.id).in(ids));
         }
 
@@ -148,7 +148,7 @@ public class UiFieldRepository implements Plugin {
         addPresetLinkPredicates(preds, cb,q, r, presetToUserFilter,securityContextBase);
         if (presetToUserFilter.getUsers() != null && !presetToUserFilter.getUsers().isEmpty()) {
             Set<String> ids = presetToUserFilter.getUsers().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-            Join<T, SecurityUser> join = cb.treat(r.join(PresetToUser_.entity), SecurityUser.class);
+            Join<T, SecurityUser> join = r.join(PresetToUser_.user);
             preds.add(join.get(SecurityUser_.id).in(ids));
         }
 

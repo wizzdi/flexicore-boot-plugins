@@ -6,6 +6,6 @@ import com.wizzdi.video.conference.model.VideoServerUser;
 
 public interface VideoUserProvider<T extends SecurityUser> {
 
-    VideoServerUser getChatUser(SecurityContextBase<?,T,?,?> securityContextBase);
+    VideoServerUser getVideoServerUser(SecurityContextBase securityContextBase);
     Class<T> getType();
 }

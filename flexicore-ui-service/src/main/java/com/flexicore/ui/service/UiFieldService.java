@@ -262,7 +262,7 @@ public class UiFieldService implements Plugin {
         boolean update = presetToEntityService.presetToEntityUpdateNoMerge(presetToTenantCreate, presetToTenant);
 
         if (presetToTenantCreate.getPreferredTenant() != null && (presetToTenant.getEntity() == null || !presetToTenantCreate.getPreferredTenant().getId().equals(presetToTenant.getEntity().getId()))) {
-            presetToTenant.setEntity(presetToTenantCreate.getPreferredTenant());
+            presetToTenant.setTenant(presetToTenantCreate.getPreferredTenant());
             update = true;
         }
         return update;
@@ -289,7 +289,7 @@ public class UiFieldService implements Plugin {
     public boolean updatePresetToUserNoMerge(PresetToUserCreate presetToUserCreate, PresetToUser presetToUser) {
         boolean update = presetToEntityService.presetToEntityUpdateNoMerge(presetToUserCreate, presetToUser);
         if (presetToUserCreate.getUser() != null && (presetToUser.getEntity() == null || !presetToUserCreate.getUser().getId().equals(presetToUser.getEntity().getId()))) {
-            presetToUser.setEntity(presetToUserCreate.getUser());
+            presetToUser.setUser(presetToUserCreate.getUser());
             update = true;
         }
         return update;
@@ -306,7 +306,7 @@ public class UiFieldService implements Plugin {
             PresetToRoleCreate presetToRoleCreate, PresetToRole presetToRole) {
         boolean update = presetToEntityService.presetToEntityUpdateNoMerge(presetToRoleCreate, presetToRole);
         if (presetToRoleCreate.getRole() != null && (presetToRole.getEntity() == null || !presetToRoleCreate.getRole().getId().equals(presetToRole.getEntity().getId()))) {
-            presetToRole.setEntity(presetToRoleCreate.getRole());
+            presetToRole.setRole(presetToRoleCreate.getRole());
             update = true;
         }
         return update;
@@ -315,7 +315,7 @@ public class UiFieldService implements Plugin {
     public void validate(PresetToRoleFilter presetToRoleFilter,
                          SecurityContextBase securityContext) {
         Set<String> roleIds = presetToRoleFilter.getRoleIds();
-        Map<String, Role> map = roleIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(Role.class, roleIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Role> map = roleIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(Role.class, roleIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         roleIds.removeAll(map.keySet());
         if (!roleIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Roles with ids " + roleIds);
@@ -338,7 +338,7 @@ public class UiFieldService implements Plugin {
 
     public void validate(PresetToTenantFilter presetToTenantFilter, SecurityContextBase securityContext) {
         Set<String> tenantIds = presetToTenantFilter.getTenantIdsForPreset();
-        Map<String, SecurityTenant> map = tenantIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityTenant.class, tenantIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityTenant> map = tenantIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityTenant.class, tenantIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         tenantIds.removeAll(map.keySet());
         if (!tenantIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Tenants with ids " + tenantIds);
@@ -360,7 +360,7 @@ public class UiFieldService implements Plugin {
 
     public void validate(PresetToUserFilter presetToUserFilter, SecurityContextBase securityContext) {
         Set<String> userIds = presetToUserFilter.getUserIds();
-        Map<String, SecurityUser> map = userIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityUser.class, userIds, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityUser> map = userIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityUser.class, userIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         userIds.removeAll(map.keySet());
         if (!userIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Users with ids " + userIds);
@@ -480,9 +480,9 @@ public class UiFieldService implements Plugin {
     @Async
     public void handlePresetPermissionGroupCreated(BasicCreated<PermissionGroupToBaseclass> baseclassCreated) {
         PermissionGroupToBaseclass permissionGroupToBaseclass = baseclassCreated.getBaseclass();
-        PermissionGroup permissionGroup = permissionGroupToBaseclass.getLeftside();
-        if (permissionGroupToBaseclass.getRightside().getClazz().getId().equals(presetClazz.getId())) {
-            Baseclass baseclass = permissionGroupToBaseclass.getRightside();
+        PermissionGroup permissionGroup = permissionGroupToBaseclass.getPermissionGroup();
+        if (permissionGroupToBaseclass.getBaseclass().getClazz().getId().equals(presetClazz.getId())) {
+            Baseclass baseclass = permissionGroupToBaseclass.getBaseclass();
             List<Preset> presets = presetService.listAllPresets(new ConfigurationPresetFiltering().setRelatedBaseclass(Collections.singletonList(baseclass)), null);
             for (Preset preset : presets) {
                 logger.info("preset " + preset.getName() + "(" + preset.getId() + ") was attached to permission group " + permissionGroup.getName() + "(" + permissionGroup.getId() + ") , will attach ui fields as well");

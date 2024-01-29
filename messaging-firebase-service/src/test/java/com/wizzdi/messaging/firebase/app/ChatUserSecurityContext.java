@@ -6,18 +6,19 @@ import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.security.SecurityPolicy;
 import com.flexicore.security.SecurityContextBase;
+import com.flexicore.security.SecurityPermissions;
 import com.wizzdi.messaging.model.ChatUser;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class ChatUserSecurityContext<ST extends SecurityTenant,O extends SecurityOperation,R extends Role> extends SecurityContextBase<ST, SecurityUser,O,R> {
+public class ChatUserSecurityContext extends SecurityContextBase {
 
 	private ChatUser chatUser;
-	private SecurityContextBase<ST,SecurityUser,O,R> securityContextBase;
+	private final SecurityContextBase securityContextBase;
 
-	public ChatUserSecurityContext(SecurityContextBase<ST, SecurityUser, O, R> securityContextBase) {
+	public ChatUserSecurityContext(SecurityContextBase securityContextBase) {
 		this.securityContextBase = securityContextBase;
 	}
 
@@ -25,19 +26,14 @@ public class ChatUserSecurityContext<ST extends SecurityTenant,O extends Securit
 		return chatUser;
 	}
 
-	public <T extends ChatUserSecurityContext<ST, O, R>> T setChatUser(ChatUser chatUser) {
+	public <T extends ChatUserSecurityContext> T setChatUser(ChatUser chatUser) {
 		this.chatUser = chatUser;
 		return (T) this;
 	}
 
 	@Override
-	public List<ST> getTenants() {
+	public List<SecurityTenant> getTenants() {
 		return securityContextBase.getTenants();
-	}
-
-	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setTenants(List<ST> tenants) {
-		return securityContextBase.setTenants(tenants);
 	}
 
 	@Override
@@ -46,28 +42,13 @@ public class ChatUserSecurityContext<ST extends SecurityTenant,O extends Securit
 	}
 
 	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setUser(SecurityUser user) {
-		return securityContextBase.setUser(user);
-	}
-
-	@Override
-	public O getOperation() {
+	public SecurityOperation getOperation() {
 		return securityContextBase.getOperation();
 	}
 
 	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setOperation(O operation) {
-		return securityContextBase.setOperation(operation);
-	}
-
-	@Override
-	public Map<String, List<R>> getRoleMap() {
+	public Map<String, List<Role>> getRoleMap() {
 		return securityContextBase.getRoleMap();
-	}
-
-	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setRoleMap(Map<String, List<R>> roleMap) {
-		return securityContextBase.setRoleMap(roleMap);
 	}
 
 	@Override
@@ -76,28 +57,13 @@ public class ChatUserSecurityContext<ST extends SecurityTenant,O extends Securit
 	}
 
 	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setImpersonated(boolean impersonated) {
-		return securityContextBase.setImpersonated(impersonated);
-	}
-
-	@Override
 	public OffsetDateTime getExpiresDate() {
 		return securityContextBase.getExpiresDate();
 	}
 
 	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setExpiresDate(OffsetDateTime expiresDate) {
-		return securityContextBase.setExpiresDate(expiresDate);
-	}
-
-	@Override
-	public ST getTenantToCreateIn() {
+	public SecurityTenant getTenantToCreateIn() {
 		return securityContextBase.getTenantToCreateIn();
-	}
-
-	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setTenantToCreateIn(ST tenantToCreateIn) {
-		return securityContextBase.setTenantToCreateIn(tenantToCreateIn);
 	}
 
 	@Override
@@ -106,7 +72,12 @@ public class ChatUserSecurityContext<ST extends SecurityTenant,O extends Securit
 	}
 
 	@Override
-	public <T extends SecurityContextBase<ST, SecurityUser, O, R>> T setSecurityPolicies(List<SecurityPolicy> securityPolicies) {
-		return securityContextBase.setSecurityPolicies(securityPolicies);
+	public List<Role> getAllRoles() {
+		return securityContextBase.getAllRoles();
+	}
+
+	@Override
+	public SecurityPermissions getSecurityPermissions() {
+		return securityContextBase.getSecurityPermissions();
 	}
 }

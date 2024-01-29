@@ -2,6 +2,7 @@ package com.flexicore.ui.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecurityEntity;
 import com.flexicore.ui.model.Preset;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
@@ -16,7 +17,7 @@ public class PresetToEntityFiltering extends PaginationFilter {
 
 	private Set<String> entityIds=new HashSet<>();
 	@JsonIgnore
-	private List<Baseclass> entities;
+	private List<SecurityEntity> entities;
 
 
 	private Boolean enabled;
@@ -59,11 +60,11 @@ public class PresetToEntityFiltering extends PaginationFilter {
 	}
 
 	@JsonIgnore
-	public List<Baseclass> getEntities() {
+	public List<SecurityEntity> getEntities() {
 		return entities;
 	}
 
-	public <T extends PresetToEntityFiltering> T setEntities(List<Baseclass> entities) {
+	public <T extends PresetToEntityFiltering> T setEntities(List<SecurityEntity> entities) {
 		this.entities = entities;
 		return (T) this;
 	}

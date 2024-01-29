@@ -119,9 +119,9 @@ public class UIComponentControllerTest {
         Map<String, UIComponent> uiComponentMap = uiComponents.stream().collect(Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a));
         for (UIComponentRegistrationContainer uiComponentRegistrationContainer : uiComponentRegistrationContainers) {
             UIComponent uiComponent = uiComponentMap.get(uiComponentRegistrationContainer.getExternalId());
-            List<PermissionGroupToBaseclass> permissionGroupToBaseclasses = permissionGroupToBaseclassService.listAllPermissionGroupToBaseclass(new PermissionGroupToBaseclassFilter().setLeftside(Collections.singletonList(uiComponent.getSecurity())), null);
+            List<PermissionGroupToBaseclass> permissionGroupToBaseclasses = permissionGroupToBaseclassService.listAllPermissionGroupToBaseclass(new PermissionGroupToBaseclassFilter().setBaseclasses(Collections.singletonList(uiComponent.getSecurity())), null);
 
-            Set<String> actualGroups = permissionGroupToBaseclasses.stream().map(f -> f.getLeftside().getExternalId()).collect(Collectors.toSet());
+            Set<String> actualGroups = permissionGroupToBaseclasses.stream().map(f -> f.getPermissionGroup().getExternalId()).collect(Collectors.toSet());
             Set<String> expectedGroups = Stream.of(uiComponentRegistrationContainer.getGroups().split(",")).collect(Collectors.toSet());
             Assertions.assertTrue(expectedGroups.containsAll(actualGroups));
             Assertions.assertTrue(actualGroups.containsAll(expectedGroups));

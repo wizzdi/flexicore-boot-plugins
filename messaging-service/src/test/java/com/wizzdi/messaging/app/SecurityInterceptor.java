@@ -25,7 +25,7 @@ public class SecurityInterceptor implements HandlerInterceptor, InitializingBean
 	@Autowired
 	@Qualifier("adminSecurityContext")
 	@Lazy
-	private SecurityContextBase<?,?,?,?> securityContextBase;
+	private SecurityContextBase securityContextBase;
 
 	private static final AtomicReference<ChatUserSecurityContext> ref=new AtomicReference<>(null);
 

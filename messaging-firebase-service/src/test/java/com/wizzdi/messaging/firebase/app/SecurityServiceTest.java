@@ -27,10 +27,10 @@ public class SecurityServiceTest {
 
 
 	public SecurityContextBase getSecurityContext(SecurityUser securityUser){
-		Map<String, List<Role>> rols = roleService.listAllRoleToUsers(new RoleToUserFilter().setSecurityUsers(Collections.singletonList(securityUser)), null).stream().collect(Collectors.groupingBy(f -> f.getTenant().getId(), Collectors.mapping(f -> f.getLeftside(), Collectors.toList())));
-		List<TenantToUser> tenantToUsers = tenantToUserService.listAllTenantToUsers(new TenantToUserFilter().setSecurityUsers(Collections.singletonList(securityUser)), null);
-		List<SecurityTenant> tenants= tenantToUsers.stream().map(f->f.getLeftside()).collect(Collectors.toList());
-		SecurityTenant createIn=tenantToUsers.stream().filter(f->f.isDefualtTennant()).findFirst().map(f->f.getLeftside()).orElse(null);
+		Map<String, List<Role>> rols = roleService.listAllRoleToUsers(new RoleToUserFilter().setUsers(Collections.singletonList(securityUser)), null).stream().collect(Collectors.groupingBy(f -> f.getRole().getSecurityTenant().getId(), Collectors.mapping(f -> f.getRole(), Collectors.toList())));
+		List<TenantToUser> tenantToUsers = tenantToUserService.listAllTenantToUsers(new TenantToUserFilter().setUsers(Collections.singletonList(securityUser)), null);
+		List<SecurityTenant> tenants= tenantToUsers.stream().map(f->f.getTenant()).collect(Collectors.toList());
+		SecurityTenant createIn=tenantToUsers.stream().filter(f->f.isDefaultTenant()).findFirst().map(f->f.getTenant()).orElse(null);
 		return new SecurityContextBase()
 				.setUser(securityUser)
 				.setRoleMap(rols)

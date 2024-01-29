@@ -72,9 +72,9 @@ import java.util.stream.Collectors;
 public class LicenseRequestService implements Plugin {
 
     private static List<String> cachedMacAdresses = null;
-    private static Queue<String> deviceSerialNumbers = new LinkedBlockingQueue<>();
+    private static final Queue<String> deviceSerialNumbers = new LinkedBlockingQueue<>();
 
-    private static Cache<String, OffsetDateTime> cachedLicense = Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
+    private static final Cache<String, OffsetDateTime> cachedLicense = Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS).build();
 
 
     @Autowired
@@ -238,7 +238,7 @@ public class LicenseRequestService implements Plugin {
         }
         licenseRequestCreate.setLicense(license);
         String licensedTenantId = licenseRequestCreate.getLicensedTenantId();
-        SecurityTenant tenant = licensedTenantId != null ? getByIdOrNull(licensedTenantId, SecurityTenant.class,  securityContext) : null;
+        SecurityTenant tenant = licensedTenantId != null ? getByIdOrNull(licensedTenantId, SecurityTenant.class,SecuredBasic_.security,  securityContext) : null;
         if (licensedTenantId!=null&&tenant == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No SecurityTenant with id " + licensedTenantId);
         }

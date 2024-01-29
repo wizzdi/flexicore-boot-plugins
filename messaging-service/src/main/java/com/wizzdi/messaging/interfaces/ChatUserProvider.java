@@ -6,7 +6,7 @@ import com.wizzdi.messaging.model.ChatUser;
 
 public interface ChatUserProvider<T extends SecurityUser> {
 
-	ChatUser getChatUser(SecurityContextBase<?,T,?,?> securityContextBase);
+	ChatUser getChatUser(SecurityContextBase securityContextBase);
 	Class<T> getType();
 
 }

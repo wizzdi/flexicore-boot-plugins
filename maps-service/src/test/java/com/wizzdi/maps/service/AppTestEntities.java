@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
+
 import com.flexicore.model.Basic;
 import com.flexicore.model.Clazz;
 import com.flexicore.model.OperationCategory;
@@ -18,9 +18,9 @@ import com.flexicore.model.SecurityOperation;
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.SecurityWildcard;
-import com.flexicore.model.TenantToBaseClassPremission;
+
 import com.flexicore.model.TenantToUser;
-import com.flexicore.model.UserToBaseClass;
+
 import com.flexicore.model.security.SecurityPolicy;
 import com.flexicore.model.territories.Address;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
@@ -53,11 +53,9 @@ public class AppTestEntities {
         new HashSet<>(
             Arrays.asList(
                 PermissionGroupToBaseclass.class,
-                TenantToBaseClassPremission.class,
                 TenantToUser.class,
                 Baseclass.class,
                 Basic.class,
-                UserToBaseClass.class,
                 OperationCategory.class,
                 SecurityOperation.class,
                 OperationToClazz.class,
@@ -78,7 +76,6 @@ public class AppTestEntities {
                 Role.class,
                 SecurityEntity.class,
                 RoleToUser.class,
-                Baselink.class,
                 SecurityTenant.class,
                 LocationHistory.class,
                 StatusHistory.class,
@@ -90,8 +87,8 @@ public class AppTestEntities {
                 PermissionGroupToBaseclass.class,
                 SecurityLink.class,
                 SecurityPolicy.class,
-                TenantToBaseClassPremission.class,
-                UserToBaseClass.class,
+                
+               
                 OperationCategory.class,
                 SecuredBasic.class,
                 SecurityUser.class,
@@ -104,7 +101,7 @@ public class AppTestEntities {
                 Basic.class,
                 SecurityEntity.class,
                 Baseclass.class,
-                Baselink.class,
+                
                 PermissionGroup.class,
                 MappedPOI.class,
                 FileResource.class,

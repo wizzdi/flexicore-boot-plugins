@@ -30,6 +30,21 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-security-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-dynamic-invokers-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-file-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-ui-model</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -39,11 +54,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
     </dependencies>
     <build>
         <resources>

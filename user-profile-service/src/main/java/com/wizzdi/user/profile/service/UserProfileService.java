@@ -1,6 +1,7 @@
 package com.wizzdi.user.profile.service;
 
 import com.flexicore.model.Baseclass;
+import com.flexicore.model.SecuredBasic_;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
@@ -88,7 +89,7 @@ public class UserProfileService implements Plugin {
     public void validate(UserProfileCreate userProfileCreate, SecurityContextBase securityContextBase) {
         basicService.validate(userProfileCreate, securityContextBase);
         String userId = userProfileCreate.getUserId();
-        SecurityUser user= userId!=null?securityUserService.getByIdOrNull(userId,SecurityUser.class,securityContextBase):null;
+        SecurityUser user= userId!=null?securityUserService.getByIdOrNull(userId,SecurityUser.class, SecuredBasic_.security,securityContextBase):null;
         if(userId!=null&&user==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no user with id "+userId);
         }
@@ -105,7 +106,7 @@ public class UserProfileService implements Plugin {
     public void validate(UserProfileFilter userProfileFilter, SecurityContextBase securityContextBase) {
         basicService.validate(userProfileFilter, securityContextBase);
         Set<String> userIds = userProfileFilter.getUserIds();
-        Map<String,SecurityUser> userMap= userIds.isEmpty()?new HashMap<>():securityUserService.listByIds(SecurityUser.class,userIds,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+        Map<String,SecurityUser> userMap= userIds.isEmpty()?new HashMap<>():securityUserService.listByIds(SecurityUser.class,userIds,SecuredBasic_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(),f->f));
         userIds.removeAll(userMap.keySet());
         if(!userIds.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no users with ids "+userIds);

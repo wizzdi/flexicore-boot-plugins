@@ -1,9 +1,9 @@
 package com.wizzdi.maps.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.interfaces.dynamic.Invoker;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.email.request.SendStatusHistoryEmailRequest;
 import com.wizzdi.maps.service.email.response.SendStatusEmailResponse;

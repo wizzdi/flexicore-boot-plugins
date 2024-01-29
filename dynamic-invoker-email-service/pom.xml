@@ -100,6 +100,12 @@
             <artifactId>flexicore-territories-service</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-invoker-export-utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
 
 
         <dependency>
@@ -112,18 +118,6 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>maps-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-service</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -180,7 +174,7 @@
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
                                         <!--suppress UnresolvedMavenProperty -->
-                                        <Plugin-Dependencies>flexicore-territories-service@&gt;=${revision},maps-service@&gt;=${revision}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>flexicore-territories-service@&gt;=${revision},maps-service@&gt;=${revision},dynamic-invoker-export-utils@&gt;=${revision}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

@@ -35,7 +35,7 @@ public class TestEntities {
 
     @Bean
     public TenantToUser tenantToUser(SecurityUser user){
-        return tenantToUserService.createTenantToUser(new TenantToUserCreate().setSecurityUser(user).setDefaultTenant(true).setTenant(adminSecurityContext.getTenantToCreateIn()),adminSecurityContext);
+        return tenantToUserService.createTenantToUser(new TenantToUserCreate().setUser(user).setDefaultTenant(true).setTenant(adminSecurityContext.getTenantToCreateIn()),adminSecurityContext);
     }
 
 

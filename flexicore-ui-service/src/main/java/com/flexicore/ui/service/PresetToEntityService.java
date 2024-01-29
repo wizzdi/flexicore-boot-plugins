@@ -3,6 +3,7 @@ package com.flexicore.ui.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
+import com.flexicore.model.SecurityEntity;
 import com.flexicore.security.SecurityContextBase;
 import com.flexicore.ui.data.PresetToEntityRepository;
 import com.flexicore.ui.model.*;
@@ -133,11 +134,11 @@ public class PresetToEntityService implements Plugin {
 	public List<Preset> getPreferredPresets(PreferedPresetRequest preferedPresetRequest, SecurityContextBase securityContext) {
 		Map<String, List<PresetToEntity>> map = new HashMap<>();
 		PresetToEntityFiltering presetToEntityFiltering = new PresetToEntityFiltering();
-		ArrayList<Baseclass> rightside = new ArrayList<>(securityContext.getTenants());
+		List<SecurityEntity> rightside = new ArrayList<>(securityContext.getTenants());
 		rightside.add(securityContext.getUser());
-		rightside.addAll(roleToUserService.listAllRoleToUsers(new RoleToUserFilter().setSecurityUsers(Collections.singletonList(securityContext.getUser())), null).stream().map(f->f.getLeftside()).collect(Collectors.toList()));
+		rightside.addAll(roleToUserService.listAllRoleToUsers(new RoleToUserFilter().setUsers(Collections.singletonList(securityContext.getUser())), null).stream().map(f->f.getRole()).toList());
 		presetToEntityFiltering.setEntities(rightside);
-		List<PresetToEntity> links = presetToEntityRepository.listAllPresetToEntities(presetToEntityFiltering, securityContext).parallelStream().filter(f -> f.getPreset() != null).sorted(PRESET_LINK_COMPARATOR.thenComparing(PresetToEntity::getPriority)).collect(Collectors.toList());
+		List<PresetToEntity> links = presetToEntityRepository.listAllPresetToEntities(presetToEntityFiltering, securityContext).parallelStream().filter(f -> f.getPreset() != null).sorted(PRESET_LINK_COMPARATOR.thenComparing(PresetToEntity::getPriority)).toList();
 		for (PresetToEntity presetToEntity : links) {
 			String canonicalName = presetToEntity.getPreset().getClass().getCanonicalName();
 			List<PresetToEntity> presetToEntities = map.computeIfAbsent(canonicalName, f -> new ArrayList<>());

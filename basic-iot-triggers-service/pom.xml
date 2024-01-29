@@ -135,11 +135,7 @@
             <artifactId>flexicore-security-model</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-file-model</artifactId>

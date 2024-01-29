@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.request;
 
-import com.flexicore.request.ExportDynamicExecution;
 
+import com.wizzdi.flexicore.dynamic.invoker.service.export.request.ExportDynamicExecution;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.ZoneOffset;

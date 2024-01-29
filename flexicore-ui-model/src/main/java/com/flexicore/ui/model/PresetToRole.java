@@ -1,31 +1,39 @@
 package com.flexicore.ui.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.Role;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 
 @Entity
 public class PresetToRole extends PresetToEntity {
+
+	@ManyToOne(targetEntity = Role.class, cascade = {CascadeType.MERGE,
+			CascadeType.PERSIST})
+	private Role role;
 
 	public PresetToRole() {
 	}
 
 
-
-	@Override
 	@ManyToOne(targetEntity = Role.class, cascade = {CascadeType.MERGE,
 			CascadeType.PERSIST})
-	public Role getEntity() {
-		return (Role) super.getEntity();
+	public Role getRole() {
+		return role;
 	}
 
-	@JsonIgnore
-	public <T extends PresetToEntity> T setEntity(Role entity) {
-		super.setEntity(entity);
+	public <T extends PresetToRole> T setRole(Role role) {
+		this.role = role;
 		return (T) this;
 	}
+
+	@Transient
+	@Override
+	public Role getEntity() {
+		return role;
+	}
+
 
 }

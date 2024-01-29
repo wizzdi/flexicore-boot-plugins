@@ -1,7 +1,7 @@
 package com.flexicore.rules;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink;
+
 import com.flexicore.model.Basic;
 import com.flexicore.model.Clazz;
 import com.flexicore.model.OperationCategory;
@@ -18,9 +18,9 @@ import com.flexicore.model.SecurityOperation;
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.SecurityWildcard;
-import com.flexicore.model.TenantToBaseClassPremission;
+
 import com.flexicore.model.TenantToUser;
-import com.flexicore.model.UserToBaseClass;
+
 import com.flexicore.model.security.SecurityPolicy;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.model.JSFunction;
@@ -57,7 +57,7 @@ public class AppTestEntities {
             Arrays.asList(
                     DynamicExecution.class,
                 PermissionGroup.class,
-                Baselink.class,
+                
                 SecurityEntity.class,
                 Baseclass.class,
                 SecurityTenant.class,
@@ -67,12 +67,12 @@ public class AppTestEntities {
                 SecurityWildcard.class,
                 SecurityEntity.class,
                 SecuredBasic.class,
-                UserToBaseClass.class,
+               
                 RoleToUser.class,
                 SecurityOperation.class,
                 OperationCategory.class,
                 RoleToBaseclass.class,
-                TenantToBaseClassPremission.class,
+                
                 SecurityUser.class,
                 Role.class,
                 SecurityPolicy.class,
@@ -90,9 +90,9 @@ public class AppTestEntities {
                 RoleToUser.class,
                 TenantToUser.class,
                 RoleToBaseclass.class,
-                Baselink.class,
+                
                 Baseclass.class,
-                TenantToBaseClassPremission.class,
+                
                 SecuredBasic.class,
                 OperationToClazz.class,
                 SecurityTenant.class,

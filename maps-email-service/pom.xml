@@ -38,6 +38,11 @@
             <artifactId>maps-service</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-invoker-export-utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
           <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2-jakarta</artifactId>
@@ -113,16 +118,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-service</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
     </dependencies>
     <build>

@@ -7,9 +7,10 @@
 package com.flexicore.category.data;
 
 import com.flexicore.category.model.CategoryToBaseClass;
+import com.flexicore.category.model.CategoryToBaseClass_;
 import com.flexicore.category.request.CategoryToBaseclassFilter;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.Baselink_;
+
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -47,7 +48,7 @@ public class CategoryToBaseclassRepository implements Plugin {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaDelete<CategoryToBaseClass> q = cb.createCriteriaDelete(CategoryToBaseClass.class);
 		Root<CategoryToBaseClass> r = q.from(CategoryToBaseClass.class);
-		Predicate pred=r.get(Baselink_.id).in(toRemove);
+		Predicate pred=r.get(CategoryToBaseClass_.id).in(toRemove);
 		q.where(pred);
 		Query query=em.createQuery(q);
 		return query.executeUpdate()> 0;

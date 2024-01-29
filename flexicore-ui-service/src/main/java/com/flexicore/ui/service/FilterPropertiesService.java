@@ -156,10 +156,10 @@ public class FilterPropertiesService implements Plugin {
     @Async
     public void handlePresetPermissionGroupCreated(BasicCreated<PermissionGroupToBaseclass> baseclassCreated) {
         PermissionGroupToBaseclass permissionGroupToBaseclass = baseclassCreated.getBaseclass();
-        PermissionGroup permissionGroup = permissionGroupToBaseclass.getLeftside();
-        if (permissionGroupToBaseclass.getRightside().getClazz().getId().equals(gridPresetClazz.getId()) ) {
+        PermissionGroup permissionGroup = permissionGroupToBaseclass.getPermissionGroup();
+        if (permissionGroupToBaseclass.getBaseclass().getClazz().getId().equals(gridPresetClazz.getId()) ) {
             SecurityContextBase securityContext = adminSecurityContextBase;
-            Baseclass baseclass = permissionGroupToBaseclass.getRightside();
+            Baseclass baseclass = permissionGroupToBaseclass.getBaseclass();
 
             List<GridPreset> presets = gridPresetService.listAllGridPresets(new GridPresetFiltering().setRelatedBaseclass(Collections.singletonList(baseclass)), null);
             for (GridPreset preset : presets) {

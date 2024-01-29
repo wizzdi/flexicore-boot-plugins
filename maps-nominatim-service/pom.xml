@@ -37,6 +37,11 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>dynamic-properties-database-converter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-security-model</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -92,16 +97,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-model</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.wizzdi</groupId>
-            <artifactId>flexicore-base-service</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
     </dependencies>
     <build>

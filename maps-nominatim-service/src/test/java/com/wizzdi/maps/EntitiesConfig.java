@@ -2,7 +2,7 @@ package com.wizzdi.maps;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.Tenant;
+import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.security.SecurityPolicy;
 import com.flexicore.model.territories.Address;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
@@ -20,6 +20,6 @@ public class EntitiesConfig {
 
 	@Bean
 	public EntitiesHolder entitiesHolder(){
-		return new EntitiesHolder(new HashSet<>(Arrays.asList(Tenant.class, FileResource.class,Baseclass.class, Basic.class, SecurityPolicy.class,  JsonConverter.class, MappedPOI.class, Address.class)));
+		return new EntitiesHolder(new HashSet<>(Arrays.asList(SecurityTenant.class, FileResource.class,Baseclass.class, Basic.class, SecurityPolicy.class,  JsonConverter.class, MappedPOI.class, Address.class)));
 	}
 }
