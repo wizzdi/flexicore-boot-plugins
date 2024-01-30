@@ -149,6 +149,10 @@ public class ScenarioTriggerService implements Plugin {
       scenarioTrigger.setValidTill(scenarioTriggerCreate.getValidTill());
       update = true;
     }
+    if(scenarioTriggerCreate.getTimeZoneId()!=null && !scenarioTriggerCreate.getTimeZoneId().equals(scenarioTrigger.getTimeZoneId())){
+      scenarioTrigger.setTimeZoneId(scenarioTriggerCreate.getTimeZoneId());
+      update=true;
+    }
 
     return update;
   }

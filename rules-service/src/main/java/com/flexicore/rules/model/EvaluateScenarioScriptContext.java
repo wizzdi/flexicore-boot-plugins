@@ -23,7 +23,7 @@ public class EvaluateScenarioScriptContext {
 	private List<DataSource> scenarioToDataSources;
 	private ScenarioEvent scenarioEvent;
 	private Scenario scenario;
-	private Map<String, ExecuteInvokerRequest> actions;
+	private List<ActionContext> actions;
 
 	private Map<String,ScenarioSavableEvent> eventCache=new ConcurrentHashMap<>();
 	private Function<String, ScenarioSavableEvent> fetchEvent;
@@ -103,11 +103,11 @@ public class EvaluateScenarioScriptContext {
 		return (T) this;
 	}
 
-	public Map<String, ExecuteInvokerRequest> getActions() {
+	public List<ActionContext> getActions() {
 		return actions;
 	}
 
-	public <T extends EvaluateScenarioScriptContext> T setActions(Map<String, ExecuteInvokerRequest> actions) {
+	public <T extends EvaluateScenarioScriptContext> T setActions(List<ActionContext> actions) {
 		this.actions = actions;
 		return (T) this;
 	}

@@ -83,6 +83,9 @@ public class ScenarioRepository implements Plugin {
     if (scenarioFilter.getScenarioHint() != null && !scenarioFilter.getScenarioHint().isEmpty()) {
       preds.add(r.get(Scenario_.scenarioHint).in(scenarioFilter.getScenarioHint()));
     }
+    if(scenarioFilter.isMissingLogFile()){
+      preds.add(cb.isNull(r.get(Scenario_.logFileResource)));
+    }
   }
   /**
    * @param scenarioFilter Object Used to List Scenario

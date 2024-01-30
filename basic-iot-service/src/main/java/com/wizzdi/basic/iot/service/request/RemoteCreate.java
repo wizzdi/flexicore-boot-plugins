@@ -1,6 +1,7 @@
 package com.wizzdi.basic.iot.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.wizzdi.maps.model.MappedPOI;
@@ -31,6 +32,28 @@ public class RemoteCreate extends BasicCreate {
 
     private Double reportedLat;
     private Double reportedLon;
+
+    public RemoteCreate() {
+    }
+
+    public RemoteCreate(Remote other) {
+        setName(other.getName());
+        setDescription(other.getDescription());
+        setUpdateDate(other.getUpdateDate());
+        setSoftDelete(other.isSoftDelete());
+        this.deviceProperties = deepCopy(other.getDeviceProperties());
+        this.userAddedProperties = deepCopy(other.getUserAddedProperties());
+        this.remoteId = other.getRemoteId();
+        this.version = other.getVersion();
+        this.currentSchema = other.getCurrentSchema();
+        this.mappedPOI = other.getMappedPOI();
+        this.lockLocation = other.isLockLocation();
+        this.lockName = other.isLockName();
+        this.lastSeen = other.getLastSeen();
+        this.keepStateHistory = other.isKeepStateHistory();
+        this.reportedLat = other.getReportedLat();
+        this.reportedLon = other.getReportedLon();
+    }
 
     public String getRemoteId() {
         return remoteId;
@@ -142,5 +165,23 @@ public class RemoteCreate extends BasicCreate {
     public <T extends RemoteCreate> T setReportedLon(Double reportedLon) {
         this.reportedLon = reportedLon;
         return (T) this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> deepCopy(Map<String, Object> originalMap) {
+        if(originalMap==null){
+            return null;
+        }
+        Map<String, Object> copiedMap = new HashMap<>();
+        for (Map.Entry<String, Object> entry : originalMap.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                // Recursive deep copy if it's a nested map
+                value = deepCopy((Map<String, Object>) value);
+            }
+            // For immutable types and primitives, the reference can be shared
+            copiedMap.put(entry.getKey(), value);
+        }
+        return copiedMap;
     }
 }

@@ -35,6 +35,8 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   @JsonIgnore private FileResource evaluatingJSCode;
 
+  private String timeZoneId;
+
   public String getLastEventId() {
     return this.lastEventId;
   }
@@ -155,6 +157,15 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   public <T extends ScenarioTriggerCreate> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
+    return (T) this;
+  }
+
+  public String getTimeZoneId() {
+    return timeZoneId;
+  }
+
+  public <T extends ScenarioTriggerCreate> T setTimeZoneId(String timeZoneId) {
+    this.timeZoneId = timeZoneId;
     return (T) this;
   }
 }

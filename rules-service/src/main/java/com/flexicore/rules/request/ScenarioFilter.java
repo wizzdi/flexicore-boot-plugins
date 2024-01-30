@@ -21,6 +21,8 @@ public class ScenarioFilter extends PaginationFilter {
   private Set<String> evaluatingJSCodeIds;
 
   private Set<String> scenarioHint;
+  @JsonIgnore
+  private boolean missingLogFile;
 
   /** @return basicPropertiesFilter */
   public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -106,6 +108,16 @@ public class ScenarioFilter extends PaginationFilter {
    */
   public <T extends ScenarioFilter> T setScenarioHint(Set<String> scenarioHint) {
     this.scenarioHint = scenarioHint;
+    return (T) this;
+  }
+
+  @JsonIgnore
+  public boolean isMissingLogFile() {
+    return missingLogFile;
+  }
+
+  public <T extends ScenarioFilter> T setMissingLogFile(boolean missingLogFile) {
+    this.missingLogFile = missingLogFile;
     return (T) this;
   }
 }

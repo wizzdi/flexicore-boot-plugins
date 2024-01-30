@@ -1,6 +1,7 @@
 package com.flexicore.rules.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.model.SecurityTenant;
 import com.flexicore.rules.model.ScenarioTriggerType;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
@@ -40,6 +41,10 @@ public class ScenarioTriggerFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
   private Set<String> eventCanonicalNames;
+  @JsonIgnore
+  private boolean missingLogFile;
+  @JsonIgnore
+  private List<SecurityTenant> tenants;
 
   public Set<String> getLastEventId() {
     return this.lastEventId;
@@ -184,5 +189,25 @@ public class ScenarioTriggerFilter extends PaginationFilter {
 
   public Set<String> getEventCanonicalNames() {
     return eventCanonicalNames;
+  }
+
+  @JsonIgnore
+  public boolean isMissingLogFile() {
+    return missingLogFile;
+  }
+
+  public <T extends ScenarioTriggerFilter> T setMissingLogFile(boolean missingLogFile) {
+    this.missingLogFile = missingLogFile;
+    return (T) this;
+  }
+
+  @JsonIgnore
+  public List<SecurityTenant> getTenants() {
+    return tenants;
+  }
+
+  public <T extends ScenarioTriggerFilter> T setTenants(List<SecurityTenant> tenants) {
+    this.tenants = tenants;
+    return (T) this;
   }
 }

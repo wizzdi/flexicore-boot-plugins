@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.events;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
+import org.springframework.core.ResolvableType;
 
 public class RemoteUpdatedEvent extends BasicUpdated<Remote> {
 
@@ -17,4 +18,8 @@ public class RemoteUpdatedEvent extends BasicUpdated<Remote> {
         return previousState;
     }
 
+    @Override
+    public ResolvableType getResolvableType() {
+        return  ResolvableType.forClass(RemoteUpdatedEvent.class);
+    }
 }

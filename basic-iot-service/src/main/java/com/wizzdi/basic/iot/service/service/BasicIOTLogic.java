@@ -407,8 +407,13 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
         }
         else{
+            MapIcon previousMapIcon = mappedPOI.getMapIcon();
             if(mappedPOIService.updateMappedPOINoMerge(mappedPOICreate, mappedPOI)){
                 mappedPOIService.merge(mappedPOI);
+                MapIcon currentMapIcon = mappedPOI.getMapIcon();
+                if(currentMapIcon!=null&&(previousMapIcon==null||!currentMapIcon.getId().equals(previousMapIcon.getId()))){
+                    eventPublisher.publishEvent(new RemoteStatusChanged(remote,currentMapIcon,previousMapIcon));
+                }
             }
 
         }

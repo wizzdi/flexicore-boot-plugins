@@ -14,10 +14,12 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@EnableAsync(proxyTargetClass = true)
 @Configuration
 @Extension
 public class BasicIOTTriggerTypeCreator implements Plugin {

@@ -2,6 +2,7 @@ package com.flexicore.rules.controller;
 
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.rules.request.ClearLogRequest;
+import com.flexicore.rules.response.FixMissingLogsResponse;
 import com.flexicore.rules.service.ScenarioLogService;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -29,6 +30,13 @@ public class ScenarioLogController implements Plugin {
             @RequestAttribute SecurityContextBase securityContext) {
         scenarioLogService.validate(scenarioCreate, securityContext);
         scenarioLogService.clearLog(scenarioCreate, securityContext);
+    }
+
+    @PostMapping("fixMissingLogFiles")
+    @Operation(summary = "fixMissingLogFiles", description = "fixesMissingLogFiles")
+    public FixMissingLogsResponse fixMissingLogFiles(
+            @RequestAttribute SecurityContextBase securityContext) {
+        return scenarioLogService.fixMissingLogFiles(securityContext);
     }
 
 }

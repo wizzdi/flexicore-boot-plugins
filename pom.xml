@@ -480,6 +480,12 @@
                 <version>${rhino.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.mozilla</groupId>
+                <artifactId>rhino-engine</artifactId>
+                <version>${rhino.version}</version>
+
+            </dependency>
+            <dependency>
                 <groupId>com.google.firebase</groupId>
                 <artifactId>firebase-admin</artifactId>
                 <version>${firebase-admin.version}</version>

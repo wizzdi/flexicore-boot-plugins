@@ -16,6 +16,8 @@ public class ScenarioTrigger extends SecuredBasic {
 
   private String lastEventId;
 
+  private String timeZoneId;
+
 
   @Column(columnDefinition = "timestamp with time zone")
   private OffsetDateTime lastActivated;
@@ -201,4 +203,12 @@ public class ScenarioTrigger extends SecuredBasic {
     return (T) this;
   }
 
+  public String getTimeZoneId() {
+    return timeZoneId;
+  }
+
+  public <T extends ScenarioTrigger> T setTimeZoneId(String timeZoneId) {
+    this.timeZoneId = timeZoneId;
+    return (T) this;
+  }
 }

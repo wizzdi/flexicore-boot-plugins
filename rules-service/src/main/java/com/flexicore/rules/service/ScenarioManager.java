@@ -1,6 +1,8 @@
 package com.flexicore.rules.service;
 
 
+import com.flexicore.model.SecurityTenant;
+import com.flexicore.model.SecurityUser;
 import com.flexicore.rules.events.ScenarioEvent;
 import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.*;
@@ -12,6 +14,7 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.file.model.FileResource;
+import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import org.apache.commons.io.FileUtils;
 import org.pf4j.Extension;
@@ -27,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
@@ -43,7 +48,7 @@ public class ScenarioManager implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(ScenarioManager.class);
 
-    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("js");
+    private static final ScriptEngine engine = new ScriptEngineManager(ScenarioManager.class.getClassLoader()).getEngineByName("rhino");
 
 
     @Autowired
@@ -73,6 +78,10 @@ public class ScenarioManager implements Plugin {
 
     private ScenarioSavableEventService scenarioEventService;
 
+    @Autowired
+    private SecurityContextProvider securityContextProvider;
+
+
 
     private boolean isActive(ScenarioTrigger trigger) {
         return trigger.getActiveTill() != null && trigger.getActiveTill().isAfter(OffsetDateTime.now());
@@ -80,10 +89,14 @@ public class ScenarioManager implements Plugin {
 
     @Async
     @EventListener
-    public void handleTrigger(ScenarioEvent scenarioEvent) {
+    public <T extends ScenarioEvent> void handleTrigger(T scenarioEvent) {
         logger.info("Scenario Trigger Event " + scenarioEvent + "captured by Scenario Manager");
-        SecurityContextBase securityContext = scenarioEvent.getSecurityContext();
-        List<ScenarioTrigger> triggers = scenarioTriggerService.listAllScenarioTriggers(new ScenarioTriggerFilter().setEventCanonicalNames(Collections.singleton(scenarioEvent.getClass().getCanonicalName())), securityContext);
+        List<SecurityTenant> tenants = scenarioEvent.getSecurityContext().getTenants();
+        if(tenants.isEmpty()){
+            logger.debug("No tenants for security context ");
+            return;
+        }
+        List<ScenarioTrigger> triggers = scenarioTriggerService.listAllScenarioTriggers(new ScenarioTriggerFilter().setTenants(tenants).setEventCanonicalNames(Collections.singleton(scenarioEvent.getClass().getCanonicalName())), null);
         List<ScenarioTrigger> activeTriggers = new ArrayList<>();
         List<Object> toMerge = new ArrayList<>();
         for (ScenarioTrigger trigger : triggers) {
@@ -113,26 +126,33 @@ public class ScenarioManager implements Plugin {
 
         ScenarioToTriggerFilter scenarioToTriggerFilter = new ScenarioToTriggerFilter()
                 .setEnabled(true)
-                .setFiring(true)
                 .setNonDeletedScenarios(true)
                 .setScenarioTrigger(activeTriggers);
-        List<ScenarioToTrigger> scenarioToTriggers = activeTriggers.isEmpty() ? new ArrayList<>() : scenarioToTriggerService.listAllScenarioToTriggers(scenarioToTriggerFilter, securityContext);
+        List<ScenarioToTrigger> scenarioToTriggers = activeTriggers.isEmpty() ? new ArrayList<>() : scenarioToTriggerService.listAllScenarioToTriggers(scenarioToTriggerFilter, null);
         Map<String, Scenario> scenarioMap = scenarioToTriggers.stream().collect(Collectors.toMap(f -> f.getScenario().getId(), f -> f.getScenario(), (a, b) -> a));
-        Map<String, List<ScenarioToTrigger>> fireingScenarios = scenarioToTriggers.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+        Map<String, SecurityUser> creatorMap = scenarioMap.values().stream().map(f -> f.getSecurity()).map(f -> f.getCreator()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+        Map<String,SecurityContextBase> securityContextMap=creatorMap.entrySet().stream().collect(Collectors.toMap(f->f.getKey(),f->securityContextProvider.getSecurityContext(f.getValue())));
+        Map<String, List<ScenarioToTrigger>> triggersForScenario = scenarioToTriggers.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
         ScenarioToDataSourceFilter scenarioToDataSourceFilter = new ScenarioToDataSourceFilter()
                 .setEnabled(true)
                 .setScenario(new ArrayList<>(scenarioMap.values()));
-        Map<String, List<ScenarioToDataSource>> scenarioToDataSource = scenarioMap.isEmpty() ? new HashMap<>() : scenarioToDataSourceService.listAllScenarioToDataSources(scenarioToDataSourceFilter, securityContext).stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+        Map<String, List<ScenarioToDataSource>> scenarioToDataSource = scenarioMap.isEmpty() ? new HashMap<>() : scenarioToDataSourceService.listAllScenarioToDataSources(scenarioToDataSourceFilter, null).stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
         List<EvaluateScenarioResponse> evaluateScenarioResponses = new ArrayList<>();
-        List<ScenarioToAction> scenarioToActions = scenarioMap.isEmpty() ? new ArrayList<>() : scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), securityContext);
-        Map<String, List<ScenarioToAction>> actions = scenarioToActions.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+        List<ScenarioToAction> scenarioToActions = scenarioMap.isEmpty() ? new ArrayList<>() : scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), null);
+        Map<String, ScenarioAction> actionsById = scenarioToActions.stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+        Map<String, List<ScenarioToAction>> actionsByScenario = scenarioToActions.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
 
-        for (Map.Entry<String, List<ScenarioToTrigger>> entry : fireingScenarios.entrySet()) {
+        for (Map.Entry<String, List<ScenarioToTrigger>> entry : triggersForScenario.entrySet()) {
+            if (entry.getValue().stream().noneMatch(f -> f.isFiring())) {
+                logger.debug("Scenario " + entry.getKey() + " has no firing triggers");
+                continue;
+            }
             String scenarioId = entry.getKey();
             Scenario scenario = scenarioMap.get(scenarioId);
+            SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
             List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
             List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
-            Map<String, ExecuteInvokerRequest> scenarioActions = actions.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a));
+            List<ActionContext> scenarioActions = actionsByScenario.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a)).entrySet().stream().map(f -> new ActionContext(f.getKey(), f.getValue())).toList();
 
             EvaluateScenarioRequest evaluateScenarioRequest = new EvaluateScenarioRequest()
                     .setScenario(scenario)
@@ -146,7 +166,14 @@ public class ScenarioManager implements Plugin {
         }
         for (EvaluateScenarioResponse evaluateScenarioResponse : evaluateScenarioResponses) {
             if (evaluateScenarioResponse.getActions() != null) {
-                for (ExecuteInvokerRequest executeInvokerRequest : evaluateScenarioResponse.getActions().values()) {
+
+                for (Map.Entry<String, ExecuteInvokerRequest> entry : evaluateScenarioResponse.getActions().entrySet()) {
+                    String actionId = entry.getKey();
+                    ScenarioAction scenarioAction = actionsById.get(actionId);
+                    ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
+                    Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
+                    SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
+                    logger.info("Executing action {}({}) for scenario {}({})", scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId());
                     dynamicInvokerService.executeInvoker(executeInvokerRequest, securityContext);
                 }
             }
@@ -156,13 +183,13 @@ public class ScenarioManager implements Plugin {
     }
 
     private boolean isValid(ScenarioTrigger trigger) {
-        OffsetDateTime now = OffsetDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
         return triggerValidTimes(now, trigger) && scenarioCoolDown(now, trigger);
     }
 
-    private boolean scenarioCoolDown(OffsetDateTime now, ScenarioTrigger trigger) {
-        OffsetDateTime cooldownMin = now.plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
-        boolean cooldown = trigger.getLastActivated() == null || cooldownMin.isAfter(trigger.getLastActivated());
+    private boolean scenarioCoolDown(ZonedDateTime now, ScenarioTrigger trigger) {
+        ZonedDateTime cooldownMin = now.plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
+        boolean cooldown = trigger.getLastActivated() == null || cooldownMin.isAfter(trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())));
         if (!cooldown) {
             logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid cooldown (" + cooldownMin + " vs " + now + ")");
 
@@ -170,9 +197,13 @@ public class ScenarioManager implements Plugin {
         return cooldown;
     }
 
-    private boolean triggerValidTimes(OffsetDateTime now, ScenarioTrigger trigger) {
-        OffsetDateTime start = trigger.getValidFrom().withDayOfYear(now.getDayOfYear()).withYear(now.getYear());
-        OffsetDateTime end = trigger.getActiveTill().withDayOfYear(now.getDayOfYear()).withYear(now.getYear());
+    private boolean triggerValidTimes(ZonedDateTime now, ScenarioTrigger trigger) {
+        ZonedDateTime start = Optional.ofNullable(trigger.getValidFrom())
+                .map(f -> f.atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId()))
+                        .withDayOfYear(now.getDayOfYear()).withYear(now.getYear())).orElse(OffsetDateTime.MIN.toZonedDateTime());
+        ZonedDateTime end = Optional.ofNullable(trigger.getValidTill())
+                .map(f -> f.atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())).withDayOfYear(now.getDayOfYear()).withYear(now.getYear()))
+                .orElse(OffsetDateTime.MAX.toZonedDateTime());
         boolean validTimes = (now.isAfter(start) || now.equals(start)) && (now.isBefore(end) || now.equals(end));
         if (!validTimes) {
             logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid times (" + start + "-" + end + " vs " + now + ")");
@@ -193,7 +224,7 @@ public class ScenarioManager implements Plugin {
         try {
             File file = new File(script.getFullPath());
             Bindings bindings = loadScript(file);
-            Map<String, ExecuteInvokerRequest> actions = evaluateScenarioRequest.getActions();
+            List<ActionContext> actions = evaluateScenarioRequest.getActions();
             EvaluateScenarioScriptContext scenarioEventScriptContext = new EvaluateScenarioScriptContext(this::fetchEvent)
                     .setScenario(evaluateScenarioRequest.getScenario())
                     .setActions(actions)
@@ -204,9 +235,9 @@ public class ScenarioManager implements Plugin {
             bindings.put("x",scenarioEventScriptContext);
             String functionName = FunctionTypes.EVALUATE.getFunctionName();
 
-            String[] res = (String[]) engine.eval(functionName+"(x);");
-            Set<String> idsToRun = Stream.of(res).collect(Collectors.toSet());
-            Map<String, ExecuteInvokerRequest> filtered = actions.entrySet().parallelStream().filter(f -> idsToRun.contains(f.getKey())).collect(Collectors.toMap(f -> f.getKey(), f -> f.getValue()));
+            List<String> res = (List<String>) engine.eval(functionName + "(x);", bindings);
+            Set<String> idsToRun = new HashSet<>(res);
+            Map<String, ExecuteInvokerRequest> filtered = actions.parallelStream().filter(f -> idsToRun.contains(f.getId())).collect(Collectors.toMap(f -> f.getId(), f -> f.getExecuteInvokerRequest()));
             evaluateScenarioResponse.setActions(filtered);
 
         } catch (Exception e) {
