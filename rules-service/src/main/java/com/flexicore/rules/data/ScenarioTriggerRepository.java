@@ -43,7 +43,7 @@ public class ScenarioTriggerRepository implements Plugin {
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
     List<Predicate> preds = new ArrayList<>();
     addScenarioTriggerPredicate(filtering, cb, q, r, preds, securityContext);
-    q.select(r).where(preds.toArray(new Predicate[0]));
+    q.select(r).where(preds.toArray(new Predicate[0])).orderBy(cb.asc(r.get(ScenarioTrigger_.name)));
     TypedQuery<ScenarioTrigger> query = em.createQuery(q);
     BasicRepository.addPagination(filtering, query);
     return query.getResultList();

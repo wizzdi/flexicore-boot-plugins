@@ -43,7 +43,7 @@ public class ScenarioActionRepository implements Plugin {
     Root<ScenarioAction> r = q.from(ScenarioAction.class);
     List<Predicate> preds = new ArrayList<>();
     addScenarioActionPredicate(scenarioActionFilter, cb, q, r, preds, securityContext);
-    q.select(r).where(preds.toArray(new Predicate[0]));
+    q.select(r).where(preds.toArray(new Predicate[0])).orderBy(cb.asc(r.get(ScenarioAction_.name)));
     TypedQuery<ScenarioAction> query = em.createQuery(q);
     BasicRepository.addPagination(scenarioActionFilter, query);
     return query.getResultList();
