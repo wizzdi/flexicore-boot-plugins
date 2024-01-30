@@ -32,6 +32,13 @@
             <artifactId>flexicore-security-service</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>maps-model</artifactId>

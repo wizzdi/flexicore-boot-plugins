@@ -33,6 +33,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>maps-service</artifactId>
@@ -43,6 +44,7 @@
             <artifactId>dynamic-invoker-export-utils</artifactId>
             <scope>provided</scope>
         </dependency>
+
           <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2-jakarta</artifactId>
@@ -157,7 +159,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
-                                        <Plugin-Dependencies>maps-service@&gt;=${revision}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>maps-service@&gt;=${revision},dynamic-invoker-export-utils@&gt;=${revision}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

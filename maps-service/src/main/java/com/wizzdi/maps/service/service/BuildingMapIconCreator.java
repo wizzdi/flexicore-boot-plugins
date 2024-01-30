@@ -10,24 +10,23 @@ import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 @Extension
-@Component
+@Configuration
 public class BuildingMapIconCreator implements Plugin {
-    @Autowired
-    private MapIconService mapIconService;
 
-    @Autowired
-    @Lazy
-    private SecurityContextBase adminSecurityContext;
 
-    @Qualifier("building_icon")
     @Bean
-    public MapIcon buildingMapIcon() {
+    @Qualifier("building_icon")
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    public MapIcon buildingMapIcon(@Lazy MapIconService mapIconService,@Lazy SecurityContextBase adminSecurityContext ) {
 
         String externalId = Building.class.getCanonicalName();
         MapIconCreate mapIconCreate=new MapIconCreate().setRelatedType(Building.class.getCanonicalName()).setExternalId(externalId).setName(Building.class.getSimpleName());
