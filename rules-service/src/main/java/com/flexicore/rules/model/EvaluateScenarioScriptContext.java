@@ -7,13 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.rules.events.ScenarioEvent;
 import com.flexicore.security.SecurityContextBase;
-import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class EvaluateScenarioScriptContext {
 	@JsonIgnore

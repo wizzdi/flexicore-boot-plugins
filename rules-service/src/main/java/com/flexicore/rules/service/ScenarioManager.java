@@ -39,7 +39,6 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.flexicore.rules.service.LogHolder.flush;
 import static com.flexicore.rules.service.LogHolder.getLogger;
 
 
@@ -175,7 +174,7 @@ public class ScenarioManager implements Plugin {
                         ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
                         Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
                         SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
-                    java.util.logging.Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
+                    Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
 
                     String message = "Executing action %s(%s) for scenario %s(%s)".formatted(scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId());
                     scenarioTriggerLogger.info(message);
@@ -188,14 +187,11 @@ public class ScenarioManager implements Plugin {
                     }
                     catch (Throwable e){
                         logger.error("failed executing action",e);
-                        scenarioTriggerLogger.log(Level.SEVERE,
-                                "failed executing action: " + e, e);
+                        scenarioTriggerLogger.error("failed executing action: " + e, e);
 
 
                     }
-                    finally {
-                        flush(scenarioTriggerLogger);
-                    }
+
                 }
             }
         }
@@ -241,7 +237,7 @@ public class ScenarioManager implements Plugin {
         ScenarioEvent scenarioEvent = evaluateScenarioRequest.getScenarioEvent();
         Scenario scenario = evaluateScenarioRequest.getScenario();
         FileResource script = scenario.getEvaluatingJSCode();
-        java.util.logging.Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
+        Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
         try {
             File file = new File(script.getFullPath());
             Bindings bindings = loadScript(file);
@@ -263,10 +259,7 @@ public class ScenarioManager implements Plugin {
 
         } catch (Exception e) {
             logger.error("failed executing script", e);
-            scenarioTriggerLogger.log(Level.SEVERE,
-                    "failed executing script: " + e, e);
-        } finally {
-            flush(scenarioTriggerLogger);
+            scenarioTriggerLogger.error("failed executing script: " + e, e);
         }
 
         return evaluateScenarioResponse;
@@ -308,7 +301,7 @@ public class ScenarioManager implements Plugin {
         ScenarioTrigger scenarioTrigger = evaluateTriggerRequest.getScenarioTrigger();
         ScenarioEvent scenarioEvent = evaluateTriggerRequest.getScenarioEvent();
         FileResource script = scenarioTrigger.getEvaluatingJSCode();
-        java.util.logging.Logger scenarioTriggerLogger = getLogger(scenarioTrigger.getId(), scenarioTrigger.getLogFileResource().getFullPath());
+        Logger scenarioTriggerLogger = getLogger(scenarioTrigger.getId(), scenarioTrigger.getLogFileResource().getFullPath());
         try {
             File file = new File(script.getFullPath());
             Bindings loaded = loadScript(file);
@@ -321,10 +314,7 @@ public class ScenarioManager implements Plugin {
 
         } catch (Exception e) {
             logger.error("failed executing script", e);
-            scenarioTriggerLogger.log(Level.SEVERE,
-                    "failed executing script: " + e.toString(), e);
-        } finally {
-            flush(scenarioTriggerLogger);
+            scenarioTriggerLogger.error("failed executing script: " + e, e);
         }
 
         return evaluateTriggerResponse;

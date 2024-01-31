@@ -272,18 +272,6 @@ public class ScenarioTriggerService implements Plugin {
       ScenarioTriggerCreate scenarioTriggerCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerCreate, securityContext);
 
-    String logFileResourceId = scenarioTriggerCreate.getLogFileResourceId();
-    FileResource logFileResource =
-        logFileResourceId == null
-            ? null
-            : this.repository.getByIdOrNull(
-                logFileResourceId, FileResource.class, SecuredBasic_.security, securityContext);
-    if (logFileResourceId != null && logFileResource == null) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with id " + logFileResourceId);
-    }
-    scenarioTriggerCreate.setLogFileResource(logFileResource);
-
     String evaluatingJSCodeId = scenarioTriggerCreate.getEvaluatingJSCodeId();
     FileResource evaluatingJSCode =
         evaluatingJSCodeId == null

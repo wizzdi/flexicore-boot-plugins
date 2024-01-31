@@ -17,7 +17,6 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   private Long cooldownIntervalMs;
 
-  private String logFileResourceId;
 
   @JsonIgnore private ScenarioTriggerType scenarioTriggerType;
 
@@ -74,14 +73,6 @@ public class ScenarioTriggerCreate extends BasicCreate {
     return (T) this;
   }
 
-  public String getLogFileResourceId() {
-    return this.logFileResourceId;
-  }
-
-  public <T extends ScenarioTriggerCreate> T setLogFileResourceId(String logFileResourceId) {
-    this.logFileResourceId = logFileResourceId;
-    return (T) this;
-  }
 
   @JsonIgnore
   public ScenarioTriggerType getScenarioTriggerType() {
