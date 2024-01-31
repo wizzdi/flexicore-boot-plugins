@@ -11,6 +11,7 @@ import com.flexicore.rules.response.EvaluateTriggerResponse;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
+import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokersResponse;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.file.model.FileResource;
@@ -168,13 +169,33 @@ public class ScenarioManager implements Plugin {
             if (evaluateScenarioResponse.getActions() != null) {
 
                 for (Map.Entry<String, ExecuteInvokerRequest> entry : evaluateScenarioResponse.getActions().entrySet()) {
-                    String actionId = entry.getKey();
-                    ScenarioAction scenarioAction = actionsById.get(actionId);
-                    ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
-                    Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
-                    SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
-                    logger.info("Executing action {}({}) for scenario {}({})", scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId());
-                    dynamicInvokerService.executeInvoker(executeInvokerRequest, securityContext);
+
+                        String actionId = entry.getKey();
+                        ScenarioAction scenarioAction = actionsById.get(actionId);
+                        ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
+                        Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
+                        SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
+                    java.util.logging.Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
+
+                    String message = "Executing action %s(%s) for scenario %s(%s)".formatted(scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId());
+                    scenarioTriggerLogger.info(message);
+                    logger.info(message);
+                    try {
+                        ExecuteInvokersResponse executeInvokersResponse = dynamicInvokerService.executeInvoker(executeInvokerRequest, securityContext);
+                        String resultMessage="Executed action %s(%s) for scenario %s(%s) with result %s".formatted(scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId(), executeInvokersResponse);
+                        scenarioTriggerLogger.info(resultMessage);
+
+                    }
+                    catch (Throwable e){
+                        logger.error("failed executing action",e);
+                        scenarioTriggerLogger.log(Level.SEVERE,
+                                "failed executing action: " + e, e);
+
+
+                    }
+                    finally {
+                        flush(scenarioTriggerLogger);
+                    }
                 }
             }
         }
@@ -265,7 +286,7 @@ public class ScenarioManager implements Plugin {
         if (active != evaluateTriggerResponse.isActive()) {
             OffsetDateTime activeTill;
             if (active) {
-                activeTill = trigger.getActiveMs() > 0 ? OffsetDateTime.now().plus(trigger.getActiveMs(), ChronoUnit.MILLIS) : OffsetDateTime.MAX;
+                activeTill = trigger.getActiveMs() > 0 ? OffsetDateTime.now().plus(trigger.getActiveMs(), ChronoUnit.MILLIS) : OffsetDateTime.now().plusYears(1000);
                 trigger.setLastActivated(OffsetDateTime.now());
             } else {
                 activeTill = OffsetDateTime.now();
