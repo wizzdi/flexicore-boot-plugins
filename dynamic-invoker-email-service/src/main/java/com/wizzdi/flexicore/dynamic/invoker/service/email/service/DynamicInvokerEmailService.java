@@ -19,6 +19,7 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionServic
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicExecutionRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendEmailPlainRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -148,4 +149,48 @@ public class DynamicInvokerEmailService implements Plugin {
 
         return sendEmail(entries,headersArr, sendDynamicInvokerRequest.getEmails(),title);
     }
+
+    public SendDynamicEmailResponse sendEmailPlain(SendEmailPlainRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
+        Set<String> emails = sendDynamicInvokerRequest.getEmails();
+        String from=sendDynamicInvokerRequest.getFrom();
+        String replyTo=sendDynamicInvokerRequest.getFrom();
+        String templateId= sendDynamicInvokerRequest.getTemplateId();
+        try {
+            Request request = new Request();
+            request.setMethod(Method.POST);
+            request.setEndpoint("/mail/send");
+
+            // Create mail
+            Mail mail = new Mail();
+            Personalization personalization = new Personalization();
+            for (String email : emails) {
+                personalization.addTo(new Email(email, email));
+
+            }
+            for (Map.Entry<String, Object> entry : sendDynamicInvokerRequest.getAdditionalProperties().entrySet()) {
+                personalization.addDynamicTemplateData(entry.getKey(),entry.getValue());
+
+            }
+
+
+
+            mail.setFrom(new Email(from, from));
+
+            mail.setReplyTo(new Email(replyTo, replyTo));
+
+            mail.setTemplateId(templateId);
+            mail.addPersonalization(personalization);
+
+            request.setBody(mail.build());
+            Response response = sendGrid.api(request);
+            logger.info(String.format("send invoker template email , status was: %d , message was : %s",response.getStatusCode(), response.getBody()));
+        } catch (IOException e) {
+            logger.error("failed sending mail ",e);
+            return new SendDynamicEmailResponse().setSent(false);
+        }
+
+        return new SendDynamicEmailResponse().setSent(true);
+    }
+
+
 }

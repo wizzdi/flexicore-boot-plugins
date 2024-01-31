@@ -8,6 +8,7 @@ import com.flexicore.service.impl.DynamicInvokersService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendEmailPlainRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.service.DynamicInvokerEmailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +39,15 @@ public class DynamicInvokerEmailController implements Plugin, Invoker {
         dynamicInvokersService.validateExportDynamicInvoker(sendDynamicInvokerRequest.getExportDynamicInvoker(), (SecurityContext) securityContext);
 
         return dynamicInvokerEmailService.sendEmail(sendDynamicInvokerRequest, securityContext);
+    }
+
+    @PostMapping("sendEmailPlain")
+    @Operation(summary = "sendEmailPlain", description = "Sends email plain")
+    public SendDynamicEmailResponse sendEmailPlain(
+            @Valid @RequestBody SendEmailPlainRequest sendDynamicInvokerRequest,
+            @RequestAttribute SecurityContextBase securityContext) {
+
+        return dynamicInvokerEmailService.sendEmailPlain(sendDynamicInvokerRequest, securityContext);
     }
 
 
