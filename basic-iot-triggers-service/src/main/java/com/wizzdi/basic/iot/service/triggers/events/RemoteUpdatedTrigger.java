@@ -23,4 +23,12 @@ public class RemoteUpdatedTrigger extends ScenarioEventBase {
     public RemoteCreate getPreviousState() {
         return previousState;
     }
+
+    @Override
+    public String toString() {
+        return "RemoteUpdatedTrigger{" +
+                "remote=" + remote +
+                ", previousState=" + previousState +
+                '}';
+    }
 }

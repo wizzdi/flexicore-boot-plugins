@@ -204,4 +204,25 @@ public class Remote extends SecuredBasic {
         this.keepStateHistory = keepStateHistory;
         return (T) this;
     }
+
+    @Override
+    public String toString() {
+        return "Remote{" +
+                "lastConnectivityChange=" + lastConnectivityChange +
+                ", lastSeen=" + lastSeen +
+                ", remoteId='" + remoteId + '\'' +
+                ", version='" + version + '\'' +
+                ", mappedPOI=" + mappedPOI +
+                ", preConnectivityLossIcon=" + preConnectivityLossIcon +
+                ", currentSchema=" + currentSchema +
+                ", deviceProperties=" + deviceProperties +
+                ", userAddedProperties=" + userAddedProperties +
+                ", lockLocation=" + lockLocation +
+                ", lockName=" + lockName +
+                ", keepStateHistory=" + keepStateHistory +
+                ", keepConnectivityHistory=" + keepConnectivityHistory +
+                ", reportedLat=" + reportedLat +
+                ", reportedLon=" + reportedLon +
+                '}';
+    }
 }

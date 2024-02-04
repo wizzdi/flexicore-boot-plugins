@@ -47,8 +47,12 @@ public class DynamicInvokerEmailService implements Plugin {
     private String templateId;
     @Value("${wizzdi.invokers.email.sendgrid.from}")
     private String from;
+    @Value("${wizzdi.invokers.email.sendgrid.from.name:Notification Manager}")
+    private String fromName;
     @Value("${wizzdi.invokers.email.sendgrid.replyTo}")
     private String replyTo;
+    @Value("${wizzdi.invokers.email.sendgrid.replyTo.name:No Reply}")
+    private String replyToName;
 
     @Autowired
     private DynamicExecutionService dynamicExecutionService;
@@ -107,9 +111,9 @@ public class DynamicInvokerEmailService implements Plugin {
                 personalization.addDynamicTemplateData("title",title);
 
 
-                mail.setFrom(new Email(from, "Notification Manager"));
+                mail.setFrom(new Email(from,fromName ));
 
-                mail.setReplyTo(new Email(replyTo, "No Reply"));
+                mail.setReplyTo(new Email(replyTo, replyToName));
 
                 mail.setTemplateId(templateId);
                 mail.addPersonalization(personalization);
@@ -173,23 +177,25 @@ public class DynamicInvokerEmailService implements Plugin {
             }
 
 
+            String fromAlias=Optional.ofNullable(sendDynamicInvokerRequest.getFromAlias()).orElse(sendDynamicInvokerRequest.getFrom());
+            mail.setFrom(new Email(from, fromAlias));
+            String replyToAlias=Optional.ofNullable(sendDynamicInvokerRequest.getReplyToAlias()).orElse(sendDynamicInvokerRequest.getReplyToAlias());
 
-            mail.setFrom(new Email(from, from));
-
-            mail.setReplyTo(new Email(replyTo, replyTo));
+            mail.setReplyTo(new Email(replyTo, replyToAlias));
 
             mail.setTemplateId(templateId);
             mail.addPersonalization(personalization);
 
             request.setBody(mail.build());
             Response response = sendGrid.api(request);
-            logger.info(String.format("send invoker template email , status was: %d , message was : %s",response.getStatusCode(), response.getBody()));
+            int statusCode = response.getStatusCode();
+            String message = response.getBody();
+            logger.info(String.format("send invoker template email , status was: %d , message was : %s", statusCode, message));
+            return new SendDynamicEmailResponse().setStatus(statusCode).setMessage(message).setSent(true);
         } catch (IOException e) {
             logger.error("failed sending mail ",e);
-            return new SendDynamicEmailResponse().setSent(false);
+            return new SendDynamicEmailResponse().setMessage(e.getMessage()).setStatus(-1).setSent(false);
         }
-
-        return new SendDynamicEmailResponse().setSent(true);
     }
 
 

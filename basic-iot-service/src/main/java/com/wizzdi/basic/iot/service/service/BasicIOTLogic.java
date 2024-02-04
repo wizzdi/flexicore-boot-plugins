@@ -198,7 +198,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         for (Remote remote : remotesWithKeepAlive) {
             if(remote.getLastSeen()==null||lastSeen.isAfter(remote.getLastSeen())){
-                remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setLastSeen(lastSeen),gatewaySecurityContext);
+                RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteCreate().setLastSeen(lastSeen));
+                if(remoteUpdateResponse.updated()){
+                    connectivityChangeService.merge(remote);
+                }
             }
             if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
                 if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {

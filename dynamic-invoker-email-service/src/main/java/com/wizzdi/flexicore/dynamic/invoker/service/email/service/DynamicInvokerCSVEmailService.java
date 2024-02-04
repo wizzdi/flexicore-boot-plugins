@@ -45,8 +45,12 @@ public class DynamicInvokerCSVEmailService implements Plugin {
 
     @Value("${wizzdi.invokers.email.sendgrid.from}")
     private String from;
+    @Value("${wizzdi.invokers.email.sendgrid.from.name:Notification Manager}")
+    private String fromName;
     @Value("${wizzdi.invokers.email.sendgrid.replyTo}")
     private String replyTo;
+    @Value("${wizzdi.invokers.email.sendgrid.replyTo.name:No Reply}")
+    private String replyToName;
 
     @Autowired
     private DynamicInvokersService dynamicInvokersService;
@@ -88,9 +92,9 @@ public class DynamicInvokerCSVEmailService implements Plugin {
                 }
 
 
-                mail.setFrom(new Email(from, "Notification Manager"));
+                mail.setFrom(new Email(from,fromName ));
                 mail.addContent(new Content("text/plain", "Exported CSV is Attached"));
-                mail.setReplyTo(new Email(replyTo, "No Reply"));
+                mail.setReplyTo(new Email(replyTo, replyToName));
 
                 mail.setSubject(title);
                 mail.addPersonalization(personalization);

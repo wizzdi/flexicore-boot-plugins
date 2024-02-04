@@ -184,4 +184,22 @@ public class RemoteCreate extends BasicCreate {
         }
         return copiedMap;
     }
+
+    @Override
+    public String toString() {
+        return "RemoteCreate{" +
+                "deviceProperties=" + deviceProperties +
+                ", userAddedProperties=" + userAddedProperties +
+                ", remoteId='" + remoteId + '\'' +
+                ", version='" + version + '\'' +
+                ", currentSchema=" + currentSchema +
+                ", mappedPOI=" + mappedPOI +
+                ", lockLocation=" + lockLocation +
+                ", lockName=" + lockName +
+                ", lastSeen=" + lastSeen +
+                ", keepStateHistory=" + keepStateHistory +
+                ", reportedLat=" + reportedLat +
+                ", reportedLon=" + reportedLon +
+                '}';
+    }
 }

@@ -171,10 +171,8 @@ public class StressTest {
             StateChanged stateChanged = new StateChanged(stateChangedExample)
                     .setDeviceId(deviceId)
                     .setGatewayId(gatewayId)
-                    .setSentAt(OffsetDateTime.now())
-                    .setId(UUID.randomUUID().toString());
-            stateChanged.getValues().put("ConnTime", OffsetDateTime.now().toString());
-            stateChanged.getValues().put("LocalTime", OffsetDateTime.now().toString());
+                    .setSentAt(OffsetDateTime.now());
+            stateChanged.getValues().put("StressTest", OffsetDateTime.now().toString());
             MqttMessage message = new MqttMessage();
             message.setPayload(objectMapper.writeValueAsBytes(stateChanged));
             client.publish(BasicIOTClient.getOutTopic(gatewayId), message);

@@ -18,4 +18,10 @@ public class RemoteCreatedTrigger extends ScenarioEventBase {
         return remote;
     }
 
+    @Override
+    public String toString() {
+        return "RemoteCreatedTrigger{" +
+                "remote=" + remote +
+                '}';
+    }
 }

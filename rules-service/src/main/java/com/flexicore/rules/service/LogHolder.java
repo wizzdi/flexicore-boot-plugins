@@ -52,7 +52,7 @@ public class LogHolder {
 		rollingPolicy.start();
 
 		SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<>();
-		triggeringPolicy.setMaxFileSize(FileSize.valueOf("5MB"));
+		triggeringPolicy.setMaxFileSize(FileSize.valueOf("500kb"));
 		triggeringPolicy.start();
 
 		rollingFileAppender.setEncoder(encoder);
@@ -62,6 +62,7 @@ public class LogHolder {
 
 		Logger logger = (Logger) LoggerFactory.getLogger(id);
 		logger.addAppender(rollingFileAppender);
+		logger.setAdditive(false);
 		return logger;
 	}
 

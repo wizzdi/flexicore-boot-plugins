@@ -18,8 +18,12 @@ public class SendEmailPlainRequest {
 
     @NotEmpty
     private String replyTo;
+
+    private String replyToAlias;
     @NotEmpty
     private String from;
+
+    private String fromAlias;
 
     @NotEmpty
     private String templateId;
@@ -70,6 +74,24 @@ public class SendEmailPlainRequest {
 
     public <T extends SendEmailPlainRequest> T setFrom(String from) {
         this.from = from;
+        return (T) this;
+    }
+
+    public String getReplyToAlias() {
+        return replyToAlias;
+    }
+
+    public <T extends SendEmailPlainRequest> T setReplyToAlias(String replyToAlias) {
+        this.replyToAlias = replyToAlias;
+        return (T) this;
+    }
+
+    public String getFromAlias() {
+        return fromAlias;
+    }
+
+    public <T extends SendEmailPlainRequest> T setFromAlias(String fromAlias) {
+        this.fromAlias = fromAlias;
         return (T) this;
     }
 }

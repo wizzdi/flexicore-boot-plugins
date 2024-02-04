@@ -29,4 +29,13 @@ public class RemoteStatusChangedTrigger extends ScenarioEventBase {
     public MapIcon getCurrentStatus() {
         return currentStatus;
     }
+
+    @Override
+    public String toString() {
+        return "RemoteStatusChangedTrigger{" +
+                "remote=" + remote +
+                ", newStatus=" + newStatus +
+                ", currentStatus=" + currentStatus +
+                '}';
+    }
 }
