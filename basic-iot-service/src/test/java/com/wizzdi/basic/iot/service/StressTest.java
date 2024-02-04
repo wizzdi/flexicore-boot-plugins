@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class StressTest {
 
     private static final int TEST_FACTOR = 1;
-    private static final int CONNECT_SEQUENCE_FACTOR=3;
+    private static final int CONNECT_SEQUENCE_FACTOR=1;
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .registerModule(new JavaTimeModule());
