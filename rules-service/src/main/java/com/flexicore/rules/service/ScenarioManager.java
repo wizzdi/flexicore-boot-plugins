@@ -35,7 +35,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.logging.Level;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,9 +97,12 @@ public class ScenarioManager implements Plugin {
             return;
         }
         List<ScenarioTrigger> triggers = scenarioTriggerService.listAllScenarioTriggers(new ScenarioTriggerFilter().setTenants(tenants).setEventCanonicalNames(Collections.singleton(scenarioEvent.getClass().getCanonicalName())), null);
+
+
         List<ScenarioTrigger> activeTriggers = new ArrayList<>();
         List<Object> toMerge = new ArrayList<>();
         for (ScenarioTrigger trigger : triggers) {
+
             if (!isValid(trigger)) {
                 logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid");
                 continue;
@@ -201,17 +204,17 @@ public class ScenarioManager implements Plugin {
 
     private boolean isValid(ScenarioTrigger trigger) {
         ZonedDateTime now = ZonedDateTime.now();
-        return triggerValidTimes(now, trigger) && scenarioCoolDown(now, trigger);
+        return triggerValidTimes(now, trigger) && !inCoolDownPeriod(now, trigger);
     }
 
-    private boolean scenarioCoolDown(ZonedDateTime now, ScenarioTrigger trigger) {
+    private boolean inCoolDownPeriod(ZonedDateTime now, ScenarioTrigger trigger) {
         ZonedDateTime cooldownMin = now.plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
-        boolean cooldown = trigger.getLastActivated() == null || cooldownMin.isAfter(trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())));
-        if (!cooldown) {
-            logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid cooldown (" + cooldownMin + " vs " + now + ")");
+        boolean inCoolDownPeriod = trigger.getLastActivated() != null&& cooldownMin.isAfter(trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())));
+        if (inCoolDownPeriod) {
+            logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") is in cooldown (" + cooldownMin + " vs " + now + ")");
 
         }
-        return cooldown;
+        return inCoolDownPeriod;
     }
 
     private boolean triggerValidTimes(ZonedDateTime now, ScenarioTrigger trigger) {
