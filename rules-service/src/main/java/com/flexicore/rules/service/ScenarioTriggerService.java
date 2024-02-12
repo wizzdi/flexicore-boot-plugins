@@ -28,6 +28,7 @@ import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
@@ -345,5 +346,10 @@ public class ScenarioTriggerService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  @Transactional
+  public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+    repository.massMerge(toMerge, updatedate, propagateEvents);
   }
 }

@@ -204,4 +204,9 @@ public class ScenarioTriggerRepository implements Plugin {
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
   }
+
+  @Transactional
+  public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+    securedBasicRepository.massMerge(toMerge, updatedate, propagateEvents);
+  }
 }

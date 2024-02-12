@@ -234,6 +234,12 @@ public class BasicIOTConfig implements Plugin {
         timer.record(time, TimeUnit.NANOSECONDS);
     }
 
+    @Bean
+    public Timer checkConnectivityTimer(){
+        return Timer.builder("iot.connectivity.timer")
+                .register(meterRegistry);
+    }
+
 
     @Bean
     public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow, Semaphore virtualThreadsLogicSemaphore, MeterRegistry meterRegistry) {

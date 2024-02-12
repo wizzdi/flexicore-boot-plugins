@@ -39,6 +39,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -87,6 +88,10 @@ public class ScenarioManager implements Plugin {
 
     @Autowired
     private MeterRegistry meterRegistry;
+    @Autowired
+    private TriggerForTenantService triggerForTenantService;
+    @Autowired
+    private Semaphore rulesLogicSemaphore;
     private static final Map<String,Counter> eventTypeCounterMap =new ConcurrentHashMap<>();
 
     private static final Map<String,Timer> timerMap =new ConcurrentHashMap<>();
@@ -95,108 +100,109 @@ public class ScenarioManager implements Plugin {
         return trigger.getActiveTill() != null && trigger.getActiveTill().isAfter(OffsetDateTime.now());
     }
 
-    @Async
+    @Async("rulesExecutor")
     @EventListener
     public <T extends ScenarioEvent> void handleTrigger(T scenarioEvent) {
-        logger.debug("Scenario Trigger Event " + scenarioEvent + "captured by Scenario Manager");
-        incEventType(scenarioEvent.getClass().getCanonicalName());
-        List<SecurityTenant> tenants = scenarioEvent.getSecurityContext().getTenants();
-        if(tenants.isEmpty()){
-            logger.debug("No tenants for security context ");
-            return;
-        }
-        List<ScenarioTrigger> triggers = scenarioTriggerService.listAllScenarioTriggers(new ScenarioTriggerFilter().setTenants(tenants).setEventCanonicalNames(Collections.singleton(scenarioEvent.getClass().getCanonicalName())), null);
+        try {
+            rulesLogicSemaphore.acquire();
+            logger.debug("Scenario Trigger Event " + scenarioEvent + "captured by Scenario Manager");
+            incEventType(scenarioEvent.getClass().getCanonicalName());
+            List<SecurityTenant> tenants = scenarioEvent.getTenants();
+            if (tenants.isEmpty()) {
+                logger.debug("No tenants for security context ");
+                return;
+            }
+            Set<String> tenantIds = tenants.stream().map(f -> f.getId()).collect(Collectors.toSet());
+            List<ScenarioTrigger> triggers = triggerForTenantService.getTriggers(scenarioEvent.getClass().getCanonicalName()).stream().filter(f -> f.getSecurity() != null && tenantIds.contains(f.getSecurity().getTenant().getId())).toList();
 
 
-        List<ScenarioTrigger> activeTriggers = new ArrayList<>();
-        List<Object> toMerge = new ArrayList<>();
-        for (ScenarioTrigger trigger : triggers) {
-
+            List<ScenarioTrigger> activeTriggers = new ArrayList<>();
+            List<Object> toMerge = new ArrayList<>();
+            for (ScenarioTrigger trigger : triggers) {
 
 
                 if (!isValid(trigger)) {
                     logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid");
                     continue;
                 }
-                long start=System.nanoTime();
-            try {
-                EvaluateTriggerResponse evaluateTriggerResponse = evaluateTrigger(new EvaluateTriggerRequest().setScenarioTrigger(trigger).setScenarioEvent(scenarioEvent));
-                if (evaluateTriggerResponse.isActive()) {
-                    activeTriggers.add(trigger);
+                long start = System.nanoTime();
+                try {
+                    EvaluateTriggerResponse evaluateTriggerResponse = evaluateTrigger(new EvaluateTriggerRequest().setScenarioTrigger(trigger).setScenarioEvent(scenarioEvent));
+                    if (evaluateTriggerResponse.isActive()) {
+                        activeTriggers.add(trigger);
+                    }
+                    if (changeTriggerState(trigger, scenarioEvent, evaluateTriggerResponse)) {
+                        logger.info("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state changed to Active till" + trigger.getActiveTill());
+                        toMerge.add(trigger);
+                    } else {
+                        logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state stayed Active till" + trigger.getActiveTill());
+                    }
+                } finally {
+                    timeTrigger(trigger, System.nanoTime() - start);
                 }
-                if (changeTriggerState(trigger, scenarioEvent, evaluateTriggerResponse)) {
-                    logger.info("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state changed to Active till" + trigger.getActiveTill());
-                    toMerge.add(trigger);
-                } else {
-                    logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state stayed Active till" + trigger.getActiveTill());
+
+
+            }
+            scenarioTriggerService.massMerge(toMerge, true, false);
+
+            if (activeTriggers.isEmpty()) {
+                logger.debug("No Active triggers for event " + scenarioEvent);
+                return;
+            }
+
+            ScenarioToTriggerFilter scenarioToTriggerFilter = new ScenarioToTriggerFilter()
+                    .setEnabled(true)
+                    .setNonDeletedScenarios(true)
+                    .setScenarioTrigger(activeTriggers);
+            List<ScenarioToTrigger> scenarioToTriggers = activeTriggers.isEmpty() ? new ArrayList<>() : scenarioToTriggerService.listAllScenarioToTriggers(scenarioToTriggerFilter, null);
+            Map<String, Scenario> scenarioMap = scenarioToTriggers.stream().collect(Collectors.toMap(f -> f.getScenario().getId(), f -> f.getScenario(), (a, b) -> a));
+            Map<String, SecurityUser> creatorMap = scenarioMap.values().stream().map(f -> f.getSecurity()).map(f -> f.getCreator()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+            Map<String, SecurityContextBase> securityContextMap = creatorMap.entrySet().stream().collect(Collectors.toMap(f -> f.getKey(), f -> securityContextProvider.getSecurityContext(f.getValue())));
+            Map<String, List<ScenarioToTrigger>> triggersForScenario = scenarioToTriggers.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+            ScenarioToDataSourceFilter scenarioToDataSourceFilter = new ScenarioToDataSourceFilter()
+                    .setEnabled(true)
+                    .setScenario(new ArrayList<>(scenarioMap.values()));
+            Map<String, List<ScenarioToDataSource>> scenarioToDataSource = scenarioMap.isEmpty() ? new HashMap<>() : scenarioToDataSourceService.listAllScenarioToDataSources(scenarioToDataSourceFilter, null).stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+            List<EvaluateScenarioResponse> evaluateScenarioResponses = new ArrayList<>();
+            List<ScenarioToAction> scenarioToActions = scenarioMap.isEmpty() ? new ArrayList<>() : scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), null);
+            Map<String, ScenarioAction> actionsById = scenarioToActions.stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+            Map<String, List<ScenarioToAction>> actionsByScenario = scenarioToActions.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
+
+            for (Map.Entry<String, List<ScenarioToTrigger>> entry : triggersForScenario.entrySet()) {
+                if (entry.getValue().stream().noneMatch(f -> f.isFiring())) {
+                    logger.debug("Scenario " + entry.getKey() + " has no firing triggers");
+                    continue;
                 }
+                String scenarioId = entry.getKey();
+                Scenario scenario = scenarioMap.get(scenarioId);
+                long started = System.nanoTime();
+                try {
+                    SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
+                    List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
+                    List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
+                    List<ActionContext> scenarioActions = actionsByScenario.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a)).entrySet().stream().map(f -> new ActionContext(f.getKey(), f.getValue())).toList();
+
+                    EvaluateScenarioRequest evaluateScenarioRequest = new EvaluateScenarioRequest()
+                            .setScenario(scenario)
+                            .setScenarioEvent(scenarioEvent)
+                            .setScenarioTriggers(scenarioToTriggerList)
+                            .setDataSources(scenarioToDataSources)
+                            .setActions(scenarioActions);
+                    EvaluateScenarioResponse evaluateScenarioResponse = evaluateScenario(evaluateScenarioRequest);
+                    evaluateScenarioResponses.add(evaluateScenarioResponse);
+                } finally {
+                    timeScenario(scenario, System.nanoTime() - started);
+                }
+
             }
-            finally {
-                timeTrigger(trigger,System.nanoTime()-start);
-            }
+            for (EvaluateScenarioResponse evaluateScenarioResponse : evaluateScenarioResponses) {
+                if (evaluateScenarioResponse.getActions() != null) {
 
-
-        }
-        scenarioTriggerService.massMerge(toMerge);
-
-        if (activeTriggers.isEmpty()) {
-            logger.debug("No Active triggers for event " + scenarioEvent);
-            return;
-        }
-
-        ScenarioToTriggerFilter scenarioToTriggerFilter = new ScenarioToTriggerFilter()
-                .setEnabled(true)
-                .setNonDeletedScenarios(true)
-                .setScenarioTrigger(activeTriggers);
-        List<ScenarioToTrigger> scenarioToTriggers = activeTriggers.isEmpty() ? new ArrayList<>() : scenarioToTriggerService.listAllScenarioToTriggers(scenarioToTriggerFilter, null);
-        Map<String, Scenario> scenarioMap = scenarioToTriggers.stream().collect(Collectors.toMap(f -> f.getScenario().getId(), f -> f.getScenario(), (a, b) -> a));
-        Map<String, SecurityUser> creatorMap = scenarioMap.values().stream().map(f -> f.getSecurity()).map(f -> f.getCreator()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
-        Map<String,SecurityContextBase> securityContextMap=creatorMap.entrySet().stream().collect(Collectors.toMap(f->f.getKey(),f->securityContextProvider.getSecurityContext(f.getValue())));
-        Map<String, List<ScenarioToTrigger>> triggersForScenario = scenarioToTriggers.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
-        ScenarioToDataSourceFilter scenarioToDataSourceFilter = new ScenarioToDataSourceFilter()
-                .setEnabled(true)
-                .setScenario(new ArrayList<>(scenarioMap.values()));
-        Map<String, List<ScenarioToDataSource>> scenarioToDataSource = scenarioMap.isEmpty() ? new HashMap<>() : scenarioToDataSourceService.listAllScenarioToDataSources(scenarioToDataSourceFilter, null).stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
-        List<EvaluateScenarioResponse> evaluateScenarioResponses = new ArrayList<>();
-        List<ScenarioToAction> scenarioToActions = scenarioMap.isEmpty() ? new ArrayList<>() : scenarioToActionService.listAllScenarioToActions(new ScenarioToActionFilter().setEnabled(true).setScenario(new ArrayList<>(scenarioMap.values())), null);
-        Map<String, ScenarioAction> actionsById = scenarioToActions.stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
-        Map<String, List<ScenarioToAction>> actionsByScenario = scenarioToActions.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
-
-        for (Map.Entry<String, List<ScenarioToTrigger>> entry : triggersForScenario.entrySet()) {
-            if (entry.getValue().stream().noneMatch(f -> f.isFiring())) {
-                logger.debug("Scenario " + entry.getKey() + " has no firing triggers");
-                continue;
-            }
-            String scenarioId = entry.getKey();
-            Scenario scenario = scenarioMap.get(scenarioId);
-            long started=System.nanoTime();
-            try {
-                SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
-                List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
-                List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
-                List<ActionContext> scenarioActions = actionsByScenario.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a)).entrySet().stream().map(f -> new ActionContext(f.getKey(), f.getValue())).toList();
-
-                EvaluateScenarioRequest evaluateScenarioRequest = new EvaluateScenarioRequest()
-                        .setScenario(scenario)
-                        .setScenarioEvent(scenarioEvent)
-                        .setScenarioTriggers(scenarioToTriggerList)
-                        .setDataSources(scenarioToDataSources)
-                        .setActions(scenarioActions);
-                EvaluateScenarioResponse evaluateScenarioResponse = evaluateScenario(evaluateScenarioRequest);
-                evaluateScenarioResponses.add(evaluateScenarioResponse);
-            }finally {
-                timeScenario(scenario,System.nanoTime()-started);
-            }
-
-        }
-        for (EvaluateScenarioResponse evaluateScenarioResponse : evaluateScenarioResponses) {
-            if (evaluateScenarioResponse.getActions() != null) {
-
-                for (Map.Entry<String, ExecuteInvokerRequest> entry : evaluateScenarioResponse.getActions().entrySet()) {
+                    for (Map.Entry<String, ExecuteInvokerRequest> entry : evaluateScenarioResponse.getActions().entrySet()) {
 
                         String actionId = entry.getKey();
                         ScenarioAction scenarioAction = actionsById.get(actionId);
-                        long started=System.nanoTime();
+                        long started = System.nanoTime();
                         try {
                             ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
                             Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
@@ -217,12 +223,19 @@ public class ScenarioManager implements Plugin {
 
 
                             }
-                        }finally {
-                            timeAction(scenarioAction,System.nanoTime()-started);
+                        } finally {
+                            timeAction(scenarioAction, System.nanoTime() - started);
                         }
 
+                    }
                 }
             }
+        }
+        catch (Throwable e){
+            logger.error("failed processing event",e);
+        }
+        finally {
+            rulesLogicSemaphore.release();
         }
 
 
