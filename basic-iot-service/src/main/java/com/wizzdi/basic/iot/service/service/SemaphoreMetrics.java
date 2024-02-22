@@ -4,6 +4,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.pf4j.Extension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Semaphore;
@@ -12,11 +13,9 @@ import java.util.concurrent.Semaphore;
 @Extension
 public class SemaphoreMetrics implements Plugin {
 
-    private final Semaphore virtualThreadsLogicSemaphore;
 
-    public SemaphoreMetrics(MeterRegistry meterRegistry, Semaphore virtualThreadsLogicSemaphore) {
-        this.virtualThreadsLogicSemaphore = virtualThreadsLogicSemaphore;
-        
+    public SemaphoreMetrics(MeterRegistry meterRegistry, @Qualifier("virtualThreadsLogicSemaphore") Semaphore virtualThreadsLogicSemaphore) {
+
         Gauge.builder("iot.available", virtualThreadsLogicSemaphore, Semaphore::availablePermits)
             .description("Available permits")
             .register(meterRegistry);

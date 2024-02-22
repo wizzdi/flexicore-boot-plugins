@@ -25,6 +25,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -91,6 +92,7 @@ public class ScenarioManager implements Plugin {
     @Autowired
     private TriggerForTenantService triggerForTenantService;
     @Autowired
+    @Qualifier("rulesLogicSemaphore")
     private Semaphore rulesLogicSemaphore;
     private static final Map<String,Counter> eventTypeCounterMap =new ConcurrentHashMap<>();
 

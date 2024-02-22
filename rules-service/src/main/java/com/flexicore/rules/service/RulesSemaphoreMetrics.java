@@ -4,6 +4,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.pf4j.Extension;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Semaphore;
@@ -13,7 +14,7 @@ import java.util.concurrent.Semaphore;
 public class RulesSemaphoreMetrics implements Plugin {
 
 
-    public RulesSemaphoreMetrics(MeterRegistry meterRegistry, Semaphore rulesLogicSemaphore) {
+    public RulesSemaphoreMetrics(MeterRegistry meterRegistry, @Qualifier("rulesLogicSemaphore") Semaphore rulesLogicSemaphore) {
 
         Gauge.builder("rules.available", rulesLogicSemaphore, Semaphore::availablePermits)
             .description("Available permits for rule engine")

@@ -12,6 +12,7 @@ import com.wizzdi.basic.iot.model.Remote_;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.dynamic.properties.converter.postgresql.FilterDynamicPropertiesUtils;
+import com.wizzdi.dynamic.properties.converter.postgresql.FilterStaticPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -96,6 +97,9 @@ public class RemoteRepository implements Plugin {
         }
         if(filtering.getUserAddedPropertiesFilter()!=null){
             preds.addAll(FilterDynamicPropertiesUtils.filterDynamic(filtering.getUserAddedPropertiesFilter(),cb,(Root)r,"userAddedProperties"));
+        }
+        if(filtering.getStaticPropertiesFilter()!=null){
+            preds.addAll(FilterStaticPropertiesUtils.filterStatic(filtering.getStaticPropertiesFilter(),cb,(Root)r));
         }
         if(filtering.getMappedPOIFilter()!=null){
             Join<T, MappedPOI> join = r.join(Remote_.mappedPOI);

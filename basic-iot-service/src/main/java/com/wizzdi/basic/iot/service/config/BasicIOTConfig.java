@@ -106,6 +106,7 @@ public class BasicIOTConfig implements Plugin {
     private int maximumPoolSize;
 
     @Bean
+    @Qualifier("virtualThreadsLogicSemaphore")
     public Semaphore virtualThreadsLogicSemaphore(){
         return new Semaphore((int) (maximumPoolSize*mqttJdbcRatio));
     }
