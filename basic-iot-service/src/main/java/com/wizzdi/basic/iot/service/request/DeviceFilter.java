@@ -1,6 +1,7 @@
 package com.wizzdi.basic.iot.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.annotations.TypeRetention;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
 
@@ -13,9 +14,11 @@ public class DeviceFilter extends RemoteFilter {
 
     private Set<String> gatewayIds=new HashSet<>();
     @JsonIgnore
+    @TypeRetention(Gateway.class)
     private List<Gateway> gateways;
     private Set<String> deviceTypeIds=new HashSet<>();
     @JsonIgnore
+    @TypeRetention(DeviceType.class)
     private List<DeviceType> deviceTypes;
     private DeviceTypeFilter deviceTypeFilter;
     @JsonIgnore

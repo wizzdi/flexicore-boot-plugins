@@ -10,6 +10,7 @@ import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
 import com.wizzdi.basic.iot.service.request.DeviceTypeUpdate;
 import com.wizzdi.basic.iot.service.service.DeviceTypeService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Tag(name = "DeviceType")
 @Extension
 @RestController
-public class DeviceTypeController implements Plugin {
+public class DeviceTypeController implements Plugin, Invoker {
 
     @Autowired
     private DeviceTypeService service;
@@ -76,5 +77,10 @@ public class DeviceTypeController implements Plugin {
         deviceTypeUpdate.setDeviceType(deviceType);
 
         return service.updateDeviceType(deviceTypeUpdate, securityContext);
+    }
+
+    @Override
+    public Class<?> getHandlingClass() {
+        return DeviceType.class;
     }
 }
