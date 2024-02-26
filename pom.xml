@@ -53,6 +53,8 @@
     </distributionManagement>
 
     <modules>
+        <module>alert-model</module>
+        <module>alert-service</module>
         <module>basic-iot-client</module>
         <module>basic-iot-model</module>
         <module>basic-iot-service</module>
@@ -148,6 +150,16 @@
                 <version>${flexicore-boot-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>alert-model</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>alert-service</artifactId>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.wizzdi</groupId>

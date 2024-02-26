@@ -145,7 +145,6 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>basic-iot-model</artifactId>
-            <version>6.0.1</version>
             <scope>provided</scope>
         </dependency>
     
