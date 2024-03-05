@@ -122,9 +122,10 @@ public class MappedPOIRepository implements Plugin {
             Set<String> ids =
                     filtering.getMapGroups().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             JoinType joinType = filtering.isMapGroupExclude() ? JoinType.LEFT : JoinType.INNER;
-            Join<MapGroupToMappedPOI, MapGroup> join = r.join(MappedPOI_.mapGroupToMappedPOIS, joinType).join(MapGroupToMappedPOI_.mapGroup,joinType);
+            ListJoin<T, MapGroupToMappedPOI> linkJoin = r.join(MappedPOI_.mapGroupToMappedPOIS, joinType);
+            Join<MapGroupToMappedPOI, MapGroup> join = linkJoin.join(MapGroupToMappedPOI_.mapGroup,joinType);
             Predicate in = join.get(Basic_.id).in(ids);
-            preds.add(filtering.isMapGroupExclude()?cb.not(in):in);
+            preds.add(cb.and((filtering.isMapGroupExclude()?cb.not(in):in),cb.isFalse(linkJoin.get(MapGroupToMappedPOI_.softDelete)),cb.isFalse(join.get(MapGroup_.softDelete))));
         }
         if (filtering.getTenants() != null && !filtering.getTenants().isEmpty()) {
             Set<String> ids =
