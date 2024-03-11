@@ -66,6 +66,9 @@ public class MapFilterComponentRepository implements Plugin {
         }
 
 
+
+
+
         q.select(cb.tuple(objectPath,cb.count(r.get(MappedPOI_.id)))).where(preds.toArray(new Predicate[0])).groupBy(objectPath);
         if(basic){
             q.orderBy(cb.asc(objectPath.get(SecuredBasic_.name.getName())));
