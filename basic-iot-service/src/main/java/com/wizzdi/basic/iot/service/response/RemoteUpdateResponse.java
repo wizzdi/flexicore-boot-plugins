@@ -4,5 +4,8 @@ import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 
 public record RemoteUpdateResponse(boolean updated, RemoteUpdatedEvent remoteUpdatedEvent) {
 
+    public RemoteUpdateResponse {
+    }
+
 
 }

@@ -20,6 +20,7 @@ import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.request.MappedPOIUpdate;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
+import io.micrometer.core.instrument.Timer;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
@@ -92,6 +94,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private KeepAliveBounceService keepAliveBounceService;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private Timer checkConnectivityTimer;
+
+
 
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
@@ -198,7 +204,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         for (Remote remote : remotesWithKeepAlive) {
             if(remote.getLastSeen()==null||lastSeen.isAfter(remote.getLastSeen())){
-                remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setLastSeen(lastSeen),gatewaySecurityContext);
+                RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteCreate().setLastSeen(lastSeen));
+                if(remoteUpdateResponse.updated()){
+                    connectivityChangeService.merge(remote);
+                }
             }
             if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
                 if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
@@ -247,46 +256,54 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Scheduled(fixedDelayString = "${basic.iot.connectivityCheckInterval:60000}",initialDelayString = "${basic.iot.connectivityDelayInterval:60000}")
     public void checkConnectivity() {
-        logger.debug("checking connectivity");
-        OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
-        List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
-        List<RemoteStatusChanged> events=new ArrayList<>();
-        for (Remote remote : remotesToUpdate) {
-            Map<String,Object> toMerge=new HashMap<>();
-            SecurityContextBase remoteSecurityContext = remoteService.getRemoteSecurityContext(remote);
-            ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now());
-            connectivityChangeCreate.setName(ConnectivityChangeService.getConnectivityChangeName(connectivityChangeCreate));
-            boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
-            ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChangeNoMerge(connectivityChangeCreate, remoteSecurityContext):updateConnectivityChangeNoMerge(remote.getLastConnectivityChange(), connectivityChangeCreate,toMerge);
-            if(createConnectivityChange){
-                remote.setLastConnectivityChange(connectivityChange);
-                toMerge.put(remote.getId(),remote);
-                toMerge.put(connectivityChange.getId(),connectivityChange);
-            }
+        long started=System.nanoTime();
+        try {
+            logger.debug("checking connectivity");
+            OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
+            List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
+            List<RemoteStatusChanged> events = new ArrayList<>();
+            Map<String, Object> toMerge = new HashMap<>();
 
-            logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
-            if(remote instanceof Device device){
-                if(device.getMappedPOI()!=null&&device.getDeviceType()!=null && device.getDeviceType().getDefaultMapIcon()!=null){
-                    MapIcon previousStatus = device.getMappedPOI().getMapIcon();
-                    MapIcon newStatus = device.getDeviceType().getDefaultMapIcon();
-                    if(previousStatus !=null&&!previousStatus.getId().equals(newStatus.getId())){
-                        device.setPreConnectivityLossIcon(previousStatus);
-                    }
-                    device.getMappedPOI().setMapIcon(newStatus);
-                    toMerge.put(device.getId(),device);
-                    toMerge.put(device.getMappedPOI().getId(),device.getMappedPOI());
-                    events.add(new RemoteStatusChanged(device,newStatus,previousStatus));
+            for (Remote remote : remotesToUpdate) {
+                ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.OFF).setRemote(remote).setDate(OffsetDateTime.now());
+                connectivityChangeCreate.setName(ConnectivityChangeService.getConnectivityChangeName(connectivityChangeCreate));
+                boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
+                ConnectivityChange connectivityChange = createConnectivityChange ? connectivityChangeService.createConnectivityChangeNoMerge(connectivityChangeCreate, remoteService.getRemoteSecurityContext(remote)) : updateConnectivityChangeNoMerge(remote.getLastConnectivityChange(), connectivityChangeCreate, toMerge);
+                if (createConnectivityChange) {
+                    remote.setLastConnectivityChange(connectivityChange);
+                    toMerge.put(remote.getId(), remote);
+                    toMerge.put(connectivityChange.getId(), connectivityChange);
                 }
-            }
 
+                logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
+                if (remote instanceof Device device) {
+                    if (device.getMappedPOI() != null && device.getDeviceType() != null && device.getDeviceType().getDefaultMapIcon() != null) {
+                        MapIcon previousStatus = device.getMappedPOI().getMapIcon();
+                        MapIcon newStatus = device.getDeviceType().getDefaultMapIcon();
+                        if (previousStatus != null && !previousStatus.getId().equals(newStatus.getId())) {
+                            device.setPreConnectivityLossIcon(previousStatus);
+                        }
+                        device.getMappedPOI().setMapIcon(newStatus);
+                        toMerge.put(device.getId(), device);
+                        toMerge.put(device.getMappedPOI().getId(), device.getMappedPOI());
+                        events.add(new RemoteStatusChanged(device, newStatus, previousStatus));
+                    }
+                }
+
+
+
+            }
             connectivityChangeService.massMerge(new ArrayList<>(toMerge.values()));
             for (RemoteStatusChanged event : events) {
                 eventPublisher.publishEvent(event);
 
             }
+            logger.debug("done checking connectivity");
+        }
+        finally {
+            checkConnectivityTimer.record(System.nanoTime()-started, TimeUnit.NANOSECONDS);
 
         }
-        logger.debug("done checking connectivity");
     }
 
     private ConnectivityChange updateConnectivityChangeNoMerge(ConnectivityChange lastConnectivityChange, ConnectivityChangeCreate connectivityChangeCreate, Map<String, Object> toMerge) {
@@ -407,8 +424,13 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
         }
         else{
+            MapIcon previousMapIcon = mappedPOI.getMapIcon();
             if(mappedPOIService.updateMappedPOINoMerge(mappedPOICreate, mappedPOI)){
                 mappedPOIService.merge(mappedPOI);
+                MapIcon currentMapIcon = mappedPOI.getMapIcon();
+                if(currentMapIcon!=null&&(previousMapIcon==null||!currentMapIcon.getId().equals(previousMapIcon.getId()))){
+                    eventPublisher.publishEvent(new RemoteStatusChanged(remote,currentMapIcon,previousMapIcon));
+                }
             }
 
         }

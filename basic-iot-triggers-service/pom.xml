@@ -80,7 +80,6 @@
             <artifactId>flexicore-territories-service</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-boot-dynamic-invokers-service</artifactId>
@@ -91,11 +90,7 @@
             <artifactId>flexicore-boot-dynamic-invokers-model</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.integration</groupId>
-            <artifactId>spring-integration-mqtt</artifactId>
-          <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>dynamic-properties-database-converter</artifactId>
@@ -137,7 +132,6 @@
         <dependency>
             <groupId>com.wizzdi</groupId>
             <artifactId>basic-iot-model</artifactId>
-            <version>6.0.1</version>
             <scope>provided</scope>
         </dependency>
     

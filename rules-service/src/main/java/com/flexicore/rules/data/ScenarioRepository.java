@@ -43,7 +43,7 @@ public class ScenarioRepository implements Plugin {
     Root<Scenario> r = q.from(Scenario.class);
     List<Predicate> preds = new ArrayList<>();
     addScenarioPredicate(scenarioFilter, cb, q, r, preds, securityContext);
-    q.select(r).where(preds.toArray(new Predicate[0]));
+    q.select(r).where(preds.toArray(new Predicate[0])).orderBy(cb.asc(r.get(Scenario_.name)));
     TypedQuery<Scenario> query = em.createQuery(q);
     BasicRepository.addPagination(scenarioFilter, query);
     return query.getResultList();
@@ -82,6 +82,9 @@ public class ScenarioRepository implements Plugin {
 
     if (scenarioFilter.getScenarioHint() != null && !scenarioFilter.getScenarioHint().isEmpty()) {
       preds.add(r.get(Scenario_.scenarioHint).in(scenarioFilter.getScenarioHint()));
+    }
+    if(scenarioFilter.isMissingLogFile()){
+      preds.add(cb.isNull(r.get(Scenario_.logFileResource)));
     }
   }
   /**

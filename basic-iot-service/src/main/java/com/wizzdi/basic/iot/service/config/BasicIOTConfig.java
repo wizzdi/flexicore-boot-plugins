@@ -35,6 +35,8 @@ import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
+import org.springframework.messaging.Message;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -53,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 @EnableScheduling
 @EnableIntegration
 @EnableTransactionManagement(proxyTargetClass = true)
+@EnableAsync(proxyTargetClass = true)
 public class BasicIOTConfig implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
@@ -67,6 +70,8 @@ public class BasicIOTConfig implements Plugin {
     private char[] password;
     @Value("${basic.iot.mqtt.keyStore:#{null}}")
     private String keystore;
+    @Value("${basic.iot.mqtt.maxInflight:300}")
+    private int maxInFlight;
     @Value("${basic.iot.mqtt.keyStorePassword:#{null}}")
     private String keystorePassword;
     @Value("${basic.iot.mqtt.keyStoreType:#{null}}")
@@ -91,6 +96,7 @@ public class BasicIOTConfig implements Plugin {
     private int maximumPoolSize;
 
     @Bean
+    @Qualifier("virtualThreadsLogicSemaphore")
     public Semaphore virtualThreadsLogicSemaphore(){
         return new Semaphore((int) (maximumPoolSize*mqttJdbcRatio));
     }
@@ -130,6 +136,7 @@ public class BasicIOTConfig implements Plugin {
         options.setKeepAliveInterval(60);
         options.setAutomaticReconnect(true);
         options.setServerURIs(mqttURLs);
+        options.setMaxInflight(maxInFlight);
         factory.setConnectionOptions(options);
         return factory;
     }
@@ -216,6 +223,12 @@ public class BasicIOTConfig implements Plugin {
                 .tag("type", e)
                 .register(meterRegistry));
         timer.record(time, TimeUnit.NANOSECONDS);
+    }
+
+    @Bean
+    public Timer checkConnectivityTimer(){
+        return Timer.builder("iot.connectivity.timer")
+                .register(meterRegistry);
     }
 
 

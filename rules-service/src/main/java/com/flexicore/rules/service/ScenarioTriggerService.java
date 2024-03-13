@@ -28,6 +28,7 @@ import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
@@ -149,6 +150,10 @@ public class ScenarioTriggerService implements Plugin {
       scenarioTrigger.setValidTill(scenarioTriggerCreate.getValidTill());
       update = true;
     }
+    if(scenarioTriggerCreate.getTimeZoneId()!=null && !scenarioTriggerCreate.getTimeZoneId().equals(scenarioTrigger.getTimeZoneId())){
+      scenarioTrigger.setTimeZoneId(scenarioTriggerCreate.getTimeZoneId());
+      update=true;
+    }
 
     return update;
   }
@@ -268,18 +273,6 @@ public class ScenarioTriggerService implements Plugin {
       ScenarioTriggerCreate scenarioTriggerCreate, SecurityContextBase securityContext) {
     basicService.validate(scenarioTriggerCreate, securityContext);
 
-    String logFileResourceId = scenarioTriggerCreate.getLogFileResourceId();
-    FileResource logFileResource =
-        logFileResourceId == null
-            ? null
-            : this.repository.getByIdOrNull(
-                logFileResourceId, FileResource.class, SecuredBasic_.security, securityContext);
-    if (logFileResourceId != null && logFileResource == null) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No FileResource with id " + logFileResourceId);
-    }
-    scenarioTriggerCreate.setLogFileResource(logFileResource);
-
     String evaluatingJSCodeId = scenarioTriggerCreate.getEvaluatingJSCodeId();
     FileResource evaluatingJSCode =
         evaluatingJSCodeId == null
@@ -353,5 +346,10 @@ public class ScenarioTriggerService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  @Transactional
+  public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+    repository.massMerge(toMerge, updatedate, propagateEvents);
   }
 }

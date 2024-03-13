@@ -1,4 +1,4 @@
-package com.wizzdi.basic.iot.service.config;
+package com.flexicore.rules.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -20,38 +20,14 @@ import java.util.concurrent.TimeUnit;
 @Extension
 @Configuration
 @EnableCaching
-public class CacheConfig implements Plugin {
+public class TriggerConfig implements Plugin {
+
+
+
 
     @Bean
-    public CacheMetricsRegistrar cacheMetricsRegistrar(MeterRegistry meterRegistry) {
-        return new CacheMetricsRegistrar(meterRegistry, List.of(new CaffeineCacheMeterBinderProvider()));
-    }
-
-    @Bean
-    @Primary
-    public CacheManager mainCache() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterAccess(3, TimeUnit.HOURS)
-                .maximumSize(10000)
-                .recordStats());
-        return cacheManager;
-    }
-
-    @Bean
-    @Qualifier("publicKeyCacheManager")
-    public CacheManager publicKeyCacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCaffeine(Caffeine.newBuilder()
-                .expireAfterAccess(3, TimeUnit.DAYS)
-                .maximumSize(20000)
-                .recordStats());
-        return cacheManager;
-    }
-
-    @Bean
-    @Qualifier("keepAliveBounceCacheManager")
-    public CacheManager keepAliveBounceCacheManager() {
+    @Qualifier("triggerCacheManager")
+    public CacheManager triggerCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager
                 .setCaffeine(Caffeine.newBuilder()

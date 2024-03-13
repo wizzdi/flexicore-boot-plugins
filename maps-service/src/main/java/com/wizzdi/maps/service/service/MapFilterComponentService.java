@@ -3,6 +3,8 @@ package com.wizzdi.maps.service.service;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
+import com.wizzdi.flexicore.security.request.SoftDeleteOption;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.service.data.MapFilterComponentRepository;
 import com.wizzdi.maps.service.request.FilterComponentType;
@@ -48,6 +50,10 @@ public class MapFilterComponentService implements Plugin {
         }
 
         mappedPOIService.validate(mapFilterComponentRequest.getMappedPOIFilter(),securityContextBase);
+        if(mapFilterComponentRequest.getBasicPropertiesFilter()==null){
+            mapFilterComponentRequest.setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.DEFAULT));
+        }
+
     }
 
 

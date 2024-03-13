@@ -14,8 +14,11 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -26,6 +29,8 @@ public class BasicIOTTriggerTypeCreator implements Plugin {
             new TriggerTypeHolder(RemoteStatusChangedTrigger.class,"fired when remote status is changed"),
             new TriggerTypeHolder(RemoteUpdatedTrigger.class,"fired when remote state or any other direct property is changed")
     );
+
+
 
 
     @Bean

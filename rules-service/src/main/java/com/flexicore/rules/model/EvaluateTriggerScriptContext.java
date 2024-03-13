@@ -7,8 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.rules.events.ScenarioEvent;
 import com.flexicore.security.SecurityContextBase;
-
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 
 
 public class EvaluateTriggerScriptContext {

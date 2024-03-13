@@ -1,19 +1,23 @@
 package com.flexicore.rules.service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-import java.util.Arrays;
-import java.util.Date;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
+import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
+import ch.qos.logback.core.util.FileSize;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.*;
+
 
 public class LogHolder {
 
 	private static final Map<String, Logger> loggers = new ConcurrentHashMap<>();
-	private static final Logger logger = Logger.getLogger(LogHolder.class
-			.getCanonicalName());
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(LogHolder.class);
 
 	public static Logger getLogger(String id,String path) {
 		return loggers.computeIfAbsent(id,
@@ -21,74 +25,46 @@ public class LogHolder {
 	}
 
 	public static void clearLogger(String id,String path) {
-		Logger scriptLogger = getLogger(id,path);
-		synchronized (scriptLogger) {
-			closeAndRemoveLogger(scriptLogger);
-
-			if (path!= null) {
-				File file = new File(path);
-				try (FileChannel outChan = new FileOutputStream(file, true)
-						.getChannel()) {
-					outChan.truncate(0);
-				} catch (Exception e) {
-					logger.log(Level.SEVERE, "failed clearing log file", e);
-				}
-			}
-		}
+	//do nothing
 
 	}
 
-	public static class CustomFormatter extends SimpleFormatter {
-		private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
 
-		@Override
-		public synchronized String format(LogRecord logRecord) {
-			return String.format(format, new Date(logRecord.getMillis()),
-					logRecord.getLevel().getLocalizedName(),
-					logRecord.getMessage());
-		}
+
+	public static Logger createLogger(String id,String path) {
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+		encoder.setContext(context);
+		encoder.setPattern("[%d{yyyy-MM-dd HH:mm:ss}] [%-5level] - %msg%n");
+		encoder.start();
+
+		RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<>();
+		rollingFileAppender.setContext(context);
+		rollingFileAppender.setFile(path);
+
+		FixedWindowRollingPolicy rollingPolicy = new FixedWindowRollingPolicy();
+		rollingPolicy.setContext(context);
+		rollingPolicy.setParent(rollingFileAppender);
+		rollingPolicy.setFileNamePattern(path + ".%i.log.zip");
+		rollingPolicy.setMinIndex(1);
+		rollingPolicy.setMaxIndex(3);
+		rollingPolicy.start();
+
+		SizeBasedTriggeringPolicy<ILoggingEvent> triggeringPolicy = new SizeBasedTriggeringPolicy<>();
+		triggeringPolicy.setMaxFileSize(FileSize.valueOf("500kb"));
+		triggeringPolicy.start();
+
+		rollingFileAppender.setEncoder(encoder);
+		rollingFileAppender.setRollingPolicy(rollingPolicy);
+		rollingFileAppender.setTriggeringPolicy(triggeringPolicy);
+		rollingFileAppender.start();
+
+		Logger logger = (Logger) LoggerFactory.getLogger(id);
+		logger.addAppender(rollingFileAppender);
+		logger.setAdditive(false);
+		return logger;
 	}
 
-	private static void closeAndRemoveLogger(Logger logger) {
-		synchronized (logger) {
-			for (Handler handler : Arrays.asList(logger.getHandlers())) {
-				handler.flush();
-				handler.close();
-				logger.removeHandler(handler);
-			}
-		}
-		loggers.remove(logger.getName(), logger);
 
-	}
-
-	public static void flush(Logger logger) {
-		for (Handler handler : logger.getHandlers()) {
-			handler.flush();
-		}
-	}
-
-	private static Logger createLogger(String id,String path) {
-		Logger scriptLogger = Logger.getLogger(id);
-		try {
-			if (path != null) {
-				boolean hasFileHandler = false;
-				for (Handler handler : scriptLogger.getHandlers()) {
-					if (handler instanceof FileHandler) {
-						hasFileHandler = true;
-						break;
-					}
-				}
-				if (!hasFileHandler) {
-					FileHandler handler = new FileHandler(path, 0, 1, true);
-					handler.setFormatter(new CustomFormatter());
-					scriptLogger.addHandler(handler);
-					scriptLogger.setUseParentHandlers(false);
-
-				}
-			}
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "failed getting script logger", e);
-		}
-		return scriptLogger;
-	}
 }

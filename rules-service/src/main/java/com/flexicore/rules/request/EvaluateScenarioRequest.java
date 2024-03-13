@@ -1,6 +1,7 @@
 package com.flexicore.rules.request;
 
 import com.flexicore.rules.events.ScenarioEvent;
+import com.flexicore.rules.model.ActionContext;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioTrigger;
@@ -14,7 +15,7 @@ public class EvaluateScenarioRequest {
     private List<ScenarioTrigger> scenarioTriggers;
     private List<DataSource> dataSources;
     private ScenarioEvent scenarioEvent;
-    private Map<String, ExecuteInvokerRequest> actions;
+    private List<ActionContext> actions;
 
     public Scenario getScenario() {
         return scenario;
@@ -53,11 +54,11 @@ public class EvaluateScenarioRequest {
         return (T) this;
     }
 
-    public Map<String, ExecuteInvokerRequest> getActions() {
+    public List<ActionContext> getActions() {
         return actions;
     }
 
-    public <T extends EvaluateScenarioRequest> T setActions(Map<String, ExecuteInvokerRequest> actions) {
+    public <T extends EvaluateScenarioRequest> T setActions(List<ActionContext> actions) {
         this.actions = actions;
         return (T) this;
     }

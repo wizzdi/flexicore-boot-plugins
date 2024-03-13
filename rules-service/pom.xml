@@ -11,14 +11,32 @@
     <artifactId>rules-service</artifactId>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+    </properties>
+
 
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-actuator</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.mozilla/rhino -->
         <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.mozilla/rhino-engine -->
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino-engine</artifactId>
+        </dependency>
+
 
 
         <dependency>

@@ -111,5 +111,10 @@ public class MapIcon extends SecuredBasic {
     return getSecurity()!=null?getSecurity().getTenant():null;
   }
 
-
+  @Override
+  public String toString() {
+    return "MapIcon{" +
+            "externalId='" + externalId + '\'' +
+            '}';
+  }
 }

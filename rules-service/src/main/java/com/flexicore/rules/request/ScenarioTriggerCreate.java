@@ -17,7 +17,6 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   private Long cooldownIntervalMs;
 
-  private String logFileResourceId;
 
   @JsonIgnore private ScenarioTriggerType scenarioTriggerType;
 
@@ -34,6 +33,8 @@ public class ScenarioTriggerCreate extends BasicCreate {
   @JsonIgnore private FileResource logFileResource;
 
   @JsonIgnore private FileResource evaluatingJSCode;
+
+  private String timeZoneId;
 
   public String getLastEventId() {
     return this.lastEventId;
@@ -72,14 +73,6 @@ public class ScenarioTriggerCreate extends BasicCreate {
     return (T) this;
   }
 
-  public String getLogFileResourceId() {
-    return this.logFileResourceId;
-  }
-
-  public <T extends ScenarioTriggerCreate> T setLogFileResourceId(String logFileResourceId) {
-    this.logFileResourceId = logFileResourceId;
-    return (T) this;
-  }
 
   @JsonIgnore
   public ScenarioTriggerType getScenarioTriggerType() {
@@ -155,6 +148,15 @@ public class ScenarioTriggerCreate extends BasicCreate {
 
   public <T extends ScenarioTriggerCreate> T setEvaluatingJSCode(FileResource evaluatingJSCode) {
     this.evaluatingJSCode = evaluatingJSCode;
+    return (T) this;
+  }
+
+  public String getTimeZoneId() {
+    return timeZoneId;
+  }
+
+  public <T extends ScenarioTriggerCreate> T setTimeZoneId(String timeZoneId) {
+    this.timeZoneId = timeZoneId;
     return (T) this;
   }
 }

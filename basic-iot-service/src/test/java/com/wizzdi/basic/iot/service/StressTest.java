@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class StressTest {
 
     private static final int TEST_FACTOR = 1;
-    private static final int CONNECT_SEQUENCE_FACTOR=3;
+    private static final int CONNECT_SEQUENCE_FACTOR=1;
     private static final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .registerModule(new JavaTimeModule());
@@ -171,10 +171,8 @@ public class StressTest {
             StateChanged stateChanged = new StateChanged(stateChangedExample)
                     .setDeviceId(deviceId)
                     .setGatewayId(gatewayId)
-                    .setSentAt(OffsetDateTime.now())
-                    .setId(UUID.randomUUID().toString());
-            stateChanged.getValues().put("ConnTime", OffsetDateTime.now().toString());
-            stateChanged.getValues().put("LocalTime", OffsetDateTime.now().toString());
+                    .setSentAt(OffsetDateTime.now());
+            stateChanged.getValues().put("StressTest", OffsetDateTime.now().toString());
             MqttMessage message = new MqttMessage();
             message.setPayload(objectMapper.writeValueAsBytes(stateChanged));
             client.publish(BasicIOTClient.getOutTopic(gatewayId), message);

@@ -14,6 +14,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Extension
 public class BasicIOTEventsToTriggerListeners implements Plugin {
@@ -21,18 +23,23 @@ public class BasicIOTEventsToTriggerListeners implements Plugin {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+
     @EventListener
     public void remoteStatusChangedToTrigger(RemoteStatusChanged remoteStatusChanged){
-        eventPublisher.publishEvent(new RemoteStatusChangedTrigger(remoteStatusChanged.remote(),remoteStatusChanged.newStatus(),remoteStatusChanged.currentStatus()));
+        Remote remote = remoteStatusChanged.remote();
+        eventPublisher.publishEvent(new RemoteStatusChangedTrigger(remote,remoteStatusChanged.newStatus(),remoteStatusChanged.currentStatus(), List.of(remote.getSecurity().getTenant())));
     }
 
     @EventListener
     public void remoteUpdatedToTrigger(RemoteUpdatedEvent remoteUpdatedEvent){
-        eventPublisher.publishEvent(new RemoteUpdatedTrigger(remoteUpdatedEvent.getBaseclass(),remoteUpdatedEvent.getPreviousState()));
+        Remote remote = remoteUpdatedEvent.getBaseclass();
+
+        eventPublisher.publishEvent(new RemoteUpdatedTrigger(remote,remoteUpdatedEvent.getPreviousState(),List.of(remote.getSecurity().getTenant())));
     }
 
     @EventListener
     public <T extends Remote> void remoteCreatedToTrigger(BasicCreated<T> remoteUpdatedEvent){
-        eventPublisher.publishEvent(new RemoteCreatedTrigger(remoteUpdatedEvent.getBaseclass()));
+        T remote = remoteUpdatedEvent.getBaseclass();
+        eventPublisher.publishEvent(new RemoteCreatedTrigger(remote,List.of(remote.getSecurity().getTenant())));
     }
 }

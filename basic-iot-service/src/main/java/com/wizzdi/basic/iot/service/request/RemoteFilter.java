@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.Connectivity;
+import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.FieldInfo;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 import com.wizzdi.dynamic.properties.converter.postgresql.DynamicFilterItem;
@@ -20,8 +21,14 @@ public class RemoteFilter extends PaginationFilter {
     private Set<String> notIds;
     private OffsetDateTime lastSeenTo;
 
+    @FieldInfo(dynamicFilterForField = "deviceProperties")
+
     private Map<String,DynamicFilterItem> devicePropertiesFilter;
+    @FieldInfo(dynamicFilterForField = "userAddedProperties")
     private Map<String,DynamicFilterItem> userAddedPropertiesFilter;
+
+    @FieldInfo(dynamicFilterForStatic = true)
+    private Map<String,DynamicFilterItem> staticPropertiesFilter;
 
 
     private MappedPOIFilter mappedPOIFilter;
@@ -97,6 +104,15 @@ public class RemoteFilter extends PaginationFilter {
 
     public <T extends RemoteFilter> T setMappedPOIFilter(MappedPOIFilter mappedPOIFilter) {
         this.mappedPOIFilter = mappedPOIFilter;
+        return (T) this;
+    }
+
+    public Map<String, DynamicFilterItem> getStaticPropertiesFilter() {
+        return staticPropertiesFilter;
+    }
+
+    public <T extends RemoteFilter> T setStaticPropertiesFilter(Map<String, DynamicFilterItem> staticPropertiesFilter) {
+        this.staticPropertiesFilter = staticPropertiesFilter;
         return (T) this;
     }
 }

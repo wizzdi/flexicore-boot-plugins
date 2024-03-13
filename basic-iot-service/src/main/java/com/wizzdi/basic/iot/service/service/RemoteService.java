@@ -186,7 +186,7 @@ public class RemoteService implements Plugin {
     }
 
     private RemoteCreate getPreviousState(Remote remote) {
-        return null;
+        return new RemoteCreate(remote);
     }
 
     public Remote updateRemote(RemoteUpdate remoteUpdate,

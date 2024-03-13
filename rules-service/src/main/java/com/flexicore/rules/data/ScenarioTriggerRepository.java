@@ -1,8 +1,6 @@
 package com.flexicore.rules.data;
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Basic;
-import com.flexicore.model.Basic_;
+import com.flexicore.model.*;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.model.ScenarioTriggerType;
 import com.flexicore.rules.model.ScenarioTriggerType_;
@@ -45,7 +43,7 @@ public class ScenarioTriggerRepository implements Plugin {
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
     List<Predicate> preds = new ArrayList<>();
     addScenarioTriggerPredicate(filtering, cb, q, r, preds, securityContext);
-    q.select(r).where(preds.toArray(new Predicate[0]));
+    q.select(r).where(preds.toArray(new Predicate[0])).orderBy(cb.asc(r.get(ScenarioTrigger_.name)));
     TypedQuery<ScenarioTrigger> query = em.createQuery(q);
     BasicRepository.addPagination(filtering, query);
     return query.getResultList();
@@ -131,6 +129,15 @@ public class ScenarioTriggerRepository implements Plugin {
       Join<T,ScenarioTriggerType> join=r.join(ScenarioTrigger_.scenarioTriggerType);
       preds.add(join.get(ScenarioTriggerType_.eventCanonicalName).in(scenarioTriggerFilter.getEventCanonicalNames()));
     }
+    if(scenarioTriggerFilter.isMissingLogFile()){
+      preds.add(r.get(ScenarioTrigger_.logFileResource).isNull());
+    }
+    if(scenarioTriggerFilter.getTenants()!=null&&!scenarioTriggerFilter.getTenants().isEmpty()){
+      Set<String> ids=scenarioTriggerFilter.getTenants().parallelStream().map(f->f.getId()).collect(Collectors.toSet());
+      Join<T,Baseclass> join=r.join(ScenarioTrigger_.security);
+      Join<Baseclass, SecurityTenant> tenantJoin=join.join(Baseclass_.tenant);
+      preds.add(tenantJoin.get(Basic_.id).in(ids));
+    }
   }
   /**
    * @param filtering Object Used to List ScenarioTrigger
@@ -196,5 +203,10 @@ public class ScenarioTriggerRepository implements Plugin {
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
+  }
+
+  @Transactional
+  public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+    securedBasicRepository.massMerge(toMerge, updatedate, propagateEvents);
   }
 }

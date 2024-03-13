@@ -15,6 +15,7 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionServic
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicExecutionRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendDynamicInvokerRequest;
+import com.wizzdi.flexicore.dynamic.invoker.service.email.request.SendEmailPlainRequest;
 import com.wizzdi.flexicore.dynamic.invoker.service.email.response.SendDynamicEmailResponse;
 import com.wizzdi.flexicore.dynamic.invoker.service.export.request.ExportDynamicExecution;
 import com.wizzdi.flexicore.dynamic.invoker.service.export.request.ExportDynamicInvoker;
@@ -47,8 +48,12 @@ public class DynamicInvokerEmailService implements Plugin {
     private String templateId;
     @Value("${wizzdi.invokers.email.sendgrid.from}")
     private String from;
+    @Value("${wizzdi.invokers.email.sendgrid.from.name:Notification Manager}")
+    private String fromName;
     @Value("${wizzdi.invokers.email.sendgrid.replyTo}")
     private String replyTo;
+    @Value("${wizzdi.invokers.email.sendgrid.replyTo.name:No Reply}")
+    private String replyToName;
 
     @Autowired
     private DynamicExecutionService dynamicExecutionService;
@@ -109,9 +114,9 @@ public class DynamicInvokerEmailService implements Plugin {
                 personalization.addDynamicTemplateData("title",title);
 
 
-                mail.setFrom(new Email(from, "Notification Manager"));
+                mail.setFrom(new Email(from,fromName ));
 
-                mail.setReplyTo(new Email(replyTo, "No Reply"));
+                mail.setReplyTo(new Email(replyTo, replyToName));
 
                 mail.setTemplateId(templateId);
                 mail.addPersonalization(personalization);
@@ -148,4 +153,50 @@ public class DynamicInvokerEmailService implements Plugin {
 
         return sendEmail(entries,headersArr, sendDynamicInvokerRequest.getEmails(),title);
     }
+
+    public SendDynamicEmailResponse sendEmailPlain(SendEmailPlainRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
+        Set<String> emails = sendDynamicInvokerRequest.getEmails();
+        String from=sendDynamicInvokerRequest.getFrom();
+        String replyTo=sendDynamicInvokerRequest.getFrom();
+        String templateId= sendDynamicInvokerRequest.getTemplateId();
+        try {
+            Request request = new Request();
+            request.setMethod(Method.POST);
+            request.setEndpoint("/mail/send");
+
+            // Create mail
+            Mail mail = new Mail();
+            Personalization personalization = new Personalization();
+            for (String email : emails) {
+                personalization.addTo(new Email(email, email));
+
+            }
+            for (Map.Entry<String, Object> entry : sendDynamicInvokerRequest.getAdditionalProperties().entrySet()) {
+                personalization.addDynamicTemplateData(entry.getKey(),entry.getValue());
+
+            }
+
+
+            String fromAlias=Optional.ofNullable(sendDynamicInvokerRequest.getFromAlias()).orElse(sendDynamicInvokerRequest.getFrom());
+            mail.setFrom(new Email(from, fromAlias));
+            String replyToAlias=Optional.ofNullable(sendDynamicInvokerRequest.getReplyToAlias()).orElse(sendDynamicInvokerRequest.getReplyToAlias());
+
+            mail.setReplyTo(new Email(replyTo, replyToAlias));
+
+            mail.setTemplateId(templateId);
+            mail.addPersonalization(personalization);
+
+            request.setBody(mail.build());
+            Response response = sendGrid.api(request);
+            int statusCode = response.getStatusCode();
+            String message = response.getBody();
+            logger.info(String.format("send invoker template email , status was: %d , message was : %s", statusCode, message));
+            return new SendDynamicEmailResponse().setStatus(statusCode).setMessage(message).setSent(true);
+        } catch (IOException e) {
+            logger.error("failed sending mail ",e);
+            return new SendDynamicEmailResponse().setMessage(e.getMessage()).setStatus(-1).setSent(false);
+        }
+    }
+
+
 }
