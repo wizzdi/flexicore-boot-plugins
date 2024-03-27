@@ -111,7 +111,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <spring-boot.version>3.1.1</spring-boot.version>
-        <flexicore-boot-dependencies.version>5.0.1</flexicore-boot-dependencies.version>
+        <flexicore-boot-dependencies.version>5.0.3</flexicore-boot-dependencies.version>
 
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>

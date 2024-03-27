@@ -26,11 +26,6 @@ public class KeepAliveBounceService implements Plugin {
     private static final Logger logger= LoggerFactory.getLogger(KeepAliveBounceService.class);
     public static final String CACHE_NAME = "keepAliveBounceCache";
 
-    public KeepAliveBounceService(@Qualifier("keepAliveBounceCacheManager") CacheManager keepAliveBounceCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar){
-        cacheMetricsRegistrar.bindCacheToRegistry(keepAliveBounceCacheManager.getCache(CACHE_NAME));
-
-    }
-
     @Cacheable(cacheNames = CACHE_NAME,key = "#remoteId",cacheManager = "keepAliveBounceCacheManager")
     public Long getLastBounce(String remoteId) {
         return 0L;

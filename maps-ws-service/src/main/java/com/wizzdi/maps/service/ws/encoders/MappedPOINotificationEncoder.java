@@ -17,7 +17,7 @@ import java.io.Writer;
 /**
  * Created by Asaf on 12/02/2017.
  */
-public class MappedPOINotificationEncoder<T extends MappedPOINotification> implements Encoder.TextStream<T> {
+public class MappedPOINotificationEncoder implements Encoder.TextStream<MappedPOINotification> {
 
     private static ObjectMapper objectMapper;
     private static final Logger logger= LoggerFactory.getLogger(MappedPOINotificationEncoder.class);
@@ -39,7 +39,7 @@ public class MappedPOINotificationEncoder<T extends MappedPOINotification> imple
     }
 
     @Override
-    public void encode(T object, Writer writer) throws IOException {
+    public void encode(MappedPOINotification object, Writer writer) throws IOException {
             objectMapper.writeValue(writer,object);
 
 

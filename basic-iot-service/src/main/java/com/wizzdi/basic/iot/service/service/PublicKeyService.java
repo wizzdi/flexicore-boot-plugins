@@ -26,9 +26,8 @@ public class PublicKeyService implements Plugin {
     public static final String CACHE_NAME = "publicKeyCache";
     private final GatewayService gatewayService;
 
-    public PublicKeyService(GatewayService gatewayService, @Qualifier("publicKeyCacheManager") CacheManager publicKeyCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar) {
+    public PublicKeyService(GatewayService gatewayService) {
         this.gatewayService = gatewayService;
-        cacheMetricsRegistrar.bindCacheToRegistry(publicKeyCacheManager.getCache(CACHE_NAME));
 
     }
 

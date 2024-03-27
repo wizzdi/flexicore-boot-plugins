@@ -297,11 +297,11 @@ public class ScenarioManager implements Plugin {
             String functionName = FunctionTypes.EVALUATE.getFunctionName();
 
             List<String> res = (List<String>) engine.eval(functionName + "(x);", bindings);
-            Set<String> idsToRun = new HashSet<>(res);
+            Set<String> idsToRun = res==null?Collections.emptySet():new HashSet<>(res);
             Map<String, ExecuteInvokerRequest> filtered = actions.parallelStream().filter(f -> idsToRun.contains(f.getId())).collect(Collectors.toMap(f -> f.getId(), f -> f.getExecuteInvokerRequest()));
             evaluateScenarioResponse.setActions(filtered);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("failed executing script", e);
             scenarioTriggerLogger.error("failed executing script: " + e, e);
         }

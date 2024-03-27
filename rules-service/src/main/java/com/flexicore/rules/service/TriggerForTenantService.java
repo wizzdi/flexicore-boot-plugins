@@ -6,6 +6,7 @@ import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
+import io.micrometer.core.instrument.Tag;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class TriggerForTenantService implements Plugin {
     private CacheManager triggerCacheManager;
 
     public TriggerForTenantService(@Qualifier("triggerCacheManager") CacheManager keepAliveBounceCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar){
-        cacheMetricsRegistrar.bindCacheToRegistry(keepAliveBounceCacheManager.getCache(CACHE_NAME));
+        cacheMetricsRegistrar.bindCacheToRegistry(keepAliveBounceCacheManager.getCache(CACHE_NAME), Tag.of("cache.manager", "keepAliveBounceCacheManager"));
 
     }
 

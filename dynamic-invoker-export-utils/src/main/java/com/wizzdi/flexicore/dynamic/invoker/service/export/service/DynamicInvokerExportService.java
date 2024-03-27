@@ -177,17 +177,24 @@ public class DynamicInvokerExportService implements Plugin {
                 //failed in the past
                 current = null;
             }
-            Method method = getGetter(methodCache, fullPathSoFar, currentClass, currentPathComponent);
-            if (method == null) {
-                failedCache.add(fullPathSoFar);
-                current = null;
+            Object data;
+            if(current instanceof Map<?,?> map){
+                data =map.get(currentPathComponent);
+            }
+            else{
+                Method method = getGetter(methodCache, fullPathSoFar, currentClass, currentPathComponent);
+                if (method == null) {
+                    failedCache.add(fullPathSoFar);
+                    current = null;
+                    break;
+                }
+                data = invokeMethodProtected(current, method);
+            }
+            if(data==null){
+                current=null;
                 break;
             }
-            Object data = invokeMethodProtected(current, method);
-            if (data == null) {
-                current = null;
-                break;
-            }
+
             current = data;
             currentClass = current.getClass();
         }

@@ -78,15 +78,17 @@ public class MapsSocketHandler implements Plugin {
 	}
 
 	private void sendMessageToTenantsSessions(MappedPOINotification mappedPOINotification) {
+		logger.debug("sending WS message {} , for mapped poi {}",mappedPOINotification.getId(),mappedPOINotification.getMappedPOIId());
 		ConcurrentLinkedQueue<Session> webSocketSessions = sessions.computeIfAbsent(mappedPOINotification.getTenantId(), f -> new ConcurrentLinkedQueue<>());
 		List<Session> toRemove=new ArrayList<>();
 		try {
 			for (Session webSocketSession : webSocketSessions) {
 				try {
 					webSocketSession.getBasicRemote().sendObject(mappedPOINotification);
+					logger.debug("sent WS message to "+webSocketSession.getId());
 				}
 				catch (Throwable e){
-					logger.error("failed sending WS message to "+webSocketSession.getId() +" closing",e);
+					logger.warn("failed sending WS message to "+webSocketSession.getId() +" closing",e);
 					toRemove.add(webSocketSession);
 
 					try {
@@ -103,6 +105,7 @@ public class MapsSocketHandler implements Plugin {
 			logger.error("failed sending WS message",e);
 		}
 		finally {
+			logger.debug("removed {} sessions",toRemove.size());
 			webSocketSessions.removeAll(toRemove);
 		}
 	}
