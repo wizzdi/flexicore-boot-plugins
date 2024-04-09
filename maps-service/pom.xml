@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-actuator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>ch.hsr</groupId>
             <artifactId>geohash</artifactId>
         </dependency>

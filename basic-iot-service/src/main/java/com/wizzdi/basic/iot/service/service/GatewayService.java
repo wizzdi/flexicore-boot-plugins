@@ -175,6 +175,12 @@ public class GatewayService implements Plugin {
     public void validate(GatewayCreate gatewayCreate,
                          SecurityContextBase securityContext) {
         remoteService.validate(gatewayCreate, securityContext);
+
+    }
+
+    public void validateCreate(GatewayCreate gatewayCreate,
+                         SecurityContextBase securityContext) {
+        validate(gatewayCreate, securityContext);
         if(gatewayCreate.getGatewayUser()==null){
             gatewayCreate.setGatewayUser(securityContext.getUser());
         }

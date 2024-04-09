@@ -158,16 +158,10 @@ public class DeviceTypeService implements Plugin {
 
     public MapIcon getOrCreateMapIcon(String status, String deviceTypeName, Class<? extends Device> deviceClass,SecurityContextBase securityContextBase) {
         MapIconCreate mapIconCreate = getMapIconCreate(status, deviceTypeName,deviceClass,securityContextBase.getTenantToCreateIn());
-        return getOrCreateMapIcon(mapIconCreate,securityContextBase);
+        return mapIconService.getOrCreateMapIcon(mapIconCreate,securityContextBase);
     }
 
-    private MapIcon getOrCreateMapIcon( MapIconCreate mapIconCreate,SecurityContextBase securityContextBase) {
-        String externalId = mapIconCreate.getExternalId();
-        String relatedType = mapIconCreate.getRelatedType();
-        return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
-                        .setExternalId(Collections.singleton(externalId)), null).stream().filter(f -> f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
-                .findFirst().orElseGet(() -> mapIconService.createMapIcon(mapIconCreate, securityContextBase));
-    }
+
 
     private static MapIconCreate getMapIconCreate(String status, String deviceTypeName, Class<? extends Device> deviceClass, SecurityTenant tenantToCreateIn) {
         String name = deviceTypeName + "_" + status;
@@ -188,7 +182,7 @@ public class DeviceTypeService implements Plugin {
             return deviceType;
         }
         MapIconCreate mapIconCreate = getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn());
-        MapIcon unknown = Optional.of(checkMapIcon).filter(f->f).map(f->getOrCreateMapIcon(mapIconCreate,securityContext)).orElseGet(()->mapIconService.createMapIcon(mapIconCreate, securityContext));
+        MapIcon unknown = Optional.of(checkMapIcon).filter(f->f).map(f->mapIconService.getOrCreateMapIcon(mapIconCreate,securityContext)).orElseGet(()->mapIconService.createMapIcon(mapIconCreate, securityContext));
         deviceType = createDeviceType(new DeviceTypeCreate().setDefaultMapIcon(unknown).setName(deviceTypeName), securityContext);
         return deviceType;
     }

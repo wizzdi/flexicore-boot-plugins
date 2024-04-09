@@ -9,6 +9,7 @@ import com.wizzdi.basic.iot.model.ConnectivityChange;
 import com.wizzdi.basic.iot.model.ConnectivityChange_;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.Remote_;
+import com.wizzdi.basic.iot.service.config.BasicIOTConfig;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.RemoteFilter;
 import com.wizzdi.dynamic.properties.converter.postgresql.FilterDynamicPropertiesUtils;
@@ -49,6 +50,8 @@ public class RemoteRepository implements Plugin {
     private MappedPOIRepository mappedPOIRepository;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private BasicIOTConfig basicIOTConfig;
 
     public List<Remote> getAllRemotes(SecurityContextBase securityContext,
                                            RemoteFilter filtering) {
@@ -174,4 +177,17 @@ public class RemoteRepository implements Plugin {
         eventPublisher.publishEvent(new BasicUpdated<>(remote));
     }
 
+    public List<Object> massMergeGetEvents(List<Basic> toMerge,Set<String> existingEvents) {
+        Set<String> createdMap=toMerge.stream().filter(f->f.getUpdateDate()==null).map(f->f.getId()).collect(Collectors.toSet());
+        securedBasicRepository.massMerge(toMerge,true,false);
+        List<Object> events=new ArrayList<>();
+        for (Basic remote : toMerge) {
+            boolean created = createdMap.contains(remote.getId());
+            if(!existingEvents.contains(remote.getId())){
+                events.add(created?new BasicCreated<>(remote):new BasicUpdated<>(remote));
+
+            }
+        }
+        return events;
+    }
 }

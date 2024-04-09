@@ -39,8 +39,8 @@ public class TriggerForTenantService implements Plugin {
     @Qualifier("triggerCacheManager")
     private CacheManager triggerCacheManager;
 
-    public TriggerForTenantService(@Qualifier("triggerCacheManager") CacheManager keepAliveBounceCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar){
-        cacheMetricsRegistrar.bindCacheToRegistry(keepAliveBounceCacheManager.getCache(CACHE_NAME), Tag.of("cache.manager", "keepAliveBounceCacheManager"));
+    public TriggerForTenantService(@Qualifier("triggerCacheManager") CacheManager triggerCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar){
+        cacheMetricsRegistrar.bindCacheToRegistry(triggerCacheManager.getCache(CACHE_NAME), Tag.of("cache.manager", "triggerCacheManager"));
 
     }
 

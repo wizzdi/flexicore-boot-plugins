@@ -62,7 +62,7 @@ public class GatewayController implements Plugin, Invoker {
             
             @RequestBody GatewayCreate gatewayCreate,
             @RequestAttribute SecurityContextBase securityContext) {
-        service.validate(gatewayCreate, securityContext);
+        service.validateCreate(gatewayCreate, securityContext);
 
         return service.createGateway(gatewayCreate, securityContext);
     }

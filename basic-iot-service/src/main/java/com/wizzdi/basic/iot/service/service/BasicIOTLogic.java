@@ -1,17 +1,19 @@
 package com.wizzdi.basic.iot.service.service;
 
-import ch.hsr.geohash.GeoHash;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.events.RemoteStatusChanged;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.basic.iot.service.utils.DistanceUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
+import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
 import com.wizzdi.maps.model.MapIcon;
@@ -35,7 +37,6 @@ import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -154,23 +155,50 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
 
         Gateway gateway = gatewayOptional.get();
-        if (iotMessage instanceof KeepAlive) {
-            onKeepAlive((KeepAlive) iotMessage, gateway, gatewaySecurityContext);
-            return null;
-        }
-        if (iotMessage instanceof StateChanged) {
-            return stateChanged((StateChanged) iotMessage, gateway, gatewaySecurityContext);
-        }
+        MessageHandleContext messageHandleContext= switch (iotMessage) {
+            case KeepAlive keepAlive ->   onKeepAlive(keepAlive, gateway, gatewaySecurityContext);
+            case StateChanged stateChanged -> stateChanged(stateChanged, gateway, gatewaySecurityContext);
+            case SetStateSchema setStateSchema -> setStateSchema(setStateSchema, gateway, gatewaySecurityContext);
+            case UpdateStateSchema updateStateSchema -> updateStateSchema(updateStateSchema, gateway, gatewaySecurityContext);
+            default -> MessageHandleContext.EMPTY;
+        };
+        return postHandle(messageHandleContext);
 
-        if (iotMessage instanceof SetStateSchema) {
-            return setStateSchema((SetStateSchema) iotMessage, gateway, gatewaySecurityContext);
-        }
+    }
 
-        if (iotMessage instanceof UpdateStateSchema) {
-            return updateStateSchema((UpdateStateSchema) iotMessage, gateway, gatewaySecurityContext);
-        }
+    private IOTMessage postHandle(MessageHandleContext messageHandleContext) {
+        List<Basic> toMerge = new ArrayList<>(messageHandleContext.toMerge.stream().filter(f -> f instanceof Basic).map(f->(Basic)f).collect(Collectors.toMap(f->f.getId(),f->f,(a,b)->a)).values());
+        LinkedHashMap<String, Object> eventMap = messageHandleContext.events.stream().filter(f -> f != null).collect(Collectors.toMap(f -> getEventId(f), f -> f, (a, b) -> mergeEvents(a, b), LinkedHashMap::new));
 
-        return null;
+        List<Object> moreEvents = remoteService.massMergeGetEvents(toMerge, eventMap.keySet());
+
+        List<Object> relevantEvents=new ArrayList<>(eventMap.values());
+        relevantEvents.addAll(moreEvents);
+         for (Object event : relevantEvents) {
+              eventPublisher.publishEvent(event);
+         }
+         return messageHandleContext.response();
+
+    }
+
+    private Object mergeEvents(Object a, Object b) {
+        if(a instanceof RemoteUpdatedEvent ){
+            return a;
+        }
+        return b;
+    }
+
+    private String getEventId(Object f) {
+        if(f instanceof BasicCreated<?> basicCreated){
+            return basicCreated.getBaseclass().getId();
+        }
+        if(f instanceof BasicUpdated<?> basicUpdated){
+            return basicUpdated.getBaseclass().getId();
+        }
+        if( f instanceof RemoteStatusChanged remoteStatusChanged){
+            return remoteStatusChanged.remote().getId();
+        }
+        return UUID.randomUUID().toString();
     }
 
     private boolean shouldBounce(IOTMessage iotMessage) {
@@ -178,26 +206,54 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return (System.currentTimeMillis() - lastKeepAliveReceived) < keepAliveBounceThreshold;
     }
 
-    private void onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+        MessageHandleContext messageHandleContext = new MessageHandleContext(new ArrayList<>(), new ArrayList<>(), null);
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
         List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
         remotesWithKeepAlive.addAll(devices);
-        List<Remote> remotesThatChangedState = updateKeepAlive(keepAlive.getSentAt(), gatewaySecurityContext, remotesWithKeepAlive);
+        UpdateKeepAliveResponse updateKeepAliveResponse = updateKeepAlive(keepAlive.getSentAt(), gatewaySecurityContext, remotesWithKeepAlive);
+        List<Remote> remotesThatChangedState=updateKeepAliveResponse.statusChanged();
+        messageHandleContext = MessageHandleContext.merged(messageHandleContext, updateKeepAliveResponse.messageHandleContext());
         for (Remote remote : remotesThatChangedState) {
             MapIcon newStatus = remote.getPreConnectivityLossIcon();
             if(remote.getMappedPOI()!=null&& newStatus !=null){
                 MapIcon previous=remote.getMappedPOI().getMapIcon();
                 remote.getMappedPOI().setMapIcon(newStatus);
-                mapIconService.merge(remote.getMappedPOI());
-                eventPublisher.publishEvent(new RemoteStatusChanged(remote,newStatus,previous));
+                messageHandleContext.toMerge.add(remote.getMappedPOI());
+                messageHandleContext.events.add(new RemoteStatusChanged(remote,newStatus,previous));
                 logger.debug("remote {}({}) connected , changing status to {}({})",remote.getRemoteId(),remote.getName(), newStatus.getName(), newStatus.getId());
             }
         }
+        return messageHandleContext;
 
 
     }
 
-    private List<Remote> updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+
+    record MessageHandleContext(List<Object> toMerge,List<Object> events,IOTMessage response){
+
+        public static MessageHandleContext EMPTY=new MessageHandleContext(Collections.emptyList(),Collections.emptyList(),null);
+
+
+
+        public static MessageHandleContext merged(MessageHandleContext one , MessageHandleContext two) {
+            MessageHandleContext context=new MessageHandleContext(new ArrayList<>(one.toMerge()),new ArrayList<>(one.events()),one.response()!=null?one.response():two.response());
+            context.toMerge.addAll(two.toMerge());
+            context.events.addAll(two.events());
+            return context;
+        }
+
+        public MessageHandleContext withResponse(IOTMessage iotMessage) {
+            return new MessageHandleContext(toMerge,events,iotMessage);
+        }
+    };
+
+    record UpdateKeepAliveResponse(List<Remote> statusChanged,MessageHandleContext messageHandleContext) {
+
+    };
+
+    private UpdateKeepAliveResponse updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+        MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         List<Remote> statusChanged = new ArrayList<>();
         if(lastSeen==null || lastSeen.isAfter(OffsetDateTime.now())){
             lastSeen=OffsetDateTime.now();
@@ -206,17 +262,18 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             if(remote.getLastSeen()==null||lastSeen.isAfter(remote.getLastSeen())){
                 RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteCreate().setLastSeen(lastSeen));
                 if(remoteUpdateResponse.updated()){
-                    connectivityChangeService.merge(remote);
+                    messageHandleContext.toMerge.add(remote);
                 }
             }
             if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
                 if (remote.getLastConnectivityChange() == null || remote.getLastConnectivityChange().getConnectivity().equals(Connectivity.OFF)) {
                     ConnectivityChangeCreate connectivityChangeCreate = new ConnectivityChangeCreate().setConnectivity(Connectivity.ON).setRemote(remote).setDate(OffsetDateTime.now());
                     boolean createConnectivityChange = remote.isKeepConnectivityHistory() || remote.getLastConnectivityChange() == null;
-                    ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChange(connectivityChangeCreate, gatewaySecurityContext): connectivityChangeService.updateConnectivityChange(connectivityChangeCreate, remote.getLastConnectivityChange());
+                    ConnectivityChange connectivityChange = createConnectivityChange ?connectivityChangeService.createConnectivityChangeNoMerge(connectivityChangeCreate, gatewaySecurityContext): updateConnectivityChangeNoMerge(remote.getLastConnectivityChange(), connectivityChangeCreate,messageHandleContext);
                     if(createConnectivityChange){
                         remote.setLastConnectivityChange(connectivityChange);
-                        connectivityChangeService.merge(remote);
+                        messageHandleContext.toMerge.add(connectivityChange);
+                        messageHandleContext.toMerge.add(remote);
                     }
 
                     logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
@@ -226,7 +283,14 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             }
 
         }
-        return statusChanged;
+        return new UpdateKeepAliveResponse(statusChanged,messageHandleContext);
+    }
+
+    private ConnectivityChange updateConnectivityChangeNoMerge(ConnectivityChange lastConnectivityChange, ConnectivityChangeCreate connectivityChangeCreate, MessageHandleContext messageHandleContext) {
+        if(connectivityChangeService.updateConnectivityChangeNoMerge(lastConnectivityChange,connectivityChangeCreate)){
+            messageHandleContext.toMerge.add(lastConnectivityChange);
+        }
+        return lastConnectivityChange;
     }
 
     /**
@@ -357,24 +421,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
 
-    private static final class GetOrCreateDeviceResponse{
-        private final Device device;
-        private final String newVersion;
+    private record GetOrCreateDeviceResponse(Device device, String newVersion,MessageHandleContext messageHandleContext) {
 
-    public GetOrCreateDeviceResponse(Device device, String newVersion) {
-        this.device = device;
-        this.newVersion = newVersion;
     }
-
-    public Device getDevice() {
-        return device;
-    }
-
-    public String getNewVersion() {
-        return newVersion;
-    }
-}
-    private IOTMessage stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
         String newVersion=null;
         Remote remote=null;
         Map<String, Object> values = stateChanged.getValues();
@@ -385,15 +435,21 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         Double longitude = stateChanged.getLongitude();
         List<Remote> keepAlive=new ArrayList<>();
         keepAlive.add(gateway);
+        MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         if(deviceId !=null){
             GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
-            newVersion=getOrCreateDeviceResponse.getNewVersion();
-            remote=getOrCreateDeviceResponse.getDevice();
+            newVersion=getOrCreateDeviceResponse.newVersion();
+            remote=getOrCreateDeviceResponse.device();
+            messageHandleContext=MessageHandleContext.merged(messageHandleContext,getOrCreateDeviceResponse.messageHandleContext());
             keepAlive.add(remote);
         }
         else{
             newVersion= version !=null&&!version.equals(gateway.getVersion())? version :null;
-            gatewayService.updateGateway(new GatewayUpdate().setGateway(gateway).setDeviceProperties(values).setVersion(version),null);
+            RemoteUpdateResponse remoteUpdateResponse = gatewayService.updateGatewayNoMerge(gateway, new GatewayCreate().setDeviceProperties(values).setVersion(version));
+            if(remoteUpdateResponse.updated()){
+                messageHandleContext.toMerge.add(gateway);
+                messageHandleContext.events.add(remoteUpdateResponse.remoteUpdatedEvent());
+            }
             remote=gateway;
         }
 
@@ -410,7 +466,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
         if(!remote.isLockLocation()
                 &&latitude!=null&&longitude!=null
-                &&!isZeroLocation(longitude,latitude)
                 &&getDistanceFromCurrentLocation(mappedPOI,longitude,latitude)>locationDistanceThreshold){
             mappedPOICreate
                     .setLon(longitude)
@@ -421,29 +476,36 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
 
         if(mappedPOI ==null){
-            mappedPOI = mappedPOIService.createMappedPOI(mappedPOICreate, gatewaySecurityContext);
+            mappedPOI = mappedPOIService.createMappedPOINoMerge(mappedPOICreate, gatewaySecurityContext);
+            messageHandleContext.toMerge.add(mappedPOI);
         }
         else{
             MapIcon previousMapIcon = mappedPOI.getMapIcon();
             if(mappedPOIService.updateMappedPOINoMerge(mappedPOICreate, mappedPOI)){
-                mappedPOIService.merge(mappedPOI);
+                messageHandleContext.toMerge().add(mappedPOI);
                 MapIcon currentMapIcon = mappedPOI.getMapIcon();
                 if(currentMapIcon!=null&&(previousMapIcon==null||!currentMapIcon.getId().equals(previousMapIcon.getId()))){
-                    eventPublisher.publishEvent(new RemoteStatusChanged(remote,currentMapIcon,previousMapIcon));
+                    messageHandleContext.events.add(new RemoteStatusChanged(remote,currentMapIcon,previousMapIcon));
                 }
             }
 
         }
-        remoteService.updateRemote(new RemoteUpdate().setRemote(remote).setReportedLat(latitude).setReportedLon(longitude).setMappedPOI(mappedPOI),gatewaySecurityContext);
+        RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteUpdate().setReportedLat(latitude).setReportedLon(longitude).setMappedPOI(mappedPOI));
+        if(remoteUpdateResponse.updated()){
+            messageHandleContext.toMerge.add(remote);
+            messageHandleContext.events.add(remoteUpdateResponse.remoteUpdatedEvent());
+        }
 
 
         if(newVersion != null){
-            updateVersion(newVersion,remote);
+            MessageHandleContext updateVersionContext=updateVersion(newVersion,remote);
+            messageHandleContext=MessageHandleContext.merged(messageHandleContext,updateVersionContext);
+
         }
 
-        updateKeepAlive(stateChanged.getSentAt(),gatewaySecurityContext,keepAlive);
+        messageHandleContext=MessageHandleContext.merged(messageHandleContext,updateKeepAlive(stateChanged.getSentAt(),gatewaySecurityContext,keepAlive).messageHandleContext());
 
-        return new StateChangedReceived().setStateChangedId(stateChanged.getId());
+        return messageHandleContext.withResponse(new StateChangedReceived().setStateChangedId(stateChanged.getId()));
     }
 
     private double getDistanceFromCurrentLocation(MappedPOI mappedPOI, double longitude, double latitude) {
@@ -493,6 +555,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
 
     private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContextBase gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
+        MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         String newVersion;
         DeviceCreate deviceCreate = new DeviceCreate()
                 .setGateway(gateway)
@@ -509,26 +572,33 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     .setRemoteId(deviceId);
 
 
-            device=deviceService.createDevice(deviceCreate, gatewaySecurityContext);
+            device=deviceService.createDeviceNoMerge(deviceCreate, gatewaySecurityContext);
+            messageHandleContext.toMerge().add(device);
             newVersion= device.getVersion();
         } else {
             newVersion= version !=null&&!version.equals(device.getVersion())? version :null;
             RemoteUpdateResponse remoteUpdateResponse = deviceService.updateDeviceNoMerge(device, deviceCreate);
             if (remoteUpdateResponse.updated()) {
+                messageHandleContext.toMerge().add(device);
+                messageHandleContext.events().add(remoteUpdateResponse.remoteUpdatedEvent());
                 deviceService.merge(device,remoteUpdateResponse.remoteUpdatedEvent());
             }
         }
-        return new GetOrCreateDeviceResponse(device,newVersion);
+        return new GetOrCreateDeviceResponse(device,newVersion,messageHandleContext);
     }
 
-    private void updateVersion(String newVersion, Remote remote) {
+    private MessageHandleContext updateVersion(String newVersion, Remote remote) {
+        MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         List<FirmwareUpdateInstallation> firmwareUpdateInstallations = firmwareUpdateInstallationService.listAllFirmwareUpdateInstallations(null, new FirmwareUpdateInstallationFilter().setTargetRemotes(Collections.singletonList(remote)).setFirmwareInstallationStates(Collections.singleton(FirmwareInstallationState.PENDING)).setVersions(Collections.singleton(newVersion)));
         for (FirmwareUpdateInstallation firmwareUpdateInstallation : firmwareUpdateInstallations) {
-            firmwareUpdateInstallationService.updateFirmwareUpdateInstallation(new FirmwareUpdateInstallationUpdate().setFirmwareUpdateInstallation(firmwareUpdateInstallation).setFirmwareInstallationState(FirmwareInstallationState.INSTALLED).setDateInstalled(OffsetDateTime.now()),null);
+            if(firmwareUpdateInstallationService.updateFirmwareUpdateInstallationNoMerge(firmwareUpdateInstallation,new FirmwareUpdateInstallationCreate().setFirmwareInstallationState(FirmwareInstallationState.INSTALLED).setDateInstalled(OffsetDateTime.now()))){
+                messageHandleContext.toMerge.add(firmwareUpdateInstallation);
+            }
         }
         if(!firmwareUpdateInstallations.isEmpty()){
             logger.info("marked "+firmwareUpdateInstallations.size() +" as installed due to remote "+remote.getRemoteId()+"("+remote.getId()+") updated to version "+newVersion);
         }
+        return messageHandleContext;
     }
 
 
@@ -537,35 +607,44 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return new RegisterGatewayReceived().setRegisterGatewayId(registerGateway.getId());
     }
 
-    private UpdateStateSchemaReceived updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
         GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, updateStateSchema.getDeviceId(), updateStateSchema.getDeviceType());
-        Device device=getOrCreateDeviceResponse.getDevice();
+        Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
+        MessageHandleContext messageHandleContext=getOrCreateDeviceResponse.messageHandleContext();
         StateSchema stateSchema=getOrCreateStateSchema(deviceType,updateStateSchema.getVersion(),updateStateSchema.getJsonSchema(),gatewaySecurityContext);
-        deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
+        RemoteUpdateResponse remoteUpdateResponse = deviceService.updateDeviceNoMerge(device, new DeviceCreate().setCurrentSchema(stateSchema));
+        if(remoteUpdateResponse.updated()){
+            messageHandleContext.toMerge.add(device);
+        }
         Set<String> externalIds=updateStateSchema.getSchemaActions().stream().map(f->f.getId()).collect(Collectors.toSet());
         Map<String, com.wizzdi.basic.iot.model.SchemaAction> schemaActionMap=externalIds.isEmpty()?Collections.emptyMap():schemaActionService.listAllSchemaActions(null,new SchemaActionFilter().setStateSchemas(Collections.singletonList(stateSchema)).setExternalIds(externalIds)).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
         for (SchemaAction incomingSchemaAction : updateStateSchema.getSchemaActions()) {
             com.wizzdi.basic.iot.model.SchemaAction schemaAction = schemaActionMap.get(incomingSchemaAction.getId());
             if(schemaAction==null){
-                schemaAction=schemaActionService.createSchemaAction(new SchemaActionCreate().setActionSchema(incomingSchemaAction.getJsonSchema()).setStateSchema(stateSchema).setExternalId(incomingSchemaAction.getId()).setName(incomingSchemaAction.getName()),gatewaySecurityContext);
+                schemaAction=schemaActionService.createSchemaActionNoMerge(new SchemaActionCreate().setActionSchema(incomingSchemaAction.getJsonSchema()).setStateSchema(stateSchema).setExternalId(incomingSchemaAction.getId()).setName(incomingSchemaAction.getName()),gatewaySecurityContext);
+                messageHandleContext.toMerge().add(schemaAction);
                 schemaActionMap.put(schemaAction.getExternalId(),schemaAction);
             }
         }
-        return new UpdateStateSchemaReceived().setUpdateStateSchemaId(updateStateSchema.getId());
+        return messageHandleContext.withResponse(new UpdateStateSchemaReceived().setUpdateStateSchemaId(updateStateSchema.getId()));
     }
 
-    private SetStateSchemaReceived setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
         GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType());
-        Device device=getOrCreateDeviceResponse.getDevice();
+        Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
+        MessageHandleContext messageHandleContext=getOrCreateDeviceResponse.messageHandleContext();
         StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setUserAddedSchema(false).setVersion(setStateSchema.getVersion()).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         boolean found=stateSchema!=null;
         //TODO: consider fallback to previous version
         if(found){
-            deviceService.updateDevice(new DeviceUpdate().setDevice(device).setCurrentSchema(stateSchema),null);
+            RemoteUpdateResponse remoteUpdateResponse = deviceService.updateDeviceNoMerge(device, new DeviceCreate().setCurrentSchema(stateSchema));
+            if(remoteUpdateResponse.updated()){
+                messageHandleContext.toMerge().add(device);
+            }
         }
-        return new SetStateSchemaReceived().setSetStateSchemaId(setStateSchema.getId()).setFound(found);
+        return messageHandleContext.withResponse(new SetStateSchemaReceived().setSetStateSchemaId(setStateSchema.getId()).setFound(found));
     }
 
     private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContextBase gatewaySecurityContext) {

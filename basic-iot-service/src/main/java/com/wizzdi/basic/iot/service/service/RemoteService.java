@@ -286,4 +286,8 @@ public class RemoteService implements Plugin {
         repository.massMergePlain(new ArrayList<>(toMerge.stream().collect(Collectors.toMap(f->f.getId(),f->f,(a,b)->a)).values()));
         return new FixRemotesResponse(fixedRemotes,fixedMappedPOIs,fixedRemoteDeviceTypes,fixedDeviceTypes);
     }
+
+    public List<Object> massMergeGetEvents(List<Basic> toMerge,Set<String> existingEventIds) {
+        return repository.massMergeGetEvents(toMerge,existingEventIds);
+    }
 }

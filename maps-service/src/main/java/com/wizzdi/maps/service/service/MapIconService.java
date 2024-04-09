@@ -4,6 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
@@ -12,21 +13,39 @@ import com.wizzdi.maps.service.data.MapIconRepository;
 import com.wizzdi.maps.service.request.MapIconCreate;
 import com.wizzdi.maps.service.request.MapIconFilter;
 import com.wizzdi.maps.service.request.MapIconUpdate;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
+
+import io.micrometer.core.instrument.Tag;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.metrics.cache.CacheMetricsRegistrar;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
 @Extension
 public class MapIconService implements Plugin {
 
+  private static final String CACHE_NAME = "mapIconCache";
   @Autowired private MapIconRepository repository;
 
   @Autowired private BasicService basicService;
+
+  @Autowired
+  @Qualifier("mapIconCacheManager")
+  private CacheManager mapIconCacheManager;
+
+
+  public MapIconService(@Qualifier("mapIconCacheManager") CacheManager mapIconCacheManager, CacheMetricsRegistrar cacheMetricsRegistrar) {
+    cacheMetricsRegistrar.bindCacheToRegistry(mapIconCacheManager.getCache(CACHE_NAME), Tag.of("cache.manager", "mapIconCacheManager"));
+
+  }
 
   /**
    * @param mapIconCreate Object Used to Create MapIcon
@@ -37,6 +56,26 @@ public class MapIconService implements Plugin {
     MapIcon mapIcon = createMapIconNoMerge(mapIconCreate, securityContext);
     this.repository.merge(mapIcon);
     return mapIcon;
+  }
+
+
+  @Cacheable(cacheNames = CACHE_NAME, key = " T(com.wizzdi.maps.service.service.MapIconService).getMapIconCacheKey(#mapIconCreate.externalId,#mapIconCreate.relatedType)", cacheManager = "mapIconCacheManager")
+  public MapIcon getOrCreateMapIcon(MapIconCreate mapIconCreate, SecurityContextBase securityContextBase) {
+    String externalId = mapIconCreate.getExternalId();
+    String relatedType = mapIconCreate.getRelatedType();
+    return listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
+            .setExternalId(Collections.singleton(externalId)), null).stream().filter(f -> f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
+            .findFirst().orElseGet(() -> createMapIcon(mapIconCreate, securityContextBase));
+  }
+
+  @EventListener
+  public void onMapIconUpdated(BasicUpdated<MapIcon> mapIconBasicUpdated) {
+    MapIcon mapIcon = mapIconBasicUpdated.getBaseclass();
+    Optional.ofNullable(mapIconCacheManager.getCache(CACHE_NAME)).ifPresent(cache->cache.evict(getMapIconCacheKey(mapIcon.getExternalId(), mapIcon.getRelatedType())));
+  }
+
+  public static String getMapIconCacheKey(String externalId, String relatedType) {
+    return externalId + "|" + relatedType;
   }
 
   /**
