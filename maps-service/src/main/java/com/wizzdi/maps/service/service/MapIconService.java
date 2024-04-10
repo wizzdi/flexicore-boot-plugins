@@ -59,7 +59,7 @@ public class MapIconService implements Plugin {
   }
 
 
-  @Cacheable(cacheNames = CACHE_NAME, key = " T(com.wizzdi.maps.service.service.MapIconService).getMapIconCacheKey(#mapIconCreate.externalId,#mapIconCreate.relatedType)", cacheManager = "mapIconCacheManager")
+  @Cacheable(cacheNames = CACHE_NAME, key = "#mapIconCreate.externalId+'|'+#mapIconCreate.relatedType", cacheManager = "mapIconCacheManager")
   public MapIcon getOrCreateMapIcon(MapIconCreate mapIconCreate, SecurityContextBase securityContextBase) {
     String externalId = mapIconCreate.getExternalId();
     String relatedType = mapIconCreate.getRelatedType();
@@ -74,7 +74,7 @@ public class MapIconService implements Plugin {
     Optional.ofNullable(mapIconCacheManager.getCache(CACHE_NAME)).ifPresent(cache->cache.evict(getMapIconCacheKey(mapIcon.getExternalId(), mapIcon.getRelatedType())));
   }
 
-  public static String getMapIconCacheKey(String externalId, String relatedType) {
+  public String getMapIconCacheKey(String externalId, String relatedType) {
     return externalId + "|" + relatedType;
   }
 

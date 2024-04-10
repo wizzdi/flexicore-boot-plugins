@@ -128,6 +128,7 @@ public class RemoteService implements Plugin {
                                                     RemoteCreate remoteCreate) {
         RemoteCreate previousState=getPreviousState(remote);
         boolean update = basicService.updateBasicNoMerge(remoteCreate, remote);
+        boolean stateUpdated=false;
         if (remoteCreate.getRemoteId() != null && !remoteCreate.getRemoteId().equals(remote.getRemoteId())) {
             remote.setRemoteId(remoteCreate.getRemoteId());
             update = true;
@@ -173,6 +174,7 @@ public class RemoteService implements Plugin {
         if (mergedDeviceValues != null) {
             remote.setDeviceProperties(mergedDeviceValues);
             update = true;
+            stateUpdated=true;
         }
 
         Map<String, Object> mergedUserValues = DynamicPropertiesUtils.updateDynamic(remoteCreate.getUserAddedProperties(), remote.getUserAddedProperties());
@@ -182,7 +184,7 @@ public class RemoteService implements Plugin {
             update = true;
         }
 
-        return new RemoteUpdateResponse(update,update?new RemoteUpdatedEvent(remote,previousState):null);
+        return new RemoteUpdateResponse(update,update?new RemoteUpdatedEvent(remote,previousState,stateUpdated):null);
     }
 
     private RemoteCreate getPreviousState(Remote remote) {

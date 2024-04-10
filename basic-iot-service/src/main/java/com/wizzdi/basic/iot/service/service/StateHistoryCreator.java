@@ -4,6 +4,7 @@ import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Remote;
+import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.StateHistoryCreate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
@@ -36,7 +37,11 @@ public class StateHistoryCreator implements Plugin {
     }
 
     @EventListener
-    public <T extends Remote> void onRemoteUpdated(BasicUpdated<T> basicUpdated) {
+    public <T extends Remote> void onRemoteUpdated(RemoteUpdatedEvent basicUpdated) {
+        if(!basicUpdated.isStateUpdated()){
+            logger.debug("remote was updated but there was no change in device state for device " + basicUpdated.getBaseclass().getName() + " with id " + basicUpdated.getBaseclass().getId());
+            return;
+        }
         createStateHistory(basicUpdated.getBaseclass());
     }
 
