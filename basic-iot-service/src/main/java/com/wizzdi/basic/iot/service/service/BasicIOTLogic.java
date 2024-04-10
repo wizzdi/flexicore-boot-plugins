@@ -262,7 +262,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteCreate().setLastSeen(lastSeen));
                 if(remoteUpdateResponse.updated()){
                     messageHandleContext.toMerge.add(remote);
-                    messageHandleContext.events().add(remoteUpdateResponse.remoteUpdatedEvent()!=null?remoteUpdateResponse.remoteUpdatedEvent():new BasicUpdated<>(remote));
                 }
             }
             if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
