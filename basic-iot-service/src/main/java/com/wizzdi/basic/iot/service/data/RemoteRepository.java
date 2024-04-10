@@ -177,17 +177,8 @@ public class RemoteRepository implements Plugin {
         eventPublisher.publishEvent(new BasicUpdated<>(remote));
     }
 
-    public List<Object> massMergeGetEvents(List<Basic> toMerge,Set<String> existingEvents) {
-        Set<String> createdMap=toMerge.stream().filter(f->f.getUpdateDate()==null).map(f->f.getId()).collect(Collectors.toSet());
-        securedBasicRepository.massMerge(toMerge,true,false);
-        List<Object> events=new ArrayList<>();
-        for (Basic remote : toMerge) {
-            boolean created = createdMap.contains(remote.getId());
-            if(!existingEvents.contains(remote.getId())){
-                events.add(created?new BasicCreated<>(remote):new BasicUpdated<>(remote));
-
-            }
-        }
-        return events;
+    @Transactional
+    public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+        securedBasicRepository.massMerge(toMerge, updatedate, propagateEvents);
     }
 }

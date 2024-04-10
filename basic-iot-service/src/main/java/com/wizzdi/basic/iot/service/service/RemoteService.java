@@ -287,7 +287,8 @@ public class RemoteService implements Plugin {
         return new FixRemotesResponse(fixedRemotes,fixedMappedPOIs,fixedRemoteDeviceTypes,fixedDeviceTypes);
     }
 
-    public List<Object> massMergeGetEvents(List<Basic> toMerge,Set<String> existingEventIds) {
-        return repository.massMergeGetEvents(toMerge,existingEventIds);
+    @Transactional
+    public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
+        repository.massMerge(toMerge, updatedate, propagateEvents);
     }
 }
