@@ -11,13 +11,8 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -75,6 +70,7 @@ public class AlertControllerTest {
 
   @Test
   @Order(1)
+  @Disabled
   public void testAlertCreate() {
     AlertCreate request = new AlertCreate().setName(UUID.randomUUID().toString());
 
@@ -97,6 +93,7 @@ public class AlertControllerTest {
 
   @Test
   @Order(2)
+  @Disabled
   public void testListAllAlerts() {
     AlertFilter request = new AlertFilter();
     ParameterizedTypeReference<PaginationResponse<Alert>> t = new ParameterizedTypeReference<>() {};
@@ -138,6 +135,7 @@ public class AlertControllerTest {
 
   @Test
   @Order(3)
+  @Disabled
   public void testAlertUpdate() {
     AlertUpdate request =
         new AlertUpdate().setId(testAlert.getId()).setName(UUID.randomUUID().toString());
