@@ -1,0 +1,20 @@
+
+<table style="width: 100%;">
+    <tr>
+        {{#each headers}}
+            <th style="text-align: center;background-color: #04AA6D" valign="top">{{this}}</th>
+        {{/each}}
+    </tr>
+    {{#each entries}}
+        <tr style="background-color: LIGHTGREY">
+            {{#each this}}
+                <td style="text-align: center" height="10px">{{this}}</td>
+            {{/each}}
+
+        </tr>
+
+
+    {{/each}}
+
+
+</table>
