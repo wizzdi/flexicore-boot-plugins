@@ -115,7 +115,7 @@ public class AlertService implements Plugin {
   /**
    * @param alertFilter Object Used to List Alert
    * @param securityContext
-   * @return PaginationResponse<Alert> containing paging information for Alert
+   * @return PaginationResponse containing paging information for Alert
    */
   public PaginationResponse<Alert> getAllAlerts(
           AlertFilter alertFilter, SecurityContextBase securityContext) {
