@@ -10,6 +10,7 @@ import com.wizzdi.maps.model.StatusHistory;
 import com.wizzdi.maps.service.request.StatusHistoryCreate;
 import com.wizzdi.maps.service.request.StatusHistoryFilter;
 import com.wizzdi.maps.service.request.StatusHistoryUpdate;
+import com.wizzdi.maps.service.response.StatusHistoryContainer;
 import com.wizzdi.maps.service.service.StatusHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,16 @@ public class StatusHistoryController implements Plugin {
       @RequestAttribute SecurityContextBase securityContext) {
 
     return statusHistoryService.getAllStatusHistories(statusHistoryFilter, securityContext);
+  }
+
+
+  @PostMapping("getAllStatusHistoryContainers")
+  @Operation(summary = "getAllStatusHistoryContainers", description = "lists StatusHistoryContainers")
+  public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(
+          @Valid @RequestBody StatusHistoryFilter statusHistoryFilter,
+          @RequestAttribute SecurityContextBase securityContext) {
+
+    return statusHistoryService.getAllStatusHistoryContainers(statusHistoryFilter, securityContext);
   }
 
 

@@ -13,12 +13,17 @@ import com.wizzdi.maps.model.MappedPOI_;
 import com.wizzdi.maps.model.StatusHistory;
 import com.wizzdi.maps.model.StatusHistory_;
 import com.wizzdi.maps.service.request.StatusHistoryFilter;
+
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.wizzdi.maps.service.response.StatusHistoryContainer;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.SingularAttribute;
@@ -54,6 +59,28 @@ public class StatusHistoryRepository implements Plugin {
     BasicRepository.addPagination(statusHistoryFilter, query);
 
     return query.getResultList();
+  }
+
+  public List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+    CriteriaQuery<Tuple> q = cb.createTupleQuery();
+    Root<StatusHistory> r = q.from(StatusHistory.class);
+    List<Predicate> preds = new ArrayList<>();
+    addStatusHistoryPredicate(statusHistoryFilter, cb, q, r, preds, securityContext);
+    q.select(cb.tuple(r.get(StatusHistory_.id),r.get(StatusHistory_.dateAtStatus),r.get(StatusHistory_.name))).where(preds.toArray(new Predicate[0])).orderBy(cb.asc(r.get(StatusHistory_.dateAtStatus)));
+    TypedQuery<Tuple> query = em.createQuery(q);
+
+    BasicRepository.addPagination(statusHistoryFilter, query);
+
+    return query.getResultList().stream().map(f->mapToStatusHistoryContainer(f)).collect(Collectors.toList());
+  }
+
+  private StatusHistoryContainer mapToStatusHistoryContainer(Tuple tuple) {
+
+    String id = tuple.get(0, String.class);
+    OffsetDateTime dateAtStatus = tuple.get(1, OffsetDateTime.class);
+    String name = tuple.get(2, String.class);
+    return new StatusHistoryContainer(id, dateAtStatus, name);
   }
 
   public <T extends StatusHistory> void addStatusHistoryPredicate(
@@ -167,4 +194,6 @@ public class StatusHistoryRepository implements Plugin {
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
   }
+
+
 }

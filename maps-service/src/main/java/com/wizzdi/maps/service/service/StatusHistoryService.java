@@ -15,6 +15,8 @@ import com.wizzdi.maps.service.request.StatusHistoryUpdate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.wizzdi.maps.service.response.StatusHistoryContainer;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,5 +176,15 @@ public class StatusHistoryService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+    List<StatusHistoryContainer> list = listAllStatusHistoryContainers(statusHistoryFilter, securityContext);
+    long count = this.repository.countAllStatusHistories(statusHistoryFilter, securityContext);
+    return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), count);
+  }
+
+  private List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+    return repository.listAllStatusHistoryContainers(statusHistoryFilter, securityContext);
   }
 }
