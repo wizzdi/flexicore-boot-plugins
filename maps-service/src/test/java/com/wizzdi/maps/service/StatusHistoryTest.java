@@ -106,6 +106,7 @@ public class StatusHistoryTest {
         for (MappedPOI pois : mappedPOIS) {
             mappedPOIService.updateMappedPOI(new MappedPOIUpdate().setMappedPOI(pois).setMapIcon(on),securityContext);
         }
+        Thread.sleep(1000);
 
 
     }
@@ -135,7 +136,7 @@ public class StatusHistoryTest {
         for (MappedPOI pois : mappedPOIS) {
             mappedPOIService.updateMappedPOI(new MappedPOIUpdate().setMappedPOI(pois).setMapIcon(off),securityContext);
         }
-
+        Thread.sleep(1000);
 
 
     }

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
@@ -84,6 +85,7 @@ public class BasicIOTConfig implements Plugin {
     @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
     private String[] mqttURLs;
     @Autowired
+    @Lazy
     private PublicKeyService publicKeyService;
     @Value("${basic.iot.mqtt.jdbcRatio:0.6666}")
     private float mqttJdbcRatio;

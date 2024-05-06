@@ -108,32 +108,32 @@
     <properties>
         <revision>0.0.0-dev</revision> <!-- version is set during CI , 99.99.9 is a placeholder for local builds-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <spring-boot.version>3.1.1</spring-boot.version>
-        <flexicore-boot-dependencies.version>5.0.8</flexicore-boot-dependencies.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <spring-boot.version>3.2.5</spring-boot.version>
+        <flexicore-boot-dependencies.version>6.0.0</flexicore-boot-dependencies.version>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-release-plugin.version>3.0.1</maven-release-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-        <maven-scm-api.version>2.0.1</maven-scm-api.version>
-        <maven-scm-provider-gitexe.version>2.0.1</maven-scm-provider-gitexe.version>
-        <maven-processor-plugin.version>4.5</maven-processor-plugin.version>
-        <ci-friendly-flatten-maven-plugin.version>1.0.17</ci-friendly-flatten-maven-plugin.version>
+        <maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
+        <maven-scm-api.version>2.1.0</maven-scm-api.version>
+        <maven-scm-provider-gitexe.version>2.1.0</maven-scm-provider-gitexe.version>
+        <maven-processor-plugin.version>5.1</maven-processor-plugin.version>
+        <ci-friendly-flatten-maven-plugin.version>1.0.19</ci-friendly-flatten-maven-plugin.version>
         <time4j.version>4.38</time4j.version>
         <tink.version>1.10.0</tink.version>
         <geohash.version>1.4.0</geohash.version>
-        <rhino.version>1.7.14</rhino.version>
+        <rhino.version>1.7.15</rhino.version>
         <firebase-admin.version>9.2.0</firebase-admin.version>
         <maven-shade-plugin.version>3.5.0</maven-shade-plugin.version>
-        <caffeine.version>3.1.7</caffeine.version>
-        <hivemq.version>1.18.3</hivemq.version>
+        <caffeine.version>3.1.8</caffeine.version>
+        <hivemq.version>1.19.7</hivemq.version>
         <version.eclipselink>4.0.2</version.eclipselink>
-        <commons-csv.version>1.10.0</commons-csv.version>
+        <commons-csv.version>1.11.0</commons-csv.version>
 
 
     </properties>

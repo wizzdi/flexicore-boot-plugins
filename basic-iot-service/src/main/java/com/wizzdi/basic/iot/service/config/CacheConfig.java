@@ -10,6 +10,7 @@ import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.metrics.cache.CacheMetricsRegistrar;
 import org.springframework.boot.actuate.metrics.cache.CaffeineCacheMeterBinderProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,7 +30,7 @@ public class CacheConfig implements Plugin {
 
     @Bean
     @Primary
-    public CacheManager mainCache() {
+    public CacheManager defaultCacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .expireAfterAccess(3, TimeUnit.HOURS)

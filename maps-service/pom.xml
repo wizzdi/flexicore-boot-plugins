@@ -46,6 +46,11 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-security-service</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-boot-starter-web</artifactId>
             <scope>provided</scope>
         </dependency>

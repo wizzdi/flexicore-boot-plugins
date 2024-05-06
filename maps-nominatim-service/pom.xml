@@ -67,6 +67,11 @@
         </dependency>
         <dependency>
             <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-boot-starter-actuator</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.wizzdi</groupId>
             <artifactId>flexicore-boot-dynamic-invokers-service</artifactId>
             <scope>provided</scope>
         </dependency>

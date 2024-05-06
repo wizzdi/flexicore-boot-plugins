@@ -64,7 +64,8 @@ public class AppConfig {
 
   @Bean
   public ScenarioTriggerType scenarioTriggerType() {
-    ScenarioTriggerTypeCreate scenarioTriggerTypeCreate = new ScenarioTriggerTypeCreate();
+    ScenarioTriggerTypeCreate scenarioTriggerTypeCreate = new ScenarioTriggerTypeCreate()
+            .setEventCanonicalName("x.y.custom");
     return scenarioTriggerTypeService.createScenarioTriggerType(
         scenarioTriggerTypeCreate, securityContext);
   }

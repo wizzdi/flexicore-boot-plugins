@@ -16,7 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication(scanBasePackages = {"com.flexicore.rules"})
+@SpringBootApplication(scanBasePackages = {"com.flexicore.rules","com.wizzdi.flexicore"})
 
 @EnableFlexiCorePlugins
 @EnableFlexiCoreJPAPlugins
