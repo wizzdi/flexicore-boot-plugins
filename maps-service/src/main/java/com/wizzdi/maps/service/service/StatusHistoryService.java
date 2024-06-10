@@ -117,8 +117,10 @@ public class StatusHistoryService implements Plugin {
   public PaginationResponse<StatusHistory> getAllStatusHistories(
       StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
     List<StatusHistory> list = listAllStatusHistories(statusHistoryFilter, securityContext);
-    long count = this.repository.countAllStatusHistories(statusHistoryFilter, securityContext);
-    return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), count);
+    return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), 0)
+            .setTotalRecords(null)
+            .setEndPage(null)
+            .setTotalPages(null);
   }
 
   /**
@@ -180,8 +182,11 @@ public class StatusHistoryService implements Plugin {
 
   public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
     List<StatusHistoryContainer> list = listAllStatusHistoryContainers(statusHistoryFilter, securityContext);
-    long count = this.repository.countAllStatusHistories(statusHistoryFilter, securityContext);
-    return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), count);
+    //long count = this.repository.countAllStatusHistories(statusHistoryFilter, securityContext);
+    return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), 0)
+            .setTotalRecords(null)
+            .setEndPage(null)
+            .setTotalPages(null);
   }
 
   private List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
