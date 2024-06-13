@@ -99,8 +99,10 @@ public class StateHistoryService implements Plugin {
     public PaginationResponse<StateHistory> getAllStateHistories(
             SecurityContextBase securityContext, StateHistoryFilter filtering) {
         List<StateHistory> list = listAllStateHistories(securityContext, filtering);
-        long count = repository.countAllStateHistories(securityContext, filtering);
-        return new PaginationResponse<>(list, filtering, count);
+        return new PaginationResponse<>(list, filtering, 0)
+                .setTotalRecords(null)
+                .setEndPage(null)
+                .setTotalPages(null);
     }
 
     public List<StateHistory> listAllStateHistories(SecurityContextBase securityContext, StateHistoryFilter stateHistoryFilter) {

@@ -38,7 +38,7 @@ public class KeyTest {
     @Order(2)
     @Test
     public void testVerify() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\DV001_public.pem");
+        PublicKey publicKey = KeyUtils.readPublicKey("C:\\Users\\Asaf\\Desktop\\output_public_key.pem");
         Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
         signature.initVerify(publicKey);
         signature.update(toSign.getBytes(StandardCharsets.UTF_8));

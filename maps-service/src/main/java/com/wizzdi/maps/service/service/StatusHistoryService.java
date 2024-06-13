@@ -53,8 +53,12 @@ public class StatusHistoryService implements Plugin {
     statusHistory.setId(UUID.randomUUID().toString());
     updateStatusHistoryNoMerge(statusHistory, statusHistoryCreate);
 
-    BaseclassService.createSecurityObjectNoMerge(statusHistory, securityContext);
-
+    if(statusHistory.getMappedPOI()!=null){
+      statusHistory.setSecurity(statusHistory.getMappedPOI().getSecurity());
+    }
+    else{
+      throw new RuntimeException("cannot create status history without MappedPOI");
+    }
     return statusHistory;
   }
 
