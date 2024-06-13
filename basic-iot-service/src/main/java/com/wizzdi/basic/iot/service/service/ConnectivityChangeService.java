@@ -111,7 +111,12 @@ public class ConnectivityChangeService implements Plugin {
         connectivityChange.setId(UUID.randomUUID().toString());
 
         updateConnectivityChangeNoMerge(connectivityChange, creationContainer);
-        BaseclassService.createSecurityObjectNoMerge(connectivityChange, securityContext);
+        if(connectivityChange.getRemote()!=null){
+            connectivityChange.setSecurity(connectivityChange.getRemote().getSecurity());
+        }
+        else{
+            throw new RuntimeException("cannot create ConnectivityChange without remote");
+        }
         return connectivityChange;
     }
 

@@ -107,7 +107,12 @@ public class FirmwareUpdateInstallationService implements Plugin {
         firmwareUpdateInstallation.setId(UUID.randomUUID().toString());
 
         updateFirmwareUpdateInstallationNoMerge(firmwareUpdateInstallation, creationContainer);
-        BaseclassService.createSecurityObjectNoMerge(firmwareUpdateInstallation, securityContext);
+        if(firmwareUpdateInstallation.getTargetRemote()!=null){
+            firmwareUpdateInstallation.setSecurity(firmwareUpdateInstallation.getTargetRemote().getSecurity());
+        }
+        else{
+            throw new RuntimeException("cannot create FirmwareUpdateInstallation without targetRemote");
+        }
         return firmwareUpdateInstallation;
     }
 
