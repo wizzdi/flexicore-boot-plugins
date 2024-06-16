@@ -35,7 +35,7 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
     private OffsetDateTime dateInstalled;
     @JsonIgnore
     private OffsetDateTime nextTimeForReminder;
-    @Null(groups = Create.class,message = "firwareInstallationState must NOT be provided when creating")
+    @Null(groups = Create.class,message = "firmwareInstallationState must NOT be provided when creating")
     private FirmwareInstallationState firmwareInstallationState;
     private OffsetDateTime expirationDate;
 
