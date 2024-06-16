@@ -9,7 +9,11 @@ import com.wizzdi.flexicore.security.validation.Create;
 import com.wizzdi.flexicore.security.validation.IdValid;
 import com.wizzdi.flexicore.security.validation.Update;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+
 import java.time.OffsetDateTime;
 
 @IdValid.List({
@@ -31,7 +35,7 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
     private OffsetDateTime dateInstalled;
     @JsonIgnore
     private OffsetDateTime nextTimeForReminder;
-    @JsonIgnore
+    @Null(groups = Create.class,message = "firwareInstallationState must NOT be provided when creating")
     private FirmwareInstallationState firmwareInstallationState;
     private OffsetDateTime expirationDate;
 
@@ -101,7 +105,6 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
         return (T) this;
     }
 
-    @JsonIgnore
     public FirmwareInstallationState getFirmwareInstallationState() {
         return firmwareInstallationState;
     }
@@ -119,4 +122,11 @@ public class FirmwareUpdateInstallationCreate extends BasicCreate {
         this.expirationDate = expirationDate;
         return (T) this;
     }
+
+    @JsonIgnore
+    @AssertTrue(message = "firmware installation must be CANCELLED or not provided", groups = Update.class)
+    public boolean isFirmwareInstallationStateValidForUpdate() {
+        return firmwareInstallationState == null || firmwareInstallationState == FirmwareInstallationState.CANCELLED;
+    }
+
 }
