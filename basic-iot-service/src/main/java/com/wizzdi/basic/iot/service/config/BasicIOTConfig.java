@@ -233,6 +233,11 @@ public class BasicIOTConfig implements Plugin {
                 .register(meterRegistry);
     }
 
+    @Bean
+    public Counter droppedMessagesCounter(){
+        return Counter.builder("iot.droppedMessages.counter")
+                .register(meterRegistry);
+    }
 
     @Bean
     public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow, Semaphore virtualThreadsLogicSemaphore, MeterRegistry meterRegistry) {

@@ -22,6 +22,7 @@ import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.request.MappedPOIUpdate;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
+import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -87,6 +88,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     @Value("${basic.iot.map.locationDistanceThresholdMeters:#{200}}")
     private int locationDistanceThreshold;
+    @Value("${basic.iot.mqtt.dropMessageMs:#{60*60*1000}}")
+    private long dropMessageMs;
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
@@ -97,7 +100,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private ApplicationEventPublisher eventPublisher;
     @Autowired
     private Timer checkConnectivityTimer;
-
+    @Autowired
+    private Counter droppedMessagesCounter;
 
 
     @Override
@@ -134,6 +138,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
             }
             return badMessageResponse?badMessage:null;
+        }
+        if(iotMessage.getSentAt().isBefore(OffsetDateTime.now().minus(dropMessageMs,ChronoUnit.MILLIS))){
+            logger.debug("dropping message , sent at {} ",iotMessage.getSentAt());
+            droppedMessagesCounter.increment();
+            return null;
         }
         if(iotMessage instanceof KeepAlive keepAlive ){
             if(shouldBounce(iotMessage)){
