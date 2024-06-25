@@ -522,7 +522,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private double getDistanceFromCurrentLocation(MappedPOI mappedPOI, double longitude, double latitude) {
-        if(mappedPOI.getLat()==null || mappedPOI.getLon()==null){
+        if(mappedPOI==null||mappedPOI.getLat()==null || mappedPOI.getLon()==null){
             return Double.POSITIVE_INFINITY;
         }
         return DistanceUtils.haversineDistance(mappedPOI.getLat(),mappedPOI.getLon(),latitude,longitude);
