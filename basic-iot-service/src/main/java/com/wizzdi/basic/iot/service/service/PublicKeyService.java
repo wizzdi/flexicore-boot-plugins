@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.metrics.cache.CacheMetricsRegistrar;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,8 @@ public class PublicKeyService implements Plugin {
         return gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(remoteId))).stream().findFirst()
                 .map(e -> getPublicKeyResponse(e)).orElse(null);
     }
+    @CacheEvict(cacheNames = CACHE_NAME,key = "#remoteId",cacheManager = "publicKeyCacheManager")
+    public void invalidateCache(String remoteId) {}
 
     private PublicKeyResponse getPublicKeyResponse(Gateway e) {
         if(e.isNoSignatureCapabilities()){

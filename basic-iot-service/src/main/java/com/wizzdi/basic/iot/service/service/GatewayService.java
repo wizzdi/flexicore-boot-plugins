@@ -69,6 +69,9 @@ public class GatewayService implements Plugin {
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
 
+    @Autowired
+    private PublicKeyService publicKeyService;
+
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
@@ -169,7 +172,15 @@ public class GatewayService implements Plugin {
         if (remoteUpdateResponse.updated()) {
             repository.merge(gateway,remoteUpdateResponse.remoteUpdatedEvent());
         }
+        invalidatePublicKey(gateway);
         return gateway;
+    }
+
+    private void invalidatePublicKey(Gateway gateway) {
+        if(gateway==null||gateway.getRemoteId()==null){
+            return;
+        }
+        publicKeyService.invalidateCache(gateway.getRemoteId());
     }
 
     public void validate(GatewayCreate gatewayCreate,
@@ -209,6 +220,7 @@ public class GatewayService implements Plugin {
             repository.massMergePlain(List.of(mappedPOI,gateway));
             response.add(gateway);
             pendingGatewayService.updatePendingGateway(new PendingGatewayUpdate().setPendingGateway(pendingGateway).setRegisteredGateway(gateway), securityContext);
+            invalidatePublicKey(gateway);
         }
         return new PaginationResponse<>(response, response.size(), response.size());
     }
