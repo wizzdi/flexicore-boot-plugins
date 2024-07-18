@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -49,6 +50,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Autowired
     private SecurityContextBase adminSecurityContext;
     @Autowired(required = false)
+    @Lazy
     private BasicIOTClient basicIOTClient;
     @Autowired
     private GatewayService gatewayService;

@@ -6,6 +6,8 @@ import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.Gateway_;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
+import com.wizzdi.basic.iot.service.response.MoveGatewaysResponse;
+import com.wizzdi.basic.iot.service.service.GatewayMoveService;
 import com.wizzdi.basic.iot.service.service.GatewayService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
@@ -31,6 +33,8 @@ public class GatewayController implements Plugin, Invoker {
 
     @Autowired
     private GatewayService service;
+    @Autowired
+    private GatewayMoveService gatewayMoveService;
 
 
     @Operation(summary = "getAllGateways", description = "Lists all Gateway")
@@ -96,6 +100,15 @@ public class GatewayController implements Plugin, Invoker {
             @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
         service.validate(importGatewaysRequest, securityContext);
         return service.importGateways(securityContext, importGatewaysRequest);
+    }
+
+    @Operation(summary = "moveGatewaysToTenant", description = "moves gateway and all of its devices and related objects to a different tenant")
+    @PostMapping("/move")
+    public MoveGatewaysResponse moveGatewaysToTenant(
+
+            @RequestBody MoveGatewaysRequest moveGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
+        gatewayMoveService.validate(moveGatewaysRequest, securityContext);
+        return gatewayMoveService.moveGatewaysToTenant(securityContext, moveGatewaysRequest);
     }
 
     @Override

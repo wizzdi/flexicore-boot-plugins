@@ -1,16 +1,15 @@
 package com.wizzdi.basic.iot.service.service;
 
 
-import com.flexicore.model.Baseclass;
-import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.model.SecurityUser;
+import com.flexicore.model.*;
 import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
+import com.wizzdi.basic.iot.service.response.MoveGatewaysResponse;
 import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
@@ -32,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +45,8 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Extension
 @Component
@@ -70,6 +72,7 @@ public class GatewayService implements Plugin {
     private MapIcon gatewayMapIcon;
 
     @Autowired
+    @Lazy
     private PublicKeyService publicKeyService;
 
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
@@ -108,7 +111,7 @@ public class GatewayService implements Plugin {
     public void validateFiltering(ApproveGatewaysRequest gatewayFilter,
                                   SecurityContextBase securityContext) {
         if(gatewayFilter.getPendingGatewayFilter()==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"pendingGatewayFilter must be provided");
+            throw new ResponseStatusException(BAD_REQUEST,"pendingGatewayFilter must be provided");
         }
         gatewayFilter.getPendingGatewayFilter().setRegistered(false);
         pendingGatewayService.validateFiltering(gatewayFilter.getPendingGatewayFilter(), securityContext);
@@ -248,7 +251,7 @@ public class GatewayService implements Plugin {
         String csvId= importGatewaysRequest.getCsvId();;
         FileResource csv=csvId!=null?getByIdOrNull(csvId,FileResource.class, SecuredBasic_.security,securityContext):null;
         if(csv==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"csvId must be provided");
+            throw new ResponseStatusException(BAD_REQUEST,"csvId must be provided");
         }
         importGatewaysRequest.setCsv(csv);
     }
@@ -281,4 +284,5 @@ public class GatewayService implements Plugin {
         }
         return new ImportGatewaysResponse();
     }
+
 }

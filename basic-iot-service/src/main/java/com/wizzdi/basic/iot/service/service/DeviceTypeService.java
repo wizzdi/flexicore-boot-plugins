@@ -163,7 +163,7 @@ public class DeviceTypeService implements Plugin {
 
 
 
-    private static MapIconCreate getMapIconCreate(String status, String deviceTypeName, Class<? extends Device> deviceClass, SecurityTenant tenantToCreateIn) {
+    public static MapIconCreate getMapIconCreate(String status, String deviceTypeName, Class<? extends Device> deviceClass, SecurityTenant tenantToCreateIn) {
         String name = deviceTypeName + "_" + status;
         String externalId = name + "_" + tenantToCreateIn.getId();
         String relatedType = deviceClass.getCanonicalName();

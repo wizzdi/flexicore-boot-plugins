@@ -89,9 +89,10 @@ public class DynamicInvokerExportService implements Plugin {
         File file = new File(fileResourceService.generateNewPathForFileResource("dynamic-execution-csv", securityContextBase.getUser()) + ".csv");
         String[] headersArr = fieldToName.values().stream().sorted(Comparator.comparing(FieldProperties::getOrdinal)).map(FieldProperties::getName).toArray(String[]::new);
 
-        CSVFormat format = csvFormat.withHeader(headersArr);
+        boolean writeBom = CSVFormat.EXCEL.equals(csvFormat);
+        CSVFormat format = csvFormat.builder().setHeader(headersArr).build();
         Map<String, Method> fieldNameToMethod = new HashMap<>();
-        if (CSVFormat.EXCEL.equals(format)) {
+        if (writeBom) {
             try (Writer out = new OutputStreamWriter(new FileOutputStream(file, true))) {
                 out.write(ByteOrderMark.UTF_BOM);
 

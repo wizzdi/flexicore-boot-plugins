@@ -69,6 +69,8 @@ public class MapsSocketHandler implements Plugin {
 
 	private void onMappedPOIChanged(MappedPOI mappedPOI) {
 		MapIconChangedNotification mapIconChangedNotification = new MapIconChangedNotification()
+				.setLat(mappedPOI.getLat())
+				.setLon(mappedPOI.getLon())
 				.setMappedIconId(Optional.ofNullable(mappedPOI.getMapIcon()).map(f->f.getId()).orElse(null))
 				.setMappedPOIId(mappedPOI.getId())
 				.setTenantId(mappedPOI.getSecurity().getTenant().getId())
