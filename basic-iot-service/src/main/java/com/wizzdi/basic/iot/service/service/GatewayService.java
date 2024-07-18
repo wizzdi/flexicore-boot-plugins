@@ -3,13 +3,11 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.*;
 import com.flexicore.security.SecurityContextBase;
-import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
 import com.wizzdi.basic.iot.service.request.*;
 import com.wizzdi.basic.iot.service.response.ImportGatewaysResponse;
-import com.wizzdi.basic.iot.service.response.MoveGatewaysResponse;
 import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
@@ -32,9 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.metamodel.SingularAttribute;
@@ -228,12 +224,21 @@ public class GatewayService implements Plugin {
         return new PaginationResponse<>(response, response.size(), response.size());
     }
 
-    private SecurityUser createGatewaySecurityUser(SecurityContextBase securityContext, String gatewayId) {
+    public SecurityUser createGatewaySecurityUser(SecurityContextBase securityContext, String gatewayId) {
+        List<Object> toMerge = new ArrayList<>();
+        SecurityUser securityUser = createGatewaySecurityUserNoMerge(securityContext, gatewayId, toMerge);
+        tenantToUserService.massMerge(toMerge);
+        return securityUser;
+    }
+
+    public SecurityUser createGatewaySecurityUserNoMerge(SecurityContextBase securityContext, String gatewayId, List<Object> toMerge) {
         SecurityUserCreate securityUserCreate=new SecurityUserCreate()
                 .setDescription("Automatically Created User for Gateway "+gatewayId)
                 .setName(gatewayId+"-User");
-        SecurityUser securityUser = securityUserService.createSecurityUser(securityUserCreate, securityContext);
-        tenantToUserService.createTenantToUser(new TenantToUserCreate().setUser(securityUser).setDefaultTenant(true).setTenant(securityContext.getTenantToCreateIn()),securityContext);
+        SecurityUser securityUser = securityUserService.createSecurityUserNoMerge(securityUserCreate, securityContext);
+        TenantToUser tenantToUser = tenantToUserService.createTenantToUserNoMerge(new TenantToUserCreate().setUser(securityUser).setDefaultTenant(true).setTenant(securityContext.getTenantToCreateIn()), securityContext);
+        toMerge.add(securityUser);
+        toMerge.add(tenantToUser);
         return securityUser;
     }
 

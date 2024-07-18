@@ -12,6 +12,7 @@ import com.wizzdi.basic.iot.service.request.MoveGatewaysRequest;
 import com.wizzdi.basic.iot.service.response.MoveGatewaysResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.TenantToUserFilter;
+import com.wizzdi.flexicore.security.service.SecurityUserService;
 import com.wizzdi.flexicore.security.service.TenantToUserService;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
@@ -89,6 +90,7 @@ public class GatewayMoveService implements Plugin {
         int movedGateways = 0;
         int movedRemotes = 0;
         int movedMappedPOIs = 0;
+        int createdUsers=0;
         AtomicInteger createdDeviceTypes = new AtomicInteger();
         AtomicInteger createdMapIcons = new AtomicInteger();
 
@@ -118,23 +120,43 @@ public class GatewayMoveService implements Plugin {
             toMove.addAll(mappedPOIS.stream().map(f -> f.getSecurity()).toList());
             toMove.add(gateway.getSecurity());
             SecurityUser gatewayUser = gateway.getGatewayUser();
-            toMove.add(gatewayUser.getSecurity());
-            toMove.add(gateway.getMappedPOI().getSecurity());
+            //handle the case where for some reason gatewayUser is not exclusive for this gateway and is a "real" user
+            if(gatewayUser==null||!SecurityUser.class.equals(gatewayUser.getClass())){
+               gatewayUser=gatewayService.createGatewaySecurityUserNoMerge(securityContext,gateway.getRemoteId(),toMerge);
+               gateway.setGatewayUser(gatewayUser);
+               toMerge.add(gateway);
+                for (MappedPOI pois : mappedPOIS) {
+                   pois.getSecurity().setCreator(gatewayUser);
+                }
+                for (Device device : devices) {
+                    device.getSecurity().setCreator(gatewayUser);
+                }
+                createdUsers++;
+            }
+            else{
+                toMove.add(gatewayUser.getSecurity());
+                gatewayUser.getSecurity().setCreator(tenantAdmin);
+                TenantToUser tenantToUser = tenantLinks.get(gatewayUser.getId());
+                if (tenantToUser != null && !tenantToUser.getTenant().getId().equals(targetTenant.getId())) {
+                    tenantToUser.setTenant(targetTenant);
+                    tenantToUser.getSecurity().setCreator(tenantAdmin);
+                    tenantToUser.getSecurity().setTenant(targetTenant);
+                    toMerge.add(tenantToUser);
+                    toMerge.add(tenantToUser.getSecurity());
+                }
+            }
+            MappedPOI gatewayPOI = gateway.getMappedPOI();
+            if(gatewayPOI !=null){
+                toMove.add(gatewayPOI.getSecurity());
+            }
             for (Baseclass baseclass : toMove) {
                 baseclass.setTenant(targetTenant);
             }
-            gatewayUser.getSecurity().setCreator(tenantAdmin);
             gateway.getSecurity().setCreator(tenantAdmin);
-            gateway.getMappedPOI().getSecurity().setCreator(tenantAdmin);
-            toMerge.addAll(toMove);
-            TenantToUser tenantToUser = tenantLinks.get(gatewayUser.getId());
-            if (tenantToUser != null && !tenantToUser.getTenant().getId().equals(targetTenant.getId())) {
-                tenantToUser.setTenant(targetTenant);
-                tenantToUser.getSecurity().setCreator(tenantAdmin);
-                tenantToUser.getSecurity().setTenant(targetTenant);
-                toMerge.add(tenantToUser);
-                toMerge.add(tenantToUser.getSecurity());
+            if(gatewayPOI!=null){
+                gatewayPOI.getSecurity().setCreator(tenantAdmin);
             }
+            toMerge.addAll(toMove);
 
             tenantToUserService.massMerge(toMerge);
             movedGateways++;
@@ -143,8 +165,9 @@ public class GatewayMoveService implements Plugin {
 
         }
 
-        return new MoveGatewaysResponse(movedGateways, movedRemotes, movedMappedPOIs, createdDeviceTypes.get(), createdMapIcons.get());
+        return new MoveGatewaysResponse(movedGateways, movedRemotes, movedMappedPOIs, createdDeviceTypes.get(), createdMapIcons.get(),createdUsers);
     }
+
 
     private DeviceType createDeviceType(String name, Map<String, MapIcon> mapIcons, SecurityTenant targetTenant, SecurityContextBase securityContext) {
 

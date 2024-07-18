@@ -1,10 +1,7 @@
 package com.wizzdi.basic.iot.service;
 
 import com.flexicore.annotations.IOperation;
-import com.flexicore.model.Clazz;
-import com.flexicore.model.SecurityOperation;
-import com.flexicore.model.SecurityTenant;
-import com.flexicore.model.SecurityUser;
+import com.flexicore.model.*;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
@@ -98,6 +95,7 @@ public class MoveGatewayTest {
     private SecurityOperation allOps;
     @Autowired
     private Clazz securityWildcard;
+    private RealUser realUser;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry registry) {
@@ -189,6 +187,13 @@ public class MoveGatewayTest {
 
 
         }
+        Gateway first=importGatewaysResponse.getImportedGateways().getList().stream().filter(f->f.getRemoteId().equals("move1")).findFirst().orElseThrow(()->new RuntimeException("no gateway move1"));
+        realUser=new RealUser()
+                .setId(UUID.randomUUID().toString())
+                .setName("realUser");
+        securityUserService.merge(realUser);
+        first.setGatewayUser(realUser);
+        securityUserService.merge(first);
 
     }
 
@@ -203,10 +208,19 @@ public class MoveGatewayTest {
         Assertions.assertEquals(10,moveGatewaysResponse.movedMappedPOIs());
         Assertions.assertEquals(1,moveGatewaysResponse.createdDeviceTypes());
         Assertions.assertEquals(1,moveGatewaysResponse.createdMapIcons());
+        Assertions.assertEquals(1,moveGatewaysResponse.createdUsers());
         SecurityContextBase user2SecurityContext = securityContextProvider.getSecurityContext(user2.securityUser());
         List<Gateway> gateways = gatewayService.listAllGateways(user2SecurityContext, new GatewayFilter());
         Assertions.assertEquals(5,gateways.size());
         List<Device> allDevices = deviceService.listAllDevices(user2SecurityContext, new DeviceFilter());
         Assertions.assertEquals(5,allDevices.size());
+        for (Gateway gateway1 : gateways) {
+            Assertions.assertFalse(gateway1.getGatewayUser() instanceof RealUser,"gateway %s has real user as gatewayUser".formatted(gateway1.getRemoteId()));
+        }
+        for (Device allDevice : allDevices) {
+
+            Assertions.assertFalse(allDevice.getSecurity().getCreator() instanceof RealUser);
+            Assertions.assertFalse(allDevice.getMappedPOI().getSecurity().getCreator() instanceof RealUser);
+        }
     }
 }
