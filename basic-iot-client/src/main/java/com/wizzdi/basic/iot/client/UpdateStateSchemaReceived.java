@@ -12,4 +12,9 @@ public class UpdateStateSchemaReceived extends IOTMessage {
         this.updateStateSchemaId = updateStateSchemaId;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }

@@ -14,6 +14,11 @@ public class ChangeStateReceived extends IOTMessage{
     }
 
     @Override
+    public boolean isRetained() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "ChangeStateReceived{" +
                 "changeStateId='" + changeStateId + '\'' +

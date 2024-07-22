@@ -28,4 +28,9 @@ public class BadMessageReceived extends IOTMessage{
     public boolean isRequireAuthentication() {
         return false;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }

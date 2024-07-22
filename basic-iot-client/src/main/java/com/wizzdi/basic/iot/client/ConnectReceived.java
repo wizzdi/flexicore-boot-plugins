@@ -22,4 +22,9 @@ public class ConnectReceived extends IOTMessage{
         this.connectionState = connectionState;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }

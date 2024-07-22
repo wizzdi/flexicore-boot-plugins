@@ -22,4 +22,9 @@ public class SetStateSchemaReceived extends IOTMessage {
         this.found = found;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }

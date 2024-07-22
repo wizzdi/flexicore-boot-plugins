@@ -12,4 +12,9 @@ public class RegisterGatewayReceived extends IOTMessage {
         this.registerGatewayId = registerGatewayId;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }

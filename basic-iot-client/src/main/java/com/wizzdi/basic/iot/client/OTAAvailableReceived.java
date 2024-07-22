@@ -15,4 +15,9 @@ public class OTAAvailableReceived extends IOTMessage{
         this.OTAAvailableId = OTAAvailableId;
         return (T) this;
     }
+
+    @Override
+    public boolean isRetained() {
+        return false;
+    }
 }
