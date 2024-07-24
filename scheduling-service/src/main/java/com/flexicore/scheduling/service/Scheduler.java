@@ -275,17 +275,16 @@ public class Scheduler implements Plugin, InitializingBean {
     public Optional<OffsetTime> getTimeFromName(
             TimeOfTheDayName timeOfTheDayName, double lon, double lat) {
         SolarTime solarTime;
-        Optional<Moment> result = Optional.empty();
-        switch (timeOfTheDayName) {
-            case SUNRISE:
+        Optional<Moment> result = switch (timeOfTheDayName) {
+            case SUNRISE -> {
                 solarTime = SolarTime.ofLocation(lat, lon);
-                result = PlainDate.nowInSystemTime().get(solarTime.sunrise());
-                break;
-            case SUNSET:
+                yield PlainDate.nowInSystemTime().get(solarTime.sunrise());
+            }
+            case SUNSET -> {
                 solarTime = SolarTime.ofLocation(lat, lon);
-                result = PlainDate.nowInSystemTime().get(solarTime.sunset());
-                break;
-        }
+                yield PlainDate.nowInSystemTime().get(solarTime.sunset());
+            }
+        };
 
         return result.map(f -> f.toLocalTimestamp().toTemporalAccessor()
                 .atZone(ZoneId.systemDefault()).toOffsetDateTime().toOffsetTime());

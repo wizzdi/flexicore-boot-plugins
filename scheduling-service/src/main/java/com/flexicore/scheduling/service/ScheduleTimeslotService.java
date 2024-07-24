@@ -265,8 +265,12 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
     validateBase(stc, securityContext);
     Schedule schedule = stc.getSchedule();
     if(schedule!=null){
-      stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(), schedule.getSelectedTimeZone()));
-      stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(), schedule.getSelectedTimeZone()));
+      if(stc.getStartTime()!=null){
+        stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(), schedule.getSelectedTimeZone()));
+      }
+      if(stc.getEndTime()!=null){
+        stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(), schedule.getSelectedTimeZone()));
+      }
     }
 
 
