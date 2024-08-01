@@ -213,11 +213,13 @@ public class Scheduler implements Plugin, InitializingBean {
 
     }
 
-    private boolean checkPreviousRun(ScheduleTimeslot schedule, OffsetDateTime now) {
-        if (schedule.getCoolDownIntervalBeforeRepeat() > 0) {
-            return schedule.getLastExecution() == null || schedule.getLastExecution().plus(schedule.getCoolDownIntervalBeforeRepeat(), ChronoUnit.MILLIS).isBefore(now);
+    private boolean checkPreviousRun(ScheduleTimeslot scheduleTimeslot, OffsetDateTime now) {
+        OffsetDateTime lastExecution = scheduleTimeslot.getLastExecution();
+        if (scheduleTimeslot.getCoolDownIntervalBeforeRepeat() > 0) {
+            return lastExecution == null || lastExecution.plus(scheduleTimeslot.getCoolDownIntervalBeforeRepeat(), ChronoUnit.MILLIS).isBefore(now);
         } else {
-            return schedule.getLastExecution() == null || !schedule.getLastExecution().getDayOfWeek().equals(now.getDayOfWeek());
+            return lastExecution == null || //never ran
+                    !lastExecution.toLocalDate().equals(now.toLocalDate()); // ran on different date
         }
 
     }
