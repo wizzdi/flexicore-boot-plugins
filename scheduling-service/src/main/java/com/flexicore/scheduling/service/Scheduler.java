@@ -179,15 +179,10 @@ public class Scheduler implements Plugin, InitializingBean {
         boolean inTimeFrame = isInTimeFrame(schedule, now);
         boolean day = isDay(schedule, now);
         boolean shouldRun = enabled && inTimeFrame && day;
-        String log;
         logger.debug("Schedule {},in time frame {} ,day {} ,enabled {} ,should run {} ********************* ", schedule.getName(), inTimeFrame, day, enabled, shouldRun);
         if (!shouldRun) {
-            log="Should not run on : " + now + " , enabled: " + enabled + " , in time frame: " + inTimeFrame + " , day: " + day;
             logger.debug("schedule " + schedule.getName() + "(" + schedule.getId() + ") should not run , in timespan: " + inTimeFrame + " , day: " + day + ", enabled:" + enabled);
-        }else {
-            log="Should run on now : " + now;
         }
-        schedulingService.updateSchedule(new ScheduleUpdate().setSchedule(schedule).setLog(log),null);
         return shouldRun;
     }
 
@@ -199,15 +194,11 @@ public class Scheduler implements Plugin, InitializingBean {
         logger.debug("-------------- Checking time slot name {}, is it in time?  {} ,previous run should run ? {}  " , scheduleTimeslot.getName() , time , previousRun);
         logger.debug("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run: " + shouldRun + " , in timespan: " + time + " , previous run: " + previousRun);
         if (!shouldRun) {
-            scheduleTimeslot.setLog("Time slot is NOT  effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
             logger.debug("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should not run , in timespan: " + time + " , previous run: " + previousRun);
 
         }else {
             logger.debug("schedule timeslot " + scheduleTimeslot.getName() + "(" + scheduleTimeslot.getId() + ") should run , in timespan: " + time + " , previous run: " + previousRun);
-            scheduleTimeslot.setLog("Time slot is effective now: " + now + " , in time frame: " + time + " , previous run: " + previousRun);
         }
-
-            schedulingService.merge(scheduleTimeslot);
 
         return shouldRun;
 
@@ -235,15 +226,16 @@ public class Scheduler implements Plugin, InitializingBean {
         if (timeslot.getStartTimeOfTheDayName() != null) {
             start = getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
         }
-        start = start != null ? start.plus(timeslot.getStartMillisOffset(),
-                ChronoUnit.MILLIS) : null;
+        long startMillisOffset = timeslot.getStartMillisOffset() != null ? timeslot.getStartMillisOffset() : 0;
+        start = start != null ? start.plus(startMillisOffset, ChronoUnit.MILLIS) : null;
 
         OffsetTime end = timeslot.getEndTime() != null ? getOffSetTime(timeslot.getEndTime(),schedule.getSelectedTimeZone()) : null;
         if (timeslot.getEndTimeOfTheDayName() != null) {
             end = getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
         }
-        end = end != null ? end.plus(timeslot.getEndMillisOffset(), ChronoUnit.MILLIS) : null;
+        long endMillisOffset = timeslot.getEndMillisOffset() != null ? timeslot.getEndMillisOffset() : 0;
+        end = end != null ? end.plus(endMillisOffset, ChronoUnit.MILLIS) : null;
 
         return start != null && nowTime.isAfter(start) && (end == null || nowTime.isBefore(end));
     }
