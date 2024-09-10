@@ -64,12 +64,7 @@ public class BuildingRepository implements Plugin {
         buildingFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
     if (buildingFilter.getMappedPOI() != null && !buildingFilter.getMappedPOI().isEmpty()) {
-      Set<String> ids =
-          buildingFilter.getMappedPOI().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, MappedPOI> join = r.join(Building_.mappedPOI);
-      preds.add(join.get(MappedPOI_.id).in(ids));
+      preds.add(r.get(Building_.mappedPOI).in(buildingFilter.getMappedPOI()));
     }
 
     if (buildingFilter.getExternalId() != null && !buildingFilter.getExternalId().isEmpty()) {
@@ -140,5 +135,14 @@ public class BuildingRepository implements Plugin {
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
+  }
+  @Transactional
+  public void createBuildingIdx() {
+    em.createNativeQuery("""
+                CREATE UNIQUE INDEX IF NOT EXISTS building_externalId_unique
+                ON Building (externalId) 
+                WHERE softdelete = false
+                """).executeUpdate();
+
   }
 }

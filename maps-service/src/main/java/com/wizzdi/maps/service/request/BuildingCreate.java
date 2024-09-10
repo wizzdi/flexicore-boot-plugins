@@ -2,18 +2,20 @@ package com.wizzdi.maps.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.wizzdi.flexicore.security.validation.Create;
 import com.wizzdi.flexicore.security.validation.IdValid;
+import com.wizzdi.flexicore.security.validation.Update;
 import com.wizzdi.maps.model.MappedPOI;
 
 /** Object Used to Create Building */
-@com.wizzdi.flexicore.security.validation.IdValid.List({
+@IdValid.List({
   @IdValid(
       targetField = "mappedPOI",
       field = "mappedPOIId",
-      fieldType = com.wizzdi.maps.model.MappedPOI.class,
+      fieldType = MappedPOI.class,
       groups = {
-        com.wizzdi.flexicore.security.validation.Create.class,
-        com.wizzdi.flexicore.security.validation.Update.class
+        Create.class,
+        Update.class
       })
 })
 public class BuildingCreate extends BasicCreate {

@@ -59,12 +59,9 @@ public class RoomRepository implements Plugin {
     this.securedBasicRepository.addSecuredBasicPredicates(
         roomFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
-//    if (roomFilter.getBuildingFloors() != null && !roomFilter.getBuildingFloors().isEmpty()) {
-//      Set<String> ids =
-//          roomFilter.getBuildingFloors().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-//      Join<T, BuildingFloor> join = r.join(Room_.buildingFloor);
-//      preds.add(join.get(BuildingFloor_.id).in(ids));
-//    }
+    if (roomFilter.getBuildingFloors() != null && !roomFilter.getBuildingFloors().isEmpty()) {
+      preds.add(r.get(Room_.buildingFloor).in(roomFilter.getBuildingFloors()));
+    }
 
     if (roomFilter.getRoomLocationHistories() != null
         && !roomFilter.getRoomLocationHistories().isEmpty()) {
@@ -79,15 +76,6 @@ public class RoomRepository implements Plugin {
     if (roomFilter.getZ() != null && !roomFilter.getZ().isEmpty()) {
       preds.add(r.get(Room_.z).in(roomFilter.getZ()));
     }
-
-//    if (roomFilter.getRoomMappedPOIs() != null && !roomFilter.getRoomMappedPOIs().isEmpty()) {
-//      Set<String> ids =
-//          roomFilter.getRoomMappedPOIs().parallelStream()
-//              .map(f -> f.getId())
-//              .collect(Collectors.toSet());
-//      ListJoin<BuildingFloor, MappedPOI> join = r.join(Room_.buildingFloor).join(BuildingFloor_.mappedPOIS);
-//      preds.add(join.get(MappedPOI_.id).in(ids));
-//    }
 
     if (roomFilter.getX() != null && !roomFilter.getX().isEmpty()) {
       preds.add(r.get(Room_.x).in(roomFilter.getX()));
@@ -164,5 +152,14 @@ public class RoomRepository implements Plugin {
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
+  }
+  @Transactional
+  public void createRoomIdx() {
+    em.createNativeQuery("""
+                CREATE UNIQUE INDEX IF NOT EXISTS room_unique_idx
+                ON Room (buildingfloor_id,externalId) 
+                WHERE softdelete = false
+                """).executeUpdate();
+
   }
 }

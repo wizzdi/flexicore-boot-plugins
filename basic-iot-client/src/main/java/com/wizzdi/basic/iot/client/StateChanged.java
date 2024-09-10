@@ -16,8 +16,10 @@ public class StateChanged extends IOTMessage{
     @JsonAlias({"Longitude","lon","Lon"})
     private Double longitude;
     @JsonAlias({"Latitude","lat","Lat"})
-
     private Double latitude;
+    private String buildingId;
+    private String floorId;
+    private String roomId;
     private String status;
 
     public StateChanged() {
@@ -31,6 +33,9 @@ public class StateChanged extends IOTMessage{
         this.version = other.version;
         this.longitude = other.longitude;
         this.latitude = other.latitude;
+        this.buildingId = other.buildingId;
+        this.floorId = other.floorId;
+        this.roomId = other.roomId;
         this.status = other.status;
     }
 
@@ -102,6 +107,33 @@ public class StateChanged extends IOTMessage{
 
     public <T extends StateChanged> T setStatus(String status) {
         this.status = status;
+        return (T) this;
+    }
+
+    public String getBuildingId() {
+        return buildingId;
+    }
+
+    public <T extends StateChanged> T setBuildingId(String buildingId) {
+        this.buildingId = buildingId;
+        return (T) this;
+    }
+
+    public String getFloorId() {
+        return floorId;
+    }
+
+    public <T extends StateChanged> T setFloorId(String floorId) {
+        this.floorId = floorId;
+        return (T) this;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public <T extends StateChanged> T setRoomId(String roomId) {
+        this.roomId = roomId;
         return (T) this;
     }
 

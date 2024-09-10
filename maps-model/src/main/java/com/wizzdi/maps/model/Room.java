@@ -7,12 +7,13 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "room_idx",columnList = "building_id")
+        @Index(name = "room_idx",columnList = "buildingFloor_id")
 })
 public class Room extends SecuredBasic {
 
-  @ManyToOne(targetEntity = Building.class)
-  private Building building;
+  @JoinColumn(nullable = false)
+  @ManyToOne(targetEntity = BuildingFloor.class)
+  private BuildingFloor buildingFloor;
 
   @OneToMany(targetEntity = LocationHistory.class, mappedBy = "room")
   @JsonIgnore
@@ -22,26 +23,20 @@ public class Room extends SecuredBasic {
   @JsonIgnore
   private List<MappedPOI> roomMappedPOIs;
 
-  private Double z;
-
-  private Double x;
-
   private String externalId;
 
+  private Double z;
+  private Double x;
   private Double y;
 
   /** @return building */
-  @ManyToOne(targetEntity = Building.class)
-  public Building getBuilding() {
-    return this.building;
+  @ManyToOne(targetEntity = BuildingFloor.class)
+  public BuildingFloor getBuildingFloor() {
+    return this.buildingFloor;
   }
 
-  /**
-   * @param building building to set
-   * @return Room
-   */
-  public <T extends Room> T setBuilding(Building building) {
-    this.building = building;
+  public <T extends Room> T setBuildingFloor(BuildingFloor buildingFloor) {
+    this.buildingFloor = buildingFloor;
     return (T) this;
   }
 

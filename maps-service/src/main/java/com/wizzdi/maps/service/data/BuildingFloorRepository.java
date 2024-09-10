@@ -61,13 +61,12 @@ public class BuildingFloorRepository implements Plugin {
     this.securedBasicRepository.addSecuredBasicPredicates(
             buildingFloorFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
-    if (buildingFloorFilter.getBuildingIds() != null && !buildingFloorFilter.getBuildingIds().isEmpty()) {
-      Set<String> ids =
-              buildingFloorFilter.getBuildings().parallelStream()
-              .map(f -> f.getId())
-              .collect(Collectors.toSet());
-      Join<T, Building> join = r.join(BuildingFloor_.building);
-      preds.add(join.get(Building_.id).in(ids));
+    List<Building> buildings = buildingFloorFilter.getBuildings();
+    if (buildings != null && !buildings.isEmpty()) {
+      preds.add(r.get(BuildingFloor_.building).in(buildings));
+    }
+    if(buildingFloorFilter.getExternalIds()!=null&&!buildingFloorFilter.getExternalIds().isEmpty()){
+      preds.add(r.get(BuildingFloor_.externalId).in(buildingFloorFilter.getExternalIds()));
     }
 
 
@@ -136,5 +135,15 @@ public class BuildingFloorRepository implements Plugin {
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
+  }
+
+  @Transactional
+  public void createBuildingFloorIdx() {
+    em.createNativeQuery("""
+                CREATE UNIQUE INDEX IF NOT EXISTS building_floor_unique_idx 
+                ON BuildingFloor (building_id,externalId) 
+                WHERE softdelete = false
+                """).executeUpdate();
+
   }
 }

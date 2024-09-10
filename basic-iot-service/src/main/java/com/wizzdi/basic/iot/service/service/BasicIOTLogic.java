@@ -16,12 +16,19 @@ import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
+import com.wizzdi.maps.model.Building;
+import com.wizzdi.maps.model.BuildingFloor;
+import com.wizzdi.maps.model.BuildingFloor_;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.model.Room;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.request.MappedPOIUpdate;
+import com.wizzdi.maps.service.service.BuildingFloorService;
+import com.wizzdi.maps.service.service.BuildingService;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
+import com.wizzdi.maps.service.service.RoomService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Timer;
 import org.pf4j.Extension;
@@ -75,6 +82,13 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private FirmwareUpdateInstallationService firmwareUpdateInstallationService;
     @Autowired
     private SchemaActionService schemaActionService;
+    @Autowired
+    private BuildingService buildingService;
+    @Autowired
+    private BuildingFloorService buildingFloorService;
+    @Autowired
+    private RoomService roomService;
+
     @Value("${basic.iot.fota.baseUrl:http://localhost:8080/downloadFirmware/}")
     private String fotaBaseUrl;
 
@@ -109,11 +123,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
         if(iotMessage instanceof KeepAlive){
-            logger.debug("received message " + iotMessage);
+            logger.debug("received message {}", iotMessage);
 
         }
         else{
-            logger.info("received message " + iotMessage);
+            logger.info("received message {}", iotMessage);
 
         }
         IOTMessage response = executeLogic(iotMessage);
@@ -132,11 +146,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         if(iotMessage instanceof BadMessage badMessage){
             if(logger.isDebugEnabled()){
-                logger.warn("bad message: "+badMessage.getError() , " original message: "+badMessage.getOriginalMessage());
+                logger.warn("bad message: {} original message: {}", badMessage.getError(), badMessage.getOriginalMessage());
 
             }
             else{
-                logger.warn("bad message: "+badMessage.getError());
+                logger.warn("bad message: {}", badMessage.getError());
 
             }
             return badMessageResponse?badMessage:null;
@@ -156,12 +170,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
         if (gatewayOptional.isEmpty()) {
-            logger.warn("could not get gateway " + iotMessage.getGatewayId());
+            logger.warn("could not get gateway {}", iotMessage.getGatewayId());
         }
         SecurityContextBase gatewaySecurityContext = gatewayOptional.map(f -> remoteService.getRemoteSecurityContext(f)).orElse(null);
 
         if (gatewaySecurityContext == null) {
-            logger.warn("could not find security context for gateway " + iotMessage.getGatewayId());
+            logger.warn("could not find security context for gateway {}", iotMessage.getGatewayId());
             return null;
         }
 
@@ -476,6 +490,18 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 .setRelatedType(remote.getClass().getCanonicalName())
 
                 .setMapIcon(mapIcon);
+        if(stateChanged.getBuildingId()!=null){
+           Building building= buildingService.getOrCreateByExternalId(stateChanged.getBuildingId(),gatewaySecurityContext);
+           if(stateChanged.getFloorId()!=null){
+               BuildingFloor buildingFloor=buildingFloorService.getOrCreateByExternalId(building,stateChanged.getFloorId(),gatewaySecurityContext);
+               mappedPOICreate.setBuildingFloor(buildingFloor);
+               if(stateChanged.getRoomId()!=null){
+                   Room room=roomService.getOrCreateByExternalId(buildingFloor,stateChanged.getRoomId(),gatewaySecurityContext);
+                   mappedPOICreate.setRoom(room);
+               }
+           }
+
+        }
 
         if(!remote.isLockLocation()
                 &&latitude!=null&&longitude!=null

@@ -8,13 +8,19 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.wizzdi.maps.model.Building;
+import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.data.BuildingRepository;
 import com.wizzdi.maps.service.request.BuildingCreate;
 import com.wizzdi.maps.service.request.BuildingFilter;
 import com.wizzdi.maps.service.request.BuildingUpdate;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.wizzdi.maps.service.request.MappedPOICreate;
 import jakarta.persistence.metamodel.SingularAttribute;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +33,8 @@ public class BuildingService implements Plugin {
   @Autowired private BuildingRepository repository;
 
   @Autowired private BasicService basicService;
+  @Autowired
+  private MappedPOIService mappedPOIService;
 
   /**
    * @param buildingCreate Object Used to Create Building
@@ -35,8 +43,9 @@ public class BuildingService implements Plugin {
    */
   public Building createBuilding(
       BuildingCreate buildingCreate, SecurityContextBase securityContext) {
-    Building building = createBuildingNoMerge(buildingCreate, securityContext);
-    this.repository.merge(building);
+    List<Object> toMerge=new ArrayList<>();
+    Building building = createBuildingNoMerge(buildingCreate, securityContext,toMerge);
+    this.repository.massMerge(toMerge);
     return building;
   }
 
@@ -46,12 +55,16 @@ public class BuildingService implements Plugin {
    * @return created Building unmerged
    */
   public Building createBuildingNoMerge(
-      BuildingCreate buildingCreate, SecurityContextBase securityContext) {
+      BuildingCreate buildingCreate, SecurityContextBase securityContext,List<Object> toMerge) {
     Building building = new Building();
     building.setId(UUID.randomUUID().toString());
+    MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setExternalId(buildingCreate.getExternalId()).setName(buildingCreate.getExternalId()), securityContext);
+    toMerge.add(mappedPOI);
+    buildingCreate.setMappedPOI(mappedPOI);
     updateBuildingNoMerge(building, buildingCreate);
 
     BaseclassService.createSecurityObjectNoMerge(building, securityContext);
+    toMerge.add(building);
 
     return building;
   }
@@ -160,5 +173,10 @@ public class BuildingService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  public Building getOrCreateByExternalId(String buildingId, SecurityContextBase securityContext) {
+    String externalId = "%s_%s".formatted(securityContext.getTenantToCreateIn().getId(), buildingId);
+    return listAllBuildings(new BuildingFilter().setExternalId(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createBuilding(new BuildingCreate().setExternalId(externalId).setName(buildingId),securityContext));
   }
 }

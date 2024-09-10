@@ -19,11 +19,9 @@ import java.util.Set;
 public class BuildingFloorFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
-
-
-
-  @JsonIgnore private List<Building> buildings;
-
+  private Set<String> externalIds;
+  @JsonIgnore
+  private List<Building> buildings;
   private Set<String> buildingIds;
 
   /** @return basicPropertiesFilter */
@@ -41,6 +39,7 @@ public class BuildingFloorFilter extends PaginationFilter {
     return (T) this;
   }
 
+  @JsonIgnore
   public List<Building> getBuildings() {
     return buildings;
   }
@@ -57,5 +56,14 @@ public class BuildingFloorFilter extends PaginationFilter {
   public BuildingFloorFilter setBuildingIds(Set<String> buildingIds) {
     this.buildingIds = buildingIds;
     return this;
+  }
+
+  public Set<String> getExternalIds() {
+    return externalIds;
+  }
+
+  public <T extends BuildingFloorFilter> T setExternalIds(Set<String> externalIds) {
+    this.externalIds = externalIds;
+    return (T) this;
   }
 }

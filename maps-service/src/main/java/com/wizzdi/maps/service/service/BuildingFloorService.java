@@ -7,6 +7,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
+import com.wizzdi.maps.model.Building;
 import com.wizzdi.maps.model.BuildingFloor;
 import com.wizzdi.maps.service.data.BuildingFloorRepository;
 import com.wizzdi.maps.service.request.BuildingFloorCreate;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import jakarta.persistence.metamodel.SingularAttribute;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -65,19 +68,19 @@ public class BuildingFloorService implements Plugin {
   public boolean updateBuildingFloorNoMerge(BuildingFloor buildingFloor, BuildingFloorCreate buildingFloorCreate) {
     boolean update = basicService.updateBasicNoMerge(buildingFloorCreate, buildingFloor);
 
-    if (buildingFloorCreate.getBuilding() != null
-        && (buildingFloor.getBuilding() == null
-            || !buildingFloor.getBuilding().getId().equals(buildingFloorCreate.getBuilding().getId()))) {
+    if (buildingFloorCreate.getBuilding() != null && (buildingFloor.getBuilding() == null || !buildingFloor.getBuilding().getId().equals(buildingFloorCreate.getBuilding().getId()))) {
       buildingFloor.setBuilding(buildingFloorCreate.getBuilding());
       update = true;
     }
-    if (buildingFloorCreate.getDrawing() != null
-            && (buildingFloor.getDrawing() == null
-            || !buildingFloor.getDrawing().getId().equals(buildingFloorCreate.getDrawing().getId()))) {
+    if (buildingFloorCreate.getDrawing() != null && (buildingFloor.getDrawing() == null || !buildingFloor.getDrawing().getId().equals(buildingFloorCreate.getDrawing().getId()))) {
       buildingFloor.setDrawing(buildingFloorCreate.getDrawing());
       update = true;
     }
 
+    if (buildingFloorCreate.getExternalId() != null && !buildingFloor.getExternalId().equals(buildingFloorCreate.getExternalId())){
+      buildingFloor.setExternalId(buildingFloorCreate.getExternalId());
+      update = true;
+    }
     return update;
   }
   /**
@@ -161,5 +164,10 @@ public class BuildingFloorService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  public BuildingFloor getOrCreateByExternalId(Building building, String floorId, SecurityContextBase gatewaySecurityContext) {
+    String externalId= "%s_%s".formatted(gatewaySecurityContext.getTenantToCreateIn().getId(), floorId);
+    return listAllBuildingFloors(new BuildingFloorFilter().setExternalIds(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createBuildingFloor(new BuildingFloorCreate().setBuilding(building).setExternalId(externalId).setName(floorId),gatewaySecurityContext));
   }
 }

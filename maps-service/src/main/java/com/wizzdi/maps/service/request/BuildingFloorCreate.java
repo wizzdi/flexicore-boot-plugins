@@ -3,7 +3,9 @@ package com.wizzdi.maps.service.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.wizzdi.flexicore.security.validation.Create;
 import com.wizzdi.flexicore.security.validation.IdValid;
+import com.wizzdi.flexicore.security.validation.Update;
 import com.wizzdi.maps.model.Building;
 import com.wizzdi.maps.model.MappedPOI;
 
@@ -16,25 +18,28 @@ import com.wizzdi.maps.model.MappedPOI;
                 field = "buildingId",
                 fieldType = Building.class,
                 groups = {
-                        com.wizzdi.flexicore.security.validation.Create.class,
-                        com.wizzdi.flexicore.security.validation.Update.class
+                        Create.class,
+                        Update.class
                 }),
         @IdValid(
                 targetField = "drawing",
                 field = "drawingId",
                 fieldType = FileResource.class,
                 groups = {
-                        com.wizzdi.flexicore.security.validation.Create.class,
-                        com.wizzdi.flexicore.security.validation.Update.class
+                        Create.class,
+                        Update.class
                 })
 })
 public class BuildingFloorCreate extends BasicCreate {
 
+    private String externalId;
     private String buildingId;
     @JsonIgnore
     private Building building;
     private String drawingId;
-    @JsonIgnore  FileResource drawing;
+    @JsonIgnore
+    private FileResource drawing;
+
     public String getBuildingId() {
         return buildingId;
     }
@@ -44,6 +49,7 @@ public class BuildingFloorCreate extends BasicCreate {
         return this;
     }
 
+    @JsonIgnore
     public Building getBuilding() {
         return building;
     }
@@ -62,6 +68,7 @@ public class BuildingFloorCreate extends BasicCreate {
         return this;
     }
 
+    @JsonIgnore
     public FileResource getDrawing() {
         return drawing;
     }
@@ -69,5 +76,14 @@ public class BuildingFloorCreate extends BasicCreate {
     public BuildingFloorCreate setDrawing(FileResource drawing) {
         this.drawing = drawing;
         return this;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends BuildingFloorCreate> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
     }
 }

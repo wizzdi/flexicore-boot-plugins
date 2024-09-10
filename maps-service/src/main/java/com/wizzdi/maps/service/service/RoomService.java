@@ -7,11 +7,14 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
+import com.wizzdi.maps.model.BuildingFloor;
 import com.wizzdi.maps.model.Room;
 import com.wizzdi.maps.service.data.RoomRepository;
 import com.wizzdi.maps.service.request.RoomCreate;
 import com.wizzdi.maps.service.request.RoomFilter;
 import com.wizzdi.maps.service.request.RoomUpdate;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -62,12 +65,18 @@ public class RoomService implements Plugin {
   public boolean updateRoomNoMerge(Room room, RoomCreate roomCreate) {
     boolean update = basicService.updateBasicNoMerge(roomCreate, room);
 
-//    if (roomCreate.getBuildingFloor() != null
-//        && (room.getBuildingFloor() == null
-//            || !roomCreate.getBuildingFloor().getId().equals(room.getBuildingFloor().getId()))) {
-//      room.setBuildingFloor(roomCreate.getBuildingFloor());
-//      update = true;
-//    }
+    if (roomCreate.getBuildingFloor() != null
+        && (room.getBuildingFloor() == null
+            || !roomCreate.getBuildingFloor().getId().equals(room.getBuildingFloor().getId()))) {
+      room.setBuildingFloor(roomCreate.getBuildingFloor());
+      update = true;
+    }
+
+    if (roomCreate.getExternalId() != null
+            && (!roomCreate.getExternalId().equals(room.getExternalId()))) {
+      room.setExternalId(roomCreate.getExternalId());
+      update = true;
+    }
 
     if (roomCreate.getZ() != null && (!roomCreate.getZ().equals(room.getZ()))) {
       room.setZ(roomCreate.getZ());
@@ -76,12 +85,6 @@ public class RoomService implements Plugin {
 
     if (roomCreate.getX() != null && (!roomCreate.getX().equals(room.getX()))) {
       room.setX(roomCreate.getX());
-      update = true;
-    }
-
-    if (roomCreate.getExternalId() != null
-        && (!roomCreate.getExternalId().equals(room.getExternalId()))) {
-      room.setExternalId(roomCreate.getExternalId());
       update = true;
     }
 
@@ -171,5 +174,10 @@ public class RoomService implements Plugin {
 
   public void massMerge(List<?> toMerge) {
     this.repository.massMerge(toMerge);
+  }
+
+  public Room getOrCreateByExternalId(BuildingFloor buildingFloor, String roomId, SecurityContextBase gatewaySecurityContext) {
+    String externalId= "%s_%s".formatted(gatewaySecurityContext.getTenantToCreateIn().getId(), roomId);
+    return listAllRooms(new RoomFilter().setExternalId(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createRoom(new RoomCreate().setBuildingFloor(buildingFloor).setExternalId(externalId).setName(roomId),gatewaySecurityContext));
   }
 }

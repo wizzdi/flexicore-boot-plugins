@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 /** Object Used to List Building */
-@com.wizzdi.flexicore.security.validation.IdValid.List({
+@IdValid.List({
   @IdValid(
       targetField = "mappedPOI",
       field = "mappedPOIIds",
-      fieldType = com.wizzdi.maps.model.MappedPOI.class)
+      fieldType = MappedPOI.class)
 })
 public class BuildingFilter extends PaginationFilter {
 
