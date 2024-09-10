@@ -285,7 +285,6 @@ public class Scheduler implements Plugin, InitializingBean {
 
     }
 
-    @Transactional
     public void runSchedule(List<ScheduleToAction> schedule,
                             SecurityContextBase securityContext) {
         logger.debug("Starting to run scheduleToActions of size : {}", schedule.size());

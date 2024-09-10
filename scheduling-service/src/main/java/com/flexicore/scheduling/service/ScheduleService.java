@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Extension
-public class ScheduleService implements Plugin, IScheduleService {
+public class ScheduleService implements Plugin  {
 
   @Autowired private ScheduleRepository repository;
 
@@ -39,7 +39,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @return created Schedule
    */
-  @Override
+
   public Schedule createSchedule(
       ScheduleCreate scheduleCreate, SecurityContextBase securityContext) {
     Schedule schedule = createScheduleNoMerge(scheduleCreate, securityContext);
@@ -52,7 +52,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @return created Schedule unmerged
    */
-  @Override
+
   public Schedule createScheduleNoMerge(
       ScheduleCreate scheduleCreate, SecurityContextBase securityContext) {
     Schedule schedule = new Schedule();
@@ -69,7 +69,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param schedule
    * @return if schedule was updated
    */
-  @Override
+
   public boolean updateScheduleNoMerge(Schedule schedule, ScheduleCreate scheduleCreate) {
     boolean update = basicService.updateBasicNoMerge(scheduleCreate, schedule);
 
@@ -154,7 +154,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @return schedule
    */
-  @Override
+
   public Schedule updateSchedule(
       ScheduleUpdate scheduleUpdate, SecurityContextBase securityContext) {
     Schedule schedule = scheduleUpdate.getSchedule();
@@ -169,7 +169,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @return PaginationResponse containing paging information for Schedule
    */
-  @Override
+
   public PaginationResponse<Schedule> getAllSchedules(
       ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
     List<Schedule> list = listAllSchedules(scheduleFilter, securityContext);
@@ -182,7 +182,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @return List of Schedule
    */
-  @Override
+
   public List<Schedule> listAllSchedules(
       ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
     return repository.listAllSchedules(scheduleFilter, securityContext);
@@ -193,7 +193,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleFilter is not valid
    */
-  @Override
+
   public void validate(ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
     basicService.validate(scheduleFilter, securityContext);
   }
@@ -203,7 +203,7 @@ public class ScheduleService implements Plugin, IScheduleService {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleCreate is not valid
    */
-  @Override
+
   public void validate(ScheduleCreate sc, SecurityContextBase securityContext) {
     basicService.validate(sc, securityContext);
     if(sc.getSelectedTimeZone()!=null){
@@ -228,19 +228,19 @@ public class ScheduleService implements Plugin, IScheduleService {
     }
     return (offsetDateTime.atZoneSameInstant(ZoneId.of(timeZone)).toOffsetDateTime());
   }
-  @Override
+
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
+
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -249,7 +249,7 @@ public class ScheduleService implements Plugin, IScheduleService {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -258,28 +258,28 @@ public class ScheduleService implements Plugin, IScheduleService {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
+
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return repository.findByIds(c, requested);
   }
 
-  @Override
+
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return repository.findByIdOrNull(type, id);
   }
 
-  @Override
+
   public void merge(java.lang.Object base) {
     repository.merge(base);
   }
 
-  @Override
+
   public void massMerge(List<?> toMerge) {
     repository.massMerge(toMerge);
   }

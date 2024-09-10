@@ -26,7 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService {
+public class ScheduleTimeslotService implements Plugin  {
 
   @Autowired private ScheduleTimeslotRepository repository;
 
@@ -37,7 +37,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @return created ScheduleTimeslot
    */
-  @Override
+
   public ScheduleTimeslot createScheduleTimeslot(
       ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext) {
     ScheduleTimeslot scheduleTimeslot =
@@ -51,7 +51,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @return created ScheduleTimeslot unmerged
    */
-  @Override
+
   public ScheduleTimeslot createScheduleTimeslotNoMerge(
       ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext) {
     ScheduleTimeslot scheduleTimeslot = new ScheduleTimeslot();
@@ -68,7 +68,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param scheduleTimeslot
    * @return if scheduleTimeslot was updated
    */
-  @Override
+
   public boolean updateScheduleTimeslotNoMerge(
       ScheduleTimeslot scheduleTimeslot, ScheduleTimeslotCreate scheduleTimeslotCreate) {
     boolean update = basicService.updateBasicNoMerge(scheduleTimeslotCreate, scheduleTimeslot);
@@ -191,7 +191,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @return scheduleTimeslot
    */
-  @Override
+
   public ScheduleTimeslot updateScheduleTimeslot(
       ScheduleTimeslotUpdate scheduleTimeslotUpdate, SecurityContextBase securityContext) {
     ScheduleTimeslot scheduleTimeslot = scheduleTimeslotUpdate.getScheduleTimeslot();
@@ -206,7 +206,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @return PaginationResponse containing paging information for ScheduleTimeslot
    */
-  @Override
+
   public PaginationResponse<ScheduleTimeslot> getAllScheduleTimeslots(
       ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
     List<ScheduleTimeslot> list = listAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
@@ -219,7 +219,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @return List of ScheduleTimeslot
    */
-  @Override
+
   public List<ScheduleTimeslot> listAllScheduleTimeslots(
       ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
     return repository.listAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
@@ -230,7 +230,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleTimeslotFilter is not valid
    */
-  @Override
+
   public void validate(
       ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
     basicService.validate(scheduleTimeslotFilter, securityContext);
@@ -259,7 +259,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if stc is not valid
    */
-  @Override
+
   public void validate(
       ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
     validateBase(stc, securityContext);
@@ -303,19 +303,19 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
 
   }
 
-  @Override
+
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
+
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -324,7 +324,7 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -333,28 +333,28 @@ public class ScheduleTimeslotService implements Plugin, IScheduleTimeslotService
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
+
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return repository.findByIds(c, requested);
   }
 
-  @Override
+
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return repository.findByIdOrNull(type, id);
   }
 
-  @Override
+
   public void merge(java.lang.Object base) {
     repository.merge(base);
   }
 
-  @Override
+
   public void massMerge(List<?> toMerge) {
     repository.massMerge(toMerge);
   }

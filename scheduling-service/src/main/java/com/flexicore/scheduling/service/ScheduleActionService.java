@@ -31,7 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @Extension
-public class ScheduleActionService implements Plugin, IScheduleActionService {
+public class ScheduleActionService implements Plugin {
 
   @Autowired private ScheduleActionRepository repository;
 
@@ -42,7 +42,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @return created ScheduleAction
    */
-  @Override
+
   public ScheduleAction createScheduleAction(
       ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
     ScheduleAction scheduleAction =
@@ -56,7 +56,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @return created ScheduleAction unmerged
    */
-  @Override
+
   public ScheduleAction createScheduleActionNoMerge(
       ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
     ScheduleAction scheduleAction = new ScheduleAction();
@@ -73,7 +73,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param scheduleAction
    * @return if scheduleAction was updated
    */
-  @Override
+
   public boolean updateScheduleActionNoMerge(
       ScheduleAction scheduleAction, ScheduleActionCreate scheduleActionCreate) {
     boolean update = basicService.updateBasicNoMerge(scheduleActionCreate, scheduleAction);
@@ -104,7 +104,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @return scheduleAction
    */
-  @Override
+
   public ScheduleAction updateScheduleAction(
       ScheduleActionUpdate scheduleActionUpdate, SecurityContextBase securityContext) {
     ScheduleAction scheduleAction = scheduleActionUpdate.getScheduleAction();
@@ -119,7 +119,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @return PaginationResponse containing paging information for ScheduleAction
    */
-  @Override
+
   public PaginationResponse<ScheduleAction> getAllScheduleActions(
       ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
     List<ScheduleAction> list = listAllScheduleActions(scheduleActionFilter, securityContext);
@@ -132,7 +132,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @return List of ScheduleAction
    */
-  @Override
+
   public List<ScheduleAction> listAllScheduleActions(
       ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
     return repository.listAllScheduleActions(scheduleActionFilter, securityContext);
@@ -143,7 +143,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleActionFilter is not valid
    */
-  @Override
+
   public void validate(
       ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
     basicService.validate(scheduleActionFilter, securityContext);
@@ -176,7 +176,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleActionCreate is not valid
    */
-  @Override
+
   public void validate(
       ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
     basicService.validate(scheduleActionCreate, securityContext);
@@ -197,19 +197,19 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
     scheduleActionCreate.setDynamicExecution(dynamicExecution);
   }
 
-  @Override
+
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
-  @Override
+
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -218,7 +218,7 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -227,28 +227,28 @@ public class ScheduleActionService implements Plugin, IScheduleActionService {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return repository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
+
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return repository.findByIds(c, requested);
   }
 
-  @Override
+
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return repository.findByIdOrNull(type, id);
   }
 
-  @Override
+
   public void merge(java.lang.Object base) {
     repository.merge(base);
   }
 
-  @Override
+
   public void massMerge(List<?> toMerge) {
     repository.massMerge(toMerge);
   }

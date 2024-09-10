@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Extension
 @Component
-public class ScheduleActionRepository implements Plugin, IScheduleActionRepository {
+public class ScheduleActionRepository implements Plugin  {
   @PersistenceContext private EntityManager em;
   @Autowired private SecuredBasicRepository securedBasicRepository;
 
@@ -36,7 +36,7 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
    * @param securityContext
    * @return List of ScheduleAction
    */
-  @Override
+
   public List<ScheduleAction> listAllScheduleActions(
       ScheduleActionFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -50,7 +50,7 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
     return query.getResultList();
   }
 
-  @Override
+
   public <T extends ScheduleAction> void addScheduleActionPredicate(
       ScheduleActionFilter filtering,
       CriteriaBuilder cb,
@@ -76,7 +76,7 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
    * @param securityContext
    * @return count of ScheduleAction
    */
-  @Override
+
   public Long countAllScheduleActions(
       ScheduleActionFilter filtering, SecurityContextBase securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -89,19 +89,19 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
     return query.getSingleResult();
   }
 
-  @Override
+
   public <T extends Baseclass> List<T> listByIds(
       Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
-  @Override
+
   public <T extends Baseclass> T getByIdOrNull(
       String id, Class<T> c, SecurityContextBase securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
@@ -110,7 +110,7 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
@@ -119,29 +119,29 @@ public class ScheduleActionRepository implements Plugin, IScheduleActionReposito
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
-  @Override
+
   public <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
     return securedBasicRepository.findByIds(c, ids, idAttribute);
   }
 
-  @Override
+
   public <T extends Basic> List<T> findByIds(Class<T> c, Set<String> requested) {
     return securedBasicRepository.findByIds(c, requested);
   }
 
-  @Override
+
   public <T> T findByIdOrNull(Class<T> type, String id) {
     return securedBasicRepository.findByIdOrNull(type, id);
   }
 
-  @Override
+
   @Transactional
   public void merge(java.lang.Object base) {
     securedBasicRepository.merge(base);
   }
 
-  @Override
+
   @Transactional
   public void massMerge(List<?> toMerge) {
     securedBasicRepository.massMerge(toMerge);
