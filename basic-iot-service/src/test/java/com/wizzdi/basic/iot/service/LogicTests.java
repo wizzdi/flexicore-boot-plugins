@@ -35,6 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.File;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -108,7 +109,7 @@ public class LogicTests {
     @Test
     @Order(1)
     public void testRegister() {
-        RegisterGatewayReceived test = (RegisterGatewayReceived) basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID));
+        RegisterGatewayReceived test = (RegisterGatewayReceived) basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID)).setSentAt(OffsetDateTime.now());
         PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(GATEWAY_ID))));
         Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(GATEWAY_ID)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
@@ -140,7 +141,7 @@ public class LogicTests {
     @Test
     @Order(2)
     public void testStateChanged() {
-        StateChangedReceived stateChangedReceived = (StateChangedReceived) basicIOTLogic.executeLogic(new StateChanged().setStatus("dim").setLatitude(50D).setLatitude(50D).setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setValue("dim", 30).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        StateChangedReceived stateChangedReceived = (StateChangedReceived) basicIOTLogic.executeLogic(new StateChanged().setStatus("dim").setLatitude(50D).setLatitude(50D).setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setRoomId("room").setFloorId("floor").setBuildingId("building").setValue("dim", 30).setGatewayId(GATEWAY_ID).setSentAt(OffsetDateTime.now()).setId(UUID.randomUUID().toString()));
         Assertions.assertNotNull(stateChangedReceived);
         DeviceType deviceType = deviceTypeService.listAllDeviceTypes(adminSecurityContext, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(DEVICE_TYPE)))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(deviceType);
@@ -155,6 +156,11 @@ public class LogicTests {
         Assertions.assertEquals(Device.class.getCanonicalName(), device.getMappedPOI().getMapIcon().getRelatedType());
         Assertions.assertTrue(device.getMappedPOI().getMapIcon().getExternalId().contains("light"));
         Assertions.assertTrue(device.getMappedPOI().getMapIcon().getName().contains("dim"));
+        Assertions.assertNotNull(device.getMappedPOI().getRoom());
+        Assertions.assertNotNull(device.getMappedPOI().getRoom().getBuildingFloor());
+        Assertions.assertNotNull(device.getMappedPOI().getRoom().getBuildingFloor().getBuilding());
+        Assertions.assertNotNull(device.getMappedPOI().getBuildingFloor());
+        Assertions.assertEquals(device.getMappedPOI().getRoom().getBuildingFloor().getId(),device.getMappedPOI().getBuildingFloor().getId());
 
     }
 
@@ -169,6 +175,7 @@ public class LogicTests {
                 .setJsonSchema(JSON_SCHEMA_V1)
                 .setSchemaActions(List.of(new SchemaAction().setJsonSchema("action").setName("action").setId("action")))
                 .setGatewayId(GATEWAY_ID)
+                .setSentAt(OffsetDateTime.now())
                 .setId(UUID.randomUUID().toString());
         UpdateStateSchemaReceived updateStateSchemaReceived = (UpdateStateSchemaReceived) basicIOTLogic.executeLogic(updateStateSchema);
         Assertions.assertNotNull(updateStateSchemaReceived);
@@ -188,7 +195,7 @@ public class LogicTests {
     @Test
     @Order(5)
     public void testUpdateSchemaV2() throws InterruptedException {
-        UpdateStateSchemaReceived updateStateSchemaReceived = (UpdateStateSchemaReceived) basicIOTLogic.executeLogic(new UpdateStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(2).setJsonSchema(JSON_SCHEMA_V2).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        UpdateStateSchemaReceived updateStateSchemaReceived = (UpdateStateSchemaReceived) basicIOTLogic.executeLogic(new UpdateStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(2).setJsonSchema(JSON_SCHEMA_V2).setGatewayId(GATEWAY_ID).setSentAt(OffsetDateTime.now()).setId(UUID.randomUUID().toString()));
         Assertions.assertNotNull(updateStateSchemaReceived);
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(device);
@@ -201,7 +208,7 @@ public class LogicTests {
     @Test
     @Order(6)
     public void testSetJsonSchema() throws InterruptedException {
-        SetStateSchemaReceived updateStateSchemaReceived = (SetStateSchemaReceived) basicIOTLogic.executeLogic(new SetStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(1).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        SetStateSchemaReceived updateStateSchemaReceived = (SetStateSchemaReceived) basicIOTLogic.executeLogic(new SetStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(1).setGatewayId(GATEWAY_ID).setSentAt(OffsetDateTime.now()).setId(UUID.randomUUID().toString()));
         Assertions.assertNotNull(updateStateSchemaReceived);
         Assertions.assertTrue(updateStateSchemaReceived.isFound());
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
@@ -215,7 +222,7 @@ public class LogicTests {
     @Test
     @Order(7)
     public void testSetJsonSchemaWhenMissing() throws InterruptedException {
-        SetStateSchemaReceived updateStateSchemaReceived = (SetStateSchemaReceived) basicIOTLogic.executeLogic(new SetStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(3).setGatewayId(GATEWAY_ID).setId(UUID.randomUUID().toString()));
+        SetStateSchemaReceived updateStateSchemaReceived = (SetStateSchemaReceived) basicIOTLogic.executeLogic(new SetStateSchema().setDeviceId(DEVICE_ID).setDeviceType(DEVICE_TYPE).setVersion(3).setGatewayId(GATEWAY_ID).setSentAt(OffsetDateTime.now()).setId(UUID.randomUUID().toString()));
         Assertions.assertNotNull(updateStateSchemaReceived);
         Assertions.assertFalse(updateStateSchemaReceived.isFound());
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);

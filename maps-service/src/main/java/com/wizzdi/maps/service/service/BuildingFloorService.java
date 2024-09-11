@@ -68,16 +68,16 @@ public class BuildingFloorService implements Plugin {
   public boolean updateBuildingFloorNoMerge(BuildingFloor buildingFloor, BuildingFloorCreate buildingFloorCreate) {
     boolean update = basicService.updateBasicNoMerge(buildingFloorCreate, buildingFloor);
 
-    if (buildingFloorCreate.getBuilding() != null && (buildingFloor.getBuilding() == null || !buildingFloor.getBuilding().getId().equals(buildingFloorCreate.getBuilding().getId()))) {
+    if (buildingFloorCreate.getBuilding() != null && (buildingFloor.getBuilding() == null || !buildingFloorCreate.getBuilding().getId().equals(buildingFloor.getBuilding().getId()))) {
       buildingFloor.setBuilding(buildingFloorCreate.getBuilding());
       update = true;
     }
-    if (buildingFloorCreate.getDrawing() != null && (buildingFloor.getDrawing() == null || !buildingFloor.getDrawing().getId().equals(buildingFloorCreate.getDrawing().getId()))) {
+    if (buildingFloorCreate.getDrawing() != null && (buildingFloor.getDrawing() == null || !buildingFloorCreate.getDrawing().getId().equals(buildingFloor.getDrawing().getId()))) {
       buildingFloor.setDrawing(buildingFloorCreate.getDrawing());
       update = true;
     }
 
-    if (buildingFloorCreate.getExternalId() != null && !buildingFloor.getExternalId().equals(buildingFloorCreate.getExternalId())){
+    if (buildingFloorCreate.getExternalId() != null && !buildingFloorCreate.getExternalId().equals(buildingFloor.getExternalId())){
       buildingFloor.setExternalId(buildingFloorCreate.getExternalId());
       update = true;
     }

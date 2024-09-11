@@ -58,7 +58,7 @@ public class BuildingService implements Plugin {
       BuildingCreate buildingCreate, SecurityContextBase securityContext,List<Object> toMerge) {
     Building building = new Building();
     building.setId(UUID.randomUUID().toString());
-    MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setExternalId(buildingCreate.getExternalId()).setName(buildingCreate.getExternalId()), securityContext);
+    MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setRelatedType(Building.class.getCanonicalName()).setRelatedId(building.getId()).setExternalId(buildingCreate.getExternalId()).setName(buildingCreate.getExternalId()), securityContext);
     toMerge.add(mappedPOI);
     buildingCreate.setMappedPOI(mappedPOI);
     updateBuildingNoMerge(building, buildingCreate);
