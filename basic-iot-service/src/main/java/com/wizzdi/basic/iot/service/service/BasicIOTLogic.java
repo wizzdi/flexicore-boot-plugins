@@ -498,6 +498,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                if(stateChanged.getRoomId()!=null){
                    Room room=roomService.getOrCreateByExternalId(buildingFloor,stateChanged.getRoomId(),gatewaySecurityContext);
                    mappedPOICreate.setRoom(room);
+                   Double x=getOffset(room.getX(),stateChanged.getRoomXOffset());
+                   Double y=getOffset(room.getY(),stateChanged.getRoomYOffset());
+                   Double z=getOffset(room.getZ(),stateChanged.getRoomZOffset());
+                   mappedPOICreate.setX(x);
+                   mappedPOICreate.setY(y);
+                   mappedPOICreate.setZ(z);
                }
            }
 
@@ -547,6 +553,17 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         messageHandleContext=MessageHandleContext.merged(messageHandleContext,updateKeepAlive(stateChanged.getSentAt(),gatewaySecurityContext,keepAlive).messageHandleContext());
 
         return messageHandleContext.withResponse(new StateChangedReceived().setStateChangedId(stateChanged.getId()));
+    }
+
+    private Double getOffset(Double roomCoordinate, Double offset) {
+        if(roomCoordinate==null){
+            return null;
+        }
+        double coordinate=roomCoordinate;
+        if(offset!=null){
+            coordinate+=offset;
+        }
+        return coordinate;
     }
 
     private double getDistanceFromCurrentLocation(MappedPOI mappedPOI, double longitude, double latitude) {

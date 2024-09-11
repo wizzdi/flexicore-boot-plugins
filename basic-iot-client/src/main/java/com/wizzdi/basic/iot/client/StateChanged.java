@@ -20,6 +20,9 @@ public class StateChanged extends IOTMessage{
     private String buildingId;
     private String floorId;
     private String roomId;
+    private Double roomXOffset;
+    private Double roomYOffset;
+    private Double roomZOffset;
     private String status;
 
     public StateChanged() {
@@ -36,6 +39,9 @@ public class StateChanged extends IOTMessage{
         this.buildingId = other.buildingId;
         this.floorId = other.floorId;
         this.roomId = other.roomId;
+        this.roomXOffset = other.roomXOffset;
+        this.roomYOffset = other.roomYOffset;
+        this.roomZOffset = other.roomZOffset;
         this.status = other.status;
     }
 
@@ -134,6 +140,33 @@ public class StateChanged extends IOTMessage{
 
     public <T extends StateChanged> T setRoomId(String roomId) {
         this.roomId = roomId;
+        return (T) this;
+    }
+
+    public Double getRoomXOffset() {
+        return roomXOffset;
+    }
+
+    public <T extends StateChanged> T setRoomXOffset(Double roomXOffset) {
+        this.roomXOffset = roomXOffset;
+        return (T) this;
+    }
+
+    public Double getRoomYOffset() {
+        return roomYOffset;
+    }
+
+    public <T extends StateChanged> T setRoomYOffset(Double roomYOffset) {
+        this.roomYOffset = roomYOffset;
+        return (T) this;
+    }
+
+    public Double getRoomZOffset() {
+        return roomZOffset;
+    }
+
+    public <T extends StateChanged> T setRoomZOffset(Double roomZOffset) {
+        this.roomZOffset = roomZOffset;
         return (T) this;
     }
 
