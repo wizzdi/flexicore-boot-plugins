@@ -22,7 +22,8 @@ public enum FilterComponentType {
     RELATED_TYPE(String.class, List.of(MappedPOI_.relatedType)),
     EXTERNAL_ID(String.class, List.of(MappedPOI_.externalId)),
     LAYER(Layer.class,List.of(MappedPOI_.layer)),
-    BUILDING_FLOOR(BuildingFloor.class,List.of(MappedPOI_.room,Room_.buildingFloor));
+    BUILDING_FLOOR(BuildingFloor.class,List.of(MappedPOI_.room,Room_.buildingFloor)),
+    MAPPED_POI_NAME(String.class,List.of(MappedPOI_.name));
 
     private final Class<?> entity;
     private final List<Attribute> attributes;
