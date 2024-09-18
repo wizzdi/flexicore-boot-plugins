@@ -87,7 +87,6 @@ public class ScenarioToTriggerControllerTest {
 
     request.setScenarioId(this.scenario.getId());
 
-    request.setOrdinal(10);
 
     request.setEnabled(true);
 
@@ -142,9 +141,6 @@ public class ScenarioToTriggerControllerTest {
       Assertions.assertEquals(request.getScenarioId(), testScenarioToTrigger.getScenario().getId());
     }
 
-    if (request.getOrdinal() != null) {
-      Assertions.assertEquals(request.getOrdinal(), testScenarioToTrigger.getOrdinal());
-    }
 
     if (request.getEnabled() != null) {
       Assertions.assertEquals(request.getEnabled(), testScenarioToTrigger.isEnabled());

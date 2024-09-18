@@ -38,14 +38,6 @@ import com.wizzdi.maps.model.Room;
                         com.wizzdi.flexicore.security.validation.Update.class,
                         com.wizzdi.flexicore.security.validation.Create.class
                 }),
-        @IdValid(
-                targetField = "buildingFloor",
-                field = "buildingFloorId",
-                fieldType = BuildingFloor.class,
-                groups = {
-                        com.wizzdi.flexicore.security.validation.Update.class,
-                        com.wizzdi.flexicore.security.validation.Create.class
-                })
 })
 public class MappedPOICreate extends BasicCreate {
 
@@ -68,9 +60,6 @@ public class MappedPOICreate extends BasicCreate {
     private String relatedType;
     private String relatedId;
     private Boolean keepStatusHistory;
-    private String buildingFloorId;
-    @JsonIgnore
-    private BuildingFloor buildingFloor;
     private String layerId;
     @JsonIgnore
     private Layer layer;
@@ -250,24 +239,6 @@ public class MappedPOICreate extends BasicCreate {
     public <T extends MappedPOICreate> T setKeepLocationHistory(Boolean keepLocationHistory) {
         this.keepLocationHistory = keepLocationHistory;
         return (T) this;
-    }
-
-    public String getBuildingFloorId() {
-        return buildingFloorId;
-    }
-
-    public MappedPOICreate setBuildingFloorId(String buildingFloorId) {
-        this.buildingFloorId = buildingFloorId;
-        return this;
-    }
-
-    public BuildingFloor getBuildingFloor() {
-        return buildingFloor;
-    }
-
-    public MappedPOICreate setBuildingFloor(BuildingFloor buildingFloor) {
-        this.buildingFloor = buildingFloor;
-        return this;
     }
 
     public String getLayerId() {

@@ -180,7 +180,7 @@ public class ScenarioManager implements Plugin {
                 long started = System.nanoTime();
                 try {
                     SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
-                    List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
+                    List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
                     List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
                     List<ActionContext> scenarioActions = actionsByScenario.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a)).entrySet().stream().map(f -> new ActionContext(f.getKey(), f.getValue())).toList();
 

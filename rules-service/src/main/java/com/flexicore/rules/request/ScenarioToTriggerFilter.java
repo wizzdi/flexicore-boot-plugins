@@ -22,8 +22,6 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
 
   private BasicPropertiesFilter basicPropertiesFilter;
 
-  private Set<Integer> ordinal;
-
   private Boolean enabled;
   private Boolean nonDeletedScenarios;
 
@@ -78,14 +76,6 @@ public class ScenarioToTriggerFilter extends PaginationFilter {
     return (T) this;
   }
 
-  public Set<Integer> getOrdinal() {
-    return this.ordinal;
-  }
-
-  public <T extends ScenarioToTriggerFilter> T setOrdinal(Set<Integer> ordinal) {
-    this.ordinal = ordinal;
-    return (T) this;
-  }
 
   public Boolean getFiring() {
     return firing;

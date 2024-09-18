@@ -87,7 +87,7 @@ public class MappedPOIRepository implements Plugin {
         this.securedBasicRepository.addSecuredBasicPredicates(
                 filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
         if(filtering.getInBuilding()!=null){
-            preds.add(filtering.getInBuilding()?r.get(MappedPOI_.buildingFloor).isNotNull():r.get(MappedPOI_.buildingFloor).isNull());
+            preds.add(filtering.getInBuilding()?r.get(MappedPOI_.room).isNotNull():r.get(MappedPOI_.room).isNull());
         }
 
         if (filtering.getAddress() != null && !filtering.getAddress().isEmpty()) {
@@ -98,10 +98,9 @@ public class MappedPOIRepository implements Plugin {
             preds.add(filtering.isAddressExclude()?cb.not(in):in);
         }
         if (filtering.getBuildingFloors()!=null && !filtering.getBuildingFloors().isEmpty()) {
-            Set<String> ids =
-                    filtering.getBuildingFloors().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-            Join<T, BuildingFloor> join = r.join(MappedPOI_.buildingFloor);
-            Predicate in = join.get(Basic_.id).in(ids);
+            Join<T, Room> join = r.join(MappedPOI_.room);
+            Join<Room, BuildingFloor> buildingFloorJoin = join.join(Room_.buildingFloor);
+            Predicate in = buildingFloorJoin.in(filtering.getBuildingFloors());
             preds.add(filtering.isBuildingFloorExclude()?cb.not(in):in);
         }
         if (filtering.getLayers()!=null && !filtering.getLayers().isEmpty()) {

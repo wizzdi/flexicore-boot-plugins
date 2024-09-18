@@ -5,6 +5,9 @@ public class MapIconChangedNotification extends MappedPOINotification {
     private String mappedIconId;
     private Double lat;
     private Double lon;
+    private String roomId;
+    private String buildingFloorId;
+    private String buildingId;
 
     public String getMappedIconId() {
         return mappedIconId;
@@ -30,6 +33,33 @@ public class MapIconChangedNotification extends MappedPOINotification {
 
     public <T extends MapIconChangedNotification> T setLon(Double lon) {
         this.lon = lon;
+        return (T) this;
+    }
+
+    public String getRoomId() {
+        return roomId;
+    }
+
+    public <T extends MapIconChangedNotification> T setRoomId(String roomId) {
+        this.roomId = roomId;
+        return (T) this;
+    }
+
+    public String getBuildingFloorId() {
+        return buildingFloorId;
+    }
+
+    public <T extends MapIconChangedNotification> T setBuildingFloorId(String buildingFloorId) {
+        this.buildingFloorId = buildingFloorId;
+        return (T) this;
+    }
+
+    public String getBuildingId() {
+        return buildingId;
+    }
+
+    public <T extends MapIconChangedNotification> T setBuildingId(String buildingId) {
+        this.buildingId = buildingId;
         return (T) this;
     }
 }

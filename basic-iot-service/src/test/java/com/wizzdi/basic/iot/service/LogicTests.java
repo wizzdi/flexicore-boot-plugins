@@ -159,8 +159,6 @@ public class LogicTests {
         Assertions.assertNotNull(device.getMappedPOI().getRoom());
         Assertions.assertNotNull(device.getMappedPOI().getRoom().getBuildingFloor());
         Assertions.assertNotNull(device.getMappedPOI().getRoom().getBuildingFloor().getBuilding());
-        Assertions.assertNotNull(device.getMappedPOI().getBuildingFloor());
-        Assertions.assertEquals(device.getMappedPOI().getRoom().getBuildingFloor().getId(),device.getMappedPOI().getBuildingFloor().getId());
 
     }
 

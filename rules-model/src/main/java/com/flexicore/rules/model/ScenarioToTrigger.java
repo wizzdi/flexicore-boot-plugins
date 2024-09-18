@@ -15,7 +15,6 @@ public class ScenarioToTrigger extends SecuredBasic {
   @ManyToOne(targetEntity = Scenario.class)
   private Scenario scenario;
 
-  private Integer ordinal;
 
   private boolean enabled;
 
@@ -63,19 +62,6 @@ public class ScenarioToTrigger extends SecuredBasic {
     return (T) this;
   }
 
-  /** @return ordinal */
-  public Integer getOrdinal() {
-    return this.ordinal;
-  }
-
-  /**
-   * @param ordinal ordinal to set
-   * @return ScenarioToTrigger
-   */
-  public <T extends ScenarioToTrigger> T setOrdinal(Integer ordinal) {
-    this.ordinal = ordinal;
-    return (T) this;
-  }
 
   /** @return enabled */
   public boolean isEnabled() {

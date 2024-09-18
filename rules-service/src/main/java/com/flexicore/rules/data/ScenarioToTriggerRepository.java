@@ -91,11 +91,6 @@ public class ScenarioToTriggerRepository implements Plugin {
       preds.add(join.get(Basic_.id).in(ids));
     }
 
-    if (scenarioToTriggerFilter.getOrdinal() != null
-            && !scenarioToTriggerFilter.getOrdinal().isEmpty()) {
-      preds.add(r.get(ScenarioToTrigger_.ordinal).in(scenarioToTriggerFilter.getOrdinal()));
-    }
-
 
   }
   /**

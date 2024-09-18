@@ -102,11 +102,6 @@ public class ScenarioToTriggerService implements Plugin {
       update = true;
     }
 
-    if (scenarioToTriggerCreate.getOrdinal() != null
-        && (!scenarioToTriggerCreate.getOrdinal().equals(scenarioToTrigger.getOrdinal()))) {
-      scenarioToTrigger.setOrdinal(scenarioToTriggerCreate.getOrdinal());
-      update = true;
-    }
 
     if (scenarioToTriggerCreate.getEnabled() != null
         && (!scenarioToTriggerCreate.getEnabled().equals(scenarioToTrigger.isEnabled()))) {

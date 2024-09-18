@@ -9,7 +9,9 @@ import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
+import com.wizzdi.maps.model.BuildingFloor;
 import com.wizzdi.maps.model.MappedPOI;
+import com.wizzdi.maps.model.Room;
 import com.wizzdi.maps.service.ws.encoders.MappedPOINotificationDecoder;
 import com.wizzdi.maps.service.ws.encoders.MappedPOINotificationEncoder;
 import com.wizzdi.maps.service.ws.messages.MapIconChangedNotification;
@@ -68,7 +70,13 @@ public class MapsSocketHandler implements Plugin {
 	}
 
 	private void onMappedPOIChanged(MappedPOI mappedPOI) {
+		Optional<Room> room = Optional.of(mappedPOI).map(f -> f.getRoom());
+		Optional<BuildingFloor> buildingFloor=room.map(f->f.getBuildingFloor());
+
 		MapIconChangedNotification mapIconChangedNotification = new MapIconChangedNotification()
+				.setRoomId(room.map(f->f.getId()).orElse(null))
+				.setBuildingFloorId(buildingFloor.map(f->f.getId()).orElse(null))
+				.setBuildingId(buildingFloor.map(f->f.getBuilding()).map(f->f.getId()).orElse(null))
 				.setLat(mappedPOI.getLat())
 				.setLon(mappedPOI.getLon())
 				.setMappedIconId(Optional.ofNullable(mappedPOI.getMapIcon()).map(f->f.getId()).orElse(null))

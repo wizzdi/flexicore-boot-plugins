@@ -18,7 +18,6 @@ public class ScenarioToTriggerCreate extends BasicCreate {
 
   private Boolean enabled;
 
-  private Integer ordinal;
 
   private Boolean firing;
 
@@ -91,20 +90,6 @@ public class ScenarioToTriggerCreate extends BasicCreate {
    */
   public <T extends ScenarioToTriggerCreate> T setEnabled(Boolean enabled) {
     this.enabled = enabled;
-    return (T) this;
-  }
-
-  /** @return ordinal */
-  public Integer getOrdinal() {
-    return this.ordinal;
-  }
-
-  /**
-   * @param ordinal ordinal to set
-   * @return ScenarioToTriggerCreate
-   */
-  public <T extends ScenarioToTriggerCreate> T setOrdinal(Integer ordinal) {
-    this.ordinal = ordinal;
     return (T) this;
   }
 

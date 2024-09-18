@@ -160,22 +160,11 @@ public class MappedPOIService implements Plugin {
             mappedPOI.setRoom(mappedPOICreate.getRoom());
             update = true;
         }
-        if (mappedPOICreate.getBuildingFloor() != null
-                && (mappedPOI.getBuildingFloor() == null
-                || !mappedPOICreate.getBuildingFloor().getId().equals(mappedPOI.getBuildingFloor().getId()))) {
-            mappedPOI.setBuildingFloor(mappedPOICreate.getBuildingFloor());
-            updateMapLocation(mappedPOICreate, mappedPOI);
-            update = true;
-        }
         if (mappedPOICreate.getLayer() != null
                 && (mappedPOI.getLayer() == null
                 || !mappedPOICreate.getLayer().getId().equals(mappedPOI.getLayer().getId()))) {
             mappedPOI.setLayer(mappedPOICreate.getLayer());
 
-            update = true;
-        }
-        if (mappedPOICreate.getBuildingFloorId() != null && mappedPOICreate.getBuildingFloorId().isEmpty()) {
-            mappedPOI.setBuildingFloor(null);
             update = true;
         }
         if (mappedPOICreate.getExternalId() != null
@@ -215,15 +204,9 @@ public class MappedPOIService implements Plugin {
 
     private void updateMapLocation(MappedPOICreate mappedPOICreate, MappedPOI mappedPOI) {
         try {
-            Double lon, lat;
-            lon = Optional.ofNullable(mappedPOICreate.getBuildingFloor().getBuilding().getMappedPOI().getLon()).orElse(null);
-            if (lon == null) {
-                lon = Optional.ofNullable(mappedPOI.getBuildingFloor().getBuilding().getMappedPOI().getLon()).orElse(null);
-            }
-            lat = Optional.ofNullable(mappedPOICreate.getBuildingFloor().getBuilding().getMappedPOI().getLat()).orElse(null);
-            if (lat == null) {
-                lat = Optional.ofNullable(mappedPOI.getBuildingFloor().getBuilding().getMappedPOI().getLat()).orElse(null);
-            }
+            Optional<MappedPOI> buildingMappedPOI=Optional.of(mappedPOICreate).map(f->f.getRoom()).or(()->Optional.of(mappedPOI).map(f->f.getRoom())).map(f->f.getBuildingFloor()).map(f->f.getBuilding()).map(f->f.getMappedPOI());
+            Double lon = buildingMappedPOI.map(f->f.getLon()).orElse(null);
+            Double lat=buildingMappedPOI.map(f->f.getLat()).orElse(null);
             if (getDistance(mappedPOI, lon, lat) > 3.00) {
                 if (lon != null) {
                     mappedPOI.setLon(Math.random() * 0.01 + lon);
@@ -425,12 +408,6 @@ public class MappedPOIService implements Plugin {
             }
             mappedPOICreate.setRoom(room);
 
-        String buildingFloorId = mappedPOICreate.getBuildingFloorId();
-        BuildingFloor buildingFloor = buildingFloorId == null ? null : this.repository.getByIdOrNull(buildingFloorId, BuildingFloor.class, SecuredBasic_.security, securityContext);
-            if (buildingFloorId != null && buildingFloor == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Building Floor with id " + buildingFloorId);
-            }
-            mappedPOICreate.setBuildingFloor(buildingFloor);
 
         if (mappedPOICreate.getAddress() == null && mappedPOICreate.getLat() != null && mappedPOICreate.getLon() != null) {
             try {

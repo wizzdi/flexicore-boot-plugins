@@ -494,7 +494,6 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
            Building building= buildingService.getOrCreateByExternalId(stateChanged.getBuildingId(),gatewaySecurityContext);
            if(stateChanged.getFloorId()!=null){
                BuildingFloor buildingFloor=buildingFloorService.getOrCreateByExternalId(building,stateChanged.getFloorId(),gatewaySecurityContext);
-               mappedPOICreate.setBuildingFloor(buildingFloor);
                if(stateChanged.getRoomId()!=null){
                    Room room=roomService.getOrCreateByExternalId(buildingFloor,stateChanged.getRoomId(),gatewaySecurityContext);
                    mappedPOICreate.setRoom(room);
