@@ -8,6 +8,8 @@ public class MapIconChangedNotification extends MappedPOINotification {
     private String roomId;
     private String buildingFloorId;
     private String buildingId;
+    private Double x;
+    private Double y;
 
     public String getMappedIconId() {
         return mappedIconId;
@@ -60,6 +62,24 @@ public class MapIconChangedNotification extends MappedPOINotification {
 
     public <T extends MapIconChangedNotification> T setBuildingId(String buildingId) {
         this.buildingId = buildingId;
+        return (T) this;
+    }
+
+    public Double getX() {
+        return x;
+    }
+
+    public <T extends MapIconChangedNotification> T setX(Double x) {
+        this.x = x;
+        return (T) this;
+    }
+
+    public Double getY() {
+        return y;
+    }
+
+    public <T extends MapIconChangedNotification> T setY(Double y) {
+        this.y = y;
         return (T) this;
     }
 }

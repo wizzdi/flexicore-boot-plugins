@@ -79,6 +79,8 @@ public class MapsSocketHandler implements Plugin {
 				.setBuildingId(buildingFloor.map(f->f.getBuilding()).map(f->f.getId()).orElse(null))
 				.setLat(mappedPOI.getLat())
 				.setLon(mappedPOI.getLon())
+				.setX(mappedPOI.getX())
+				.setY(mappedPOI.getY())
 				.setMappedIconId(Optional.ofNullable(mappedPOI.getMapIcon()).map(f->f.getId()).orElse(null))
 				.setMappedPOIId(mappedPOI.getId())
 				.setTenantId(mappedPOI.getSecurity().getTenant().getId())
