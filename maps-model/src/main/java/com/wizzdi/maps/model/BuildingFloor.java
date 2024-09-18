@@ -20,9 +20,6 @@ public class BuildingFloor extends SecuredBasic {
     private Building building;
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource drawing;
-    @JsonIgnore
-    @OneToMany(targetEntity = MappedPOI.class,mappedBy = "buildingFloor")
-    private List<MappedPOI> mappedPOIs=new ArrayList<>();
 
     @ManyToOne(targetEntity = Building.class)
     public Building getBuilding() {
@@ -41,17 +38,6 @@ public class BuildingFloor extends SecuredBasic {
 
     public BuildingFloor setDrawing(FileResource drawing) {
         this.drawing = drawing;
-        return this;
-    }
-
-    @JsonIgnore
-    @OneToMany(targetEntity = MappedPOI.class,mappedBy = "buildingFloor")
-    public List<MappedPOI> getMappedPOIs() {
-        return mappedPOIs;
-    }
-
-    public BuildingFloor setMappedPOIs(List<MappedPOI> mappedPOIs) {
-        this.mappedPOIs = mappedPOIs;
         return this;
     }
 
