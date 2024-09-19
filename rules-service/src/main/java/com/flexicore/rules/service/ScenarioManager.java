@@ -124,7 +124,7 @@ public class ScenarioManager implements Plugin {
 
 
                 if (!isValid(trigger)) {
-                    logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid");
+                    logger.debug("Trigger {}({}) invalid", trigger.getName(), trigger.getId());
                     continue;
                 }
                 long start = System.nanoTime();
@@ -134,10 +134,10 @@ public class ScenarioManager implements Plugin {
                         activeTriggers.add(trigger);
                     }
                     if (changeTriggerState(trigger, scenarioEvent, evaluateTriggerResponse)) {
-                        logger.info("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state changed to Active till" + trigger.getActiveTill());
+                        logger.info("Trigger {}({}) state changed to Active till{}", trigger.getName(), trigger.getId(), trigger.getActiveTill());
                         toMerge.add(trigger);
                     } else {
-                        logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") state stayed Active till" + trigger.getActiveTill());
+                        logger.debug("Trigger {}({}) state stayed Active till{}", trigger.getName(), trigger.getId(), trigger.getActiveTill());
                     }
                 } finally {
                     timeTrigger(trigger, System.nanoTime() - start);
@@ -148,7 +148,7 @@ public class ScenarioManager implements Plugin {
             scenarioTriggerService.massMerge(toMerge, true, false);
 
             if (activeTriggers.isEmpty()) {
-                logger.debug("No Active triggers for event " + scenarioEvent);
+                logger.debug("No Active triggers for event {}", scenarioEvent);
                 return;
             }
 
@@ -172,7 +172,7 @@ public class ScenarioManager implements Plugin {
 
             for (Map.Entry<String, List<ScenarioToTrigger>> entry : triggersForScenario.entrySet()) {
                 if (entry.getValue().stream().noneMatch(f -> f.isFiring())) {
-                    logger.debug("Scenario " + entry.getKey() + " has no firing triggers");
+                    logger.debug("Scenario {} has no firing triggers", entry.getKey());
                     continue;
                 }
                 String scenarioId = entry.getKey();
@@ -221,7 +221,7 @@ public class ScenarioManager implements Plugin {
 
                             } catch (Throwable e) {
                                 logger.error("failed executing action", e);
-                                scenarioTriggerLogger.error("failed executing action: " + e, e);
+                                scenarioTriggerLogger.error("failed executing action: {}", e, e);
 
 
                             }
@@ -252,7 +252,7 @@ public class ScenarioManager implements Plugin {
         ZonedDateTime cooldownMin = now.plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
         boolean inCoolDownPeriod = trigger.getLastActivated() != null&& cooldownMin.isAfter(trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())));
         if (inCoolDownPeriod) {
-            logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") is in cooldown (" + cooldownMin + " vs " + now + ")");
+            logger.debug("Trigger {}({}) is in cooldown ({} vs {})", trigger.getName(), trigger.getId(), cooldownMin, now);
 
         }
         return inCoolDownPeriod;
@@ -267,7 +267,7 @@ public class ScenarioManager implements Plugin {
                 .orElse(OffsetDateTime.MAX.toZonedDateTime());
         boolean validTimes = (now.isAfter(start) || now.equals(start)) && (now.isBefore(end) || now.equals(end));
         if (!validTimes) {
-            logger.debug("Trigger " + trigger.getName() + "(" + trigger.getId() + ") invalid times (" + start + "-" + end + " vs " + now + ")");
+            logger.debug("Trigger {}({}) invalid times ({}-{} vs {})", trigger.getName(), trigger.getId(), start, end, now);
         }
         return validTimes;
     }
@@ -303,7 +303,7 @@ public class ScenarioManager implements Plugin {
 
         } catch (Throwable e) {
             logger.error("failed executing script", e);
-            scenarioTriggerLogger.error("failed executing script: " + e, e);
+            scenarioTriggerLogger.error("failed executing script: {}", e, e);
         }
 
         return evaluateScenarioResponse;
@@ -319,18 +319,17 @@ public class ScenarioManager implements Plugin {
 
     private boolean changeTriggerState(ScenarioTrigger trigger, ScenarioEvent scenarioEvent, EvaluateTriggerResponse evaluateTriggerResponse) {
         boolean update = false;
-        boolean active = isActive(trigger);
-        if (active != evaluateTriggerResponse.isActive()) {
+        boolean wasActive = isActive(trigger);
+        boolean isActive = evaluateTriggerResponse.isActive();
+        if (wasActive != isActive) {
             OffsetDateTime activeTill;
-            if (active) {
+            if (isActive) {
                 activeTill = trigger.getActiveMs() > 0 ? OffsetDateTime.now().plus(trigger.getActiveMs(), ChronoUnit.MILLIS) : OffsetDateTime.now().plusYears(1000);
                 trigger.setLastActivated(OffsetDateTime.now());
             } else {
                 activeTill = OffsetDateTime.now();
             }
             trigger.setActiveTill(activeTill);
-
-
             update = true;
         }
         if (trigger.getLastEventId() == null || (!trigger.getLastEventId().equals(scenarioEvent.getId()))) {
@@ -358,7 +357,7 @@ public class ScenarioManager implements Plugin {
 
         } catch (Exception e) {
             logger.error("failed executing script", e);
-            scenarioTriggerLogger.error("failed executing script: " + e, e);
+            scenarioTriggerLogger.error("failed executing script: {}", e, e);
         }
 
         return evaluateTriggerResponse;
