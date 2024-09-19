@@ -249,10 +249,10 @@ public class ScenarioManager implements Plugin {
     }
 
     private boolean inCoolDownPeriod(ZonedDateTime now, ScenarioTrigger trigger) {
-        ZonedDateTime cooldownMin = now.plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
-        boolean inCoolDownPeriod = trigger.getLastActivated() != null&& cooldownMin.isAfter(trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())));
+        ZonedDateTime coolDownTill = trigger.getLastActivated()==null?null:trigger.getLastActivated().atZoneSameInstant(ZoneId.of(trigger.getTimeZoneId())).plus(trigger.getCooldownIntervalMs(), ChronoUnit.MILLIS);
+        boolean inCoolDownPeriod = coolDownTill != null&& coolDownTill.isAfter(now);
         if (inCoolDownPeriod) {
-            logger.debug("Trigger {}({}) is in cooldown ({} vs {})", trigger.getName(), trigger.getId(), cooldownMin, now);
+            logger.debug("Trigger {}({}) is in cooldown ({} vs {})", trigger.getName(), trigger.getId(), coolDownTill, now);
 
         }
         return inCoolDownPeriod;
