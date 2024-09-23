@@ -181,4 +181,13 @@ public class RemoteRepository implements Plugin {
     public void massMerge(List<?> toMerge, boolean updatedate, boolean propagateEvents) {
         securedBasicRepository.massMerge(toMerge, updatedate, propagateEvents);
     }
+
+    @Transactional
+    public void createRemoteIdx() {
+        em.createNativeQuery("""
+                CREATE UNIQUE INDEX IF NOT EXISTS remote_unique_idx 
+                ON Remote (remoteId) 
+                WHERE softdelete = false
+                """).executeUpdate();
+    }
 }

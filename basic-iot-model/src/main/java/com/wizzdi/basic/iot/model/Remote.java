@@ -23,7 +23,6 @@ public class Remote extends SecuredBasic {
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime lastSeen;
 
-    @Column(unique = true)
     private String remoteId;
     private String version;
     @ManyToOne(targetEntity = MappedPOI.class)

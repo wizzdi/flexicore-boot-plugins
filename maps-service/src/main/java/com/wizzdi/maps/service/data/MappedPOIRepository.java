@@ -269,5 +269,12 @@ public class MappedPOIRepository implements Plugin {
     }
 
 
-
+    @Transactional
+    public void createMappedPOIIdx() {
+        em.createNativeQuery("""
+                CREATE UNIQUE INDEX IF NOT EXISTS mapped_poi_unique_idx 
+                ON MappedPOI (relatedId,relatedType) 
+                WHERE softdelete = false
+                """).executeUpdate();
+    }
 }
