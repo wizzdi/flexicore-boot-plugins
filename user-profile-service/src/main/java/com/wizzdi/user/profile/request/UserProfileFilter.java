@@ -3,11 +3,15 @@ package com.wizzdi.user.profile.request;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecurityUser;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
+import com.wizzdi.flexicore.security.validation.IdValid;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@IdValid.List({
+        @IdValid(field = "userIds",targetField = "users",fieldType = SecurityUser.class)
+})
 public class UserProfileFilter extends PaginationFilter {
     private Set<String> userIds=new HashSet<>();
     @JsonIgnore

@@ -6,11 +6,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.model.SecurityUser;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.request.BasicCreate;
+import com.wizzdi.flexicore.security.validation.Create;
+import com.wizzdi.flexicore.security.validation.IdValid;
+import com.wizzdi.flexicore.security.validation.Update;
 import com.wizzdi.user.profile.model.Gender;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@IdValid.List({
+        @IdValid(field = "userId",targetField = "securityUser",fieldType = SecurityUser.class,groups = {Create.class, Update.class}),
+        @IdValid(field = "avatarId",targetField = "avatar",fieldType = FileResource.class,groups = {Create.class, Update.class})
+})
 public class UserProfileCreate extends BasicCreate {
 
     private String lastName;

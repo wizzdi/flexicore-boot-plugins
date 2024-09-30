@@ -36,10 +36,6 @@ public class UserProfileService implements Plugin {
     private UserProfileRepository userProfileRepository;
     @Autowired
     private BasicService basicService;
-    @Autowired
-    private SecurityUserService securityUserService;
-    @Autowired
-    private FileResourceService fileResourceService;
 
 
     public UserProfile createUserProfileNoMerge(UserProfileCreate userProfileCreate) {
@@ -86,34 +82,7 @@ public class UserProfileService implements Plugin {
 
     }
 
-    public void validate(UserProfileCreate userProfileCreate, SecurityContextBase securityContextBase) {
-        basicService.validate(userProfileCreate, securityContextBase);
-        String userId = userProfileCreate.getUserId();
-        SecurityUser user= userId!=null?securityUserService.getByIdOrNull(userId,SecurityUser.class, SecuredBasic_.security,securityContextBase):null;
-        if(userId!=null&&user==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no user with id "+userId);
-        }
-        userProfileCreate.setSecurityUser(user);
 
-        String avatarId = userProfileCreate.getAvatarId();
-        FileResource avatar= avatarId!=null?fileResourceService.getByIdOrNull(avatarId,FileResource.class, FileResource_.security,securityContextBase):null;
-        if(avatarId!=null&&avatar==null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no file resource  with id "+avatarId);
-        }
-        userProfileCreate.setAvatar(avatar);
-    }
-
-    public void validate(UserProfileFilter userProfileFilter, SecurityContextBase securityContextBase) {
-        basicService.validate(userProfileFilter, securityContextBase);
-        Set<String> userIds = userProfileFilter.getUserIds();
-        Map<String,SecurityUser> userMap= userIds.isEmpty()?new HashMap<>():securityUserService.listByIds(SecurityUser.class,userIds,SecuredBasic_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(),f->f));
-        userIds.removeAll(userMap.keySet());
-        if(!userIds.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no users with ids "+userIds);
-        }
-        userProfileFilter.setUsers(new ArrayList<>(userMap.values()));
-
-    }
 
     public PaginationResponse<UserProfile> getAllUserProfiles(UserProfileFilter userProfileFilter, SecurityContextBase securityContextBase) {
         List<UserProfile> list = listAllUserProfiles(userProfileFilter, securityContextBase);
@@ -130,12 +99,10 @@ public class UserProfileService implements Plugin {
         return userProfileRepository.findByIdOrNull(type, id);
     }
 
-    @Transactional
     public void merge(Object base) {
         userProfileRepository.merge(base);
     }
 
-    @Transactional
     public void massMerge(List<?> toMerge) {
         userProfileRepository.massMerge(toMerge);
     }
@@ -148,10 +115,5 @@ public class UserProfileService implements Plugin {
         return userProfile;
     }
 
-    public void validateCreate(UserProfileCreate userProfileCreate, SecurityContextBase securityContext) {
-        validate(userProfileCreate,securityContext);
-        if(userProfileCreate.getSecurityUser()==null){
-            userProfileCreate.setSecurityUser(securityContext.getUser());
-        }
-    }
+
 }
