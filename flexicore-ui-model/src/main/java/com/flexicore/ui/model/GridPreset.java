@@ -5,6 +5,8 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
+import java.util.Optional;
+
 @Entity
 public class GridPreset extends Preset {
 
@@ -58,5 +60,13 @@ public class GridPreset extends Preset {
 	public <T extends GridPreset> T setLonMapping(String lonMapping) {
 		this.lonMapping = lonMapping;
 		return (T) this;
+	}
+
+	public String getTenantName(){
+		return Optional.ofNullable(getSecurity()).map(f->f.getTenant()).map(f->f.getName()).orElse(null);
+	}
+
+	public String getCreatorName(){
+		return Optional.ofNullable(getSecurity()).map(f->f.getCreator()).map(f->f.getName()).orElse(null);
 	}
 }
