@@ -263,15 +263,6 @@ public class ScheduleTimeslotService implements Plugin  {
   public void validate(
       ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
     validateBase(stc, securityContext);
-    Schedule schedule = stc.getSchedule();
-    if(schedule!=null){
-      if(stc.getStartTime()!=null){
-        stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(), schedule.getSelectedTimeZone()));
-      }
-      if(stc.getEndTime()!=null){
-        stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(), schedule.getSelectedTimeZone()));
-      }
-    }
 
 
   }
@@ -295,12 +286,6 @@ public class ScheduleTimeslotService implements Plugin  {
   public void validateUpdate(
           ScheduleTimeslotUpdate stc, SecurityContextBase securityContext) {
    validateBase(stc, securityContext);
-    Schedule schedule = Optional.ofNullable(stc.getSchedule())
-            .or(() -> Optional.ofNullable(stc.getScheduleTimeslot()).map(f -> f.getSchedule()))
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule set on schedule timeslot"));
-    stc.setStartTime(scheduleService.convertToOffsetDateTime(stc.getStartTime(),schedule.getSelectedTimeZone()));
-    stc.setEndTime(scheduleService.convertToOffsetDateTime(stc.getEndTime(),schedule.getSelectedTimeZone()));
-
   }
 
 

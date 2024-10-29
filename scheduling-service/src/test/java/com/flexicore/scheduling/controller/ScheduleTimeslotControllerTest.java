@@ -13,6 +13,7 @@ import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleTimeslotUpdate;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -88,12 +89,12 @@ public class ScheduleTimeslotControllerTest {
     public void testScheduleTimeslotCreate() throws JsonProcessingException {
         String name = UUID.randomUUID().toString();
         ScheduleTimeslotCreate request = new ScheduleTimeslotCreate()
-                .setStartTime(ZonedDateTime.now().withZoneSameInstant(ZoneId.of("America/Bahia_Banderas")).toOffsetDateTime())
+                .setStartTime(LocalTime.of(10,20))
                 .setStartMillisOffset(10L)
                 .setScheduleId(this.schedule.getId())
                 .setTimeOfTheDayNameEndLon(10D)
                 .setTimeOfTheDayNameEndLat(10D)
-                .setEndTime(ZonedDateTime.now().withZoneSameInstant(ZoneId.of("America/Bahia_Banderas")).toOffsetDateTime())
+                .setEndTime(LocalTime.of(10,30))
                 .setCoolDownIntervalBeforeRepeat(10L)
                 .setEndMillisOffset(10L)
                 .setName(name);
@@ -148,7 +149,7 @@ public class ScheduleTimeslotControllerTest {
 
         if (request.getStartTime() != null) {
 
-            Assertions.assertEquals(request.getStartTime(), testScheduleTimeslot.getStartTime().atZoneSameInstant(ZoneId.of(request.getStartTime().getOffset().getId())).toOffsetDateTime());
+            Assertions.assertEquals(request.getStartTime(), testScheduleTimeslot.getStartTime());
         }
 
         if (request.getLastExecution() != null) {
@@ -188,7 +189,7 @@ public class ScheduleTimeslotControllerTest {
 
         if (request.getEndTime() != null) {
 
-            Assertions.assertEquals(request.getEndTime(), testScheduleTimeslot.getEndTime().atZoneSameInstant(ZoneId.of(request.getEndTime().getOffset().getId())).toOffsetDateTime());
+            Assertions.assertEquals(request.getEndTime(), testScheduleTimeslot.getEndTime());
 
         }
 

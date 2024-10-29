@@ -1,6 +1,8 @@
 package com.flexicore.scheduling.model;
 
 import com.flexicore.model.SecuredBasic;
+
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,9 +14,8 @@ public class ScheduleTimeslot extends SecuredBasic {
 
 
   private TimeOfTheDayName startTimeOfTheDayName;
-  @Column(columnDefinition = "timestamp with time zone")
 
-  private OffsetDateTime startTime;
+  private LocalTime startTime;
   @Column(columnDefinition = "timestamp with time zone")
 
   private OffsetDateTime lastExecution;
@@ -28,9 +29,8 @@ public class ScheduleTimeslot extends SecuredBasic {
   private Double timeOfTheDayNameEndLon;
 
   private Double timeOfTheDayNameEndLat;
-  @Column(columnDefinition = "timestamp with time zone")
 
-  private OffsetDateTime endTime;
+  private LocalTime endTime;
 
   private Long coolDownIntervalBeforeRepeat;
 
@@ -61,7 +61,7 @@ public class ScheduleTimeslot extends SecuredBasic {
   }
 
   /** @return startTime */
-  public OffsetDateTime getStartTime() {
+  public LocalTime getStartTime() {
     return this.startTime;
   }
 
@@ -69,7 +69,7 @@ public class ScheduleTimeslot extends SecuredBasic {
    * @param startTime startTime to set
    * @return ScheduleTimeslot
    */
-  public <T extends ScheduleTimeslot> T setStartTime(OffsetDateTime startTime) {
+  public <T extends ScheduleTimeslot> T setStartTime(LocalTime startTime) {
     this.startTime = startTime;
     return (T) this;
   }
@@ -146,7 +146,7 @@ public class ScheduleTimeslot extends SecuredBasic {
   }
 
   /** @return endTime */
-  public OffsetDateTime getEndTime() {
+  public LocalTime getEndTime() {
     return this.endTime;
   }
 
@@ -154,7 +154,7 @@ public class ScheduleTimeslot extends SecuredBasic {
    * @param endTime endTime to set
    * @return ScheduleTimeslot
    */
-  public <T extends ScheduleTimeslot> T setEndTime(OffsetDateTime endTime) {
+  public <T extends ScheduleTimeslot> T setEndTime(LocalTime endTime) {
     this.endTime = endTime;
     return (T) this;
   }

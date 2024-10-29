@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.TimeOfTheDayName;
 import com.wizzdi.flexicore.security.request.BasicCreate;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Lob;
 
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 
 public class ScheduleTimeslotCreate extends BasicCreate {
@@ -14,7 +13,7 @@ public class ScheduleTimeslotCreate extends BasicCreate {
     private String log;
   private TimeOfTheDayName startTimeOfTheDayName;
 
-  private OffsetDateTime startTime;
+  private LocalTime startTime;
 
   @JsonIgnore
   private OffsetDateTime lastExecution;
@@ -29,7 +28,7 @@ public class ScheduleTimeslotCreate extends BasicCreate {
 
   private Double timeOfTheDayNameEndLat;
 
-  private OffsetDateTime endTime;
+  private LocalTime endTime;
 
   private Long coolDownIntervalBeforeRepeat;
 
@@ -52,11 +51,11 @@ public class ScheduleTimeslotCreate extends BasicCreate {
     return (T) this;
   }
 
-  public OffsetDateTime getStartTime() {
+  public LocalTime getStartTime() {
     return this.startTime;
   }
 
-  public <T extends ScheduleTimeslotCreate> T setStartTime(OffsetDateTime startTime) {
+  public <T extends ScheduleTimeslotCreate> T setStartTime(LocalTime startTime) {
     this.startTime = startTime;
     return (T) this;
   }
@@ -119,11 +118,11 @@ public class ScheduleTimeslotCreate extends BasicCreate {
     return (T) this;
   }
 
-  public OffsetDateTime getEndTime() {
+  public LocalTime getEndTime() {
     return this.endTime;
   }
 
-  public <T extends ScheduleTimeslotCreate> T setEndTime(OffsetDateTime endTime) {
+  public <T extends ScheduleTimeslotCreate> T setEndTime(LocalTime endTime) {
     this.endTime = endTime;
     return (T) this;
   }

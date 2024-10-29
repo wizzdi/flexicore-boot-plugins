@@ -3,7 +3,6 @@ package com.flexicore.scheduling.service;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
-import com.flexicore.scheduling.request.ScheduleUpdate;
 import com.flexicore.security.SecurityContextBase;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Method;
 import java.time.*;
@@ -32,7 +30,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @Extension
@@ -222,14 +219,14 @@ public class Scheduler implements Plugin, InitializingBean {
         Schedule schedule = timeslot.getSchedule();
         OffsetTime nowTime = now.toOffsetTime();
 
-        OffsetTime start = timeslot.getStartTime() != null ? getOffSetTime(timeslot.getStartTime(),schedule.getSelectedTimeZone()) : null;
+        OffsetTime start = timeslot.getStartTime() != null ? getOffSetTime(now, timeslot.getStartTime(),schedule.getSelectedTimeZone()) : null;
         if (timeslot.getStartTimeOfTheDayName() != null) {
             start = getTimeFromName(timeslot.getStartTimeOfTheDayName(), timeslot.getTimeOfTheDayNameStartLon(), timeslot.getTimeOfTheDayNameStartLat()).orElse(null);
         }
         long startMillisOffset = timeslot.getStartMillisOffset() != null ? timeslot.getStartMillisOffset() : 0;
         start = start != null ? start.plus(startMillisOffset, ChronoUnit.MILLIS) : null;
 
-        OffsetTime end = timeslot.getEndTime() != null ? getOffSetTime(timeslot.getEndTime(),schedule.getSelectedTimeZone()) : null;
+        OffsetTime end = timeslot.getEndTime() != null ? getOffSetTime(now,timeslot.getEndTime(),schedule.getSelectedTimeZone()) : null;
         if (timeslot.getEndTimeOfTheDayName() != null) {
             end = getTimeFromName(timeslot.getEndTimeOfTheDayName(), timeslot.getTimeOfTheDayNameEndLon(), timeslot.getTimeOfTheDayNameEndLat()).orElse(null);
 
@@ -239,9 +236,10 @@ public class Scheduler implements Plugin, InitializingBean {
 
         return start != null && nowTime.isAfter(start) && (end == null || nowTime.isBefore(end));
     }
-    public static OffsetTime getOffSetTime(OffsetDateTime startTime, String timezoneId) {
+    public static OffsetTime getOffSetTime(OffsetDateTime now, LocalTime startTime, String timezoneId) {
 
-        return startTime.atZoneSameInstant(ZoneId.of(timezoneId)).toOffsetDateTime().toOffsetTime();
+        ZoneOffset offsetOfTimeZoneNow = ZoneId.of(timezoneId).getRules().getOffset(now.toInstant());
+        return startTime.atOffset(offsetOfTimeZoneNow);
     }
     private boolean isInTimeFrame(Schedule schedule, OffsetDateTime now) {
         return now.isAfter(schedule.getTimeFrameStart().atZoneSameInstant(ZoneId.of(schedule.getSelectedTimeZone())).toOffsetDateTime())
