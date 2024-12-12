@@ -212,7 +212,7 @@ public class Scheduler implements Plugin, InitializingBean {
 
     }
 
-    private boolean isTime(ScheduleTimeslot timeslot, OffsetDateTime now) {
+    public static boolean isTime(ScheduleTimeslot timeslot, OffsetDateTime now) {
         if ((timeslot.getStartTime() == null && timeslot.getStartTimeOfTheDayName() == null) || (timeslot.getEndTime() == null && timeslot.getEndTimeOfTheDayName() == null)) {
             return false;
         }
@@ -264,7 +264,7 @@ public class Scheduler implements Plugin, InitializingBean {
     }
 
 
-    public Optional<OffsetTime> getTimeFromName(
+    public static Optional<OffsetTime> getTimeFromName(
             TimeOfTheDayName timeOfTheDayName, double lon, double lat) {
         SolarTime solarTime;
         Optional<Moment> result = switch (timeOfTheDayName) {
