@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 @Table(indexes = {
         @Index(name = "firmware_installation_idx",columnList = "targetRemote_id,firmwareUpdate_id,firmwareInstallationState")
 })
-public class FirmwareUpdateInstallation extends SecuredBasic {
+public class FirmwareUpdateInstallation extends Baseclass {
 
     @ManyToOne(targetEntity = FirmwareUpdate.class)
     private FirmwareUpdate firmwareUpdate;

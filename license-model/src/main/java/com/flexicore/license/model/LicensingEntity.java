@@ -8,15 +8,22 @@ package com.flexicore.license.model;
 
 
 
-import com.flexicore.model.SecuredBasic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.model.Baseclass;
 
+import com.flexicore.model.Clazz;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 
 @SuppressWarnings("serial")
 
 @Entity
-public class  LicensingEntity extends SecuredBasic {
+public class  LicensingEntity extends Baseclass {
 
 
 	private String canonicalName;
@@ -28,6 +35,13 @@ public class  LicensingEntity extends SecuredBasic {
 
 	public String getCanonicalName() {
 		return canonicalName;
+	}
+
+	@Transient
+	@JsonIgnore
+	public Clazz getClazz(){
+		List<String> list = Optional.ofNullable(getCanonicalName()).map(f -> f.split("\\.")).stream().flatMap(Arrays::stream).toList();
+		return list.isEmpty()?null:new Clazz(list.getLast());
 	}
 
 	public void setCanonicalName(String canonicalName) {

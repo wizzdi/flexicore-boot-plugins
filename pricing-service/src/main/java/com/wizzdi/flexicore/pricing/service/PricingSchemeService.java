@@ -3,8 +3,8 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.PricingSchemeRepository;
 import com.wizzdi.flexicore.pricing.model.price.Money;
@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -37,19 +38,19 @@ public class PricingSchemeService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -76,32 +77,32 @@ public class PricingSchemeService implements Plugin {
     }
 
     public void validateFiltering(PricingSchemeFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
     }
 
     public PaginationResponse<PricingScheme> getAllPricingSchemes(
-            SecurityContextBase securityContext, PricingSchemeFiltering filtering) {
+            SecurityContext securityContext, PricingSchemeFiltering filtering) {
         List<PricingScheme> list = listAllPricingSchemes(securityContext, filtering);
         long count = repository.countAllPricingSchemes(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-	public List<PricingScheme> listAllPricingSchemes(SecurityContextBase securityContext, PricingSchemeFiltering filtering) {
+	public List<PricingScheme> listAllPricingSchemes(SecurityContext securityContext, PricingSchemeFiltering filtering) {
 		return repository.listAllPricingSchemes(securityContext, filtering);
 	}
 
 	public PricingScheme createPricingScheme(PricingSchemeCreate creationContainer,
-                                                 SecurityContextBase securityContext) {
+                                                 SecurityContext securityContext) {
         PricingScheme pricingScheme = createPricingSchemeNoMerge(creationContainer, securityContext);
         repository.merge(pricingScheme);
         return pricingScheme;
     }
 
     public PricingScheme createPricingSchemeNoMerge(PricingSchemeCreate creationContainer,
-                                                         SecurityContextBase securityContext) {
+                                                         SecurityContext securityContext) {
         PricingScheme pricingScheme = new PricingScheme();
-        pricingScheme.setId(Baseclass.getBase64ID());
+        pricingScheme.setId(UUID.randomUUID().toString());
         updatePricingSchemeNoMerge(pricingScheme, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(pricingScheme, securityContext);
         return pricingScheme;
@@ -123,7 +124,7 @@ public class PricingSchemeService implements Plugin {
     }
 
     public PricingScheme updatePricingScheme(PricingSchemeUpdate updateContainer,
-                                                 SecurityContextBase securityContext) {
+                                                 SecurityContext securityContext) {
         PricingScheme pricingScheme = updateContainer.getPricingScheme();
         if (updatePricingSchemeNoMerge(pricingScheme, updateContainer)) {
             repository.merge(pricingScheme);
@@ -132,11 +133,11 @@ public class PricingSchemeService implements Plugin {
     }
 
     public void validate(PricingSchemeCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(creationContainer, securityContext);
 
         String fixedPriceId=creationContainer.getFixedPriceId();
-        Money money=fixedPriceId==null?null:getByIdOrNull(fixedPriceId,Money.class, SecuredBasic_.security,securityContext);
+        Money money=fixedPriceId==null?null:getByIdOrNull(fixedPriceId,Money.class, securityContext);
         if(money==null&&fixedPriceId!=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no money with id "+fixedPriceId);
         }

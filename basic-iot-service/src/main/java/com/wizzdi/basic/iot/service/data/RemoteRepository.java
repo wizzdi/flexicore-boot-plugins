@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.ConnectivityChange;
 import com.wizzdi.basic.iot.model.ConnectivityChange_;
 import com.wizzdi.basic.iot.model.Remote;
@@ -53,7 +53,7 @@ public class RemoteRepository implements Plugin {
     @Autowired
     private BasicIOTConfig basicIOTConfig;
 
-    public List<Remote> getAllRemotes(SecurityContextBase securityContext,
+    public List<Remote> getAllRemotes(SecurityContext securityContext,
                                            RemoteFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Remote> q = cb.createQuery(Remote.class);
@@ -66,7 +66,7 @@ public class RemoteRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllRemotes(SecurityContextBase securityContext,
+    public long countAllRemotes(SecurityContext securityContext,
                                    RemoteFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -79,7 +79,7 @@ public class RemoteRepository implements Plugin {
     }
 
     public <T extends Remote> void addRemotePredicates(RemoteFilter filtering,
-                                                           CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
         if(filtering.getRemoteIds()!=null&&!filtering.getRemoteIds().isEmpty()){
@@ -113,19 +113,19 @@ public class RemoteRepository implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

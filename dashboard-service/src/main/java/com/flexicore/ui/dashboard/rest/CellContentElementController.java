@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.CellContentElement;
 import com.flexicore.ui.dashboard.request.CellContentElementCreate;
 import com.flexicore.ui.dashboard.request.CellContentElementFilter;
@@ -45,7 +45,7 @@ public class CellContentElementController implements Plugin {
 	public PaginationResponse<CellContentElement> getAllCellContentElement(
 			 @RequestBody
 			CellContentElementFilter cellContentElementFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(cellContentElementFilter, securityContext);
 		return service.getAllCellContentElement(cellContentElementFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class CellContentElementController implements Plugin {
 	@PutMapping("updateCellContentElement")
 	public CellContentElement updateCellContentElement(
 			@RequestBody
-			CellContentElementUpdate updateCellContentElement, @RequestAttribute SecurityContextBase securityContext) {
+			CellContentElementUpdate updateCellContentElement, @RequestAttribute SecurityContext securityContext) {
 		CellContentElement cellContentElement = updateCellContentElement.getId() != null ? service.getByIdOrNull(
-				updateCellContentElement.getId(), CellContentElement.class, SecuredBasic_.security, securityContext) : null;
+				updateCellContentElement.getId(), CellContentElement.class,  securityContext) : null;
 		if (cellContentElement == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateCellContentElement.getId());
@@ -77,7 +77,7 @@ public class CellContentElementController implements Plugin {
 	@PostMapping("createCellContentElement")
 	public CellContentElement createCellContentElement(
 			@RequestBody
-			CellContentElementCreate createCellContentElement, @RequestAttribute SecurityContextBase securityContext) {
+			CellContentElementCreate createCellContentElement, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createCellContentElement, securityContext);
 		return service.createCellContentElement(createCellContentElement, securityContext);
 

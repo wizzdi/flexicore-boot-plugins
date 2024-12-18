@@ -5,7 +5,7 @@ import com.flexicore.annotations.OperationsInside;
 import com.flexicore.organization.model.SalesPersonToRegion;
 import com.flexicore.organization.request.SalesPersonToRegionCreate;
 import com.flexicore.organization.service.SalesPersonToRegionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class SalesPersonToRegionController implements Plugin {
 	public SalesPersonToRegion createSalesPersonToRegion(
 
 			@RequestBody  SalesPersonToRegionCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validate(creationContainer, securityContext);
 

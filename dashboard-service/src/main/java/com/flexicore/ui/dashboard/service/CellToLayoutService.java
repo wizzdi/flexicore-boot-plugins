@@ -2,11 +2,11 @@ package com.flexicore.ui.dashboard.service;
 
 
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.CellToLayoutRepository;
@@ -42,7 +42,7 @@ public class CellToLayoutService implements Plugin {
 	@Autowired
 	private BasicService  baseclassNewService;
 
-	public CellToLayout updateCellToLayout(CellToLayoutUpdate cellToLayoutUpdate, SecurityContextBase securityContext) {
+	public CellToLayout updateCellToLayout(CellToLayoutUpdate cellToLayoutUpdate, SecurityContext securityContext) {
 		if (CellToLayoutUpdateNoMerge(cellToLayoutUpdate,
 				cellToLayoutUpdate.getCellToLayout())) {
 			cellToLayoutRepository.merge(cellToLayoutUpdate.getCellToLayout());
@@ -77,13 +77,13 @@ public class CellToLayoutService implements Plugin {
 
 	public List<CellToLayout> listAllCellToLayout(
 			CellToLayoutFilter cellToLayoutFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return cellToLayoutRepository.listAllCellToLayout(cellToLayoutFilter,
 				securityContext);
 	}
 
 	public CellToLayout createCellToLayout(CellToLayoutCreate createCellToLayout,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		CellToLayout cellToLayout = createCellToLayoutNoMerge(createCellToLayout,
 				securityContext);
 		cellToLayoutRepository.merge(cellToLayout);
@@ -92,7 +92,7 @@ public class CellToLayoutService implements Plugin {
 	}
 
 	public CellToLayout createCellToLayoutNoMerge(
-			CellToLayoutCreate createCellToLayout, SecurityContextBase securityContext) {
+			CellToLayoutCreate createCellToLayout, SecurityContext securityContext) {
 		CellToLayout cellToLayout = new CellToLayout();
 		cellToLayout.setId(UUID.randomUUID().toString());
 		CellToLayoutUpdateNoMerge(createCellToLayout, cellToLayout);
@@ -102,7 +102,7 @@ public class CellToLayoutService implements Plugin {
 
 	public PaginationResponse<CellToLayout> getAllCellToLayout(
 			CellToLayoutFilter cellToLayoutFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<CellToLayout> list = listAllCellToLayout(cellToLayoutFilter,
 				securityContext);
 		long count = cellToLayoutRepository.countAllCellToLayout(
@@ -111,7 +111,7 @@ public class CellToLayoutService implements Plugin {
 	}
 
 	public void validate(CellToLayoutCreate createCellToLayout,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createCellToLayout, securityContext);
 		String dashboardPresetId=createCellToLayout.getDashboardPresetId();
 		DashboardPreset dashboardPreset=dashboardPresetId!=null?getByIdOrNull(dashboardPresetId,DashboardPreset.class,null,securityContext):null;
@@ -137,11 +137,11 @@ public class CellToLayoutService implements Plugin {
 	}
 
 	public void validate(CellToLayoutFilter cellToLayoutFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		baseclassNewService.validate(cellToLayoutFilter, securityContext);
 
 		Set<String> dashboardPresetIds= cellToLayoutFilter.getDashboardPresetIds();
-		Map<String,DashboardPreset> dashboardPresetMap=dashboardPresetIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(DashboardPreset.class,dashboardPresetIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String,DashboardPreset> dashboardPresetMap=dashboardPresetIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(DashboardPreset.class,dashboardPresetIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		dashboardPresetIds.removeAll(dashboardPresetMap.keySet());
 		if(!dashboardPresetIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No DashboardPreset with ids "+dashboardPresetIds);
@@ -149,7 +149,7 @@ public class CellToLayoutService implements Plugin {
 		cellToLayoutFilter.setDashboardPresets(new ArrayList<>(dashboardPresetMap.values()));
 
 		Set<String> cellContentIds= cellToLayoutFilter.getCellContentIds();
-		Map<String,CellContent> cellContentMap=cellContentIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(CellContent.class,cellContentIds,SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String,CellContent> cellContentMap=cellContentIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(CellContent.class,cellContentIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		cellContentIds.removeAll(cellContentMap.keySet());
 		if(!cellContentIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContent with ids "+cellContentIds);
@@ -157,7 +157,7 @@ public class CellToLayoutService implements Plugin {
 		cellToLayoutFilter.setCellContents(new ArrayList<>(cellContentMap.values()));
 
 		Set<String> gridLayoutCellIds= cellToLayoutFilter.getGridLayoutCellIds();
-		Map<String,GridLayoutCell> gridLayoutCellMap=gridLayoutCellIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(GridLayoutCell.class,gridLayoutCellIds,SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String,GridLayoutCell> gridLayoutCellMap=gridLayoutCellIds.isEmpty()?new HashMap<>():cellToLayoutRepository.listByIds(GridLayoutCell.class,gridLayoutCellIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		gridLayoutCellIds.removeAll(gridLayoutCellMap.keySet());
 		if(!gridLayoutCellIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayoutCell with ids "+gridLayoutCellIds);
@@ -167,19 +167,19 @@ public class CellToLayoutService implements Plugin {
 
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return cellToLayoutRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return cellToLayoutRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellToLayoutRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellToLayoutRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

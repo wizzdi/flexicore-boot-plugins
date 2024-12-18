@@ -11,8 +11,6 @@ public class CategoryToClazzCreate extends BasicCreate {
     private String categoryId;
     @JsonIgnore
     private Category category;
-    private String clazzId;
-    @JsonIgnore
     private Clazz clazz;
     private Boolean enabled;
 
@@ -36,16 +34,6 @@ public class CategoryToClazzCreate extends BasicCreate {
     }
 
 
-    public String getClazzId() {
-        return clazzId;
-    }
-
-    public <T extends CategoryToClazzCreate> T setClazzId(String clazzId) {
-        this.clazzId = clazzId;
-        return (T) this;
-    }
-
-    @JsonIgnore
     public Clazz getClazz() {
         return clazz;
     }

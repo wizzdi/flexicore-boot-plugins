@@ -1,12 +1,12 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class SalesPersonToRegion extends SecuredBasic {
+public class SalesPersonToRegion extends Baseclass {
 
 
 	@ManyToOne(targetEntity = SalesPerson.class)

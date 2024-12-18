@@ -3,7 +3,7 @@ package com.flexicore.scheduling.service;
 import com.flexicore.scheduling.model.*;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteDynamicExecution;
@@ -115,7 +115,7 @@ public class Scheduler implements Plugin, InitializingBean {
                             continue;
                         }
                         logger.debug("Starting to check schedule " + schedule.getName() + "(" + schedule.getId() + ")");
-                        SecurityContextBase scheduleSecurityContext = securityContextProvider.getSecurityContext(schedule.getSecurity().getCreator());
+                        SecurityContext scheduleSecurityContext = securityContextProvider.getSecurityContext(schedule.getCreator());
                         List<ScheduleTimeslot> timeslots = timeSlotsMap.get(schedule.getId());
                         if (timeslots == null) {
                             logger.debug("no timeslots for schedule " + schedule.getName() + "(" + schedule.getId() + ")");
@@ -284,7 +284,7 @@ public class Scheduler implements Plugin, InitializingBean {
     }
 
     public void runSchedule(List<ScheduleToAction> schedule,
-                            SecurityContextBase securityContext) {
+                            SecurityContext securityContext) {
         logger.debug("Starting to run scheduleToActions of size : {}", schedule.size());
         for (ScheduleToAction link : schedule) {
             logger.debug("Will run scheduleToAction {} " , link.getScheduleAction().getName() );
@@ -329,7 +329,7 @@ public class Scheduler implements Plugin, InitializingBean {
         Class<?>[] parameterTypes = method.getParameterTypes();
         return method.getParameterCount() == 2
                 && ScheduleAction.class.isAssignableFrom(parameterTypes[0])
-                && SecurityContextBase.class.isAssignableFrom(parameterTypes[1]);
+                && SecurityContext.class.isAssignableFrom(parameterTypes[1]);
     }
 
     @Override

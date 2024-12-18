@@ -2,13 +2,13 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.scheduling.model.ScheduleAction;
 import com.flexicore.scheduling.data.ScheduleActionRepository;
 import com.flexicore.scheduling.request.ScheduleActionCreate;
 import com.flexicore.scheduling.request.ScheduleActionFilter;
 import com.flexicore.scheduling.request.ScheduleActionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -44,7 +44,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public ScheduleAction createScheduleAction(
-      ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
+      ScheduleActionCreate scheduleActionCreate, SecurityContext securityContext) {
     ScheduleAction scheduleAction =
         createScheduleActionNoMerge(scheduleActionCreate, securityContext);
     repository.merge(scheduleAction);
@@ -58,7 +58,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public ScheduleAction createScheduleActionNoMerge(
-      ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
+      ScheduleActionCreate scheduleActionCreate, SecurityContext securityContext) {
     ScheduleAction scheduleAction = new ScheduleAction();
     scheduleAction.setId(UUID.randomUUID().toString());
     updateScheduleActionNoMerge(scheduleAction, scheduleActionCreate);
@@ -106,7 +106,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public ScheduleAction updateScheduleAction(
-      ScheduleActionUpdate scheduleActionUpdate, SecurityContextBase securityContext) {
+      ScheduleActionUpdate scheduleActionUpdate, SecurityContext securityContext) {
     ScheduleAction scheduleAction = scheduleActionUpdate.getScheduleAction();
     if (updateScheduleActionNoMerge(scheduleAction, scheduleActionUpdate)) {
       repository.merge(scheduleAction);
@@ -121,7 +121,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public PaginationResponse<ScheduleAction> getAllScheduleActions(
-      ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
+      ScheduleActionFilter scheduleActionFilter, SecurityContext securityContext) {
     List<ScheduleAction> list = listAllScheduleActions(scheduleActionFilter, securityContext);
     long count = repository.countAllScheduleActions(scheduleActionFilter, securityContext);
     return new PaginationResponse<>(list, scheduleActionFilter, count);
@@ -134,7 +134,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public List<ScheduleAction> listAllScheduleActions(
-      ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
+      ScheduleActionFilter scheduleActionFilter, SecurityContext securityContext) {
     return repository.listAllScheduleActions(scheduleActionFilter, securityContext);
   }
 
@@ -145,7 +145,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public void validate(
-      ScheduleActionFilter scheduleActionFilter, SecurityContextBase securityContext) {
+      ScheduleActionFilter scheduleActionFilter, SecurityContext securityContext) {
     basicService.validate(scheduleActionFilter, securityContext);
 
     Set<String> dynamicExecutionIds =
@@ -159,7 +159,6 @@ public class ScheduleActionService implements Plugin {
                 .listByIds(
                     DynamicExecution.class,
                     dynamicExecutionIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -178,7 +177,7 @@ public class ScheduleActionService implements Plugin {
    */
 
   public void validate(
-      ScheduleActionCreate scheduleActionCreate, SecurityContextBase securityContext) {
+      ScheduleActionCreate scheduleActionCreate, SecurityContext securityContext) {
     basicService.validate(scheduleActionCreate, securityContext);
 
     String dynamicExecutionId = scheduleActionCreate.getDynamicExecutionId();
@@ -188,7 +187,7 @@ public class ScheduleActionService implements Plugin {
             : repository.getByIdOrNull(
                 dynamicExecutionId,
                 DynamicExecution.class,
-                SecuredBasic_.security,
+                
                 securityContext);
     if (dynamicExecutionId != null && dynamicExecution == null) {
       throw new ResponseStatusException(
@@ -199,13 +198,13 @@ public class ScheduleActionService implements Plugin {
 
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -214,7 +213,7 @@ public class ScheduleActionService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -223,7 +222,7 @@ public class ScheduleActionService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

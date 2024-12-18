@@ -4,7 +4,7 @@ package com.flexicore.territories.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.model.territories.Address;
 import com.flexicore.model.territories.Address_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.AddressCreate;
 import com.flexicore.territories.request.AddressFilter;
@@ -38,14 +38,14 @@ public class AddressRESTService implements Plugin {
 	public Address updateAddress(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody AddressUpdate updateContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		Address address = service.getByIdOrNull(updateContainer.getId(), Address.class, Address_.security, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		Address address = service.getByIdOrNull(updateContainer.getId(), Address.class,SecurityContext);
 		if (address == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Address with id " + updateContainer.getId());
 		}
 		updateContainer.setAddress(address);
-		service.validate(updateContainer, securityContextBase);
-		return service.updateAddress(updateContainer, securityContextBase);
+		service.validate(updateContainer, SecurityContext);
+		return service.updateAddress(updateContainer, SecurityContext);
 	}
 
 
@@ -55,8 +55,8 @@ public class AddressRESTService implements Plugin {
 	public AddressImportResponse importAddresses(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody AddressImportRequest addressImportRequest,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		return service.importAddresses(securityContextBase, addressImportRequest);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		return service.importAddresses(SecurityContext, addressImportRequest);
 	}
 
 	@Operation(description = "get all address",summary = "get all address")
@@ -64,8 +64,8 @@ public class AddressRESTService implements Plugin {
 	@PostMapping("getAllAddresses")
 	public PaginationResponse<Address> getAllAddresses(
 			
-			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody AddressFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		return service.getAllAddresses(securityContextBase, filtering);
+			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody AddressFilter filtering, @RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		return service.getAllAddresses(SecurityContext, filtering);
 	}
 
 
@@ -74,9 +74,9 @@ public class AddressRESTService implements Plugin {
 	public Address createAddress(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody AddressCreate creationContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(creationContainer, securityContextBase);
-		return service.createAddress(creationContainer, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(creationContainer, SecurityContext);
+		return service.createAddress(creationContainer, SecurityContext);
 	}
 
 }

@@ -8,7 +8,7 @@ import com.wizzdi.flexicore.billing.request.PaymentCreate;
 import com.wizzdi.flexicore.billing.request.PaymentFiltering;
 import com.wizzdi.flexicore.billing.request.PaymentUpdate;
 import com.wizzdi.flexicore.billing.service.PaymentService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class PaymentController implements Plugin {
     public PaginationResponse<Payment> getAllPayments(
 
             
-            @RequestBody PaymentFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PaymentFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPayments(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class PaymentController implements Plugin {
 
             
             @RequestBody PaymentCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPayment(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class PaymentController implements Plugin {
 
             
             @RequestBody PaymentUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Payment payment = service.getByIdOrNull(updateContainer.getId(),
-                Payment.class, Payment_.security, securityContext);
+                Payment.class,  securityContext);
         if (payment == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Payment with id "
                     + updateContainer.getId());

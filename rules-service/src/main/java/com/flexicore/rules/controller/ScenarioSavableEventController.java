@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioSavableEventCreate;
 import com.flexicore.rules.request.ScenarioSavableEventFilter;
 import com.flexicore.rules.request.ScenarioSavableEventUpdate;
 import com.flexicore.rules.service.ScenarioSavableEventService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioSavableEventController implements Plugin {
   public ScenarioSavableEvent createScenarioSavableEvent(
       
       @RequestBody ScenarioSavableEventCreate scenarioSavableEventCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioSavableEventService.validate(scenarioSavableEventCreate, securityContext);
     return scenarioSavableEventService.createScenarioSavableEvent(
@@ -44,14 +44,13 @@ public class ScenarioSavableEventController implements Plugin {
   public ScenarioSavableEvent updateScenarioSavableEvent(
       
       @RequestBody ScenarioSavableEventUpdate scenarioSavableEventUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioSavableEventId = scenarioSavableEventUpdate.getId();
     ScenarioSavableEvent scenarioSavableEvent =
         scenarioSavableEventService.getByIdOrNull(
             scenarioSavableEventId,
             ScenarioSavableEvent.class,
-            ScenarioSavableEvent_.security,
             securityContext);
     if (scenarioSavableEvent == null) {
       throw new ResponseStatusException(
@@ -68,7 +67,7 @@ public class ScenarioSavableEventController implements Plugin {
   public PaginationResponse<ScenarioSavableEvent> getAllScenarioSavableEvents(
       
       @RequestBody ScenarioSavableEventFilter scenarioSavableEventFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioSavableEventService.validate(scenarioSavableEventFilter, securityContext);
     return scenarioSavableEventService.getAllScenarioSavableEvents(

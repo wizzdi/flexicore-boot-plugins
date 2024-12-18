@@ -7,7 +7,7 @@ import com.flexicore.rules.request.JSFunctionCreate;
 import com.flexicore.rules.request.JSFunctionFilter;
 import com.flexicore.rules.request.JSFunctionUpdate;
 import com.flexicore.rules.service.JSFunctionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class JSFunctionController implements Plugin {
   public PaginationResponse<JSFunction> getAllJSFunctions(
       
       @RequestBody JSFunctionFilter jSFunctionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     jSFunctionService.validate(jSFunctionFilter, securityContext);
     return jSFunctionService.getAllJSFunctions(jSFunctionFilter, securityContext);
@@ -43,7 +43,7 @@ public class JSFunctionController implements Plugin {
   public JSFunction createJSFunction(
       
       @RequestBody JSFunctionCreate jSFunctionCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     jSFunctionService.validate(jSFunctionCreate, securityContext);
     return jSFunctionService.createJSFunction(jSFunctionCreate, securityContext);
@@ -54,12 +54,12 @@ public class JSFunctionController implements Plugin {
   public JSFunction updateJSFunction(
       
       @RequestBody JSFunctionUpdate jSFunctionUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String jSFunctionId = jSFunctionUpdate.getId();
     JSFunction jSFunction =
         jSFunctionService.getByIdOrNull(
-            jSFunctionId, JSFunction.class, JSFunction_.security, securityContext);
+            jSFunctionId, JSFunction.class,  securityContext);
     if (jSFunction == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No JSFunction with id " + jSFunctionId);

@@ -2,14 +2,14 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.JSFunctionParameterRepository;
 import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.model.JSFunctionParameter;
 import com.flexicore.rules.request.JSFunctionParameterCreate;
 import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.rules.request.JSFunctionParameterUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -43,7 +43,7 @@ public class JSFunctionParameterService implements Plugin {
    * @return created JSFunctionParameter
    */
   public JSFunctionParameter createJSFunctionParameter(
-      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContextBase securityContext) {
+      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContext securityContext) {
     JSFunctionParameter jSFunctionParameter =
         createJSFunctionParameterNoMerge(jSFunctionParameterCreate, securityContext);
     this.repository.merge(jSFunctionParameter);
@@ -56,7 +56,7 @@ public class JSFunctionParameterService implements Plugin {
    * @return created JSFunctionParameter unmerged
    */
   public JSFunctionParameter createJSFunctionParameterNoMerge(
-      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContextBase securityContext) {
+      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContext securityContext) {
     JSFunctionParameter jSFunctionParameter = new JSFunctionParameter();
     jSFunctionParameter.setId(UUID.randomUUID().toString());
     updateJSFunctionParameterNoMerge(jSFunctionParameter, jSFunctionParameterCreate);
@@ -109,7 +109,7 @@ public class JSFunctionParameterService implements Plugin {
    * @return jSFunctionParameter
    */
   public JSFunctionParameter updateJSFunctionParameter(
-      JSFunctionParameterUpdate jSFunctionParameterUpdate, SecurityContextBase securityContext) {
+      JSFunctionParameterUpdate jSFunctionParameterUpdate, SecurityContext securityContext) {
     JSFunctionParameter jSFunctionParameter = jSFunctionParameterUpdate.getJSFunctionParameter();
     if (updateJSFunctionParameterNoMerge(jSFunctionParameter, jSFunctionParameterUpdate)) {
       this.repository.merge(jSFunctionParameter);
@@ -123,7 +123,7 @@ public class JSFunctionParameterService implements Plugin {
    * @return PaginationResponse containing paging information for JSFunctionParameter
    */
   public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameters(
-      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContextBase securityContext) {
+      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContext securityContext) {
     List<JSFunctionParameter> list =
         listAllJSFunctionParameters(jSFunctionParameterFilter, securityContext);
     long count =
@@ -137,7 +137,7 @@ public class JSFunctionParameterService implements Plugin {
    * @return List of JSFunctionParameter
    */
   public List<JSFunctionParameter> listAllJSFunctionParameters(
-      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContextBase securityContext) {
+      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContext securityContext) {
     return this.repository.listAllJSFunctionParameters(jSFunctionParameterFilter, securityContext);
   }
 
@@ -147,7 +147,7 @@ public class JSFunctionParameterService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionParameterFilter is not valid
    */
   public void validate(
-      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContextBase securityContext) {
+      JSFunctionParameterFilter jSFunctionParameterFilter, SecurityContext securityContext) {
     basicService.validate(jSFunctionParameterFilter, securityContext);
 
     Set<String> jsFunctionIds =
@@ -158,7 +158,7 @@ public class JSFunctionParameterService implements Plugin {
         jsFunctionIds.isEmpty()
             ? new HashMap<>()
             : this.repository
-                .listByIds(JSFunction.class, jsFunctionIds, SecuredBasic_.security, securityContext)
+                .listByIds(JSFunction.class, jsFunctionIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     jsFunctionIds.removeAll(jsFunction.keySet());
@@ -174,7 +174,7 @@ public class JSFunctionParameterService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionParameterCreate is not valid
    */
   public void validate(
-      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContextBase securityContext) {
+      JSFunctionParameterCreate jSFunctionParameterCreate, SecurityContext securityContext) {
     basicService.validate(jSFunctionParameterCreate, securityContext);
 
     String jsFunctionId = jSFunctionParameterCreate.getJsFunctionId();
@@ -182,7 +182,7 @@ public class JSFunctionParameterService implements Plugin {
         jsFunctionId == null
             ? null
             : this.repository.getByIdOrNull(
-                jsFunctionId, JSFunction.class, SecuredBasic_.security, securityContext);
+                jsFunctionId, JSFunction.class,  securityContext);
     if (jsFunctionId != null && jsFunction == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No JSFunction with id " + jsFunctionId);
@@ -191,12 +191,12 @@ public class JSFunctionParameterService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -204,7 +204,7 @@ public class JSFunctionParameterService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -212,7 +212,7 @@ public class JSFunctionParameterService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

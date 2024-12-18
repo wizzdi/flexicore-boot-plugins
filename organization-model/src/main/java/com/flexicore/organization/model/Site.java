@@ -1,13 +1,13 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Address;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Site extends SecuredBasic {
+public class Site extends Baseclass {
 
 
 	private String externalId;

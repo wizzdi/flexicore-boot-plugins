@@ -2,8 +2,9 @@ package com.flexicore.ui.dashboard.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution_;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.*;
 import com.flexicore.ui.dashboard.request.DataMapperFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -29,13 +30,14 @@ import java.util.stream.Collectors;
 @Extension
 @Component
 public class DataMapperRepository implements Plugin {
-@PersistenceContext
-private EntityManager em;
-@Autowired
-private SecuredBasicRepository securedBasicRepository;
 
-	public List<DataMapper> listAllDataMapper(DataMapperFilter dataMapperFilter,
-                                              SecurityContextBase securityContext) {
+	@PersistenceContext
+	private EntityManager em;
+
+	@Autowired
+	private SecuredBasicRepository securedBasicRepository;
+
+	public List<DataMapper> listAllDataMapper(DataMapperFilter dataMapperFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<DataMapper> q = cb.createQuery(DataMapper.class);
 		Root<DataMapper> r = q.from(DataMapper.class);
@@ -47,8 +49,7 @@ private SecuredBasicRepository securedBasicRepository;
         return query.getResultList();
 	}
 
-	public <T extends DataMapper> void addDataMapperPredicates(List<Predicate> preds, CriteriaBuilder cb,
-                                                               CommonAbstractCriteria q, From<?,T> r, DataMapperFilter dataMapperFilter, SecurityContextBase securityContext) {
+	public <T extends DataMapper> void addDataMapperPredicates(List<Predicate> preds, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, DataMapperFilter dataMapperFilter, SecurityContext securityContext) {
 		securedBasicRepository.addSecuredBasicPredicates(null,cb,q,r,preds,securityContext);
 
 		if(dataMapperFilter.getCellContentElements()!=null &&!dataMapperFilter.getCellContentElements().isEmpty()){
@@ -65,16 +66,15 @@ private SecuredBasicRepository securedBasicRepository;
 
 		if(dataMapperFilter.getDynamicExecutions()!=null &&!dataMapperFilter.getDynamicExecutions().isEmpty()){
 			Set<String> ids= dataMapperFilter.getDynamicExecutions().stream().map(f->f.getId()).collect(Collectors.toSet());
-			Join<T, DynamicExecution> join=r.join(DataMapper_.dynamicExecution);
-			preds.add(join.get(SecuredBasic_.id).in(ids));
+
+			preds.add(r.get(DataMapper_.dynamicExecution).get(DynamicExecution_.id).in(ids));
 		}
 
 
 
 	}
 
-	public long countAllDataMapper(DataMapperFilter dataMapperFilter,
-                                   SecurityContextBase securityContext) {
+	public long countAllDataMapper(DataMapperFilter dataMapperFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<DataMapper> r = q.from(DataMapper.class);
@@ -86,19 +86,19 @@ private SecuredBasicRepository securedBasicRepository;
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

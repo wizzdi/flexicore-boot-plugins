@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.triggers.events;
 
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.rules.events.ScenarioEventBase;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.maps.model.MapIcon;
 

@@ -8,7 +8,7 @@ import com.flexicore.organization.request.BranchCreate;
 import com.flexicore.organization.request.BranchFiltering;
 import com.flexicore.organization.request.BranchUpdate;
 import com.flexicore.organization.service.BranchService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ public class BranchController implements Plugin {
 	@PostMapping("/getAllBranches")
 	public PaginationResponse<Branch> getAllBranchs(
 
-			@RequestBody BranchFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody BranchFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllBranches(securityContext, filtering);
 	}
@@ -47,7 +47,7 @@ public class BranchController implements Plugin {
 	public Branch createBranch(
 
 			@RequestBody BranchCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createBranch(creationContainer, securityContext);
@@ -59,10 +59,10 @@ public class BranchController implements Plugin {
 	public Branch updateBranch(
 
 			@RequestBody BranchUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		Branch branch = service.getByIdOrNull(updateContainer.getId(),
-				Branch.class, Branch_.security, securityContext);
+				Branch.class,  securityContext);
 		if (branch == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Branch with id "
 					+ updateContainer.getId());

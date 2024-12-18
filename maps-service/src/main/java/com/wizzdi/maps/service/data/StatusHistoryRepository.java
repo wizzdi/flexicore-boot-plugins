@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -47,7 +47,7 @@ public class StatusHistoryRepository implements Plugin {
    * @return List of StatusHistory
    */
   public List<StatusHistory> listAllStatusHistories(
-      StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+      StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<StatusHistory> q = cb.createQuery(StatusHistory.class);
     Root<StatusHistory> r = q.from(StatusHistory.class);
@@ -61,7 +61,7 @@ public class StatusHistoryRepository implements Plugin {
     return query.getResultList();
   }
 
-  public List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+  public List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Tuple> q = cb.createTupleQuery();
     Root<StatusHistory> r = q.from(StatusHistory.class);
@@ -89,7 +89,7 @@ public class StatusHistoryRepository implements Plugin {
       CriteriaQuery<?> q,
       From<?, T> r,
       List<Predicate> preds,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
         statusHistoryFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -135,7 +135,7 @@ public class StatusHistoryRepository implements Plugin {
    * @return count of StatusHistory
    */
   public Long countAllStatusHistories(
-      StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+      StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<StatusHistory> r = q.from(StatusHistory.class);
@@ -147,12 +147,12 @@ public class StatusHistoryRepository implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -160,7 +160,7 @@ public class StatusHistoryRepository implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -168,7 +168,7 @@ public class StatusHistoryRepository implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

@@ -2,7 +2,7 @@ package com.flexicore.ui.tree.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.model.TreeNode_;
 import com.flexicore.ui.tree.request.TreeNodeFilter;
@@ -34,7 +34,7 @@ public class TreeNodeRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
 
 
-    public List<TreeNode> getAllTreeNodes(TreeNodeFilter treeFilter, SecurityContextBase securityContext) {
+    public List<TreeNode> getAllTreeNodes(TreeNodeFilter treeFilter, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<TreeNode> q = cb.createQuery(TreeNode.class);
         Root<TreeNode> r = q.from(TreeNode.class);
@@ -48,7 +48,7 @@ public class TreeNodeRepository implements Plugin {
 
     }
 
-    public long countAllTreeNodes(TreeNodeFilter treeFilter, SecurityContextBase securityContext) {
+    public long countAllTreeNodes(TreeNodeFilter treeFilter, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<TreeNode> r = q.from(TreeNode.class);
@@ -60,27 +60,27 @@ public class TreeNodeRepository implements Plugin {
 
     }
 
-    public <T extends TreeNode> void addTreeNodeFiltering(CriteriaBuilder cb, CommonAbstractCriteria q, Root<TreeNode> r, List<Predicate> preds, TreeNodeFilter treeNodeFilter, SecurityContextBase securityContextBase) {
-        securedBasicRepository.addSecuredBasicPredicates(treeNodeFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContextBase);
+    public <T extends TreeNode> void addTreeNodeFiltering(CriteriaBuilder cb, CommonAbstractCriteria q, Root<TreeNode> r, List<Predicate> preds, TreeNodeFilter treeNodeFilter, SecurityContext SecurityContext) {
+        securedBasicRepository.addSecuredBasicPredicates(treeNodeFilter.getBasicPropertiesFilter(), cb, q, r, preds, SecurityContext);
         if (treeNodeFilter.getParents() != null && !treeNodeFilter.getParents().isEmpty()) {
             Set<String> ids = treeNodeFilter.getParents().stream().map(f -> f.getId()).collect(Collectors.toSet());
             preds.add(r.get(TreeNode_.parent).in(ids));
         }
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

@@ -1,13 +1,13 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class FirmwareUpdate extends SecuredBasic {
+public class FirmwareUpdate extends Baseclass {
 
     private String version;
     private String crc;

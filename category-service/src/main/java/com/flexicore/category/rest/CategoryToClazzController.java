@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -45,7 +45,7 @@ public class CategoryToClazzController implements Plugin {
 	public PaginationResponse<CategoryToClazz> getAllCategoryToClazz(
 			
 			@RequestBody CategoryToClazzFilter filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(filtering, securityContext);
 		return service.getAllCategoryToClazz(filtering, securityContext);
 	}
@@ -57,7 +57,7 @@ public class CategoryToClazzController implements Plugin {
 	public CategoryToClazz createCategoryToClazz(
 			
 			@RequestBody CategoryToClazzCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validate(creationContainer, securityContext);
 
@@ -71,7 +71,7 @@ public class CategoryToClazzController implements Plugin {
 	public CategoryToClazz updateCategoryToClazz(
 			
 			@RequestBody CategoryToClazzUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		CategoryToClazz CategoryToClazz = service.getByIdOrNull(updateContainer.getId(), CategoryToClazz.class, null, securityContext);
 		if (CategoryToClazz == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no CategoryToClazz with id "

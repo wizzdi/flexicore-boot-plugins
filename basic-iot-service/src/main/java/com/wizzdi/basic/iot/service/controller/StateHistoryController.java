@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.StateHistory;
 import com.wizzdi.basic.iot.service.request.StateHistoryFilter;
 import com.wizzdi.basic.iot.service.service.StateHistoryService;
@@ -38,7 +38,7 @@ public class StateHistoryController implements Plugin , Invoker {
     public PaginationResponse<StateHistory> getAllStateHistories(
 
             
-            @RequestBody StateHistoryFilter stateHistoryFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody StateHistoryFilter stateHistoryFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(stateHistoryFilter, securityContext);
         return service.getAllStateHistories(securityContext, stateHistoryFilter);
     }

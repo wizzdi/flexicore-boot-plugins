@@ -1,9 +1,9 @@
 package com.wizzdi.user.profile.service;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.model.SecurityUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
@@ -40,12 +40,12 @@ public class UserProfileService implements Plugin {
 
     public UserProfile createUserProfileNoMerge(UserProfileCreate userProfileCreate) {
         UserProfile userProfile = new UserProfile();
-        userProfile.setId(Baseclass.getBase64ID());
+        userProfile.setId(UUID.randomUUID().toString());
         updateUserProfileNoMerge(userProfile, userProfileCreate);
         return userProfile;
     }
 
-    public UserProfile createUserProfile(UserProfileCreate userProfileCreate,SecurityContextBase securityContextBase) {
+    public UserProfile createUserProfile(UserProfileCreate userProfileCreate,SecurityContext SecurityContext) {
         UserProfile userProfile = createUserProfileNoMerge(userProfileCreate);
         userProfileRepository.merge(userProfile);
         return userProfile;
@@ -84,14 +84,14 @@ public class UserProfileService implements Plugin {
 
 
 
-    public PaginationResponse<UserProfile> getAllUserProfiles(UserProfileFilter userProfileFilter, SecurityContextBase securityContextBase) {
-        List<UserProfile> list = listAllUserProfiles(userProfileFilter, securityContextBase);
-        long count = userProfileRepository.countAllUserProfiles(userProfileFilter, securityContextBase);
+    public PaginationResponse<UserProfile> getAllUserProfiles(UserProfileFilter userProfileFilter, SecurityContext SecurityContext) {
+        List<UserProfile> list = listAllUserProfiles(userProfileFilter, SecurityContext);
+        long count = userProfileRepository.countAllUserProfiles(userProfileFilter, SecurityContext);
         return new PaginationResponse<>(list, userProfileFilter, count);
     }
 
-    public List<UserProfile> listAllUserProfiles(UserProfileFilter userProfileFilter, SecurityContextBase securityContextBase) {
-        return userProfileRepository.listAllUserProfiles(userProfileFilter, securityContextBase);
+    public List<UserProfile> listAllUserProfiles(UserProfileFilter userProfileFilter, SecurityContext SecurityContext) {
+        return userProfileRepository.listAllUserProfiles(userProfileFilter, SecurityContext);
     }
 
 
@@ -107,7 +107,7 @@ public class UserProfileService implements Plugin {
         userProfileRepository.massMerge(toMerge);
     }
 
-    public UserProfile updateUserProfile(UserProfileUpdate userProfileUpdate, SecurityContextBase securityContext) {
+    public UserProfile updateUserProfile(UserProfileUpdate userProfileUpdate, SecurityContext securityContext) {
         UserProfile userProfile = userProfileUpdate.getUserProfile();
         if(updateUserProfileNoMerge(userProfile, userProfileUpdate)){
             merge(userProfile);

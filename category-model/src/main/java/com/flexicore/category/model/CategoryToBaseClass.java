@@ -7,21 +7,22 @@
 package com.flexicore.category.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @SuppressWarnings("serial")
 @Entity
-public class CategoryToBaseClass extends SecuredBasic {
+public class CategoryToBaseClass extends Baseclass {
 
 
 	@ManyToOne(targetEntity = Category.class)
 	private Category category;
 
-	@ManyToOne(targetEntity = Baseclass.class)
-	private Baseclass baseclass;
+
+	private String baseclassId;
+	private String baseclassType;
 
 	@ManyToOne(targetEntity = Category.class)
 
@@ -34,14 +35,21 @@ public class CategoryToBaseClass extends SecuredBasic {
 		return (T) this;
 	}
 
-	@ManyToOne(targetEntity = Baseclass.class)
-
-	public Baseclass getBaseclass() {
-		return baseclass;
+	public String getBaseclassId() {
+		return baseclassId;
 	}
 
-	public <T extends CategoryToBaseClass> T setBaseclass(Baseclass baseclass) {
-		this.baseclass = baseclass;
+	public <T extends CategoryToBaseClass> T setBaseclassId(String baseclassId) {
+		this.baseclassId = baseclassId;
+		return (T) this;
+	}
+
+	public String getBaseclassType() {
+		return baseclassType;
+	}
+
+	public <T extends CategoryToBaseClass> T setBaseclassType(String baseclassType) {
+		this.baseclassType = baseclassType;
 		return (T) this;
 	}
 }

@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.FirmwareUpdate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateFilter;
@@ -39,7 +39,7 @@ public class FirmwareUpdateController implements Plugin {
     public PaginationResponse<FirmwareUpdate> getAllFirmwareUpdates(
 
             
-            @RequestBody @Valid FirmwareUpdateFilter firmwareUpdateFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody @Valid FirmwareUpdateFilter firmwareUpdateFilter, @RequestAttribute SecurityContext securityContext) {
         return service.getAllFirmwareUpdates(securityContext, firmwareUpdateFilter);
     }
 
@@ -51,7 +51,7 @@ public class FirmwareUpdateController implements Plugin {
     public FirmwareUpdate createFirmwareUpdate(
             
             @RequestBody @Validated(Create.class) FirmwareUpdateCreate firmwareUpdateCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return service.createFirmwareUpdate(firmwareUpdateCreate, securityContext);
     }
@@ -64,7 +64,7 @@ public class FirmwareUpdateController implements Plugin {
 
             
             @RequestBody @Validated(Update.class) FirmwareUpdateUpdate firmwareUpdateUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return service.updateFirmwareUpdate(firmwareUpdateUpdate, securityContext);
     }

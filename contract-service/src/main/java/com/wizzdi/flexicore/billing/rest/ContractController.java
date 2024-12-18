@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class ContractController implements Plugin {
     public PaginationResponse<Contract> getAllContracts(
 
             
-            @RequestBody ContractFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ContractFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllContracts(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class ContractController implements Plugin {
 
             
             @RequestBody ContractCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createContract(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class ContractController implements Plugin {
 
             
             @RequestBody ContractUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Contract contract = service.getByIdOrNull(updateContainer.getId(),
-                Contract.class, Contract_.security, securityContext);
+                Contract.class,  securityContext);
         if (contract == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Contract with id "
                     + updateContainer.getId());

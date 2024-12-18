@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.email.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -59,7 +59,7 @@ public class MappedPOIStatusHistoryEmailService implements Plugin {
     private MappedPOICsvMailService mappedPOICsvMailService;
 
 
-    public SendStatusEmailResponse sendEmail(SendStatusHistoryEmailRequest sendStatusEmailRequest, SecurityContextBase securityContext) {
+    public SendStatusEmailResponse sendEmail(SendStatusHistoryEmailRequest sendStatusEmailRequest, SecurityContext securityContext) {
         ZoneOffset zoneOffset=sendStatusEmailRequest.getZoneOffset()!=null?sendStatusEmailRequest.getZoneOffset():ZoneOffset.UTC;
         List<StatusHistory> statusHistories = statusHistoryService.listAllStatusHistories(sendStatusEmailRequest.getStatusHistoryFilter(), securityContext);
         List<EmailEntry> emailEntries=new ArrayList<>();

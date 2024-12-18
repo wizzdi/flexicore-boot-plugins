@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.service.request.FilterComponentType;
@@ -36,7 +36,7 @@ public class MapFilterComponentController implements Plugin {
     public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(
             
             @RequestBody MapFilterComponentRequest mapFilterComponentRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         mappedPOIService.validate(mapFilterComponentRequest, securityContext);
         return mappedPOIService.getAllMapFilterComponents(mapFilterComponentRequest, securityContext);
     }
@@ -45,7 +45,7 @@ public class MapFilterComponentController implements Plugin {
     public List<String> getAllMapFilterComponentsTypes(
             
 
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
        return Arrays.stream(FilterComponentType.values()).map(f->f.toString()).collect(Collectors.toList());
     }

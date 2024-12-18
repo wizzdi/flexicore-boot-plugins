@@ -1,7 +1,7 @@
 package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Address;
 
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Organization extends SecuredBasic {
+public class Organization extends Baseclass {
 
 
 	@ManyToOne(targetEntity = Address.class)

@@ -1,7 +1,7 @@
 package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class ScheduleAction extends SecuredBasic {
+public class ScheduleAction extends Baseclass {
 
   @ManyToOne(targetEntity = DynamicExecution.class)
   private DynamicExecution dynamicExecution;

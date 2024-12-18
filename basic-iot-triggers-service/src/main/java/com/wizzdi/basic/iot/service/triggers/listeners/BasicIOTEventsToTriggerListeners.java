@@ -27,19 +27,19 @@ public class BasicIOTEventsToTriggerListeners implements Plugin {
     @EventListener
     public void remoteStatusChangedToTrigger(RemoteStatusChanged remoteStatusChanged){
         Remote remote = remoteStatusChanged.remote();
-        eventPublisher.publishEvent(new RemoteStatusChangedTrigger(remote,remoteStatusChanged.newStatus(),remoteStatusChanged.currentStatus(), List.of(remote.getSecurity().getTenant())));
+        eventPublisher.publishEvent(new RemoteStatusChangedTrigger(remote,remoteStatusChanged.newStatus(),remoteStatusChanged.currentStatus(), List.of(remote.getTenant())));
     }
 
     @EventListener
     public void remoteUpdatedToTrigger(RemoteUpdatedEvent remoteUpdatedEvent){
         Remote remote = remoteUpdatedEvent.getBaseclass();
 
-        eventPublisher.publishEvent(new RemoteUpdatedTrigger(remote,remoteUpdatedEvent.getPreviousState(),List.of(remote.getSecurity().getTenant())));
+        eventPublisher.publishEvent(new RemoteUpdatedTrigger(remote,remoteUpdatedEvent.getPreviousState(),List.of(remote.getTenant())));
     }
 
     @EventListener
     public <T extends Remote> void remoteCreatedToTrigger(BasicCreated<T> remoteUpdatedEvent){
         T remote = remoteUpdatedEvent.getBaseclass();
-        eventPublisher.publishEvent(new RemoteCreatedTrigger(remote,List.of(remote.getSecurity().getTenant())));
+        eventPublisher.publishEvent(new RemoteCreatedTrigger(remote,List.of(remote.getTenant())));
     }
 }

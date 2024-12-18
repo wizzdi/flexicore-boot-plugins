@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.maps.model.MappedPOI;
@@ -34,7 +34,7 @@ public class MappedPOIStatusHistoryEmailController implements Plugin, Invoker {
     @Operation(summary = "sendEmail", description = "Sends MappedPOI Status History email")
     public SendStatusEmailResponse sendEmail(
             @Valid @RequestBody SendStatusHistoryEmailRequest sendStatusEmailRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         if(sendStatusEmailRequest.getStatusHistoryFilter().getStartDate()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"statusHistoryFilter.startDate must be provided");
         }

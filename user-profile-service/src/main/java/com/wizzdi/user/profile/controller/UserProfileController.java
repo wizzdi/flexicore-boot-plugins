@@ -1,7 +1,7 @@
 package com.wizzdi.user.profile.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -36,7 +36,7 @@ public class UserProfileController implements Plugin {
 	@PostMapping("/createUserProfile")
 	@Operation(description = "creates UserProfile",summary = "creates UserProfile")
 	public UserProfile createUserProfile(@RequestBody @Validated(Create.class) UserProfileCreate userProfileCreate,
-										 @RequestAttribute SecurityContextBase securityContext){
+										 @RequestAttribute SecurityContext securityContext){
 		if(userProfileCreate.getSecurityUser()==null){
 			userProfileCreate.setSecurityUser(securityContext.getUser());
 		}
@@ -47,7 +47,7 @@ public class UserProfileController implements Plugin {
 	@Operation(description = "returns UserProfiles",summary = "returns UserProfiles")
 
 	public PaginationResponse<UserProfile> getAllUserProfiles(@RequestBody
-			@Valid UserProfileFilter userProfileFilter, @RequestAttribute SecurityContextBase securityContext){
+			@Valid UserProfileFilter userProfileFilter, @RequestAttribute SecurityContext securityContext){
 		if(userProfileFilter.getUsers()==null||userProfileFilter.getUsers().isEmpty()){
 			userProfileFilter.setUsers(Collections.singletonList(securityContext.getUser()));
 		}
@@ -56,7 +56,7 @@ public class UserProfileController implements Plugin {
 
 	@GetMapping
 	@Operation(description = "returns UserProfile",summary = "returns UserProfile")
-	public UserProfile getUserProfile( @RequestAttribute SecurityContextBase securityContext){
+	public UserProfile getUserProfile( @RequestAttribute SecurityContext securityContext){
 		return userProfileService.listAllUserProfiles(new UserProfileFilter().setUsers(Collections.singletonList(securityContext.getUser())),securityContext).stream().findFirst().orElse(null);
 	}
 
@@ -65,7 +65,7 @@ public class UserProfileController implements Plugin {
 	@Operation(description = "updates UserProfile",summary = "updates UserProfile")
 
 	public UserProfile updateUserProfile(@RequestBody @Validated(Update.class) UserProfileUpdate userProfileUpdate,
-										 @RequestAttribute SecurityContextBase securityContext){
+										 @RequestAttribute SecurityContext securityContext){
 		return userProfileService.updateUserProfile(userProfileUpdate,securityContext);
 	}
 }

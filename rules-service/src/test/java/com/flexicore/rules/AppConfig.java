@@ -18,7 +18,7 @@ import com.flexicore.rules.service.ScenarioActionService;
 import com.flexicore.rules.service.ScenarioService;
 import com.flexicore.rules.service.ScenarioTriggerService;
 import com.flexicore.rules.service.ScenarioTriggerTypeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +41,7 @@ public class AppConfig {
 
   @Autowired
   @Qualifier("adminSecurityContext")
-  private SecurityContextBase securityContext;
+  private SecurityContext securityContext;
 
   @Bean
   @Qualifier("scenarioDataSource")

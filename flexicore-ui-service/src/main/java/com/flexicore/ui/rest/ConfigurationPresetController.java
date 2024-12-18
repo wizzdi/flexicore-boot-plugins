@@ -9,7 +9,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.ConfigurationPreset;
 import com.flexicore.ui.request.ConfigurationPresetCreate;
 import com.flexicore.ui.request.ConfigurationPresetFiltering;
@@ -50,7 +50,7 @@ public class ConfigurationPresetController implements Plugin {
 	public PaginationResponse<ConfigurationPreset> getAllConfigurationPresets(
 			 @RequestBody
 			ConfigurationPresetFiltering configurationPresetFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		return service.getAllConfigurationPresets(configurationPresetFiltering, securityContext);
 
 	}
@@ -61,8 +61,8 @@ public class ConfigurationPresetController implements Plugin {
 	public ConfigurationPreset updateConfigurationPreset(
 			 @RequestBody
 			ConfigurationPresetUpdate updateConfigurationPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
-		ConfigurationPreset configurationPresetToClazz = updateConfigurationPreset.getId() != null ? service.getByIdOrNull(updateConfigurationPreset.getId(), ConfigurationPreset.class, ConfigurationPreset_.security, securityContext) : null;
+			@RequestAttribute SecurityContext securityContext) {
+		ConfigurationPreset configurationPresetToClazz = updateConfigurationPreset.getId() != null ? service.getByIdOrNull(updateConfigurationPreset.getId(), ConfigurationPreset.class,securityContext) : null;
 		if (configurationPresetToClazz == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ConfigurationPreset with id  " + updateConfigurationPreset.getId());
 		}
@@ -77,7 +77,7 @@ public class ConfigurationPresetController implements Plugin {
 	public ConfigurationPreset createConfigurationPreset(
 			 @RequestBody
 			ConfigurationPresetCreate createConfigurationPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(createConfigurationPreset, securityContext);
 		return service.createConfigurationPreset(createConfigurationPreset,
 				securityContext);

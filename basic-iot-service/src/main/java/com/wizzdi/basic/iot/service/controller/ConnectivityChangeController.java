@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.ConnectivityChange;
 import com.wizzdi.basic.iot.model.ConnectivityChange_;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
@@ -39,7 +39,7 @@ public class ConnectivityChangeController implements Plugin {
     public PaginationResponse<ConnectivityChange> getAllConnectivityChanges(
 
             
-            @RequestBody ConnectivityChangeFilter connectivityChangeFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ConnectivityChangeFilter connectivityChangeFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(connectivityChangeFilter, securityContext);
         return service.getAllConnectivityChanges(securityContext, connectivityChangeFilter);
     }
@@ -51,7 +51,7 @@ public class ConnectivityChangeController implements Plugin {
     public ConnectivityChange createConnectivityChange(
             
             @RequestBody ConnectivityChangeCreate connectivityChangeCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(connectivityChangeCreate, securityContext);
 
         return service.createConnectivityChange(connectivityChangeCreate, securityContext);
@@ -65,10 +65,10 @@ public class ConnectivityChangeController implements Plugin {
 
             
             @RequestBody ConnectivityChangeUpdate connectivityChangeUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(connectivityChangeUpdate, securityContext);
         ConnectivityChange connectivityChange = service.getByIdOrNull(connectivityChangeUpdate.getId(),
-                ConnectivityChange.class, ConnectivityChange_.security, securityContext);
+                ConnectivityChange.class,  securityContext);
         if (connectivityChange == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no ConnectivityChange with id "
                     + connectivityChangeUpdate.getId());

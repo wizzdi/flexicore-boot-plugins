@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
@@ -29,6 +29,7 @@ import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.service.MapIconService;
 import com.wizzdi.maps.service.service.MappedPOIService;
+import com.wizzdi.segmantix.model.Access;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Files;
@@ -118,7 +119,7 @@ public class MoveGatewayTest {
     private FileResourceService fileResourceService;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired
     @Lazy
     private SecurityUserService securityUserService;
@@ -137,7 +138,7 @@ public class MoveGatewayTest {
     @Autowired
     private DeviceTypeService deviceTypeService;
     private NewUserResult user1;
-    private SecurityContextBase user1SecurityContext;
+    private SecurityContext user1SecurityContext;
     private NewUserResult user2;
     @Autowired
     private TenantToBaseclassService tenantToBaseclassService;
@@ -167,7 +168,7 @@ public class MoveGatewayTest {
         SecurityTenant newTenant = securityTenantService.createTenant(new SecurityTenantCreate().setName(tenantName), adminSecurityContext);
         SecurityUser securityUser = securityUserService.createSecurityUser(new SecurityUserCreate().setTenant(newTenant), adminSecurityContext);
         tenantToUserService.createTenantToUserNoMerge(new TenantToUserCreate().setTenant(newTenant).setUser(securityUser).setDefaultTenant(true),adminSecurityContext);
-        tenantToBaseclassService.createTenantToBaseclass(new TenantToBaseclassCreate().setTenant(newTenant).setClazz(securityWildcard).setOperation(allOps).setAccess(IOperation.Access.allow),adminSecurityContext);
+        tenantToBaseclassService.createTenantToBaseclass(new TenantToBaseclassCreate().setTenant(newTenant).setClazz(securityWildcard).setOperation(allOps).setAccess(Access.allow),adminSecurityContext);
         return new NewUserResult(securityUser,newTenant);
     }
     record NewUserResult(SecurityUser securityUser,SecurityTenant securityTenant){}
@@ -209,7 +210,7 @@ public class MoveGatewayTest {
         Assertions.assertEquals(1,moveGatewaysResponse.createdDeviceTypes());
         Assertions.assertEquals(1,moveGatewaysResponse.createdMapIcons());
         Assertions.assertEquals(1,moveGatewaysResponse.createdUsers());
-        SecurityContextBase user2SecurityContext = securityContextProvider.getSecurityContext(user2.securityUser());
+        SecurityContext user2SecurityContext = securityContextProvider.getSecurityContext(user2.securityUser());
         List<Gateway> gateways = gatewayService.listAllGateways(user2SecurityContext, new GatewayFilter());
         Assertions.assertEquals(5,gateways.size());
         List<Device> allDevices = deviceService.listAllDevices(user2SecurityContext, new DeviceFilter());
@@ -219,8 +220,8 @@ public class MoveGatewayTest {
         }
         for (Device allDevice : allDevices) {
 
-            Assertions.assertFalse(allDevice.getSecurity().getCreator() instanceof RealUser);
-            Assertions.assertFalse(allDevice.getMappedPOI().getSecurity().getCreator() instanceof RealUser);
+            Assertions.assertFalse(allDevice.getCreator() instanceof RealUser);
+            Assertions.assertFalse(allDevice.getMappedPOI().getCreator() instanceof RealUser);
         }
     }
 }

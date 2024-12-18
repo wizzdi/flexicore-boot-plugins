@@ -11,8 +11,8 @@ public class CategoryToBaseclassCreate extends BasicCreate {
     @JsonIgnore
     private Category category;
     private String baseclassId;
-    @JsonIgnore
-    private Baseclass baseclass;
+    private String baseclassType;
+
     private Boolean enabled;
 
     public String getCategoryId() {
@@ -43,13 +43,12 @@ public class CategoryToBaseclassCreate extends BasicCreate {
         return (T) this;
     }
 
-    @JsonIgnore
-    public Baseclass getBaseclass() {
-        return baseclass;
+    public String getBaseclassType() {
+        return baseclassType;
     }
 
-    public <T extends CategoryToBaseclassCreate> T setBaseclass(Baseclass baseclass) {
-        this.baseclass = baseclass;
+    public <T extends CategoryToBaseclassCreate> T setBaseclassType(String baseclassType) {
+        this.baseclassType = baseclassType;
         return (T) this;
     }
 

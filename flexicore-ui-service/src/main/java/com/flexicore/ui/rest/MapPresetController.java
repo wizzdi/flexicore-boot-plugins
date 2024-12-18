@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.MapPreset;
 import com.flexicore.ui.request.MapPresetCreate;
 import com.flexicore.ui.request.MapPresetFiltering;
@@ -50,7 +50,7 @@ public class MapPresetController implements Plugin {
 	public PaginationResponse<MapPreset> getAllMapPresets(
 			 @RequestBody
 			MapPresetFiltering mapPresetFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		return service.getAllMapPresets(mapPresetFiltering, securityContext);
 
 	}
@@ -62,8 +62,8 @@ public class MapPresetController implements Plugin {
 	public MapPreset updateMapPreset(
 			 @RequestBody
 			MapPresetUpdate updateMapPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
-		MapPreset mapPreset = updateMapPreset.getId() != null ? service.getByIdOrNull(updateMapPreset.getId(), MapPreset.class, MapPreset_.security, securityContext) : null;
+			@RequestAttribute SecurityContext securityContext) {
+		MapPreset mapPreset = updateMapPreset.getId() != null ? service.getByIdOrNull(updateMapPreset.getId(), MapPreset.class,securityContext) : null;
 		if (mapPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Map Preset with id  " + updateMapPreset.getId());
 		}
@@ -80,7 +80,7 @@ public class MapPresetController implements Plugin {
 	public MapPreset createMapPreset(
 			 @RequestBody
 			MapPresetCreate createMapPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(createMapPreset, securityContext);
 		return service.createMapPreset(createMapPreset, securityContext);
 

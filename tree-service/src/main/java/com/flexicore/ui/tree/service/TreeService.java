@@ -8,7 +8,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.tree.data.TreeRepository;
@@ -60,7 +60,7 @@ public class TreeService implements Plugin {
     }
 
 
-    public Tree createTree(TreeCreate treeCreate, SecurityContextBase securityContext) {
+    public Tree createTree(TreeCreate treeCreate, SecurityContext securityContext) {
 
         Tree tree = new Tree();
         tree.setId(UUID.randomUUID().toString());
@@ -71,14 +71,14 @@ public class TreeService implements Plugin {
     }
 
 
-    public PaginationResponse<Tree> getAllTrees(TreeFilter treeFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<Tree> getAllTrees(TreeFilter treeFilter, SecurityContext securityContext) {
         List<Tree> list = treeRepository.getAllTrees(treeFilter, securityContext);
         long count = treeRepository.countAllTrees(treeFilter, securityContext);
         return new PaginationResponse<>(list, treeFilter, count);
     }
 
 
-    public Tree updateTree(TreeUpdate updateTree, SecurityContextBase securityContext) {
+    public Tree updateTree(TreeUpdate updateTree, SecurityContext securityContext) {
 
         Tree tree = updateTree.getTree();
         if (updateTreeNoMerge(updateTree, tree)) {
@@ -87,15 +87,15 @@ public class TreeService implements Plugin {
         return tree;
     }
 
-    public void validate(TreeFilter treeFilter, SecurityContextBase securityContext) {
+    public void validate(TreeFilter treeFilter, SecurityContext securityContext) {
         basicService.validate(treeFilter,securityContext);
 
     }
 
-    public void validate(TreeCreate treeCreate, SecurityContextBase securityContext) {
+    public void validate(TreeCreate treeCreate, SecurityContext securityContext) {
         basicService.validate(treeCreate,securityContext);
         String rootId = treeCreate.getRootId();
-        TreeNode root = rootId != null ? getByIdOrNull(rootId, TreeNode.class, TreeNode_.security, securityContext) : null;
+        TreeNode root = rootId != null ? getByIdOrNull(rootId, TreeNode.class,securityContext) : null;
         if (root == null && rootId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree Node With id " + rootId);
         }
@@ -103,19 +103,19 @@ public class TreeService implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return treeRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return treeRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

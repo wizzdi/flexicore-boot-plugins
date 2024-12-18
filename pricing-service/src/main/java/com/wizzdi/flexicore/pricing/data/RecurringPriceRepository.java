@@ -3,7 +3,7 @@ package com.wizzdi.flexicore.pricing.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice_;
@@ -31,7 +31,7 @@ public class RecurringPriceRepository implements Plugin {
     @Autowired
     private PriceRepository priceRepository;
 
-    public List<RecurringPrice> getAllRecurringPrice(SecurityContextBase securityContext,
+    public List<RecurringPrice> getAllRecurringPrice(SecurityContext securityContext,
                                            RecurringPriceFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<RecurringPrice> q = cb.createQuery(RecurringPrice.class);
@@ -44,7 +44,7 @@ public class RecurringPriceRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllRecurringPrice(SecurityContextBase securityContext,
+    public long countAllRecurringPrice(SecurityContext securityContext,
                                    RecurringPriceFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -57,25 +57,25 @@ public class RecurringPriceRepository implements Plugin {
     }
 
     public <T extends RecurringPrice> void addRecurringPricePredicates(RecurringPriceFiltering filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         priceRepository.addPricePredicates(filtering, cb, q, r, preds, securityContext);
 
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return priceRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return priceRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return priceRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return priceRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

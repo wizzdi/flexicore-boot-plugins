@@ -1,6 +1,6 @@
 package com.flexicore.ui.app;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.Form;
 import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.request.FormCreate;
@@ -26,7 +26,7 @@ public class TestEntities {
     private JsonConverterImplementationHolder jsonConverterImplementationHolder;
 
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired
     private FormService formService;
     @Autowired

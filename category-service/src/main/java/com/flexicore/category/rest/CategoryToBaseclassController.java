@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -46,7 +46,7 @@ public class CategoryToBaseclassController implements Plugin {
 	public PaginationResponse<CategoryToBaseClass> getAllCategoryToBaseclass(
 			
 			@RequestBody CategoryToBaseclassFilter filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(filtering, securityContext);
 		return service.getAllCategoryToBaseclass(filtering, securityContext);
 	}
@@ -58,7 +58,7 @@ public class CategoryToBaseclassController implements Plugin {
 	public CategoryToBaseClass createCategoryToBaseclass(
 			
 			@RequestBody CategoryToBaseclassCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validate(creationContainer, securityContext);
 
@@ -72,7 +72,7 @@ public class CategoryToBaseclassController implements Plugin {
 	public CategoryToBaseClass updateCategoryToBaseclass(
 			
 			@RequestBody CategoryToBaseclassUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		CategoryToBaseClass CategoryToBaseclass = service.getByIdOrNull(updateContainer.getId(), CategoryToBaseClass.class, null, securityContext);
 		if (CategoryToBaseclass == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no CategoryToBaseclass with id "

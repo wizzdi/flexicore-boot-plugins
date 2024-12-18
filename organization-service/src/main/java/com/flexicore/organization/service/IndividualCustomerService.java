@@ -10,7 +10,7 @@ import com.flexicore.organization.model.IndividualCustomer;
 import com.flexicore.organization.request.IndividualCustomerCreate;
 import com.flexicore.organization.request.IndividualCustomerFiltering;
 import com.flexicore.organization.request.IndividualCustomerUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Extension
@@ -37,19 +38,18 @@ public class IndividualCustomerService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -76,29 +76,29 @@ public class IndividualCustomerService implements Plugin {
 	}
 
 	public void validateFiltering(IndividualCustomerFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		customerService.validateFiltering(filtering, securityContext);
 
 	}
 
 	public PaginationResponse<IndividualCustomer> getAllIndividualCustomers(
-			SecurityContextBase securityContext, IndividualCustomerFiltering filtering) {
+			SecurityContext securityContext, IndividualCustomerFiltering filtering) {
 		List<IndividualCustomer> list = repository.getAllIndividualCustomers(securityContext, filtering);
 		long count = repository.countAllIndividualCustomers(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	public IndividualCustomer createIndividualCustomer(IndividualCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndividualCustomer individualCustomer = createIndividualCustomerNoMerge(creationContainer, securityContext);
 		repository.merge(individualCustomer);
 		return individualCustomer;
 	}
 
 	public IndividualCustomer createIndividualCustomerNoMerge(IndividualCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndividualCustomer individualCustomer = new IndividualCustomer();
-		individualCustomer.setId(Baseclass.getBase64ID());
+		individualCustomer.setId(UUID.randomUUID().toString());
 		updateIndividualCustomerNoMerge(individualCustomer, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(individualCustomer, securityContext);
 		return individualCustomer;
@@ -114,7 +114,7 @@ public class IndividualCustomerService implements Plugin {
 	}
 
 	public IndividualCustomer updateIndividualCustomer(IndividualCustomerUpdate updateContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndividualCustomer individualCustomer = updateContainer.getIndividualCustomer();
 		if (updateIndividualCustomerNoMerge(individualCustomer, updateContainer)) {
 			repository.merge(individualCustomer);
@@ -123,7 +123,7 @@ public class IndividualCustomerService implements Plugin {
 	}
 
 	public void validate(IndividualCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		customerService.validate(creationContainer, securityContext);
 
 	}

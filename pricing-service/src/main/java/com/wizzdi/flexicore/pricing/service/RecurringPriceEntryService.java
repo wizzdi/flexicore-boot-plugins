@@ -3,8 +3,8 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.RecurringPriceEntryRepository;
 import com.wizzdi.flexicore.pricing.model.price.*;
@@ -36,19 +36,18 @@ public class RecurringPriceEntryService implements Plugin {
 	@Autowired
 	private BasicService basicService;
 
-public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -75,10 +74,10 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public void validateFiltering(RecurringPriceEntryFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
 		basicService.validate(filtering, securityContext);
 		Set<String> recurringPriceIds=filtering.getRecurringPriceIds();
-		Map<String, RecurringPrice> recurringPriceMap=recurringPriceIds.isEmpty()?new HashMap<>():listByIds(RecurringPrice.class,recurringPriceIds,SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Map<String, RecurringPrice> recurringPriceMap=recurringPriceIds.isEmpty()?new HashMap<>():listByIds(RecurringPrice.class,recurringPriceIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		recurringPriceIds.removeAll(recurringPriceMap.keySet());
 		if(!recurringPriceIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no RecurringPrices with ids "+recurringPriceIds);
@@ -87,27 +86,27 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public PaginationResponse<RecurringPriceEntry> getAllRecurringPriceEntry(
-			SecurityContextBase securityContext, RecurringPriceEntryFiltering filtering) {
+			SecurityContext securityContext, RecurringPriceEntryFiltering filtering) {
 		List<RecurringPriceEntry> list = listAllRecurringPriceEntry(securityContext, filtering);
 		long count = repository.countAllRecurringPriceEntry(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	public List<RecurringPriceEntry> listAllRecurringPriceEntry(SecurityContextBase securityContext, RecurringPriceEntryFiltering filtering) {
+	public List<RecurringPriceEntry> listAllRecurringPriceEntry(SecurityContext securityContext, RecurringPriceEntryFiltering filtering) {
 		return repository.getAllRecurringPriceEntry(securityContext, filtering);
 	}
 
 	public RecurringPriceEntry createRecurringPriceEntry(RecurringPriceEntryCreate creationContainer,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
 		RecurringPriceEntry recurringPriceEntry = createRecurringPriceEntryNoMerge(creationContainer, securityContext);
 		repository.merge(recurringPriceEntry);
 		return recurringPriceEntry;
 	}
 
 	private RecurringPriceEntry createRecurringPriceEntryNoMerge(RecurringPriceEntryCreate creationContainer,
-                                       SecurityContextBase securityContext) {
+                                       SecurityContext securityContext) {
 		RecurringPriceEntry recurringPriceEntry = new RecurringPriceEntry();
-		recurringPriceEntry.setId(Baseclass.getBase64ID());
+		recurringPriceEntry.setId(UUID.randomUUID().toString());
 
 		updateRecurringPriceEntryNoMerge(recurringPriceEntry, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(recurringPriceEntry,securityContext);
@@ -146,7 +145,7 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public RecurringPriceEntry updateRecurringPriceEntry(RecurringPriceEntryUpdate updateContainer,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
 		RecurringPriceEntry recurringPriceEntry = updateContainer.getRecurringPriceEntry();
 		if (updateRecurringPriceEntryNoMerge(recurringPriceEntry, updateContainer)) {
 			repository.merge(recurringPriceEntry);
@@ -155,24 +154,24 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public void validate(RecurringPriceEntryCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
 		basicService.validate(creationContainer, securityContext);
 		String frequencyId=creationContainer.getFrequencyId();
-		Frequency frequency=frequencyId==null?null:getByIdOrNull(frequencyId,Frequency.class, SecuredBasic_.security,securityContext);
+		Frequency frequency=frequencyId==null?null:getByIdOrNull(frequencyId,Frequency.class, securityContext);
 		if(frequency==null&&frequencyId!=null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Frequency with id "+frequencyId);
 		}
 		creationContainer.setFrequency(frequency);
 
 		String recurringPriceId=creationContainer.getRecurringPriceId();
-		RecurringPrice recurringPrice=recurringPriceId==null?null:getByIdOrNull(recurringPriceId,RecurringPrice.class, SecuredBasic_.security,securityContext);
+		RecurringPrice recurringPrice=recurringPriceId==null?null:getByIdOrNull(recurringPriceId,RecurringPrice.class, securityContext);
 		if(recurringPrice==null&&recurringPriceId!=null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no RecurringPrice with id "+recurringPriceId);
 		}
 		creationContainer.setRecurringPrice(recurringPrice);
 
 		String pricingSchemeId=creationContainer.getPricingSchemeId();
-		PricingScheme pricingScheme=pricingSchemeId==null?null:getByIdOrNull(pricingSchemeId,PricingScheme.class, SecuredBasic_.security,securityContext);
+		PricingScheme pricingScheme=pricingSchemeId==null?null:getByIdOrNull(pricingSchemeId,PricingScheme.class, securityContext);
 		if(pricingScheme==null&&pricingSchemeId!=null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no PricingScheme with id "+pricingSchemeId);
 		}

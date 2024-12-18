@@ -1,7 +1,7 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.territories.Address;
 
 import jakarta.persistence.*;
@@ -13,7 +13,7 @@ import java.util.List;
         @Index(name = "mapped_poi_idx", columnList = "layer_id,relatedId,relatedType,lat,lon,mapIcon_id"),
         @Index(name = "mapped_poi_geohash_idx", columnList = "geoHash12,geoHash11,geoHash10,geoHash9,geoHash8,geoHash7,geoHash6,geoHash5,geoHash4,geoHash3,geoHash2,geoHash1")
 })
-public class MappedPOI extends SecuredBasic {
+public class MappedPOI extends Baseclass {
 
     private String externalId;
 

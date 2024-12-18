@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.service.ScheduleService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,7 @@ public class AppConfig {
 
     @Autowired
     @Qualifier("adminSecurityContext")
-    private SecurityContextBase securityContext;
+    private SecurityContext securityContext;
 
     @Bean
     public Schedule schedule() {

@@ -2,14 +2,14 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.ScenarioSavableEventRepository;
 import com.flexicore.rules.model.ScenarioSavableEvent;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.request.ScenarioSavableEventCreate;
 import com.flexicore.rules.request.ScenarioSavableEventFilter;
 import com.flexicore.rules.request.ScenarioSavableEventUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -43,7 +43,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @return created ScenarioSavableEvent
    */
   public ScenarioSavableEvent createScenarioSavableEvent(
-      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContextBase securityContext) {
+      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContext securityContext) {
     ScenarioSavableEvent scenarioSavableEvent =
         createScenarioSavableEventNoMerge(scenarioSavableEventCreate, securityContext);
     this.repository.merge(scenarioSavableEvent);
@@ -56,7 +56,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @return created ScenarioSavableEvent unmerged
    */
   public ScenarioSavableEvent createScenarioSavableEventNoMerge(
-      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContextBase securityContext) {
+      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContext securityContext) {
     ScenarioSavableEvent scenarioSavableEvent = new ScenarioSavableEvent();
     scenarioSavableEvent.setId(UUID.randomUUID().toString());
     updateScenarioSavableEventNoMerge(scenarioSavableEvent, scenarioSavableEventCreate);
@@ -95,7 +95,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @return scenarioSavableEvent
    */
   public ScenarioSavableEvent updateScenarioSavableEvent(
-      ScenarioSavableEventUpdate scenarioSavableEventUpdate, SecurityContextBase securityContext) {
+      ScenarioSavableEventUpdate scenarioSavableEventUpdate, SecurityContext securityContext) {
     ScenarioSavableEvent scenarioSavableEvent =
         scenarioSavableEventUpdate.getScenarioSavableEvent();
     if (updateScenarioSavableEventNoMerge(scenarioSavableEvent, scenarioSavableEventUpdate)) {
@@ -110,7 +110,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @return PaginationResponse containing paging information for ScenarioSavableEvent
    */
   public PaginationResponse<ScenarioSavableEvent> getAllScenarioSavableEvents(
-      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContext securityContext) {
     List<ScenarioSavableEvent> list =
         listAllScenarioSavableEvents(scenarioSavableEventFilter, securityContext);
     long count =
@@ -124,7 +124,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @return List of ScenarioSavableEvent
    */
   public List<ScenarioSavableEvent> listAllScenarioSavableEvents(
-      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarioSavableEvents(
         scenarioSavableEventFilter, securityContext);
   }
@@ -135,7 +135,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioSavableEventFilter is not valid
    */
   public void validate(
-      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContext securityContext) {
     basicService.validate(scenarioSavableEventFilter, securityContext);
 
     Set<String> scenarioTriggerIds =
@@ -149,7 +149,6 @@ public class ScenarioSavableEventService implements Plugin {
                 .listByIds(
                     ScenarioTrigger.class,
                     scenarioTriggerIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -167,7 +166,7 @@ public class ScenarioSavableEventService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioSavableEventCreate is not valid
    */
   public void validate(
-      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContextBase securityContext) {
+      ScenarioSavableEventCreate scenarioSavableEventCreate, SecurityContext securityContext) {
     basicService.validate(scenarioSavableEventCreate, securityContext);
 
     String scenarioTriggerId = scenarioSavableEventCreate.getScenarioTriggerId();
@@ -175,7 +174,7 @@ public class ScenarioSavableEventService implements Plugin {
         scenarioTriggerId == null
             ? null
             : this.repository.getByIdOrNull(
-                scenarioTriggerId, ScenarioTrigger.class, SecuredBasic_.security, securityContext);
+                scenarioTriggerId, ScenarioTrigger.class,  securityContext);
     if (scenarioTriggerId != null && scenarioTrigger == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No ScenarioTrigger with id " + scenarioTriggerId);
@@ -184,12 +183,12 @@ public class ScenarioSavableEventService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -197,7 +196,7 @@ public class ScenarioSavableEventService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -205,7 +204,7 @@ public class ScenarioSavableEventService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

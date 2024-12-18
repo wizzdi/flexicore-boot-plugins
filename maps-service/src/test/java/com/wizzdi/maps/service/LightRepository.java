@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.model.Basic_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class LightRepository {
             CommonAbstractCriteria q,
             From<?, T> r,
             List<Predicate> preds,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
 
         this.securedBasicRepository.addSecuredBasicPredicates(
                 lightFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);

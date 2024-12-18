@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.model.Connectivity;
 import com.wizzdi.basic.iot.model.Device;
@@ -87,7 +87,7 @@ public class LogicTests {
     public static final String JSON_SCHEMA_V1 = "v1";
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired
     @Lazy
     private BasicIOTLogic basicIOTLogic;

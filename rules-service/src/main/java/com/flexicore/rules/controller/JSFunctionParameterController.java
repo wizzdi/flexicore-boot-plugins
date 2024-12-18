@@ -7,7 +7,7 @@ import com.flexicore.rules.request.JSFunctionParameterCreate;
 import com.flexicore.rules.request.JSFunctionParameterFilter;
 import com.flexicore.rules.request.JSFunctionParameterUpdate;
 import com.flexicore.rules.service.JSFunctionParameterService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class JSFunctionParameterController implements Plugin {
   public JSFunctionParameter createJSFunctionParameter(
       
       @RequestBody JSFunctionParameterCreate jSFunctionParameterCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     jSFunctionParameterService.validate(jSFunctionParameterCreate, securityContext);
     return jSFunctionParameterService.createJSFunctionParameter(
@@ -44,14 +44,13 @@ public class JSFunctionParameterController implements Plugin {
   public JSFunctionParameter updateJSFunctionParameter(
       
       @RequestBody JSFunctionParameterUpdate jSFunctionParameterUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String jSFunctionParameterId = jSFunctionParameterUpdate.getId();
     JSFunctionParameter jSFunctionParameter =
         jSFunctionParameterService.getByIdOrNull(
             jSFunctionParameterId,
             JSFunctionParameter.class,
-            JSFunctionParameter_.security,
             securityContext);
     if (jSFunctionParameter == null) {
       throw new ResponseStatusException(
@@ -68,7 +67,7 @@ public class JSFunctionParameterController implements Plugin {
   public PaginationResponse<JSFunctionParameter> getAllJSFunctionParameters(
       
       @RequestBody JSFunctionParameterFilter jSFunctionParameterFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     jSFunctionParameterService.validate(jSFunctionParameterFilter, securityContext);
     return jSFunctionParameterService.getAllJSFunctionParameters(

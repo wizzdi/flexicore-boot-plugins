@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -40,7 +40,7 @@ public class MapGroupToMappedPOIRepository implements Plugin {
    * @return List of MapGroupToMappedPOI
    */
   public List<MapGroupToMappedPOI> listAllMapGroupToMappedPOIs(
-      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContextBase securityContext) {
+      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<MapGroupToMappedPOI> q = cb.createQuery(MapGroupToMappedPOI.class);
     Root<MapGroupToMappedPOI> r = q.from(MapGroupToMappedPOI.class);
@@ -60,7 +60,7 @@ public class MapGroupToMappedPOIRepository implements Plugin {
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
         mapGroupToMappedPOIFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -91,7 +91,7 @@ public class MapGroupToMappedPOIRepository implements Plugin {
    * @return count of MapGroupToMappedPOI
    */
   public Long countAllMapGroupToMappedPOIs(
-      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContextBase securityContext) {
+      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<MapGroupToMappedPOI> r = q.from(MapGroupToMappedPOI.class);
@@ -103,12 +103,12 @@ public class MapGroupToMappedPOIRepository implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -116,7 +116,7 @@ public class MapGroupToMappedPOIRepository implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -124,7 +124,7 @@ public class MapGroupToMappedPOIRepository implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

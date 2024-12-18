@@ -7,7 +7,7 @@ import com.flexicore.organization.model.Organization_;
 import com.flexicore.organization.model.OrganizationalCustomer;
 import com.flexicore.organization.model.OrganizationalCustomer_;
 import com.flexicore.organization.request.OrganizationalCustomerFiltering;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.pf4j.Extension;
@@ -35,7 +35,7 @@ public class OrganizationalCustomerRepository implements Plugin {
 	private CustomerRepository customerRepository;
 
 	public <T extends OrganizationalCustomer> void addOrganizationalCustomerPredicates(OrganizationalCustomerFiltering filtering,
-																							  CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContextBase securityContext) {
+																							  CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContext securityContext) {
 		customerRepository.addCustomerPredicates(filtering, cb,q, r, preds,securityContext);
 		if (filtering.getOrganizations() != null && !filtering.getOrganizations().isEmpty()) {
 			Set<String> ids = filtering.getOrganizations().stream().map(f -> f.getId()).collect(Collectors.toSet());
@@ -46,7 +46,7 @@ public class OrganizationalCustomerRepository implements Plugin {
 
 	}
 
-	public List<OrganizationalCustomer> getAllOrganizationalCustomers(SecurityContextBase securityContext,
+	public List<OrganizationalCustomer> getAllOrganizationalCustomers(SecurityContext securityContext,
 																	  OrganizationalCustomerFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<OrganizationalCustomer> q = cb.createQuery(OrganizationalCustomer.class);
@@ -59,7 +59,7 @@ public class OrganizationalCustomerRepository implements Plugin {
 		return query.getResultList();
 	}
 
-	public long countAllOrganizationalCustomers(SecurityContextBase securityContext,
+	public long countAllOrganizationalCustomers(SecurityContext securityContext,
 												OrganizationalCustomerFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -72,19 +72,19 @@ public class OrganizationalCustomerRepository implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return customerRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return customerRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return customerRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return customerRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

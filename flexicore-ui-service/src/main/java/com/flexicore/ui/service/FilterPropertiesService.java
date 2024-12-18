@@ -2,7 +2,7 @@ package com.flexicore.ui.service;
 
 
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.FilterPropertiesRepository;
 import com.flexicore.ui.model.FilterProperties;
 import com.flexicore.ui.model.GridPreset;
@@ -56,7 +56,7 @@ public class FilterPropertiesService implements Plugin {
     private GridPresetService gridPresetService;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContextBase;
+    private SecurityContext adminSecurityContext;
     @Autowired
     @Lazy
     @Qualifier("gridPresetClazz")
@@ -64,7 +64,7 @@ public class FilterPropertiesService implements Plugin {
 
 
 
-    public FilterProperties updateFilterProperties(FilterPropertiesUpdate filterPropertiesUpdate, SecurityContextBase securityContext) {
+    public FilterProperties updateFilterProperties(FilterPropertiesUpdate filterPropertiesUpdate, SecurityContext securityContext) {
         if (FilterPropertiesUpdateNoMerge(filterPropertiesUpdate,
                 filterPropertiesUpdate.getFilterProperties())) {
             filterPropertiesRepository.merge(filterPropertiesUpdate.getFilterProperties());
@@ -97,13 +97,13 @@ public class FilterPropertiesService implements Plugin {
 
     public List<FilterProperties> listAllFilterProperties(
             FilterPropertiesFiltering filterPropertiesFiltering,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return filterPropertiesRepository.listAllFilterProperties(filterPropertiesFiltering,
                 securityContext);
     }
 
     public FilterProperties createFilterProperties(FilterPropertiesCreate createFilterProperties,
-                                                   SecurityContextBase securityContext) {
+                                                   SecurityContext securityContext) {
         FilterProperties filterProperties = createFilterPropertiesNoMerge(createFilterProperties,
                 securityContext);
         filterPropertiesRepository.merge(filterProperties);
@@ -112,7 +112,7 @@ public class FilterPropertiesService implements Plugin {
     }
 
     public FilterProperties createFilterPropertiesNoMerge(
-            FilterPropertiesCreate createFilterProperties, SecurityContextBase securityContext) {
+            FilterPropertiesCreate createFilterProperties, SecurityContext securityContext) {
         FilterProperties filterProperties = new FilterProperties();
         filterProperties.setId(UUID.randomUUID().toString());
         FilterPropertiesUpdateNoMerge(createFilterProperties, filterProperties);
@@ -122,17 +122,17 @@ public class FilterPropertiesService implements Plugin {
 
     public PaginationResponse<FilterProperties> getAllFilterProperties(
             FilterPropertiesFiltering filterPropertiesFiltering,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         List<FilterProperties> list = listAllFilterProperties(filterPropertiesFiltering, securityContext);
         long count = filterPropertiesRepository.countAllFilterProperties(filterPropertiesFiltering, securityContext);
         return new PaginationResponse<>(list, filterPropertiesFiltering, count);
     }
 
     public void validate(FilterPropertiesCreate createFilterProperties,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(createFilterProperties, securityContext);
         String baseclassId = createFilterProperties.getBaseclassId();
-        Preset baseclass = baseclassId != null ? getByIdOrNull(baseclassId, Preset.class, Preset_.security, securityContext) : null;
+        Preset baseclass = baseclassId != null ? getByIdOrNull(baseclassId, Preset.class,securityContext) : null;
         if (baseclassId!=null&&baseclass == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Preset with id " + baseclassId);
         }
@@ -140,10 +140,10 @@ public class FilterPropertiesService implements Plugin {
     }
 
     public void validate(FilterPropertiesFiltering filterPropertiesFiltering,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(filterPropertiesFiltering, securityContext);
         Set<String> baseclassIds = filterPropertiesFiltering.getBaseclassIds();
-        Map<String, Preset> baseclassMap = baseclassIds.isEmpty() ? new HashMap<>() : filterPropertiesRepository.listByIds(Preset.class, baseclassIds,Preset_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+        Map<String, Preset> baseclassMap = baseclassIds.isEmpty() ? new HashMap<>() : filterPropertiesRepository.listByIds(Preset.class, baseclassIds,securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
         baseclassIds.removeAll(baseclassMap.keySet());
         if (!baseclassIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Presets with ids " + baseclassIds);
@@ -157,18 +157,19 @@ public class FilterPropertiesService implements Plugin {
     public void handlePresetPermissionGroupCreated(BasicCreated<PermissionGroupToBaseclass> baseclassCreated) {
         PermissionGroupToBaseclass permissionGroupToBaseclass = baseclassCreated.getBaseclass();
         PermissionGroup permissionGroup = permissionGroupToBaseclass.getPermissionGroup();
-        if (permissionGroupToBaseclass.getBaseclass().getClazz().getId().equals(gridPresetClazz.getId()) ) {
-            SecurityContextBase securityContext = adminSecurityContextBase;
-            Baseclass baseclass = permissionGroupToBaseclass.getBaseclass();
+        if (permissionGroupToBaseclass.getSecuredType().equals(gridPresetClazz.name()) ) {
+            SecurityContext securityContext = adminSecurityContext;
+            String baseclass = permissionGroupToBaseclass.getSecuredId();
 
-            List<GridPreset> presets = gridPresetService.listAllGridPresets(new GridPresetFiltering().setRelatedBaseclass(Collections.singletonList(baseclass)), null);
+            List<GridPreset> presets = gridPresetService.listAllGridPresets(new GridPresetFiltering().setRelatedBaseclass(Collections.singleton(baseclass)), null);
             for (GridPreset preset : presets) {
                 logger.info("grid preset " + preset.getName() + "(" + preset.getId() + ") was attached to permission group " + permissionGroup.getName() + "(" + permissionGroup.getId() + ") , will attach filter properties");
                 List<FilterProperties> filterProperties = listAllFilterProperties(new FilterPropertiesFiltering().setBaseclasses(Collections.singletonList(preset)), securityContext);
                 for (FilterProperties filterProperty : filterProperties) {
                     PermissionGroupToBaseclassCreate createPermissionGroupLinkRequest = new PermissionGroupToBaseclassCreate()
                             .setPermissionGroup(permissionGroup)
-                            .setBaseclass(filterProperty.getSecurity());
+                            .setSecuredId(filterProperty.getSecurityId())
+                                    .setSecuredType(Clazz.ofClass(filterProperty.getClass()));
                     permissionGroupToBaseclassService.createPermissionGroupToBaseclass(createPermissionGroupLinkRequest, securityContext);
                 }
 
@@ -180,19 +181,19 @@ public class FilterPropertiesService implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return filterPropertiesRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return filterPropertiesRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return filterPropertiesRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return filterPropertiesRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -218,7 +219,7 @@ public class FilterPropertiesService implements Plugin {
         filterPropertiesRepository.massMerge(toMerge);
     }
 
-    public void validateCreate(FilterPropertiesCreate createFilterProperties, SecurityContextBase securityContext) {
+    public void validateCreate(FilterPropertiesCreate createFilterProperties, SecurityContext securityContext) {
         validate(createFilterProperties,securityContext);
         if(createFilterProperties.getBaseclass()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"baseclassId must be provided");

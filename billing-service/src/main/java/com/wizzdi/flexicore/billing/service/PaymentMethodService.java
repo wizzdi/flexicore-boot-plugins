@@ -14,7 +14,7 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
 import com.flexicore.organization.model.Customer;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -41,19 +41,19 @@ public class PaymentMethodService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -80,11 +80,11 @@ public class PaymentMethodService implements Plugin {
     }
 
     public void validateFiltering(PaymentMethodFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
 
         Set<String> customerIds = filtering.getCustomerIds();
-        Map<String, Customer> customerMap = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds, Customer_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Customer> customerMap = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         customerIds.removeAll(customerMap.keySet());
         if (!customerIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Customer with ids " + customerIds);
@@ -92,7 +92,7 @@ public class PaymentMethodService implements Plugin {
         filtering.setCustomers(new ArrayList<>(customerMap.values()));
 
         Set<String> paymentMethodTypeIds = filtering.getPaymentMethodTypeIds();
-        Map<String, PaymentMethodType> paymentMethodTypeMap = paymentMethodTypeIds.isEmpty() ? new HashMap<>() : listByIds(PaymentMethodType.class, paymentMethodTypeIds, PaymentMethodType_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, PaymentMethodType> paymentMethodTypeMap = paymentMethodTypeIds.isEmpty() ? new HashMap<>() : listByIds(PaymentMethodType.class, paymentMethodTypeIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         paymentMethodTypeIds.removeAll(paymentMethodTypeMap.keySet());
         if (!paymentMethodTypeIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PaymentMethodType with ids " + paymentMethodTypeIds);
@@ -101,27 +101,27 @@ public class PaymentMethodService implements Plugin {
     }
 
     public PaginationResponse<PaymentMethod> getAllPaymentMethods(
-            SecurityContextBase securityContext, PaymentMethodFiltering filtering) {
+            SecurityContext securityContext, PaymentMethodFiltering filtering) {
         List<PaymentMethod> list = listAllPaymentMethods(securityContext, filtering);
         long count = repository.countAllPaymentMethods(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<PaymentMethod> listAllPaymentMethods(SecurityContextBase securityContext, PaymentMethodFiltering filtering) {
+    public List<PaymentMethod> listAllPaymentMethods(SecurityContext securityContext, PaymentMethodFiltering filtering) {
         return repository.getAllPaymentMethods(securityContext, filtering);
     }
 
     public PaymentMethod createPaymentMethod(PaymentMethodCreate paymentMethodCreate,
-                                             SecurityContextBase securityContext) {
+                                             SecurityContext securityContext) {
         PaymentMethod paymentMethod = createPaymentMethodNoMerge(paymentMethodCreate, securityContext);
         repository.merge(paymentMethod);
         return paymentMethod;
     }
 
     private PaymentMethod createPaymentMethodNoMerge(PaymentMethodCreate paymentMethodCreate,
-                                                     SecurityContextBase securityContext) {
+                                                     SecurityContext securityContext) {
         PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setId(Baseclass.getBase64ID());
+        paymentMethod.setId(UUID.randomUUID().toString());
 
         updatePaymentMethodNoMerge(paymentMethod, paymentMethodCreate);
         BaseclassService.createSecurityObjectNoMerge(paymentMethod, securityContext);
@@ -149,7 +149,7 @@ public class PaymentMethodService implements Plugin {
     }
 
     public PaymentMethod updatePaymentMethod(PaymentMethodUpdate paymentMethodUpdate,
-                                             SecurityContextBase securityContext) {
+                                             SecurityContext securityContext) {
         PaymentMethod paymentMethod = paymentMethodUpdate.getPaymentMethod();
         if (updatePaymentMethodNoMerge(paymentMethod, paymentMethodUpdate)) {
             repository.merge(paymentMethod);
@@ -158,7 +158,7 @@ public class PaymentMethodService implements Plugin {
     }
 
     public void validate(PaymentMethodCreate paymentMethodCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(paymentMethodCreate, securityContext);
         String customerId = paymentMethodCreate.getCustomerId();
         Customer customer = customerId == null ? null : getByIdOrNull(customerId, Customer.class, null, securityContext);

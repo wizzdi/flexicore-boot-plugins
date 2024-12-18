@@ -2,7 +2,7 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.ScenarioToDataSourceRepository;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.model.Scenario;
@@ -10,7 +10,7 @@ import com.flexicore.rules.model.ScenarioToDataSource;
 import com.flexicore.rules.request.ScenarioToDataSourceCreate;
 import com.flexicore.rules.request.ScenarioToDataSourceFilter;
 import com.flexicore.rules.request.ScenarioToDataSourceUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -44,7 +44,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @return created ScenarioToDataSource
    */
   public ScenarioToDataSource createScenarioToDataSource(
-      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
+      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContext securityContext) {
     ScenarioToDataSource scenarioToDataSource =
         createScenarioToDataSourceNoMerge(scenarioToDataSourceCreate, securityContext);
     this.repository.merge(scenarioToDataSource);
@@ -57,7 +57,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @return created ScenarioToDataSource unmerged
    */
   public ScenarioToDataSource createScenarioToDataSourceNoMerge(
-      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
+      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContext securityContext) {
     ScenarioToDataSource scenarioToDataSource = new ScenarioToDataSource();
     scenarioToDataSource.setId(UUID.randomUUID().toString());
     updateScenarioToDataSourceNoMerge(scenarioToDataSource, scenarioToDataSourceCreate);
@@ -118,7 +118,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @return scenarioToDataSource
    */
   public ScenarioToDataSource updateScenarioToDataSource(
-      ScenarioToDataSourceUpdate scenarioToDataSourceUpdate, SecurityContextBase securityContext) {
+      ScenarioToDataSourceUpdate scenarioToDataSourceUpdate, SecurityContext securityContext) {
     ScenarioToDataSource scenarioToDataSource =
         scenarioToDataSourceUpdate.getScenarioToDataSource();
     if (updateScenarioToDataSourceNoMerge(scenarioToDataSource, scenarioToDataSourceUpdate)) {
@@ -133,7 +133,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @return PaginationResponse containing paging information for ScenarioToDataSource
    */
   public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
-      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContext securityContext) {
     List<ScenarioToDataSource> list =
         listAllScenarioToDataSources(scenarioToDataSourceFilter, securityContext);
     long count =
@@ -147,7 +147,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @return List of ScenarioToDataSource
    */
   public List<ScenarioToDataSource> listAllScenarioToDataSources(
-      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarioToDataSources(
         scenarioToDataSourceFilter, securityContext);
   }
@@ -158,7 +158,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioToDataSourceFilter is not valid
    */
   public void validate(
-      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContextBase securityContext) {
+      ScenarioToDataSourceFilter scenarioToDataSourceFilter, SecurityContext securityContext) {
     basicService.validate(scenarioToDataSourceFilter, securityContext);
 
     Set<String> dataSourceIds =
@@ -169,7 +169,7 @@ public class ScenarioToDataSourceService implements Plugin {
         dataSourceIds.isEmpty()
             ? new HashMap<>()
             : this.repository
-                .listByIds(DataSource.class, dataSourceIds, SecuredBasic_.security, securityContext)
+                .listByIds(DataSource.class, dataSourceIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     dataSourceIds.removeAll(dataSource.keySet());
@@ -185,7 +185,7 @@ public class ScenarioToDataSourceService implements Plugin {
         scenarioIds.isEmpty()
             ? new HashMap<>()
             : this.repository
-                .listByIds(Scenario.class, scenarioIds, SecuredBasic_.security, securityContext)
+                .listByIds(Scenario.class, scenarioIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     scenarioIds.removeAll(scenario.keySet());
@@ -201,7 +201,7 @@ public class ScenarioToDataSourceService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioToDataSourceCreate is not valid
    */
   public void validate(
-      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContextBase securityContext) {
+      ScenarioToDataSourceCreate scenarioToDataSourceCreate, SecurityContext securityContext) {
     basicService.validate(scenarioToDataSourceCreate, securityContext);
 
     String dataSourceId = scenarioToDataSourceCreate.getDataSourceId();
@@ -209,7 +209,7 @@ public class ScenarioToDataSourceService implements Plugin {
         dataSourceId == null
             ? null
             : this.repository.getByIdOrNull(
-                dataSourceId, DataSource.class, SecuredBasic_.security, securityContext);
+                dataSourceId, DataSource.class, securityContext);
     if (dataSourceId != null && dataSource == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No DataSource with id " + dataSourceId);
@@ -221,7 +221,7 @@ public class ScenarioToDataSourceService implements Plugin {
         scenarioId == null
             ? null
             : this.repository.getByIdOrNull(
-                scenarioId, Scenario.class, SecuredBasic_.security, securityContext);
+                scenarioId, Scenario.class,  securityContext);
     if (scenarioId != null && scenario == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Scenario with id " + scenarioId);
@@ -230,12 +230,12 @@ public class ScenarioToDataSourceService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -243,7 +243,7 @@ public class ScenarioToDataSourceService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -251,7 +251,7 @@ public class ScenarioToDataSourceService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

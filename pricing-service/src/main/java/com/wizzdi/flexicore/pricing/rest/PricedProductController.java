@@ -8,7 +8,7 @@ import com.wizzdi.flexicore.pricing.request.PricedProductCreate;
 import com.wizzdi.flexicore.pricing.request.PricedProductFiltering;
 import com.wizzdi.flexicore.pricing.request.PricedProductUpdate;
 import com.wizzdi.flexicore.pricing.service.PricedProductService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class PricedProductController implements Plugin {
     public PaginationResponse<PricedProduct> getAllPricedProducts(
 
             
-            @RequestBody PricedProductFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PricedProductFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPricedProducts(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class PricedProductController implements Plugin {
 
             
             @RequestBody PricedProductCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPricedProduct(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class PricedProductController implements Plugin {
 
             
             @RequestBody PricedProductUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PricedProduct pricedProduct = service.getByIdOrNull(updateContainer.getId(),
-                PricedProduct.class, PricedProduct_.security, securityContext);
+                PricedProduct.class,  securityContext);
         if (pricedProduct == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PricedProduct with id "
                     + updateContainer.getId());

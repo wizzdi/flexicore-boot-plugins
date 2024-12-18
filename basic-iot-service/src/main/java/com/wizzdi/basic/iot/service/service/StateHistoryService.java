@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.StateHistoryRepository;
 import com.wizzdi.basic.iot.service.request.*;
@@ -50,19 +50,19 @@ public class StateHistoryService implements Plugin {
     @Autowired
     private RemoteService remoteService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -89,7 +89,7 @@ public class StateHistoryService implements Plugin {
     }
 
     public void validateFiltering(StateHistoryFilter stateHistoryFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(stateHistoryFilter, securityContext);
         if(stateHistoryFilter.getRemoteFilter()!=null){
             remoteService.validateFiltering(stateHistoryFilter.getRemoteFilter(),securityContext);
@@ -97,7 +97,7 @@ public class StateHistoryService implements Plugin {
     }
 
     public PaginationResponse<StateHistory> getAllStateHistories(
-            SecurityContextBase securityContext, StateHistoryFilter filtering) {
+            SecurityContext securityContext, StateHistoryFilter filtering) {
         List<StateHistory> list = listAllStateHistories(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, 0)
                 .setTotalRecords(null)
@@ -105,25 +105,25 @@ public class StateHistoryService implements Plugin {
                 .setTotalPages(null);
     }
 
-    public List<StateHistory> listAllStateHistories(SecurityContextBase securityContext, StateHistoryFilter stateHistoryFilter) {
+    public List<StateHistory> listAllStateHistories(SecurityContext securityContext, StateHistoryFilter stateHistoryFilter) {
         return repository.getAllStateHistories(securityContext, stateHistoryFilter);
     }
 
     public StateHistory createStateHistory(StateHistoryCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         StateHistory stateHistory = createStateHistoryNoMerge(creationContainer, securityContext);
         repository.merge(stateHistory);
         return stateHistory;
     }
 
     public StateHistory createStateHistoryNoMerge(StateHistoryCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         StateHistory stateHistory = new StateHistory();
         stateHistory.setId(UUID.randomUUID().toString());
 
         updateStateHistoryNoMerge(stateHistory, creationContainer);
         if(stateHistory.getRemote()!=null){
-            stateHistory.setSecurity(stateHistory.getRemote().getSecurity());
+            stateHistory.setSecurityId(stateHistory.getRemote().getSecurityId());
         }
         else{
             throw new RuntimeException("cannot create state history without remote");
@@ -163,7 +163,7 @@ public class StateHistoryService implements Plugin {
     }
 
     public StateHistory updateStateHistory(StateHistoryUpdate stateHistoryUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         StateHistory stateHistory = stateHistoryUpdate.getStateHistory();
         if (updateStateHistoryNoMerge(stateHistory, stateHistoryUpdate)) {
             repository.merge(stateHistory);

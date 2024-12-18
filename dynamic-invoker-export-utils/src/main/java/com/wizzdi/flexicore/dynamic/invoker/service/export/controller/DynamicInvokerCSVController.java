@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.export.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -30,7 +30,7 @@ public class DynamicInvokerCSVController implements Plugin, Invoker {
     @Operation(summary = "exportDynamicInvokerToCSV", description = "Export CSV")
     public FileResource exportDynamicInvokerToCSV(
             @Valid @RequestBody ExportDynamicInvoker exportDynamicInvoker,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         dynamicInvokerExportService.validateExportDynamicInvoker(exportDynamicInvoker, securityContext);
         return dynamicInvokerExportService.exportDynamicInvokerToCSV(exportDynamicInvoker, securityContext);
     }

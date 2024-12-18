@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.DeviceType_;
 import com.wizzdi.basic.iot.service.request.DeviceTypeCreate;
@@ -40,7 +40,7 @@ public class DeviceTypeController implements Plugin, Invoker {
     public PaginationResponse<DeviceType> getAllDeviceTypes(
 
             
-            @RequestBody DeviceTypeFilter deviceTypeFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody DeviceTypeFilter deviceTypeFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(deviceTypeFilter, securityContext);
         return service.getAllDeviceTypes(securityContext, deviceTypeFilter);
     }
@@ -52,7 +52,7 @@ public class DeviceTypeController implements Plugin, Invoker {
     public DeviceType createDeviceType(
             
             @RequestBody DeviceTypeCreate deviceTypeCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(deviceTypeCreate, securityContext);
 
         return service.createDeviceType(deviceTypeCreate, securityContext);
@@ -66,10 +66,10 @@ public class DeviceTypeController implements Plugin, Invoker {
 
             
             @RequestBody DeviceTypeUpdate deviceTypeUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(deviceTypeUpdate, securityContext);
         DeviceType deviceType = service.getByIdOrNull(deviceTypeUpdate.getId(),
-                DeviceType.class, DeviceType_.security, securityContext);
+                DeviceType.class,  securityContext);
         if (deviceType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no DeviceType with id "
                     + deviceTypeUpdate.getId());

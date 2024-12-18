@@ -2,7 +2,7 @@ package com.flexicore.rules.events;
 
 
 import com.flexicore.model.SecurityTenant;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 import java.util.List;
 

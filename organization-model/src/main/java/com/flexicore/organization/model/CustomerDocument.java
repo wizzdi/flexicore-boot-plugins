@@ -1,6 +1,6 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 import jakarta.persistence.Entity;
@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
-public class CustomerDocument extends SecuredBasic {
+public class CustomerDocument extends Baseclass {
 
     @OneToOne(targetEntity = FileResource.class)
     private FileResource fileResource;

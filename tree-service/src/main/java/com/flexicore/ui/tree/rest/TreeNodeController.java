@@ -7,7 +7,7 @@
 package com.flexicore.ui.tree.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.model.TreeNode_;
 import com.flexicore.ui.tree.request.TreeNodeCreate;
@@ -46,7 +46,7 @@ public class TreeNodeController implements Plugin {
 	public PaginationResponse<TreeNode> getAllTreeNodes(
 			@RequestBody
 			TreeNodeFilter treeFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(treeFilter,securityContext);
 
 		return service.getAllTreeNodes(treeFilter, securityContext);
@@ -62,7 +62,7 @@ public class TreeNodeController implements Plugin {
 	public TreeNode createTreeNode(
 			@RequestBody
 			TreeNodeCreate treeNodeCreationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(treeNodeCreationContainer,securityContext);
 
 		return service.createTreeNode(treeNodeCreationContainer, securityContext);
@@ -75,8 +75,8 @@ public class TreeNodeController implements Plugin {
 	public TreeNode updateTreeNode(
 			@RequestBody
 			TreeNodeUpdate treeNodeCreationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
-		TreeNode treeNode=treeNodeCreationContainer.getNodeId()!=null?service.getByIdOrNull(treeNodeCreationContainer.getNodeId(),TreeNode.class, TreeNode_.security,securityContext):null;
+			@RequestAttribute SecurityContext securityContext) {
+		TreeNode treeNode=treeNodeCreationContainer.getNodeId()!=null?service.getByIdOrNull(treeNodeCreationContainer.getNodeId(),TreeNode.class, securityContext):null;
 		if(treeNode==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree node with id "+treeNodeCreationContainer.getNodeId());
 		}

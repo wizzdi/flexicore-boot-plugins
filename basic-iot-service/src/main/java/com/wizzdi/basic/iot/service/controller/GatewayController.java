@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.Gateway_;
 import com.wizzdi.basic.iot.service.request.*;
@@ -43,7 +43,7 @@ public class GatewayController implements Plugin, Invoker {
     public PaginationResponse<Gateway> getAllGateways(
 
             
-            @RequestBody GatewayFilter gatewayFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody GatewayFilter gatewayFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(gatewayFilter, securityContext);
         return service.getAllGateways(securityContext, gatewayFilter);
     }
@@ -53,7 +53,7 @@ public class GatewayController implements Plugin, Invoker {
     public PaginationResponse<Gateway> approveGateways(
 
             
-            @RequestBody ApproveGatewaysRequest approveGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ApproveGatewaysRequest approveGatewaysRequest, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(approveGatewaysRequest, securityContext);
         return service.approveGateways(securityContext, approveGatewaysRequest);
     }
@@ -65,7 +65,7 @@ public class GatewayController implements Plugin, Invoker {
     public Gateway createGateway(
             
             @RequestBody GatewayCreate gatewayCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validateCreate(gatewayCreate, securityContext);
 
         return service.createGateway(gatewayCreate, securityContext);
@@ -79,10 +79,10 @@ public class GatewayController implements Plugin, Invoker {
 
             
             @RequestBody GatewayUpdate gatewayUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(gatewayUpdate, securityContext);
         Gateway gateway = service.getByIdOrNull(gatewayUpdate.getId(),
-                Gateway.class, Gateway_.security, securityContext);
+                Gateway.class,  securityContext);
         if (gateway == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Gateway with id "
                     + gatewayUpdate.getId());
@@ -97,7 +97,7 @@ public class GatewayController implements Plugin, Invoker {
     public ImportGatewaysResponse importGateways(
 
             
-            @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ImportGatewaysRequest importGatewaysRequest, @RequestAttribute SecurityContext securityContext) {
         service.validate(importGatewaysRequest, securityContext);
         return service.importGateways(securityContext, importGatewaysRequest);
     }
@@ -106,7 +106,7 @@ public class GatewayController implements Plugin, Invoker {
     @PostMapping("/move")
     public MoveGatewaysResponse moveGatewaysToTenant(
 
-            @RequestBody MoveGatewaysRequest moveGatewaysRequest, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody MoveGatewaysRequest moveGatewaysRequest, @RequestAttribute SecurityContext securityContext) {
         gatewayMoveService.validate(moveGatewaysRequest, securityContext);
         return gatewayMoveService.moveGatewaysToTenant(securityContext, moveGatewaysRequest);
     }

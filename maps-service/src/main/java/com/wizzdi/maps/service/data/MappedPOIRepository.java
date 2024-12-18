@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.data;
 
 import com.flexicore.model.*;
 import com.flexicore.model.territories.Address;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.AddressRepository;
 import com.flexicore.territories.request.AddressFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -48,7 +48,7 @@ public class MappedPOIRepository implements Plugin {
      * @return List of MappedPOI
      */
     public List<MappedPOI> listAllMappedPOIs(
-            MappedPOIFilter filtering, SecurityContextBase securityContext) {
+            MappedPOIFilter filtering, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MappedPOI> q = cb.createQuery(MappedPOI.class);
         Root<MappedPOI> r = q.from(MappedPOI.class);
@@ -60,7 +60,7 @@ public class MappedPOIRepository implements Plugin {
         return query.getResultList();
     }
 
-    public List<MappedPoiDTO> listAllMappedPOIDTOs(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public List<MappedPoiDTO> listAllMappedPOIDTOs(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MappedPoiDTO> q = cb.createQuery(MappedPoiDTO.class);
         Root<MappedPOI> r = q.from(MappedPOI.class);
@@ -82,7 +82,7 @@ public class MappedPOIRepository implements Plugin {
             CriteriaQuery<?> q,
             From<?, T> r,
             List<Predicate> preds,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
 
         this.securedBasicRepository.addSecuredBasicPredicates(
                 filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -129,8 +129,7 @@ public class MappedPOIRepository implements Plugin {
         if (filtering.getTenants() != null && !filtering.getTenants().isEmpty()) {
             Set<String> ids =
                     filtering.getTenants().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
-            Join<T, Baseclass> join = r.join(MappedPOI_.security);
-            Join<Baseclass, SecurityTenant> tenantJoin = join.join(Baseclass_.tenant);
+            Join<T, SecurityTenant> tenantJoin = r.join(Baseclass_.tenant);
             Predicate in = tenantJoin.get(Basic_.id).in(ids);
             preds.add(filtering.isTenantsExclude()?cb.not(in):in);
         }
@@ -199,7 +198,7 @@ public class MappedPOIRepository implements Plugin {
      * @param securityContext
      * @return count of MappedPOI
      */
-    public Long countAllMappedPOIs(MappedPOIFilter filtering, SecurityContextBase securityContext) {
+    public Long countAllMappedPOIs(MappedPOIFilter filtering, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<MappedPOI> r = q.from(MappedPOI.class);
@@ -212,13 +211,13 @@ public class MappedPOIRepository implements Plugin {
 
 
     public <T extends Baseclass> List<T> listByIds(
-            Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+            Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
 
     public <T extends Baseclass> T getByIdOrNull(
-            String id, Class<T> c, SecurityContextBase securityContext) {
+            String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
@@ -227,7 +226,7 @@ public class MappedPOIRepository implements Plugin {
             String id,
             Class<T> c,
             SingularAttribute<D, E> baseclassAttribute,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
@@ -236,7 +235,7 @@ public class MappedPOIRepository implements Plugin {
             Class<T> c,
             Set<String> ids,
             SingularAttribute<D, E> baseclassAttribute,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

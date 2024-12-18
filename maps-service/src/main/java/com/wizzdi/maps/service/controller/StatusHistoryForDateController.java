@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -31,7 +31,7 @@ public class StatusHistoryForDateController implements Plugin, Invoker {
   @Operation(summary = "getAllStatusHistoriesForDate", description = "lists StatusHistories for Date")
   public PaginationResponse<StatusHistory> getAllStatusHistoriesForDate(
           @Valid @RequestBody StatusHistoryForDateRequest statusHistoryFilter,
-          @RequestAttribute SecurityContextBase securityContext) {
+          @RequestAttribute SecurityContext securityContext) {
 
     return statusHistoryGroupedService.getAllStatusHistoriesForDate(statusHistoryFilter, securityContext);
   }

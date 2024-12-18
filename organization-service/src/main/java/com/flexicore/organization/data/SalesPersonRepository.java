@@ -4,7 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.organization.model.*;
 import com.flexicore.organization.request.SalesPersonFiltering;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.pf4j.Extension;
@@ -32,7 +32,7 @@ public class SalesPersonRepository implements Plugin {
 	private EmployeeRepository employeeRepository;
 
 	public List<SalesPerson> listAllSalesPeople(
-			SecurityContextBase securityContext, SalesPersonFiltering filtering) {
+			SecurityContext securityContext, SalesPersonFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<SalesPerson> q = cb.createQuery(SalesPerson.class);
 		Root<SalesPerson> r = q.from(SalesPerson.class);
@@ -45,7 +45,7 @@ public class SalesPersonRepository implements Plugin {
 	}
 
 	public <T extends SalesPerson> void addSalesPersonPredicates(SalesPersonFiltering filtering,
-										  CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContextBase securityContext) {
+										  CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContext securityContext) {
 		employeeRepository.addEmployeePredicates(filtering, cb,q, r, preds,securityContext);
 		if (filtering.getSalesRegions() != null && !filtering.getSalesRegions().isEmpty()) {
 			Set<String> ids = filtering.getSalesRegions().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
@@ -55,7 +55,7 @@ public class SalesPersonRepository implements Plugin {
 		}
 	}
 
-	public Long countAllSalesPeople(SecurityContextBase securityContext,
+	public Long countAllSalesPeople(SecurityContext securityContext,
 									SalesPersonFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -69,19 +69,19 @@ public class SalesPersonRepository implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return employeeRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return employeeRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return employeeRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return employeeRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

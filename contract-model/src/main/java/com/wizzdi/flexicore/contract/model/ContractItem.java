@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.contract.model;
 
 import com.wizzdi.flexicore.pricing.model.price.PriceListItem;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 
 import jakarta.persistence.Column;
@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.OffsetDateTime;
 
 @Entity
-public class ContractItem extends SecuredBasic {
+public class ContractItem extends Baseclass {
 
     @ManyToOne(targetEntity = PriceListItem.class)
     private PriceListItem priceListItem;

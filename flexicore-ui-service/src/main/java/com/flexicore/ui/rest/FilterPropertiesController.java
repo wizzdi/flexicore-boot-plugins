@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.FilterProperties;
 import com.flexicore.ui.request.FilterPropertiesCreate;
 import com.flexicore.ui.request.FilterPropertiesFiltering;
@@ -48,7 +48,7 @@ public class FilterPropertiesController implements Plugin {
 	public PaginationResponse<FilterProperties> getAllFilterProperties(
 			 @RequestBody
 			FilterPropertiesFiltering filterPropertiesFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(filterPropertiesFiltering,securityContext);
 		return service.getAllFilterProperties(filterPropertiesFiltering, securityContext);
 
@@ -59,8 +59,8 @@ public class FilterPropertiesController implements Plugin {
 	@PutMapping("updateFilterProperties")
 	public FilterProperties updateFilterProperties(
 			 @RequestBody
-			FilterPropertiesUpdate updateFilterProperties, @RequestAttribute SecurityContextBase securityContext) {
-		FilterProperties filterProperties = updateFilterProperties.getId() != null ? service.getByIdOrNull(updateFilterProperties.getId(), FilterProperties.class, FilterProperties_.security, securityContext) : null;
+			FilterPropertiesUpdate updateFilterProperties, @RequestAttribute SecurityContext securityContext) {
+		FilterProperties filterProperties = updateFilterProperties.getId() != null ? service.getByIdOrNull(updateFilterProperties.getId(), FilterProperties.class,securityContext) : null;
 		if (filterProperties == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no FilterProperties id  " + updateFilterProperties.getId());
 		}
@@ -76,7 +76,7 @@ public class FilterPropertiesController implements Plugin {
 	@PostMapping("createFilterProperties")
 	public FilterProperties createFilterProperties(
 			 @RequestBody
-			FilterPropertiesCreate createFilterProperties, @RequestAttribute SecurityContextBase securityContext) {
+			FilterPropertiesCreate createFilterProperties, @RequestAttribute SecurityContext securityContext) {
 		service.validateCreate(createFilterProperties, securityContext);
 		return service.createFilterProperties(createFilterProperties, securityContext);
 

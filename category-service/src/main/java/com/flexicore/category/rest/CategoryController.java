@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class CategoryController implements Plugin {
 	public PaginationResponse<Category> getAllCategories(
 			
 			@RequestBody CategoryFilter filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(filtering, securityContext);
 		return service.getAllCategories(filtering, securityContext);
 	}
@@ -57,7 +57,7 @@ public class CategoryController implements Plugin {
 	public Category createCategory(
 			
 			@RequestBody CategoryCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validate(creationContainer, securityContext);
 
@@ -71,7 +71,7 @@ public class CategoryController implements Plugin {
 	public Category updateCategory(
 			
 			@RequestBody CategoryUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		Category Category = service.getByIdOrNull(updateContainer.getId(),
 				Category.class, null, securityContext);
 		if (Category == null) {

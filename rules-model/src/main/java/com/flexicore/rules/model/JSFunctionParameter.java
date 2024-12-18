@@ -1,11 +1,11 @@
 package com.flexicore.rules.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class JSFunctionParameter extends SecuredBasic {
+public class JSFunctionParameter extends Baseclass {
 
   private Integer ordinal;
 

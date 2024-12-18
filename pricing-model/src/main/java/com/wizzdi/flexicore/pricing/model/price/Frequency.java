@@ -1,11 +1,11 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class Frequency extends SecuredBasic {
+public class Frequency extends Baseclass {
     private IntervalUnit intervalUnit;
     private int intervalCount;
 

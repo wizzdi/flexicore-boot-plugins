@@ -7,7 +7,7 @@
 package com.flexicore.category.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -18,7 +18,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 @Entity
 
-public class Category extends SecuredBasic {
+public class Category extends Baseclass {
 
 	@OneToMany(targetEntity = CategoryToBaseClass.class,mappedBy="category")
 	@JsonIgnore

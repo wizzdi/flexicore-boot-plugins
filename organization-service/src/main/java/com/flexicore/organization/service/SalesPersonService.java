@@ -10,7 +10,7 @@ import com.flexicore.organization.model.SalesRegion;
 import com.flexicore.organization.request.SalesPersonCreate;
 import com.flexicore.organization.request.SalesPersonFiltering;
 import com.flexicore.organization.request.SalesPersonUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -42,19 +42,18 @@ public class SalesPersonService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -81,7 +80,7 @@ public class SalesPersonService implements Plugin {
 	}
 
 	public PaginationResponse<SalesPerson> getAllSalesPeople(
-			SecurityContextBase securityContext, SalesPersonFiltering filtering) {
+			SecurityContext securityContext, SalesPersonFiltering filtering) {
 
 		List<SalesPerson> endpoints = repository.listAllSalesPeople(securityContext, filtering);
 		long count = repository.countAllSalesPeople(securityContext, filtering);
@@ -89,7 +88,7 @@ public class SalesPersonService implements Plugin {
 	}
 
 	public SalesPerson createSalesPerson(SalesPersonCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 
 		SalesPerson salesPerson = createSalesPersonNoMerge(creationContainer, securityContext);
 
@@ -98,9 +97,9 @@ public class SalesPersonService implements Plugin {
 	}
 
 	public SalesPerson createSalesPersonNoMerge(
-			SalesPersonCreate creationContainer, SecurityContextBase securityContext) {
+			SalesPersonCreate creationContainer, SecurityContext securityContext) {
 		SalesPerson salesPerson = new SalesPerson();
-		salesPerson.setId(Baseclass.getBase64ID());
+		salesPerson.setId(UUID.randomUUID().toString());
 
 		updateSalesPersonNoMerge(salesPerson, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(salesPerson, securityContext);
@@ -110,7 +109,7 @@ public class SalesPersonService implements Plugin {
 	}
 
 	public SalesPerson updateSalesPerson(SalesPersonUpdate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		SalesPerson salesPerson = creationContainer.getSalesPerson();
 		if (updateSalesPersonNoMerge(salesPerson, creationContainer)) {
 			repository.merge(salesPerson);
@@ -124,10 +123,10 @@ public class SalesPersonService implements Plugin {
 	}
 
 	public void validateFiltering(SalesPersonFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		employeeService.validateFiltering(filtering,securityContext);
 		Set<String> regionIds = filtering.getRegionIds();
-		Map<String, SalesRegion> salesRegion = regionIds.isEmpty() ? new HashMap<>() : listByIds(SalesRegion.class, regionIds, SalesPerson_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, SalesRegion> salesRegion = regionIds.isEmpty() ? new HashMap<>() : listByIds(SalesRegion.class, regionIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		regionIds.removeAll(salesRegion.keySet());
 		if (!salesRegion.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Sales Region with ids " + regionIds);

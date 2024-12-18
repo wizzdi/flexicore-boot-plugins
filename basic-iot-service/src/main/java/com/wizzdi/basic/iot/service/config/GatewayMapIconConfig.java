@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service.config;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.MapIcon;
@@ -22,7 +22,7 @@ public class GatewayMapIconConfig implements Plugin {
 
     @Bean
     @Qualifier("gatewayMapIcon")
-    public MapIcon gatewayMapIcon(SecurityContextBase adminSecurityContext, MapIconService mapIconService){
+    public MapIcon gatewayMapIcon(SecurityContext adminSecurityContext, MapIconService mapIconService){
         return mapIconService.listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(Gateway.class.getCanonicalName())),adminSecurityContext).stream().findFirst().orElseGet(()->mapIconService.createMapIcon(new MapIconCreate().setRelatedType(Gateway.class.getCanonicalName()).setExternalId(GATEWAY_EXTERNAL_ID).setName(GATEWAY_EXTERNAL_ID),adminSecurityContext));
     }
 }

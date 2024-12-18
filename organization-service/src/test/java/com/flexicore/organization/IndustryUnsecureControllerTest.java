@@ -5,7 +5,7 @@ import com.flexicore.organization.model.Industry;
 import com.flexicore.organization.request.IndustryCreate;
 import com.flexicore.organization.request.IndustryFiltering;
 import com.flexicore.organization.service.IndustryService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +61,7 @@ public class IndustryUnsecureControllerTest {
     @Autowired
     private IndustryService industryService;
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
 
     @Test

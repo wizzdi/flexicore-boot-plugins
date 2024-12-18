@@ -3,7 +3,7 @@ package com.flexicore.ui.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.Form;
 import com.flexicore.ui.request.FormFiltering;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -32,7 +32,7 @@ public class FormRepository implements Plugin {
     private PresetRepository presetRepository;
 
     public List<Form> listAllForms(FormFiltering formFiltering,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Form> q = cb.createQuery(Form.class);
         Root<Form> r = q.from(Form.class);
@@ -46,14 +46,14 @@ public class FormRepository implements Plugin {
 
     public <T extends Form> void addFormPredicates(List<Predicate> preds, CriteriaBuilder cb,
                                    CommonAbstractCriteria q,
-                                   From<?,T> r, FormFiltering formFiltering,SecurityContextBase securityContextBase) {
-        presetRepository.addPresetPredicates(preds, cb,q, r, formFiltering,securityContextBase);
+                                   From<?,T> r, FormFiltering formFiltering,SecurityContext SecurityContext) {
+        presetRepository.addPresetPredicates(preds, cb,q, r, formFiltering,SecurityContext);
 
 
     }
 
     public long countAllForms(FormFiltering formFiltering,
-                              SecurityContextBase securityContext) {
+                              SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<Form> r = q.from(Form.class);
@@ -65,19 +65,19 @@ public class FormRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

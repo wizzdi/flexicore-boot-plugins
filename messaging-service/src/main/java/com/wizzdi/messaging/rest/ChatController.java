@@ -2,8 +2,8 @@ package com.wizzdi.messaging.rest;
 
 import com.flexicore.annotations.OperationsInside;
 
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.messaging.model.Chat;
@@ -32,7 +32,7 @@ public class ChatController implements Plugin {
 
 	@PostMapping("/createChat")
 	@Operation(description = "creates Chat",summary = "creates Chat")
-	public Chat createChat( @RequestBody ChatCreate chatCreate, @RequestAttribute SecurityContextBase securityContext){
+	public Chat createChat( @RequestBody ChatCreate chatCreate, @RequestAttribute SecurityContext securityContext){
 		chatService.validate(chatCreate,securityContext);
 		return chatService.createChat(chatCreate,securityContext);
 	}
@@ -40,7 +40,7 @@ public class ChatController implements Plugin {
 	@PostMapping("/getAllChats")
 	@Operation(description = "returns Chats",summary = "returns Chats")
 
-	public PaginationResponse<Chat> getAllChats( @RequestBody ChatFilter chatFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<Chat> getAllChats( @RequestBody ChatFilter chatFilter, @RequestAttribute SecurityContext securityContext){
 		chatService.validate(chatFilter,securityContext);
 		return chatService.getAllChats(chatFilter,securityContext);
 	}
@@ -48,9 +48,9 @@ public class ChatController implements Plugin {
 	@PutMapping("/updateChat")
 	@Operation(description = "updates Chat",summary = "updates Chat")
 
-	public Chat updateChat( @RequestBody ChatUpdate chatUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public Chat updateChat( @RequestBody ChatUpdate chatUpdate, @RequestAttribute SecurityContext securityContext){
 		String id=chatUpdate.getId();
-		Chat chat=id!=null? chatService.getByIdOrNull(id,Chat.class, SecuredBasic_.security,securityContext):null;
+		Chat chat=id!=null? chatService.getByIdOrNull(id,Chat.class, securityContext):null;
 		if(chat==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Chat user with id "+id);
 		}

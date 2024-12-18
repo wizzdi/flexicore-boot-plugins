@@ -7,7 +7,7 @@
 package com.flexicore.license.rest;
 
 import com.flexicore.annotations.IOperation;
-import com.flexicore.annotations.IOperation.Access;
+
 import com.flexicore.annotations.OperationsInside;
 
 
@@ -16,9 +16,9 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.flexicore.license.model.LicensingProduct;
 import com.flexicore.license.request.LicensingProductFiltering;
 import com.flexicore.license.service.LicensingProductService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
+import com.wizzdi.segmantix.model.Access;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.stereotype.Component;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,7 +48,7 @@ public class LicensingProductController implements Plugin {
    @PostMapping("/getAllLicensingProducts")
 
     @IOperation(access = Access.allow, Name = "getAllLicensingProducts", Description = "lists LicensingProducts")
-    public PaginationResponse<LicensingProduct> getAllLicensingProducts(@RequestBody LicensingProductFiltering licensingProductFiltering, @RequestAttribute SecurityContextBase securityContext) {
+    public PaginationResponse<LicensingProduct> getAllLicensingProducts(@RequestBody LicensingProductFiltering licensingProductFiltering, @RequestAttribute SecurityContext securityContext) {
         licensingProductService.validate(licensingProductFiltering, securityContext);
         return licensingProductService.getAllLicensingProducts(licensingProductFiltering, securityContext);
 

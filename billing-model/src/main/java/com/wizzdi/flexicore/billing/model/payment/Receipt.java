@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.billing.model.payment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Receipt extends SecuredBasic {
+public class Receipt extends Baseclass {
 
     @ManyToOne(targetEntity = Payment.class)
     private Payment payment;

@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.client.ChangeState;
 import com.wizzdi.basic.iot.client.ChangeStateReceived;
@@ -46,7 +46,7 @@ public class DeviceStateService implements Plugin {
 
 
     public void validate(ChangeStateRequest changeStateRequest,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         if (changeStateRequest.getDeviceFilter() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "device filter must be provided");
         }
@@ -59,7 +59,7 @@ public class DeviceStateService implements Plugin {
 
 
 
-    public ChangeStateResponse changeState(SecurityContextBase securityContext, ChangeStateRequest changeStateRequest) {
+    public ChangeStateResponse changeState(SecurityContext securityContext, ChangeStateRequest changeStateRequest) {
         Map<String, ChangeStateResponseEntry> responseEntryMap=new HashMap<>();
         List<Device> devices = deviceService.listAllDevices(securityContext, changeStateRequest.getDeviceFilter());
         changeStateRequest.setAsync(changeStateRequest.isAsync()||devices.size()>forceAsyncOnSize);

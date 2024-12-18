@@ -8,7 +8,7 @@ import com.flexicore.organization.model.SupplierApi;
 import com.flexicore.organization.request.SupplierApiCreate;
 import com.flexicore.organization.request.SupplierApiFiltering;
 import com.flexicore.organization.request.SupplierApiUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -41,19 +42,17 @@ public class SupplierApiService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -80,7 +79,7 @@ public class SupplierApiService implements Plugin {
 	}
 
 	public PaginationResponse<SupplierApi> listAllSupplierApis(
-			SecurityContextBase securityContext, SupplierApiFiltering filtering) {
+			SecurityContext securityContext, SupplierApiFiltering filtering) {
 
 		List<SupplierApi> endpoints = repository.getAllSupplierApis(
 				securityContext, filtering);
@@ -91,13 +90,13 @@ public class SupplierApiService implements Plugin {
 
 	
 	public List<SupplierApi> getAllSupplierApis(
-			SecurityContextBase securityContext, SupplierApiFiltering filtering) {
+			SecurityContext securityContext, SupplierApiFiltering filtering) {
 		return repository.getAllSupplierApis(securityContext, filtering);
 	}
 
 	
 	public SupplierApi createSupplierApi(SupplierApiCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		SupplierApi SupplierApi = createSupplierApiNoMerge(creationContainer,
 				securityContext);
 		repository.merge(SupplierApi);
@@ -106,9 +105,9 @@ public class SupplierApiService implements Plugin {
 
 	
 	public SupplierApi createSupplierApiNoMerge(
-			SupplierApiCreate creationContainer, SecurityContextBase securityContext) {
+			SupplierApiCreate creationContainer, SecurityContext securityContext) {
 		SupplierApi supplierApi = new SupplierApi();
-		supplierApi.setId(Baseclass.getBase64ID());
+		supplierApi.setId(UUID.randomUUID().toString());
 		updateSupplierApiNoMerge(creationContainer, supplierApi);
 		BaseclassService.createSecurityObjectNoMerge(supplierApi, securityContext);
 
@@ -118,7 +117,7 @@ public class SupplierApiService implements Plugin {
 
 	
 	public SupplierApi updateSupplierApi(SupplierApiUpdate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		SupplierApi SupplierApi = creationContainer.getSupplierApi();
 		if (updateSupplierApiNoMerge(creationContainer, SupplierApi)) {
 			repository.merge(SupplierApi);
@@ -140,14 +139,14 @@ public class SupplierApiService implements Plugin {
 	}
 
 	public void validateFiltering(SupplierApiFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(filtering,securityContext);
 
 	}
 
 	
 	public void validateCreate(SupplierApiCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (creationContainer.getName() == null
 				|| creationContainer.getName().isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -166,7 +165,7 @@ public class SupplierApiService implements Plugin {
 
 	
 	public void validateUpdate(SupplierApiUpdate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(creationContainer,securityContext);
 
 		if (creationContainer.getName() != null) {

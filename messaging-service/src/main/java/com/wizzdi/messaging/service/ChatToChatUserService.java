@@ -2,7 +2,7 @@ package com.wizzdi.messaging.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BasicService;
@@ -32,7 +32,7 @@ public class ChatToChatUserService implements Plugin {
 	private BasicService basicService;
 
 
-	public ChatToChatUser createChatToChatUser(ChatToChatUserCreate chatToChatUserCreate, SecurityContextBase securityContext) {
+	public ChatToChatUser createChatToChatUser(ChatToChatUserCreate chatToChatUserCreate, SecurityContext securityContext) {
 		ChatToChatUser chatToChatUser = createChatToChatUserNoMerge(chatToChatUserCreate, securityContext);
 		chatToChatUserRepository.merge(chatToChatUser);
 		return chatToChatUser;
@@ -46,17 +46,17 @@ public class ChatToChatUserService implements Plugin {
 		chatToChatUserRepository.massMerge(list);
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return chatToChatUserRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatToChatUserRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
-	public ChatToChatUser createChatToChatUserNoMerge(ChatToChatUserCreate chatToChatUserCreate, SecurityContextBase securityContext) {
+	public ChatToChatUser createChatToChatUserNoMerge(ChatToChatUserCreate chatToChatUserCreate, SecurityContext securityContext) {
 		ChatToChatUser chatToChatUser = new ChatToChatUser();
-		chatToChatUser.setId(Baseclass.getBase64ID());
+		chatToChatUser.setId(UUID.randomUUID().toString());
 		updateChatToChatUserNoMerge(chatToChatUserCreate, chatToChatUser);
 		return chatToChatUser;
 	}
@@ -79,7 +79,7 @@ public class ChatToChatUserService implements Plugin {
 		return update;
 	}
 
-	public ChatToChatUser updateChatToChatUser(ChatToChatUserUpdate chatToChatUserUpdate, SecurityContextBase securityContext) {
+	public ChatToChatUser updateChatToChatUser(ChatToChatUserUpdate chatToChatUserUpdate, SecurityContext securityContext) {
 		ChatToChatUser ChatToChatUser = chatToChatUserUpdate.getChatToChatUser();
 		if (updateChatToChatUserNoMerge(chatToChatUserUpdate, ChatToChatUser)) {
 			chatToChatUserRepository.merge(ChatToChatUser);
@@ -87,17 +87,17 @@ public class ChatToChatUserService implements Plugin {
 		return ChatToChatUser;
 	}
 
-	public void validate(ChatToChatUserCreate chatToChatUserCreate, SecurityContextBase securityContext) {
+	public void validate(ChatToChatUserCreate chatToChatUserCreate, SecurityContext securityContext) {
 		basicService.validate(chatToChatUserCreate, securityContext);
 		String chatId = chatToChatUserCreate.getChatId();
-		Chat chat = chatId != null ? getByIdOrNull(chatId, Chat.class, Chat_.security, securityContext) : null;
+		Chat chat = chatId != null ? getByIdOrNull(chatId, Chat.class,securityContext) : null;
 		if (chatId != null && chat == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chat with id " + chatId);
 		}
 		chatToChatUserCreate.setChat(chat);
 
 		String chatUserId = chatToChatUserCreate.getChatUserId();
-		ChatUser chatUser = chatUserId != null ? getByIdOrNull(chatUserId, ChatUser.class, ChatUser_.security, securityContext) : null;
+		ChatUser chatUser = chatUserId != null ? getByIdOrNull(chatUserId, ChatUser.class,securityContext) : null;
 		if (chatUserId != null && chatUser == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chatUser with id " + chatUserId);
 		}
@@ -105,10 +105,10 @@ public class ChatToChatUserService implements Plugin {
 
 	}
 
-	public void validate(ChatToChatUserFilter chatToChatUserFilter, SecurityContextBase securityContext) {
+	public void validate(ChatToChatUserFilter chatToChatUserFilter, SecurityContext securityContext) {
 		basicService.validate(chatToChatUserFilter, securityContext);
 		Set<String> chatIds=chatToChatUserFilter.getChatsIds();
-		Map<String,Chat> chatMap=chatIds.isEmpty()?new HashMap<>():chatToChatUserRepository.listByIds(Chat.class,chatIds,Chat_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String,Chat> chatMap=chatIds.isEmpty()?new HashMap<>():chatToChatUserRepository.listByIds(Chat.class,chatIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		chatIds.removeAll(chatMap.keySet());
 		if(!chatIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chats with ids " + chatIds);
@@ -116,7 +116,7 @@ public class ChatToChatUserService implements Plugin {
 		chatToChatUserFilter.setChats(new ArrayList<>(chatMap.values()));
 
 		Set<String> chatUserIds=chatToChatUserFilter.getChatUsersIds();
-		Map<String,ChatUser> chatUserMap=chatUserIds.isEmpty()?new HashMap<>():listByIds(ChatUser.class,chatUserIds,ChatUser_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String,ChatUser> chatUserMap=chatUserIds.isEmpty()?new HashMap<>():listByIds(ChatUser.class,chatUserIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		chatUserIds.removeAll(chatUserMap.keySet());
 		if(!chatUserIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chat users with ids " + chatUserIds);
@@ -131,21 +131,21 @@ public class ChatToChatUserService implements Plugin {
 
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatToChatUserRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return chatToChatUserRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public PaginationResponse<ChatToChatUser> getAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContextBase securityContext) {
+	public PaginationResponse<ChatToChatUser> getAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContext securityContext) {
 		List<ChatToChatUser> list = listAllChatToChatUsers(ChatToChatUserFilter, securityContext);
 		long count = chatToChatUserRepository.countAllChatToChatUsers(ChatToChatUserFilter, securityContext);
 		return new PaginationResponse<>(list, ChatToChatUserFilter, count);
 	}
 
-	public List<ChatToChatUser> listAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContextBase securityContext) {
+	public List<ChatToChatUser> listAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContext securityContext) {
 		return chatToChatUserRepository.listAllChatToChatUsers(ChatToChatUserFilter, securityContext);
 	}
 

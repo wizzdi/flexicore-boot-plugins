@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.contract.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.billing.model.payment.PaymentMethod;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.organization.model.Customer;
 
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Contract extends SecuredBasic {
+public class Contract extends Baseclass {
 
     @JsonIgnore
     @OneToMany(targetEntity = ContractItem.class,mappedBy = "contract")

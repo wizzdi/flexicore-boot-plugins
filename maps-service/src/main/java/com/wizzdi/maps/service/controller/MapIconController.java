@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class MapIconController implements Plugin {
   @Operation(summary = "updateMapIcon", description = "Updates MapIcon")
   public MapIcon updateMapIcon(
       @Validated(Update.class) @RequestBody MapIconUpdate mapIconUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapIconService.updateMapIcon(mapIconUpdate, securityContext);
   }
@@ -41,7 +41,7 @@ public class MapIconController implements Plugin {
   @Operation(summary = "getAllMapIcons", description = "lists MapIcons")
   public PaginationResponse<MapIcon> getAllMapIcons(
       @Valid @RequestBody MapIconFilter mapIconFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapIconService.getAllMapIcons(mapIconFilter, securityContext);
   }
@@ -50,7 +50,7 @@ public class MapIconController implements Plugin {
   @Operation(summary = "createMapIcon", description = "Creates MapIcon")
   public MapIcon createMapIcon(
       @Validated(Create.class) @RequestBody MapIconCreate mapIconCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapIconService.createMapIcon(mapIconCreate, securityContext);
   }

@@ -1,13 +1,13 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
 import com.wizzdi.flexicore.pricing.model.product.PricedProduct;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class PriceListItem extends SecuredBasic {
+public class PriceListItem extends Baseclass {
     @ManyToOne(targetEntity = PricedProduct.class)
     private PricedProduct pricedProduct;
     @ManyToOne(targetEntity = PriceList.class)

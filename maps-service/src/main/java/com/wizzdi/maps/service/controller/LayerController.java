@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -33,7 +33,7 @@ public class LayerController implements Plugin {
   @Operation(summary = "updateLayer", description = "Updates Layer")
   public Layer updateLayer(
       @Validated(Update.class) @RequestBody LayerUpdate layerUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerService.updateLayer(layerUpdate, securityContext);
   }
@@ -42,7 +42,7 @@ public class LayerController implements Plugin {
   @Operation(summary = "getAllLayers", description = "lists Layers")
   public PaginationResponse<Layer> getAllLayers(
       @Valid @RequestBody LayerFilter layerFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerService.getAllLayers(layerFilter, securityContext);
   }
@@ -51,7 +51,7 @@ public class LayerController implements Plugin {
   @Operation(summary = "createLayer", description = "Creates Layer")
   public Layer createLayer(
       @Validated(Create.class) @RequestBody LayerCreate layerCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerService.createLayer(layerCreate, securityContext);
   }

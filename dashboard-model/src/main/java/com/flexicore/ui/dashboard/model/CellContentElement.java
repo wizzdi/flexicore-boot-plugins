@@ -2,7 +2,7 @@ package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class CellContentElement extends SecuredBasic {
+public class CellContentElement extends Baseclass {
 
     @Column(columnDefinition = "jsonb")
    
@@ -66,7 +66,7 @@ public class CellContentElement extends SecuredBasic {
         return jsonNode;
     }
 
-    public <T extends SecuredBasic> T setJsonNode(Map<String, Object> jsonNode) {
+    public <T extends Baseclass> T setJsonNode(Map<String, Object> jsonNode) {
         this.jsonNode = jsonNode;
         return (T) this;
     }

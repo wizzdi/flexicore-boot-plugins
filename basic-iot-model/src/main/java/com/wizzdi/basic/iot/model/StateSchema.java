@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 @Table(indexes = {
         @Index(name = "state_schema_idx",columnList = "deviceType_id,version,name")
 })
-public class StateSchema extends SecuredBasic {
+public class StateSchema extends Baseclass {
 
     private int version;
     private boolean userAddedSchema;

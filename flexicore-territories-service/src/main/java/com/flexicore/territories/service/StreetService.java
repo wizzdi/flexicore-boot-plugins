@@ -3,7 +3,7 @@ package com.flexicore.territories.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.StreetRepository;
 import com.flexicore.territories.request.StreetCreate;
 import com.flexicore.territories.request.StreetFilter;
@@ -35,28 +35,27 @@ public class StreetService implements Plugin {
 	@Autowired
 	private BasicService basicService;
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	
-	public List<Street> listAllStreets(SecurityContextBase securityContextBase,
-			StreetFilter filtering) {
-		return repository.listAllStreets(securityContextBase, filtering);
+	public List<Street> listAllStreets(SecurityContext SecurityContext,
+									   StreetFilter filtering) {
+		return repository.listAllStreets(SecurityContext, filtering);
 
 	}
 
 	
 	public PaginationResponse<Street> getAllStreets(
-			SecurityContextBase securityContextBase, StreetFilter filtering) {
-		List<Street> list = listAllStreets(securityContextBase, filtering);
-		long count = repository.countAllStreets(securityContextBase, filtering);
+			SecurityContext SecurityContext, StreetFilter filtering) {
+		List<Street> list = listAllStreets(SecurityContext, filtering);
+		long count = repository.countAllStreets(SecurityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	
 	public Street updateStreet(StreetUpdate updateContainer,
-							   com.flexicore.security.SecurityContextBase securityContextBase) {
+							   SecurityContext SecurityContext) {
 		Street street = updateContainer.getStreet();
 		if (updateStreetNoMerge(street, updateContainer)) {
 			repository.merge(street);
@@ -65,8 +64,8 @@ public class StreetService implements Plugin {
 	}
 
 	public void validate(StreetUpdate updateContainer,
-						 SecurityContextBase securityContextBase) {
-		City city = updateContainer.getCityId() != null ? getByIdOrNull(updateContainer.getCityId(), City.class, City_.security, securityContextBase) : null;
+						 SecurityContext SecurityContext) {
+		City city = updateContainer.getCityId() != null ? getByIdOrNull(updateContainer.getCityId(), City.class,  SecurityContext) : null;
 		if (city == null && updateContainer.getCityId() != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no City with id "
 					+ updateContainer.getCityId());
@@ -75,10 +74,10 @@ public class StreetService implements Plugin {
 	}
 
 	public void validate(StreetFilter streetFiltering,
-						 SecurityContextBase securityContextBase) {
-		basicService.validate(streetFiltering, securityContextBase);
+						 SecurityContext SecurityContext) {
+		basicService.validate(streetFiltering, SecurityContext);
 		Set<String> citiesIds = streetFiltering.getCitiesIds();
-		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds,City_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds,SecurityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		citiesIds.removeAll(cityMap.keySet());
 		if(!citiesIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Cities with ids "+citiesIds);
@@ -86,7 +85,7 @@ public class StreetService implements Plugin {
 		streetFiltering.setCities(new ArrayList<>(cityMap.values()));
 
 		Set<String> countriesIds = streetFiltering.getCountriesIds();
-		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,Country_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds,SecurityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		countriesIds.removeAll(countryMap.keySet());
 		if(!countriesIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
@@ -95,7 +94,7 @@ public class StreetService implements Plugin {
 
 
 		Set<String> neighbourhoodsIds = streetFiltering.getNeighbourhoodsIds();
-		Map<String, Neighbourhood> stringNeighbourhoodMap = neighbourhoodsIds.isEmpty()?new HashMap<>():repository.listByIds(Neighbourhood.class,neighbourhoodsIds,Neighbourhood_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Map<String, Neighbourhood> stringNeighbourhoodMap = neighbourhoodsIds.isEmpty()?new HashMap<>():repository.listByIds(Neighbourhood.class,neighbourhoodsIds,SecurityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		neighbourhoodsIds.removeAll(stringNeighbourhoodMap.keySet());
 		if(!neighbourhoodsIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Neighbourhoods with ids "+neighbourhoodsIds);
@@ -107,9 +106,9 @@ public class StreetService implements Plugin {
 	
 	public Street createStreetNoMerge(
 			StreetCreate streetCreationContainer,
-			SecurityContextBase securityContextBase) {
-		Street street = new Street().setId(Baseclass.getBase64ID());
-		BaseclassService.createSecurityObjectNoMerge(street,securityContextBase);
+			SecurityContext SecurityContext) {
+		Street street = new Street().setId(UUID.randomUUID().toString());
+		BaseclassService.createSecurityObjectNoMerge(street,SecurityContext);
 		updateStreetNoMerge(street, streetCreationContainer);
 		return street;
 
@@ -139,15 +138,15 @@ public class StreetService implements Plugin {
 
 	
 	public Street createStreet(StreetCreate creationContainer,
-							   com.flexicore.security.SecurityContextBase securityContextBase) {
-		Street street = createStreetNoMerge(creationContainer, securityContextBase);
+							   SecurityContext SecurityContext) {
+		Street street = createStreetNoMerge(creationContainer, SecurityContext);
 		repository.merge(street);
 		return street;
 	}
 
 	
-	public void deleteStreet(String streetid, SecurityContextBase securityContextBase) {
-		Street street = getByIdOrNull(streetid, Street.class, Street_.security, securityContextBase);
+	public void deleteStreet(String streetid, SecurityContext SecurityContext) {
+		Street street = getByIdOrNull(streetid, Street.class,  SecurityContext);
 		repository.remove(street);
 	}
 }

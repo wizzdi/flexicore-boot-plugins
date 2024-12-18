@@ -2,13 +2,13 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.ScenarioActionRepository;
 import com.flexicore.rules.model.ScenarioAction;
 import com.flexicore.rules.request.ScenarioActionCreate;
 import com.flexicore.rules.request.ScenarioActionFilter;
 import com.flexicore.rules.request.ScenarioActionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -43,7 +43,7 @@ public class ScenarioActionService implements Plugin {
    * @return created ScenarioAction
    */
   public ScenarioAction createScenarioAction(
-      ScenarioActionCreate scenarioActionCreate, SecurityContextBase securityContext) {
+      ScenarioActionCreate scenarioActionCreate, SecurityContext securityContext) {
     ScenarioAction scenarioAction =
         createScenarioActionNoMerge(scenarioActionCreate, securityContext);
     this.repository.merge(scenarioAction);
@@ -56,7 +56,7 @@ public class ScenarioActionService implements Plugin {
    * @return created ScenarioAction unmerged
    */
   public ScenarioAction createScenarioActionNoMerge(
-      ScenarioActionCreate scenarioActionCreate, SecurityContextBase securityContext) {
+      ScenarioActionCreate scenarioActionCreate, SecurityContext securityContext) {
     ScenarioAction scenarioAction = new ScenarioAction();
     scenarioAction.setId(UUID.randomUUID().toString());
     updateScenarioActionNoMerge(scenarioAction, scenarioActionCreate);
@@ -93,7 +93,7 @@ public class ScenarioActionService implements Plugin {
    * @return scenarioAction
    */
   public ScenarioAction updateScenarioAction(
-      ScenarioActionUpdate scenarioActionUpdate, SecurityContextBase securityContext) {
+      ScenarioActionUpdate scenarioActionUpdate, SecurityContext securityContext) {
     ScenarioAction scenarioAction = scenarioActionUpdate.getScenarioAction();
     if (updateScenarioActionNoMerge(scenarioAction, scenarioActionUpdate)) {
       this.repository.merge(scenarioAction);
@@ -107,7 +107,7 @@ public class ScenarioActionService implements Plugin {
    * @return PaginationResponse containing paging information for ScenarioAction
    */
   public PaginationResponse<ScenarioAction> getAllScenarioActions(
-      ScenarioActionFilter scenarioActionFilter, SecurityContextBase securityContext) {
+      ScenarioActionFilter scenarioActionFilter, SecurityContext securityContext) {
     List<ScenarioAction> list = listAllScenarioActions(scenarioActionFilter, securityContext);
     long count = this.repository.countAllScenarioActions(scenarioActionFilter, securityContext);
     return new PaginationResponse<>(list, scenarioActionFilter, count);
@@ -119,7 +119,7 @@ public class ScenarioActionService implements Plugin {
    * @return List of ScenarioAction
    */
   public List<ScenarioAction> listAllScenarioActions(
-      ScenarioActionFilter scenarioActionFilter, SecurityContextBase securityContext) {
+      ScenarioActionFilter scenarioActionFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarioActions(scenarioActionFilter, securityContext);
   }
 
@@ -129,7 +129,7 @@ public class ScenarioActionService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioActionFilter is not valid
    */
   public void validate(
-      ScenarioActionFilter scenarioActionFilter, SecurityContextBase securityContext) {
+      ScenarioActionFilter scenarioActionFilter, SecurityContext securityContext) {
     basicService.validate(scenarioActionFilter, securityContext);
 
     Set<String> dynamicExecutionIds =
@@ -143,7 +143,6 @@ public class ScenarioActionService implements Plugin {
                 .listByIds(
                     DynamicExecution.class,
                     dynamicExecutionIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -161,7 +160,7 @@ public class ScenarioActionService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioActionCreate is not valid
    */
   public void validate(
-      ScenarioActionCreate scenarioActionCreate, SecurityContextBase securityContext) {
+      ScenarioActionCreate scenarioActionCreate, SecurityContext securityContext) {
     basicService.validate(scenarioActionCreate, securityContext);
 
     String dynamicExecutionId = scenarioActionCreate.getDynamicExecutionId();
@@ -171,7 +170,7 @@ public class ScenarioActionService implements Plugin {
             : this.repository.getByIdOrNull(
                 dynamicExecutionId,
                 DynamicExecution.class,
-                SecuredBasic_.security,
+                
                 securityContext);
     if (dynamicExecutionId != null && dynamicExecution == null) {
       throw new ResponseStatusException(
@@ -181,12 +180,12 @@ public class ScenarioActionService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -194,7 +193,7 @@ public class ScenarioActionService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -202,7 +201,7 @@ public class ScenarioActionService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

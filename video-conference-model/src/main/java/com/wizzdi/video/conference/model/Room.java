@@ -1,11 +1,11 @@
 package com.wizzdi.video.conference.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Room extends SecuredBasic {
+public class Room extends Baseclass {
 
   @ManyToOne(targetEntity = VideoServer.class)
   private VideoServer videoServer;

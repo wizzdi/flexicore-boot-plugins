@@ -1,6 +1,6 @@
 package com.flexicore.scheduling.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -10,7 +10,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class ScheduleTimeslot extends SecuredBasic {
+public class ScheduleTimeslot extends Baseclass {
 
 
   private TimeOfTheDayName startTimeOfTheDayName;

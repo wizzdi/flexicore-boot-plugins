@@ -4,7 +4,7 @@ package com.flexicore.ui.tree.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.data.TreeNodeToUserRepository;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.model.TreeNodeToUser;
@@ -35,7 +35,7 @@ public class TreeNodeToUserService implements Plugin {
     private TreeNodeToUserRepository treeNodeToUserRepository;
 
 
-    public SaveTreeNodeStatusResponse saveTreeNodeStatus(SaveTreeNodeStatusRequest saveTreeNodeStatusRequest, SecurityContextBase securityContext) {
+    public SaveTreeNodeStatusResponse saveTreeNodeStatus(SaveTreeNodeStatusRequest saveTreeNodeStatusRequest, SecurityContext securityContext) {
         Map<String, TreeNodeToUser> links = treeNodeToUserRepository.getAllTreeNodeToUserLinks(saveTreeNodeStatusRequest.getNodeIdtoTree().keySet(), securityContext).parallelStream().collect(Collectors.toMap(f -> f.getTreeNode().getId(), f -> f));
         List<Object> toMerge = new ArrayList<>();
         SaveTreeNodeStatusResponse saveTreeNodeStatusResponse = new SaveTreeNodeStatusResponse();
@@ -61,7 +61,7 @@ public class TreeNodeToUserService implements Plugin {
 
     }
 
-    public TreeNodeToUser createTreeNodeToTenantLinkNoMerge(TreeNode treeNode, SecurityUser user, Boolean value, SecurityContextBase securityContext) {
+    public TreeNodeToUser createTreeNodeToTenantLinkNoMerge(TreeNode treeNode, SecurityUser user, Boolean value, SecurityContext securityContext) {
         TreeNodeToUser link = new TreeNodeToUser();
         link.setId(UUID.randomUUID().toString());
         link.setTreeNode(treeNode);
@@ -71,7 +71,7 @@ public class TreeNodeToUserService implements Plugin {
     }
 
 
-    public TreeNodeStatusResponse getTreeNodeStatus(TreeNodeStatusRequest treeNodeStatusRequest, SecurityContextBase securityContext) {
+    public TreeNodeStatusResponse getTreeNodeStatus(TreeNodeStatusRequest treeNodeStatusRequest, SecurityContext securityContext) {
         Map<String, Boolean> links = treeNodeStatusRequest.getTreeNodes().isEmpty()?new HashMap<>():treeNodeToUserRepository.getAllTreeNodeToUserLinks(treeNodeStatusRequest.getTreeNodes().stream().map(f->f.getId()).collect(Collectors.toSet()), securityContext).parallelStream().collect(Collectors.toMap(f -> f.getTreeNode().getId(), f -> f.isNodeOpen()));
         Map<String, Boolean> res = treeNodeStatusRequest.getTreeNodes().parallelStream().map(f->f.getId()).collect(Collectors.toMap(f -> f, f -> links.getOrDefault(f, false)));
         return new TreeNodeStatusResponse(res);
@@ -79,12 +79,12 @@ public class TreeNodeToUserService implements Plugin {
     }
 
 
-    public void validate(SaveTreeNodeStatusRequest saveTreeNodeStatusRequest, SecurityContextBase securityContext) {
+    public void validate(SaveTreeNodeStatusRequest saveTreeNodeStatusRequest, SecurityContext securityContext) {
         if (saveTreeNodeStatusRequest.getNodeStatus().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No status was provided");
         }
         Set<String> ids = new HashSet<>(saveTreeNodeStatusRequest.getNodeStatus().keySet());
-        List<TreeNode> treeNodes = listByIds(TreeNode.class, ids, TreeNode_.security, securityContext);
+        List<TreeNode> treeNodes = listByIds(TreeNode.class, ids,securityContext);
         ids.removeAll(treeNodes.parallelStream().map(f -> f.getId()).collect(Collectors.toSet()));
         if (!ids.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Tree nodes with ids " + ids);
@@ -93,11 +93,11 @@ public class TreeNodeToUserService implements Plugin {
         saveTreeNodeStatusRequest.setNodeIdtoTree(treeNodeMap);
     }
 
-    public void validate(TreeNodeStatusRequest treeNodeStatusRequest, SecurityContextBase securityContext) {
+    public void validate(TreeNodeStatusRequest treeNodeStatusRequest, SecurityContext securityContext) {
         if (treeNodeStatusRequest.getNodeIds().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tree Nodes must be provided");
         }
-        List<TreeNode> treeNodes = listByIds(TreeNode.class, treeNodeStatusRequest.getNodeIds(), TreeNode_.security, securityContext);
+        List<TreeNode> treeNodes = listByIds(TreeNode.class, treeNodeStatusRequest.getNodeIds(),securityContext);
         treeNodeStatusRequest.getNodeIds().removeAll(treeNodes.parallelStream().map(f -> f.getId()).collect(Collectors.toSet()));
         if (!treeNodeStatusRequest.getNodeIds().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Tree nodes with ids " + treeNodeStatusRequest.getNodeIds());
@@ -105,19 +105,19 @@ public class TreeNodeToUserService implements Plugin {
         treeNodeStatusRequest.setTreeNodes(treeNodes);
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return treeNodeToUserRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return treeNodeToUserRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeNodeToUserRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeNodeToUserRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

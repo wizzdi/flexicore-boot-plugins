@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -33,7 +33,7 @@ public class StatusHistoryController implements Plugin {
   @Operation(summary = "getAllStatusHistories", description = "lists StatusHistories")
   public PaginationResponse<StatusHistory> getAllStatusHistories(
       @Valid @RequestBody StatusHistoryFilter statusHistoryFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return statusHistoryService.getAllStatusHistories(statusHistoryFilter, securityContext);
   }
@@ -43,7 +43,7 @@ public class StatusHistoryController implements Plugin {
   @Operation(summary = "getAllStatusHistoryContainers", description = "lists StatusHistoryContainers")
   public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(
           @Valid @RequestBody StatusHistoryFilter statusHistoryFilter,
-          @RequestAttribute SecurityContextBase securityContext) {
+          @RequestAttribute SecurityContext securityContext) {
 
     return statusHistoryService.getAllStatusHistoryContainers(statusHistoryFilter, securityContext);
   }
@@ -54,7 +54,7 @@ public class StatusHistoryController implements Plugin {
   @Operation(summary = "updateStatusHistory", description = "Updates StatusHistory")
   public StatusHistory updateStatusHistory(
       @Validated(Update.class) @RequestBody StatusHistoryUpdate statusHistoryUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return statusHistoryService.updateStatusHistory(statusHistoryUpdate, securityContext);
   }
@@ -63,7 +63,7 @@ public class StatusHistoryController implements Plugin {
   @Operation(summary = "createStatusHistory", description = "Creates StatusHistory")
   public StatusHistory createStatusHistory(
       @Validated(Create.class) @RequestBody StatusHistoryCreate statusHistoryCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return statusHistoryService.createStatusHistory(statusHistoryCreate, securityContext);
   }

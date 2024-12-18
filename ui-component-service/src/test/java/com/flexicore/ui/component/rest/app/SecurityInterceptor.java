@@ -1,7 +1,7 @@
 package com.flexicore.ui.component.rest.app;
 
 import com.flexicore.model.SecurityUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,7 +24,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 	@Autowired
 	@Qualifier("adminSecurityContext")
 	@Lazy
-	private SecurityContextBase securityContext;
+	private SecurityContext securityContext;
 	@Autowired
 	@Lazy
 	private SecurityContextProvider securityContextProvider;

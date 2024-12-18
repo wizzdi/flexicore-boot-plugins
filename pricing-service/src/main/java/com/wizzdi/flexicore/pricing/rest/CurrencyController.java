@@ -10,7 +10,7 @@ import com.wizzdi.flexicore.pricing.request.CurrencyFiltering;
 import com.wizzdi.flexicore.pricing.request.CurrencyUpdate;
 import com.wizzdi.flexicore.pricing.service.CurrencyService;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -42,7 +42,7 @@ public class CurrencyController implements Plugin {
     public PaginationResponse<Currency> getAllCurrencies(
 
             
-            @RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody CurrencyFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllCurrencies(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class CurrencyController implements Plugin {
     public Currency createCurrency(
             
             @RequestBody CurrencyCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createCurrency(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class CurrencyController implements Plugin {
 
             
             @RequestBody CurrencyUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Currency currency = service.getByIdOrNull(updateContainer.getId(),
-                Currency.class, Currency_.security, securityContext);
+                Currency.class,  securityContext);
         if (currency == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Currency with id "
                     + updateContainer.getId());

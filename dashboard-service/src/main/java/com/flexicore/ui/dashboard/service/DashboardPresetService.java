@@ -2,11 +2,11 @@ package com.flexicore.ui.dashboard.service;
 
 
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 import com.flexicore.ui.dashboard.data.DashboardPresetRepository;
 import com.flexicore.ui.dashboard.model.GridLayout;
@@ -46,7 +46,7 @@ public class DashboardPresetService implements Plugin {
 	
 	private PresetService presetService;
 
-	public DashboardPreset updateDashboardPreset(DashboardPresetUpdate dashboardPresetUpdate, SecurityContextBase securityContext) {
+	public DashboardPreset updateDashboardPreset(DashboardPresetUpdate dashboardPresetUpdate, SecurityContext securityContext) {
 		if (DashboardPresetUpdateNoMerge(dashboardPresetUpdate,
 				dashboardPresetUpdate.getDashboardPreset())) {
 			dashboardPresetRepository.merge(dashboardPresetUpdate.getDashboardPreset());
@@ -67,13 +67,13 @@ public class DashboardPresetService implements Plugin {
 
 	public List<DashboardPreset> listAllDashboardPreset(
 			DashboardPresetFilter dashboardPresetFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return dashboardPresetRepository.listAllDashboardPreset(dashboardPresetFilter,
 				securityContext);
 	}
 
 	public DashboardPreset createDashboardPreset(DashboardPresetCreate createDashboardPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		DashboardPreset dashboardPreset = createDashboardPresetNoMerge(createDashboardPreset,
 				securityContext);
 		dashboardPresetRepository.merge(dashboardPreset);
@@ -82,7 +82,7 @@ public class DashboardPresetService implements Plugin {
 	}
 
 	public DashboardPreset createDashboardPresetNoMerge(
-			DashboardPresetCreate createDashboardPreset, SecurityContextBase securityContext) {
+			DashboardPresetCreate createDashboardPreset, SecurityContext securityContext) {
 		DashboardPreset dashboardPreset = new DashboardPreset();
 		dashboardPreset.setId(UUID.randomUUID().toString());
 		DashboardPresetUpdateNoMerge(createDashboardPreset, dashboardPreset);
@@ -92,7 +92,7 @@ public class DashboardPresetService implements Plugin {
 
 	public PaginationResponse<DashboardPreset> getAllDashboardPreset(
 			DashboardPresetFilter dashboardPresetFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<DashboardPreset> list = listAllDashboardPreset(dashboardPresetFilter,
 				securityContext);
 		long count = dashboardPresetRepository.countAllDashboardPreset(
@@ -101,10 +101,10 @@ public class DashboardPresetService implements Plugin {
 	}
 
 	public void validate(DashboardPresetCreate createDashboardPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		presetService.validate(createDashboardPreset, securityContext);
 		String presetId=createDashboardPreset.getGridLayoutId();
-		GridLayout gridPreset=presetId!=null?getByIdOrNull(presetId,GridLayout.class,SecuredBasic_.security,securityContext):null;
+		GridLayout gridPreset=presetId!=null?getByIdOrNull(presetId,GridLayout.class,securityContext):null;
 		if(gridPreset==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with id "+presetId);
 		}
@@ -112,10 +112,10 @@ public class DashboardPresetService implements Plugin {
 	}
 
 	public void validate(DashboardPresetFilter dashboardPresetFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		presetService.validate(dashboardPresetFilter, securityContext);
 		Set<String> presetIds= dashboardPresetFilter.getGridLayoutIds();
-		Map<String,GridLayout> presetMap=presetIds.isEmpty()?new HashMap<>():dashboardPresetRepository.listByIds(GridLayout.class,presetIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String,GridLayout> presetMap=presetIds.isEmpty()?new HashMap<>():dashboardPresetRepository.listByIds(GridLayout.class,presetIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		presetIds.removeAll(presetMap.keySet());
 		if(!presetIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with ids "+presetIds);
@@ -123,19 +123,19 @@ public class DashboardPresetService implements Plugin {
 		dashboardPresetFilter.setGridLayouts(new ArrayList<>(presetMap.values()));
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return dashboardPresetRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return dashboardPresetRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return dashboardPresetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return dashboardPresetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -4,7 +4,7 @@ import com.flexicore.model.Role;
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.TenantToUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.request.RoleToUserFilter;
 import com.wizzdi.flexicore.security.request.TenantToUserFilter;
 import com.wizzdi.flexicore.security.service.RoleService;
@@ -28,12 +28,12 @@ public class SecurityServiceTest {
 
 
 
-	public SecurityContextBase getSecurityContext(SecurityUser securityUser){
-		Map<String, List<Role>> rols = roleService.listAllRoleToUsers(new RoleToUserFilter().setUsers(Collections.singletonList(securityUser)), null).stream().collect(Collectors.groupingBy(f -> f.getRole().getSecurityTenant().getId(), Collectors.mapping(f -> f.getRole(), Collectors.toList())));
+	public SecurityContext getSecurityContext(SecurityUser securityUser){
+		Map<String, List<Role>> rols = roleService.listAllRoleToUsers(new RoleToUserFilter().setUsers(Collections.singletonList(securityUser)), null).stream().collect(Collectors.groupingBy(f -> f.getRole().getTenant().getId(), Collectors.mapping(f -> f.getRole(), Collectors.toList())));
 		List<TenantToUser> tenantToUsers = tenantToUserService.listAllTenantToUsers(new TenantToUserFilter().setUsers(Collections.singletonList(securityUser)), null);
 		List<SecurityTenant> tenants= tenantToUsers.stream().map(f->f.getTenant()).collect(Collectors.toList());
 		SecurityTenant createIn=tenantToUsers.stream().filter(f->f.isDefaultTenant()).findFirst().map(f->f.getTenant()).orElse(null);
-		return new SecurityContextBase()
+		return new SecurityContext()
 				.setUser(securityUser)
 				.setRoleMap(rols)
 				.setTenants(tenants)

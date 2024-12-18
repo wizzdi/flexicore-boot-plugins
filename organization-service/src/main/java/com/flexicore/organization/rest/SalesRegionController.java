@@ -13,7 +13,7 @@ import com.flexicore.organization.request.SalesRegionCreate;
 import com.flexicore.organization.request.SalesRegionFiltering;
 import com.flexicore.organization.request.SalesRegionUpdate;
 import com.flexicore.organization.service.SalesRegionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,7 +44,7 @@ public class SalesRegionController implements Plugin {
 	public PaginationResponse<SalesRegion> getAllSalesRegions(
 
 			@RequestBody SalesRegionFiltering filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllSalesRegions(securityContext, filtering);
 	}
@@ -56,7 +56,7 @@ public class SalesRegionController implements Plugin {
 	public SalesRegion createSalesRegion(
 
 			@RequestBody SalesRegionCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		return service.createSalesRegion(creationContainer, securityContext);
 	}
@@ -68,9 +68,9 @@ public class SalesRegionController implements Plugin {
 	public SalesRegion updateSalesRegion(
 
 			@RequestBody SalesRegionUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		SalesRegion salesRegion = service.getByIdOrNull(
-				updateContainer.getId(), SalesRegion.class, SalesRegion_.security,
+				updateContainer.getId(), SalesRegion.class, 
 				securityContext);
 		if (salesRegion == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no SalesRegion with id "

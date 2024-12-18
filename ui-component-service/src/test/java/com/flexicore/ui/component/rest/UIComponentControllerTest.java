@@ -1,5 +1,6 @@
 package com.flexicore.ui.component.rest;
 
+import com.flexicore.model.Clazz;
 import com.flexicore.model.PermissionGroup;
 
 import com.flexicore.model.PermissionGroupToBaseclass;
@@ -119,7 +120,7 @@ public class UIComponentControllerTest {
         Map<String, UIComponent> uiComponentMap = uiComponents.stream().collect(Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a));
         for (UIComponentRegistrationContainer uiComponentRegistrationContainer : uiComponentRegistrationContainers) {
             UIComponent uiComponent = uiComponentMap.get(uiComponentRegistrationContainer.getExternalId());
-            List<PermissionGroupToBaseclass> permissionGroupToBaseclasses = permissionGroupToBaseclassService.listAllPermissionGroupToBaseclass(new PermissionGroupToBaseclassFilter().setBaseclasses(Collections.singletonList(uiComponent.getSecurity())), null);
+            List<PermissionGroupToBaseclass> permissionGroupToBaseclasses = permissionGroupToBaseclassService.listAllPermissionGroupToBaseclass(new PermissionGroupToBaseclassFilter().setSecuredIds(Collections.singleton(uiComponent.getSecurityId())).setClazzes(Collections.singletonList(Clazz.ofClass(uiComponent.getClass()))), null);
 
             Set<String> actualGroups = permissionGroupToBaseclasses.stream().map(f -> f.getPermissionGroup().getExternalId()).collect(Collectors.toSet());
             Set<String> expectedGroups = Stream.of(uiComponentRegistrationContainer.getGroups().split(",")).collect(Collectors.toSet());

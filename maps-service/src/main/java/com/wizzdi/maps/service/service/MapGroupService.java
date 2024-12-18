@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -34,7 +34,7 @@ public class MapGroupService implements Plugin {
    * @return created MapGroup
    */
   public MapGroup createMapGroup(
-      MapGroupCreate mapGroupCreate, SecurityContextBase securityContext) {
+      MapGroupCreate mapGroupCreate, SecurityContext securityContext) {
     MapGroup mapGroup = createMapGroupNoMerge(mapGroupCreate, securityContext);
     this.repository.merge(mapGroup);
     return mapGroup;
@@ -46,7 +46,7 @@ public class MapGroupService implements Plugin {
    * @return created MapGroup unmerged
    */
   public MapGroup createMapGroupNoMerge(
-      MapGroupCreate mapGroupCreate, SecurityContextBase securityContext) {
+      MapGroupCreate mapGroupCreate, SecurityContext securityContext) {
     MapGroup mapGroup = new MapGroup();
     mapGroup.setId(UUID.randomUUID().toString());
     updateMapGroupNoMerge(mapGroup, mapGroupCreate);
@@ -78,7 +78,7 @@ public class MapGroupService implements Plugin {
    * @return mapGroup
    */
   public MapGroup updateMapGroup(
-      MapGroupUpdate mapGroupUpdate, SecurityContextBase securityContext) {
+      MapGroupUpdate mapGroupUpdate, SecurityContext securityContext) {
     MapGroup mapGroup = mapGroupUpdate.getMapGroup();
     if (updateMapGroupNoMerge(mapGroup, mapGroupUpdate)) {
       this.repository.merge(mapGroup);
@@ -92,7 +92,7 @@ public class MapGroupService implements Plugin {
    * @return PaginationResponse containing paging information for MapGroup
    */
   public PaginationResponse<MapGroup> getAllMapGroups(
-      MapGroupFilter mapGroupFilter, SecurityContextBase securityContext) {
+      MapGroupFilter mapGroupFilter, SecurityContext securityContext) {
     List<MapGroup> list = listAllMapGroups(mapGroupFilter, securityContext);
     long count = this.repository.countAllMapGroups(mapGroupFilter, securityContext);
     return new PaginationResponse<>(list, mapGroupFilter.getPageSize(), count);
@@ -104,17 +104,17 @@ public class MapGroupService implements Plugin {
    * @return List of MapGroup
    */
   public List<MapGroup> listAllMapGroups(
-      MapGroupFilter mapGroupFilter, SecurityContextBase securityContext) {
+      MapGroupFilter mapGroupFilter, SecurityContext securityContext) {
     return this.repository.listAllMapGroups(mapGroupFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -122,7 +122,7 @@ public class MapGroupService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -130,7 +130,7 @@ public class MapGroupService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

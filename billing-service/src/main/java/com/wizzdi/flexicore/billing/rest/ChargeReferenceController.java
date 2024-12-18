@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.billing.request.ChargeReferenceCreate;
 import com.wizzdi.flexicore.billing.request.ChargeReferenceFiltering;
 import com.wizzdi.flexicore.billing.request.ChargeReferenceUpdate;
 import com.wizzdi.flexicore.billing.service.ChargeReferenceService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.billing.ChargeReference;
 import com.wizzdi.flexicore.billing.model.billing.ChargeReference_;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -39,7 +39,7 @@ public class ChargeReferenceController implements Plugin {
     public PaginationResponse<ChargeReference> getAllChargeReferences(
 
             
-            @RequestBody ChargeReferenceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ChargeReferenceFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllChargeReferences(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class ChargeReferenceController implements Plugin {
 
             
             @RequestBody ChargeReferenceCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createChargeReference(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class ChargeReferenceController implements Plugin {
 
             
             @RequestBody ChargeReferenceUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         ChargeReference chargeReference = service.getByIdOrNull(updateContainer.getId(),
-                ChargeReference.class, ChargeReference_.security, securityContext);
+                ChargeReference.class,  securityContext);
         if (chargeReference == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no ChargeReference with id "
                     + updateContainer.getId());

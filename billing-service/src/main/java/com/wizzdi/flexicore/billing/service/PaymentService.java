@@ -7,7 +7,7 @@ import com.wizzdi.flexicore.billing.request.PaymentFiltering;
 import com.wizzdi.flexicore.billing.request.PaymentUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.payment.Payment;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.Money;
@@ -35,19 +35,19 @@ public class PaymentService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -74,34 +74,34 @@ public class PaymentService implements Plugin {
     }
 
     public void validateFiltering(PaymentFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
 
 
     }
 
     public PaginationResponse<Payment> getAllPayments(
-            SecurityContextBase securityContext, PaymentFiltering filtering) {
+            SecurityContext securityContext, PaymentFiltering filtering) {
         List<Payment> list = listAllPayments(securityContext, filtering);
         long count = repository.countAllPayments(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<Payment> listAllPayments(SecurityContextBase securityContext, PaymentFiltering filtering) {
+    public List<Payment> listAllPayments(SecurityContext securityContext, PaymentFiltering filtering) {
         return repository.getAllPayments(securityContext, filtering);
     }
 
     public Payment createPayment(PaymentCreate paymentCreate,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         Payment payment = createPaymentNoMerge(paymentCreate, securityContext);
         repository.merge(payment);
         return payment;
     }
 
     public Payment createPaymentNoMerge(PaymentCreate paymentCreate,
-                                                SecurityContextBase securityContext) {
+                                                SecurityContext securityContext) {
         Payment payment = new Payment();
-        payment.setId(Baseclass.getBase64ID());
+        payment.setId(UUID.randomUUID().toString());
 
         updatePaymentNoMerge(payment, paymentCreate);
         BaseclassService.createSecurityObjectNoMerge(payment, securityContext);
@@ -130,7 +130,7 @@ public class PaymentService implements Plugin {
     }
 
     public Payment updatePayment(PaymentUpdate paymentUpdate,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         Payment payment = paymentUpdate.getPayment();
         if (updatePaymentNoMerge(payment, paymentUpdate)) {
             repository.merge(payment);
@@ -138,7 +138,7 @@ public class PaymentService implements Plugin {
         return payment;
     }
 
-    public void validate(PaymentCreate paymentCreate, SecurityContextBase securityContext) {
+    public void validate(PaymentCreate paymentCreate, SecurityContext securityContext) {
         basicService.validate(paymentCreate, securityContext);
 
         String moneyId = paymentCreate.getMoneyId();

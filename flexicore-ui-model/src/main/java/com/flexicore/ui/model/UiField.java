@@ -1,13 +1,13 @@
 package com.flexicore.ui.model;
 
 import com.flexicore.category.model.Category;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class UiField extends SecuredBasic {
+public class UiField extends Baseclass {
 
 	public UiField() {
 	}

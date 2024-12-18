@@ -10,7 +10,7 @@ import com.flexicore.organization.model.OrganizationalCustomer;
 import com.flexicore.organization.request.OrganizationalCustomerCreate;
 import com.flexicore.organization.request.OrganizationalCustomerFiltering;
 import com.flexicore.organization.request.OrganizationalCustomerUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Extension
@@ -38,19 +39,18 @@ public class OrganizationalCustomerService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -77,33 +77,33 @@ public class OrganizationalCustomerService implements Plugin {
 	}
 
 	public void validateFiltering(OrganizationalCustomerFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		customerService.validateFiltering(filtering, securityContext);
 
 	}
 
 	public PaginationResponse<OrganizationalCustomer> getAllOrganizationalCustomers(
-			SecurityContextBase securityContext, OrganizationalCustomerFiltering filtering) {
+			SecurityContext securityContext, OrganizationalCustomerFiltering filtering) {
 		List<OrganizationalCustomer> list = listAllOrganizationalCustomers(securityContext, filtering);
 		long count = repository.countAllOrganizationalCustomers(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	public List<OrganizationalCustomer> listAllOrganizationalCustomers(SecurityContextBase securityContext, OrganizationalCustomerFiltering filtering) {
+	public List<OrganizationalCustomer> listAllOrganizationalCustomers(SecurityContext securityContext, OrganizationalCustomerFiltering filtering) {
 		return repository.getAllOrganizationalCustomers(securityContext, filtering);
 	}
 
 	public OrganizationalCustomer createOrganizationalCustomer(OrganizationalCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		OrganizationalCustomer organizationalCustomer = createOrganizationalCustomerNoMerge(creationContainer, securityContext);
 		repository.merge(organizationalCustomer);
 		return organizationalCustomer;
 	}
 
 	public OrganizationalCustomer createOrganizationalCustomerNoMerge(OrganizationalCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		OrganizationalCustomer organizationalCustomer = new OrganizationalCustomer();
-		organizationalCustomer.setId(Baseclass.getBase64ID());
+		organizationalCustomer.setId(UUID.randomUUID().toString());
 
 		updateOrganizationalCustomerNoMerge(organizationalCustomer, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(organizationalCustomer, securityContext);
@@ -125,7 +125,7 @@ public class OrganizationalCustomerService implements Plugin {
 	}
 
 	public OrganizationalCustomer updateOrganizationalCustomer(OrganizationalCustomerUpdate updateContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		OrganizationalCustomer organizationalCustomer = updateContainer.getOrganizationalCustomer();
 		if (updateOrganizationalCustomerNoMerge(organizationalCustomer, updateContainer)) {
 			repository.merge(organizationalCustomer);
@@ -134,7 +134,7 @@ public class OrganizationalCustomerService implements Plugin {
 	}
 
 	public void validate(OrganizationalCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		customerService.validate(creationContainer, securityContext);
 
 	}

@@ -1,12 +1,12 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Tier extends SecuredBasic {
+public class Tier extends Baseclass {
     private int startingQuantity;
     private Integer endingQuantity;
     @ManyToOne(targetEntity = Money.class)

@@ -11,7 +11,7 @@ import com.flexicore.model.PermissionGroupToBaseclass;
 import com.flexicore.model.Role;
 import com.flexicore.model.RoleToBaseclass;
 import com.flexicore.model.RoleToUser;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecurityEntity;
 import com.flexicore.model.SecurityLink;
 import com.flexicore.model.SecurityOperation;
@@ -65,7 +65,6 @@ public class AppTestEntities {
                 SecurityPolicy.class,
                 Address.class,
                 ZipFile.class,
-                SecuredBasic.class,
                 Room.class,
                 ZipFileToFileResource.class,
                 MapGroupToMappedPOI.class,
@@ -90,7 +89,6 @@ public class AppTestEntities {
                 
                
                 OperationCategory.class,
-                SecuredBasic.class,
                 SecurityUser.class,
                 Role.class,
                 RoleToUser.class,
@@ -105,7 +103,6 @@ public class AppTestEntities {
                 PermissionGroup.class,
                 MappedPOI.class,
                 FileResource.class,
-                JsonConverter.class,
-                SecuredBasic.class)));
+                JsonConverter.class)));
   }
 }

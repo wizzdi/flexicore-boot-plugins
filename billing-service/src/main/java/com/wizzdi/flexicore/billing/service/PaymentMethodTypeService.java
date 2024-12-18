@@ -10,7 +10,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -34,19 +35,19 @@ public class PaymentMethodTypeService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -73,32 +74,32 @@ public class PaymentMethodTypeService implements Plugin {
     }
 
     public void validateFiltering(PaymentMethodTypeFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
     }
 
     public PaginationResponse<PaymentMethodType> getAllPaymentMethodTypes(
-            SecurityContextBase securityContext, PaymentMethodTypeFiltering filtering) {
+            SecurityContext securityContext, PaymentMethodTypeFiltering filtering) {
         List<PaymentMethodType> list = listAllPaymentMethodTypes(securityContext, filtering);
         long count = repository.countAllPaymentMethodTypes(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<PaymentMethodType> listAllPaymentMethodTypes(SecurityContextBase securityContext, PaymentMethodTypeFiltering filtering) {
+    public List<PaymentMethodType> listAllPaymentMethodTypes(SecurityContext securityContext, PaymentMethodTypeFiltering filtering) {
         return repository.getAllPaymentMethodTypes(securityContext, filtering);
     }
 
     public PaymentMethodType createPaymentMethodType(PaymentMethodTypeCreate paymentMethodTypeCreate,
-                                                     SecurityContextBase securityContext) {
+                                                     SecurityContext securityContext) {
         PaymentMethodType paymentMethodType = createPaymentMethodTypeNoMerge(paymentMethodTypeCreate, securityContext);
         repository.merge(paymentMethodType);
         return paymentMethodType;
     }
 
     private PaymentMethodType createPaymentMethodTypeNoMerge(PaymentMethodTypeCreate paymentMethodTypeCreate,
-                                                             SecurityContextBase securityContext) {
+                                                             SecurityContext securityContext) {
         PaymentMethodType paymentMethodType = new PaymentMethodType();
-        paymentMethodType.setId(Baseclass.getBase64ID());
+        paymentMethodType.setId(UUID.randomUUID().toString());
 
         updatePaymentMethodTypeNoMerge(paymentMethodType, paymentMethodTypeCreate);
         BaseclassService.createSecurityObjectNoMerge(paymentMethodType,securityContext);
@@ -118,7 +119,7 @@ public class PaymentMethodTypeService implements Plugin {
     }
 
     public PaymentMethodType updatePaymentMethodType(PaymentMethodTypeUpdate paymentMethodTypeUpdate,
-                                                     SecurityContextBase securityContext) {
+                                                     SecurityContext securityContext) {
         PaymentMethodType paymentMethodType = paymentMethodTypeUpdate.getPaymentMethodType();
         if (updatePaymentMethodTypeNoMerge(paymentMethodType, paymentMethodTypeUpdate)) {
             repository.merge(paymentMethodType);
@@ -127,7 +128,7 @@ public class PaymentMethodTypeService implements Plugin {
     }
 
     public void validate(PaymentMethodTypeCreate paymentMethodTypeCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(paymentMethodTypeCreate, securityContext);
     }
 }

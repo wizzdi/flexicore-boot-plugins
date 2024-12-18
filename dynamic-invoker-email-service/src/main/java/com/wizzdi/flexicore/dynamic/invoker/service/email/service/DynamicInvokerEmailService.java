@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.service;
 
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
@@ -67,7 +67,7 @@ public class DynamicInvokerEmailService implements Plugin {
     private SendGrid sendGrid;
 
 
-    public SendDynamicEmailResponse sendEmail(SendDynamicExecutionRequest sendDynamicExecutionRequest, SecurityContextBase securityContext) {
+    public SendDynamicEmailResponse sendEmail(SendDynamicExecutionRequest sendDynamicExecutionRequest, SecurityContext securityContext) {
         ZoneOffset zoneOffset= sendDynamicExecutionRequest.getZoneOffset()!=null? sendDynamicExecutionRequest.getZoneOffset():ZoneOffset.UTC;
         ExportDynamicExecution exportDynamicExecution = sendDynamicExecutionRequest.getExportDynamicExecution();
         ExecuteInvokersResponse executeInvokersResponse = dynamicExecutionService.executeDynamicExecution(exportDynamicExecution, securityContext);
@@ -142,7 +142,7 @@ public class DynamicInvokerEmailService implements Plugin {
         return null;
     }
 
-    public SendDynamicEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
+    public SendDynamicEmailResponse sendEmail(SendDynamicInvokerRequest sendDynamicInvokerRequest, SecurityContext securityContext) {
         ZoneOffset zoneOffset= sendDynamicInvokerRequest.getZoneOffset()!=null? sendDynamicInvokerRequest.getZoneOffset():ZoneOffset.UTC;
         ExportDynamicInvoker exportDynamicInvoker = sendDynamicInvokerRequest.getExportDynamicInvoker();
         ExecuteInvokersResponse executeInvokersResponse = dynamicInvokerService.executeInvoker(exportDynamicInvoker, securityContext);
@@ -154,7 +154,7 @@ public class DynamicInvokerEmailService implements Plugin {
         return sendEmail(entries,headersArr, sendDynamicInvokerRequest.getEmails(),title);
     }
 
-    public SendDynamicEmailResponse sendEmailPlain(SendEmailPlainRequest sendDynamicInvokerRequest, SecurityContextBase securityContext) {
+    public SendDynamicEmailResponse sendEmailPlain(SendEmailPlainRequest sendDynamicInvokerRequest, SecurityContext securityContext) {
         Set<String> emails = sendDynamicInvokerRequest.getEmails();
         String from=sendDynamicInvokerRequest.getFrom();
         String replyTo=sendDynamicInvokerRequest.getFrom();

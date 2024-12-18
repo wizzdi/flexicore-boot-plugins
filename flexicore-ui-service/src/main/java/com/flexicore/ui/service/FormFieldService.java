@@ -5,7 +5,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.FormFieldRepository;
 import com.flexicore.ui.model.FormField;
 import com.flexicore.ui.request.FormFieldCreate;
@@ -42,7 +42,7 @@ public class FormFieldService implements Plugin {
 	private UiFieldService uiFieldService;
 
 	public FormField FormFieldUpdate(FormFieldUpdate FormFieldUpdate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (FormFieldUpdateNoMerge(FormFieldUpdate,
 				FormFieldUpdate.getFormField())) {
 			formFieldRepository.merge(FormFieldUpdate.getFormField());
@@ -86,13 +86,13 @@ public class FormFieldService implements Plugin {
 
 	public List<FormField> listAllFormFields(
 			FormFieldFiltering formFieldFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return formFieldRepository.listAllFormFields(formFieldFiltering,
 				securityContext);
 	}
 
 	public FormField createFormField(FormFieldCreate createFormField,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		FormField formField = createFormFieldNoMerge(createFormField,
 				securityContext);
 		formFieldRepository.merge(formField);
@@ -101,7 +101,7 @@ public class FormFieldService implements Plugin {
 	}
 
 	public FormField createFormFieldNoMerge(FormFieldCreate createFormField,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		FormField formField = new FormField();
 		formField.setId(UUID.randomUUID().toString());
 		FormFieldUpdateNoMerge(createFormField, formField);
@@ -111,17 +111,17 @@ public class FormFieldService implements Plugin {
 
 	public PaginationResponse<FormField> getAllFormFields(
 			FormFieldFiltering formFieldFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<FormField> list = listAllFormFields(formFieldFiltering, securityContext);
 		long count = formFieldRepository.countAllFormFields(formFieldFiltering, securityContext);
 		return new PaginationResponse<>(list, formFieldFiltering, count);
 	}
 
-	public void validate(FormFieldCreate createFormField, SecurityContextBase securityContext) {
+	public void validate(FormFieldCreate createFormField, SecurityContext securityContext) {
 		uiFieldService.validate(createFormField, securityContext);
 	}
 
-	public void validate(FormFieldFiltering formFieldFiltering, SecurityContextBase securityContext) {
+	public void validate(FormFieldFiltering formFieldFiltering, SecurityContext securityContext) {
 		uiFieldService.validate(formFieldFiltering, securityContext);
 	}
 
@@ -142,19 +142,19 @@ public class FormFieldService implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return formFieldRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return formFieldRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return formFieldRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return formFieldRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -175,7 +175,7 @@ public class FormFieldService implements Plugin {
 		formFieldRepository.merge(base);
 	}
 
-	public void validateCreate(FormFieldCreate createFormField, SecurityContextBase securityContext) {
+	public void validateCreate(FormFieldCreate createFormField, SecurityContext securityContext) {
 		uiFieldService.validateCreate(createFormField,securityContext);
 	}
 }

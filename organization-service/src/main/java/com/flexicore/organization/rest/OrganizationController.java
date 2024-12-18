@@ -8,7 +8,7 @@ import com.flexicore.organization.request.OrganizationCreate;
 import com.flexicore.organization.request.OrganizationFiltering;
 import com.flexicore.organization.request.OrganizationUpdate;
 import com.flexicore.organization.service.OrganizationService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +37,7 @@ public class OrganizationController implements Plugin {
 	@PostMapping("/getAllOrganizations")
 	public PaginationResponse<Organization> getAllOrganizations(
 
-			@RequestBody OrganizationFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody OrganizationFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllOrganizations(securityContext, filtering);
 	}
@@ -49,7 +49,7 @@ public class OrganizationController implements Plugin {
 	public Organization createOrganization(
 
 			@RequestBody OrganizationCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createOrganization(creationContainer, securityContext);
@@ -62,10 +62,10 @@ public class OrganizationController implements Plugin {
 	public Organization updateOrganization(
 
 			@RequestBody OrganizationUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		Organization organization = service.getByIdOrNull(updateContainer.getId(),
-				Organization.class, Organization_.security, securityContext);
+				Organization.class,  securityContext);
 		if (organization == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Organization with id "
 					+ updateContainer.getId());

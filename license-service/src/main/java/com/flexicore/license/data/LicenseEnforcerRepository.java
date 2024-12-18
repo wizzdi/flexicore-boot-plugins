@@ -5,7 +5,6 @@ import com.flexicore.license.response.ClazzCount;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baseclass_;
 import com.flexicore.model.Clazz;
-import com.flexicore.model.Clazz_;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
@@ -15,6 +14,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Extension
@@ -26,6 +26,7 @@ public class LicenseEnforcerRepository implements Plugin {
 
 
 	public List<ClazzCount> getClazzCount(ClazzCountRequest clazzCountRequest) {
+		/* TODO:use union query over clazz types since baseclass is mappedsuperclass
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<ClazzCount> q = cb.createQuery(ClazzCount.class);
 		Root<Baseclass> r = q.from(Baseclass.class);
@@ -52,6 +53,7 @@ public class LicenseEnforcerRepository implements Plugin {
 				.groupBy(groupBy)
 				.orderBy(cb.asc(join.get(Clazz_.name)));
 		return em.createQuery(q).getResultList();
-
+*/
+		return Collections.emptyList();
 	}
 }

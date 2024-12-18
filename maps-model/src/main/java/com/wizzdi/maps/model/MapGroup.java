@@ -1,13 +1,13 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class MapGroup extends SecuredBasic {
+public class MapGroup extends Baseclass {
 
   private String externalId;
 

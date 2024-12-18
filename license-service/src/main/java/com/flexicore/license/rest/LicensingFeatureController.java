@@ -7,7 +7,7 @@
 package com.flexicore.license.rest;
 
 import com.flexicore.annotations.IOperation;
-import com.flexicore.annotations.IOperation.Access;
+
 import com.flexicore.annotations.OperationsInside;
 
 
@@ -17,7 +17,8 @@ import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.flexicore.license.model.LicensingFeature;
 import com.flexicore.license.request.LicensingFeatureFiltering;
 import com.flexicore.license.service.LicensingFeatureService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
+import com.wizzdi.segmantix.model.Access;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.stereotype.Component;
 import org.pf4j.Extension;
@@ -49,7 +50,7 @@ public class LicensingFeatureController implements Plugin {
    @PostMapping("/getAllLicensingFeatures")
 
     @IOperation(access = Access.allow, Name = "getAllLicensingFeatures", Description = "lists LicensingFeatures")
-    public PaginationResponse<LicensingFeature> getAllLicensingFeatures(@RequestBody LicensingFeatureFiltering licensingFeatureFiltering, @RequestAttribute SecurityContextBase securityContext) {
+    public PaginationResponse<LicensingFeature> getAllLicensingFeatures(@RequestBody LicensingFeatureFiltering licensingFeatureFiltering, @RequestAttribute SecurityContext securityContext) {
         licensingFeatureService.validate(licensingFeatureFiltering, securityContext);
         return licensingFeatureService.getAllLicensingFeatures(licensingFeatureFiltering, securityContext);
 

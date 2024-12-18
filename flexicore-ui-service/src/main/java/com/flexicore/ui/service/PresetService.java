@@ -6,7 +6,7 @@ import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.PresetRepository;
 import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.request.PresetCreate;
@@ -45,7 +45,7 @@ public class PresetService implements Plugin {
 
 
     public Preset updatePreset(PresetUpdate updatePreset,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         if (updatePresetNoMerge(updatePreset, updatePreset.getPreset())) {
             presetRepository.merge(updatePreset.getPreset());
         }
@@ -71,19 +71,19 @@ public class PresetService implements Plugin {
 
 
     public PaginationResponse<Preset> getAllPresets(
-            PresetFiltering presetFiltering, SecurityContextBase securityContext) {
+            PresetFiltering presetFiltering, SecurityContext securityContext) {
         List<Preset> list = listAllPresets(presetFiltering, securityContext);
         long count = presetRepository.countAllPresets(presetFiltering, securityContext);
         return new PaginationResponse<>(list, presetFiltering, count);
     }
 
     public List<Preset> listAllPresets(PresetFiltering presetFiltering,
-                                       SecurityContextBase securityContext) {
+                                       SecurityContext securityContext) {
         return presetRepository.listAllPresets(presetFiltering, securityContext);
     }
 
     public Preset createPreset(PresetCreate createPreset,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         Preset preset = createPresetNoMerge(createPreset, securityContext);
         presetRepository.merge(preset);
         return preset;
@@ -92,7 +92,7 @@ public class PresetService implements Plugin {
 
 
     private Preset createPresetNoMerge(PresetCreate createPreset,
-                                       SecurityContextBase securityContext) {
+                                       SecurityContext securityContext) {
         Preset preset = new Preset();
         preset.setId(UUID.randomUUID().toString());
         updatePresetNoMerge(createPreset, preset);
@@ -100,28 +100,28 @@ public class PresetService implements Plugin {
         return preset;
     }
 
-    public void validate(PresetCreate presetCreate, SecurityContextBase securityContext) {
+    public void validate(PresetCreate presetCreate, SecurityContext securityContext) {
         basicService.validate(presetCreate, securityContext);
     }
 
-    public void validate(PresetFiltering presetFiltering, SecurityContextBase securityContext) {
+    public void validate(PresetFiltering presetFiltering, SecurityContext securityContext) {
         basicService.validate(presetFiltering, securityContext);
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

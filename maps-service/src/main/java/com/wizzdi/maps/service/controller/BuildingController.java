@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class BuildingController implements Plugin {
   @Operation(summary = "updateBuilding", description = "Updates Building")
   public Building updateBuilding(
       @Validated(Update.class) @RequestBody BuildingUpdate buildingUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingService.updateBuilding(buildingUpdate, securityContext);
   }
@@ -41,7 +41,7 @@ public class BuildingController implements Plugin {
   @Operation(summary = "getAllBuildings", description = "lists Buildings")
   public PaginationResponse<Building> getAllBuildings(
       @Valid @RequestBody BuildingFilter buildingFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingService.getAllBuildings(buildingFilter, securityContext);
   }
@@ -50,7 +50,7 @@ public class BuildingController implements Plugin {
   @Operation(summary = "createBuilding", description = "Creates Building")
   public Building createBuilding(
       @Validated(Create.class) @RequestBody BuildingCreate buildingCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingService.createBuilding(buildingCreate, securityContext);
   }

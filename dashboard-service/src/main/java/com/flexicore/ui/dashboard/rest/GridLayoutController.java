@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.GridLayout;
 import com.flexicore.ui.dashboard.request.GridLayoutCreate;
 import com.flexicore.ui.dashboard.request.GridLayoutFilter;
@@ -45,7 +45,7 @@ public class GridLayoutController implements Plugin {
 	public PaginationResponse<GridLayout> getAllGridLayout(
 			@RequestBody
 			GridLayoutFilter gridLayoutFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(gridLayoutFilter, securityContext);
 		return service.getAllGridLayout(gridLayoutFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class GridLayoutController implements Plugin {
 	@PutMapping("updateGridLayout")
 	public GridLayout updateGridLayout(
 			@RequestBody
-			GridLayoutUpdate updateGridLayout, @RequestAttribute SecurityContextBase securityContext) {
+			GridLayoutUpdate updateGridLayout, @RequestAttribute SecurityContext securityContext) {
 		GridLayout gridLayout = updateGridLayout.getId() != null ? service.getByIdOrNull(
-				updateGridLayout.getId(), GridLayout.class, SecuredBasic_.security, securityContext) : null;
+				updateGridLayout.getId(), GridLayout.class,  securityContext) : null;
 		if (gridLayout == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGridLayout.getId());
@@ -77,7 +77,7 @@ public class GridLayoutController implements Plugin {
 	@PostMapping("createGridLayout")
 	public GridLayout createGridLayout(
 			@RequestBody
-			GridLayoutCreate createGridLayout, @RequestAttribute SecurityContextBase securityContext) {
+			GridLayoutCreate createGridLayout, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createGridLayout, securityContext);
 		return service.createGridLayout(createGridLayout, securityContext);
 

@@ -1,12 +1,12 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class RecurringPriceEntry extends SecuredBasic {
+public class RecurringPriceEntry extends Baseclass {
 
     @ManyToOne(targetEntity = PricingScheme.class)
     private PricingScheme pricingScheme;

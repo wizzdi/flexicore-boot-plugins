@@ -3,7 +3,7 @@ package com.wizzdi.messaging.service;
 import com.flexicore.model.Baseclass;
 
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -26,6 +26,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -42,16 +43,16 @@ public class ChatService implements Plugin {
 	private ChatUserService chatUserService;
 
 
-	public Chat createChat(ChatCreate chatCreate, SecurityContextBase securityContext) {
+	public Chat createChat(ChatCreate chatCreate, SecurityContext securityContext) {
 		Chat chat = createChatNoMerge(chatCreate, securityContext);
 		chatRepository.merge(chat);
 		return chat;
 	}
 
 
-	public Chat createChatNoMerge(ChatCreate chatCreate, SecurityContextBase securityContext) {
+	public Chat createChatNoMerge(ChatCreate chatCreate, SecurityContext securityContext) {
 		Chat chat = new Chat();
-		chat.setId(Baseclass.getBase64ID());
+		chat.setId(UUID.randomUUID().toString());
 		updateChatNoMerge(chatCreate, chat);
 		BaseclassService.createSecurityObjectNoMerge(chat,securityContext);
 		return chat;
@@ -66,7 +67,7 @@ public class ChatService implements Plugin {
 		return update;
 	}
 
-	public Chat updateChat(ChatUpdate chatUpdate, SecurityContextBase securityContext) {
+	public Chat updateChat(ChatUpdate chatUpdate, SecurityContext securityContext) {
 		Chat Chat = chatUpdate.getChat();
 		if (updateChatNoMerge(chatUpdate, Chat)) {
 			chatRepository.merge(Chat);
@@ -74,10 +75,10 @@ public class ChatService implements Plugin {
 		return Chat;
 	}
 
-	public void validate(ChatCreate chatCreate, SecurityContextBase securityContext) {
+	public void validate(ChatCreate chatCreate, SecurityContext securityContext) {
 		basicService.validate(chatCreate,securityContext);
 		String ownerId=chatCreate.getOwnerId();
-		ChatUser owner=ownerId!=null?getByIdOrNull(ownerId,ChatUser.class, ChatUser_.security,securityContext):null;
+		ChatUser owner=ownerId!=null?getByIdOrNull(ownerId,ChatUser.class, securityContext):null;
 		if(ownerId!=null&&owner==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no owner with id "+ownerId);
 		}
@@ -91,35 +92,35 @@ public class ChatService implements Plugin {
 		}
 	}
 
-	public void validate(ChatFilter chatFilter, SecurityContextBase securityContext) {
+	public void validate(ChatFilter chatFilter, SecurityContext securityContext) {
 		basicService.validate(chatFilter, securityContext);
 
 
 	}
 
-	public PaginationResponse<Chat> getAllChats(ChatFilter ChatFilter, SecurityContextBase securityContext) {
+	public PaginationResponse<Chat> getAllChats(ChatFilter ChatFilter, SecurityContext securityContext) {
 		List<Chat> list = listAllChats(ChatFilter, securityContext);
 		long count = chatRepository.countAllChats(ChatFilter, securityContext);
 		return new PaginationResponse<>(list, ChatFilter, count);
 	}
 
-	public List<Chat> listAllChats(ChatFilter ChatFilter, SecurityContextBase securityContext) {
+	public List<Chat> listAllChats(ChatFilter ChatFilter, SecurityContext securityContext) {
 		return chatRepository.listAllChats(ChatFilter, securityContext);
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return chatRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return chatRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -1,7 +1,7 @@
 package com.flexicore.rules.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class ScenarioAction extends SecuredBasic {
+public class ScenarioAction extends Baseclass {
 
   @ManyToOne(targetEntity = DynamicExecution.class)
   private DynamicExecution dynamicExecution;

@@ -5,7 +5,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.MapPresetRepository;
 import com.flexicore.ui.model.MapPreset;
 import com.flexicore.ui.request.MapPresetFiltering;
@@ -41,7 +41,7 @@ public class MapPresetService implements Plugin {
 	@Autowired
 	private PresetService presetService;
 
-	public MapPreset updateMapPreset(MapPresetUpdate mapPresetUpdate, SecurityContextBase securityContext) {
+	public MapPreset updateMapPreset(MapPresetUpdate mapPresetUpdate, SecurityContext securityContext) {
 		if (updateMapPresetNoMerge(mapPresetUpdate, mapPresetUpdate.getMapPreset())) {
 			mapPresetRepository.merge(mapPresetUpdate.getMapPreset());
 		}
@@ -63,24 +63,24 @@ public class MapPresetService implements Plugin {
 	}
 
 
-	public PaginationResponse<MapPreset> getAllMapPresets(MapPresetFiltering mapPresetFiltering, SecurityContextBase securityContext) {
+	public PaginationResponse<MapPreset> getAllMapPresets(MapPresetFiltering mapPresetFiltering, SecurityContext securityContext) {
 		List<MapPreset> list = listAllMapPresets(mapPresetFiltering, securityContext);
 		long count = mapPresetRepository.countAllMapPresets(mapPresetFiltering, securityContext);
 		return new PaginationResponse<>(list, mapPresetFiltering, count);
 	}
 
-	public List<MapPreset> listAllMapPresets(MapPresetFiltering mapPresetFiltering, SecurityContextBase securityContext) {
+	public List<MapPreset> listAllMapPresets(MapPresetFiltering mapPresetFiltering, SecurityContext securityContext) {
 		return mapPresetRepository.listAllMapPresets(mapPresetFiltering, securityContext);
 	}
 
-	public MapPreset createMapPreset(MapPresetCreate mapPresetCreate, SecurityContextBase securityContext) {
+	public MapPreset createMapPreset(MapPresetCreate mapPresetCreate, SecurityContext securityContext) {
 		MapPreset mapPreset = createMapPresetNoMerge(mapPresetCreate, securityContext);
 		mapPresetRepository.merge(mapPreset);
 		return mapPreset;
 
 	}
 
-	private MapPreset createMapPresetNoMerge(MapPresetCreate mapPresetCreate, SecurityContextBase securityContext) {
+	private MapPreset createMapPresetNoMerge(MapPresetCreate mapPresetCreate, SecurityContext securityContext) {
 		MapPreset mapPreset = new MapPreset();
 		mapPreset.setId(UUID.randomUUID().toString());
 		updateMapPresetNoMerge(mapPresetCreate, mapPreset);
@@ -88,25 +88,25 @@ public class MapPresetService implements Plugin {
 		return mapPreset;
 	}
 
-	public void validate(MapPresetCreate mapPresetCreate, SecurityContextBase securityContext) {
+	public void validate(MapPresetCreate mapPresetCreate, SecurityContext securityContext) {
 		presetService.validate(mapPresetCreate,securityContext);
 
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return mapPresetRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return mapPresetRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return mapPresetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return mapPresetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

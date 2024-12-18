@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.*;
 import com.flexicore.territories.service.*;
 import com.wizzdi.maps.model.*;
@@ -44,7 +44,7 @@ public class AppConfig {
 
     @Autowired
     @Qualifier("adminSecurityContext")
-    private SecurityContextBase securityContext;
+    private SecurityContext securityContext;
 
 
     @Autowired
@@ -62,11 +62,11 @@ public class AppConfig {
     @Autowired
     private StateService stateService;
     @Bean
-    public LayerType layerType1(SecurityContextBase securityContext) {
+    public LayerType layerType1(SecurityContext securityContext) {
         return layerTypeService.createLayerType(new LayerTypeCreate().setName("Layer type 1"),securityContext);
     }
     @Bean
-    public Layer layer1(LayerType layerType1,SecurityContextBase securityContext) {
+    public Layer layer1(LayerType layerType1,SecurityContext securityContext) {
         return layerService.createLayer(new LayerCreate().setLayerType(layerType1).setName("Layer 1"),securityContext);
     }
     @Bean

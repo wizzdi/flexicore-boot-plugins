@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.Building;
 import com.wizzdi.maps.model.MapIcon;
@@ -26,7 +26,7 @@ public class BuildingMapIconCreator implements Plugin {
     @Bean
     @Qualifier("building_icon")
     @Order(Ordered.LOWEST_PRECEDENCE)
-    public MapIcon buildingMapIcon(@Lazy MapIconService mapIconService,@Lazy SecurityContextBase adminSecurityContext ) {
+    public MapIcon buildingMapIcon(@Lazy MapIconService mapIconService,@Lazy SecurityContext adminSecurityContext ) {
 
         String externalId = Building.class.getCanonicalName();
         MapIconCreate mapIconCreate=new MapIconCreate().setRelatedType(Building.class.getCanonicalName()).setExternalId(externalId).setName(Building.class.getSimpleName());

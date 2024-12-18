@@ -17,7 +17,7 @@ public enum FilterComponentType {
     STATE(State.class, List.of(MappedPOI_.address, Address_.street, Street_.city, City_.state)),
     MAP_ICON(MapIcon.class, List.of(MappedPOI_.mapIcon)),
     MAP_GROUPS(MapGroup.class, List.of(MappedPOI_.mapGroupToMappedPOIS, MapGroupToMappedPOI_.mapGroup)),
-    TENANTS(SecurityTenant.class, List.of(MappedPOI_.security, Baseclass_.tenant)),
+    TENANTS(SecurityTenant.class, List.of( Baseclass_.tenant)),
     ROOM(Room.class, List.of(MappedPOI_.room)),
     RELATED_TYPE(String.class, List.of(MappedPOI_.relatedType)),
     EXTERNAL_ID(String.class, List.of(MappedPOI_.externalId)),

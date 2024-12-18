@@ -10,7 +10,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -34,19 +34,19 @@ public class ContractService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -73,33 +73,33 @@ public class ContractService implements Plugin {
     }
 
     public void validateFiltering(ContractFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
 
     }
 
     public PaginationResponse<Contract> getAllContracts(
-            SecurityContextBase securityContext, ContractFiltering filtering) {
+            SecurityContext securityContext, ContractFiltering filtering) {
         List<Contract> list = listAllContracts(securityContext, filtering);
         long count = repository.countAllContracts(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-	public List<Contract> listAllContracts(SecurityContextBase securityContext, ContractFiltering filtering) {
+	public List<Contract> listAllContracts(SecurityContext securityContext, ContractFiltering filtering) {
 		return repository.getAllContracts(securityContext, filtering);
 	}
 
 	public Contract createContract(ContractCreate contractCreate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Contract contract = createContractNoMerge(contractCreate, securityContext);
         repository.merge(contract);
         return contract;
     }
 
     public Contract createContractNoMerge(ContractCreate contractCreate,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         Contract contract = new Contract();
-        contract.setId(Baseclass.getBase64ID());
+        contract.setId(UUID.randomUUID().toString());
 
         updateContractNoMerge(contract, contractCreate);
         BaseclassService.createSecurityObjectNoMerge(contract, securityContext);
@@ -127,7 +127,7 @@ public class ContractService implements Plugin {
     }
 
     public Contract updateContract(ContractUpdate contractUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Contract contract = contractUpdate.getContract();
         if (updateContractNoMerge(contract, contractUpdate)) {
             repository.merge(contract);
@@ -136,7 +136,7 @@ public class ContractService implements Plugin {
     }
 
     public void validate(ContractCreate contractCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(contractCreate, securityContext);
 
 

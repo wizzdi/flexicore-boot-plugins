@@ -1,9 +1,9 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class Price extends SecuredBasic {
+public class Price extends Baseclass {
 }

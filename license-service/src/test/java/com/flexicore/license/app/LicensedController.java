@@ -7,15 +7,16 @@
 package com.flexicore.license.app;
 
 import com.flexicore.annotations.IOperation;
-import com.flexicore.annotations.IOperation.Access;
+
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.license.annotations.HasFeature;
 import com.flexicore.license.annotations.HasFeatures;
 import com.flexicore.license.model.LicenseRequest;
 import com.flexicore.license.request.LicenseRequestFiltering;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
+import com.wizzdi.segmantix.model.Access;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class LicensedController implements Plugin {
    @GetMapping("/test")
 
     @IOperation(access = Access.allow, Name = "test", Description = "test")
-    public String test( @RequestAttribute SecurityContextBase securityContext) {
+    public String test( @RequestAttribute SecurityContext securityContext) {
      return "test";
 
     }

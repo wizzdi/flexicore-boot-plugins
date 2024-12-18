@@ -12,7 +12,7 @@ import com.flexicore.organization.request.SupplierCreate;
 import com.flexicore.organization.request.SupplierFiltering;
 import com.flexicore.organization.request.SupplierUpdate;
 import com.flexicore.organization.service.SupplierService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -45,7 +45,7 @@ public class SupplierController implements Plugin {
 	public PaginationResponse<Supplier> listAllSuppliers(
 
 			@RequestBody SupplierFiltering filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.listAllSuppliers(securityContext, filtering);
 	}
@@ -58,7 +58,7 @@ public class SupplierController implements Plugin {
 	public Supplier createSupplier(
 
 			@RequestBody SupplierCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validateCreate(creationContainer, securityContext);
 
@@ -72,9 +72,9 @@ public class SupplierController implements Plugin {
 	public Supplier updateSupplier(
 
 			@RequestBody SupplierUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		Supplier Supplier = service.getByIdOrNull(updateContainer.getId(),
-				Supplier.class, Supplier_.security, securityContext);
+				Supplier.class,  securityContext);
 		if (Supplier == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Supplier with id "
 					+ updateContainer.getId());

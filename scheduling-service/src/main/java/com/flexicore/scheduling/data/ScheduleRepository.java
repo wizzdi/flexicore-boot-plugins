@@ -4,7 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.request.ScheduleFilter;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -34,7 +34,7 @@ public class ScheduleRepository implements Plugin {
    */
 
   public List<Schedule> listAllSchedules(
-      ScheduleFilter filtering, SecurityContextBase securityContext) {
+      ScheduleFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Schedule> q = cb.createQuery(Schedule.class);
     Root<Schedule> r = q.from(Schedule.class);
@@ -53,7 +53,7 @@ public class ScheduleRepository implements Plugin {
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
         filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -64,7 +64,7 @@ public class ScheduleRepository implements Plugin {
    * @return count of Schedule
    */
 
-  public Long countAllSchedules(ScheduleFilter filtering, SecurityContextBase securityContext) {
+  public Long countAllSchedules(ScheduleFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<Schedule> r = q.from(Schedule.class);
@@ -77,13 +77,13 @@ public class ScheduleRepository implements Plugin {
 
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -92,7 +92,7 @@ public class ScheduleRepository implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -101,7 +101,7 @@ public class ScheduleRepository implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

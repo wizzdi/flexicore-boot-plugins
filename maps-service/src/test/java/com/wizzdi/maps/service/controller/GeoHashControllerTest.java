@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.controller;
 
 
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MappedPOI;
@@ -47,7 +47,7 @@ public class GeoHashControllerTest {
   private MappedPOIService mappedPOIService;
   @Autowired
   @Lazy
-  private SecurityContextBase adminSecurityContext;
+  private SecurityContext adminSecurityContext;
 
   private Set<String> ids=new HashSet<>();
    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")

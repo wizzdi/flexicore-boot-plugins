@@ -6,7 +6,7 @@ import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GridLayoutRepository;
@@ -39,7 +39,7 @@ public class GridLayoutService implements Plugin {
 	@Autowired
 	private BasicService  baseclassNewService;
 
-	public GridLayout updateGridLayout(GridLayoutUpdate gridLayoutUpdate, SecurityContextBase securityContext) {
+	public GridLayout updateGridLayout(GridLayoutUpdate gridLayoutUpdate, SecurityContext securityContext) {
 		if (GridLayoutUpdateNoMerge(gridLayoutUpdate,
 				gridLayoutUpdate.getGridLayout())) {
 			gridLayoutRepository.merge(gridLayoutUpdate.getGridLayout());
@@ -61,13 +61,13 @@ public class GridLayoutService implements Plugin {
 
 	public List<GridLayout> listAllGridLayout(
 			GridLayoutFilter gridLayoutFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return gridLayoutRepository.listAllGridLayout(gridLayoutFilter,
 				securityContext);
 	}
 
 	public GridLayout createGridLayout(GridLayoutCreate createGridLayout,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		GridLayout gridLayout = createGridLayoutNoMerge(createGridLayout,
 				securityContext);
 		gridLayoutRepository.merge(gridLayout);
@@ -76,7 +76,7 @@ public class GridLayoutService implements Plugin {
 	}
 
 	public GridLayout createGridLayoutNoMerge(
-			GridLayoutCreate createGridLayout, SecurityContextBase securityContext) {
+			GridLayoutCreate createGridLayout, SecurityContext securityContext) {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.setId(UUID.randomUUID().toString());
 		GridLayoutUpdateNoMerge(createGridLayout, gridLayout);
@@ -86,7 +86,7 @@ public class GridLayoutService implements Plugin {
 
 	public PaginationResponse<GridLayout> getAllGridLayout(
 			GridLayoutFilter gridLayoutFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<GridLayout> list = listAllGridLayout(gridLayoutFilter,
 				securityContext);
 		long count = gridLayoutRepository.countAllGridLayout(
@@ -95,31 +95,31 @@ public class GridLayoutService implements Plugin {
 	}
 
 	public void validate(GridLayoutCreate createGridLayout,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createGridLayout, securityContext);
 
 	}
 
 	public void validate(GridLayoutFilter gridLayoutFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		baseclassNewService.validate(gridLayoutFilter, securityContext);
 
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return gridLayoutRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return gridLayoutRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridLayoutRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridLayoutRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

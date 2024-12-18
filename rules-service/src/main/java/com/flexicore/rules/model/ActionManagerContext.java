@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 import org.slf4j.Logger;
 
@@ -14,7 +14,7 @@ import java.util.Map;
 public class ActionManagerContext {
 	@JsonIgnore
 	private Logger logger;
-	private SecurityContextBase securityContext;
+	private SecurityContext securityContext;
 	private Scenario scenario;
 	private Map<String, ExecuteInvokerRequest> actionMap;
 	private static final ObjectMapper objectMapper = new ObjectMapper()
@@ -31,12 +31,12 @@ public class ActionManagerContext {
 		return (T) this;
 	}
 
-	public SecurityContextBase getSecurityContext() {
+	public SecurityContext getSecurityContext() {
 		return securityContext;
 	}
 
 	public <T extends ActionManagerContext> T setSecurityContext(
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		this.securityContext = securityContext;
 		return (T) this;
 	}

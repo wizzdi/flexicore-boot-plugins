@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.CellToLayout;
 import com.flexicore.ui.dashboard.request.CellToLayoutCreate;
 import com.flexicore.ui.dashboard.request.CellToLayoutFilter;
@@ -45,7 +45,7 @@ public class CellToLayoutController implements Plugin {
 	public PaginationResponse<CellToLayout> getAllCellToLayout(
 			@RequestBody
 			CellToLayoutFilter cellToLayoutFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(cellToLayoutFilter,securityContext);
 		return service.getAllCellToLayout(cellToLayoutFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class CellToLayoutController implements Plugin {
 	@PutMapping("updateCellToLayout")
 	public CellToLayout updateCellToLayout(
 			@RequestBody
-			CellToLayoutUpdate updateCellToLayout, @RequestAttribute SecurityContextBase securityContext) {
+			CellToLayoutUpdate updateCellToLayout, @RequestAttribute SecurityContext securityContext) {
 		CellToLayout cellToLayout = updateCellToLayout.getId() != null ? service.getByIdOrNull(
-				updateCellToLayout.getId(), CellToLayout.class, SecuredBasic_.security, securityContext) : null;
+				updateCellToLayout.getId(), CellToLayout.class,  securityContext) : null;
 		if (cellToLayout == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateCellToLayout.getId());
@@ -77,7 +77,7 @@ public class CellToLayoutController implements Plugin {
 	@PostMapping("createCellToLayout")
 	public CellToLayout createCellToLayout(
 			@RequestBody
-			CellToLayoutCreate createCellToLayout, @RequestAttribute SecurityContextBase securityContext) {
+			CellToLayoutCreate createCellToLayout, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createCellToLayout, securityContext);
 		return service.createCellToLayout(createCellToLayout, securityContext);
 

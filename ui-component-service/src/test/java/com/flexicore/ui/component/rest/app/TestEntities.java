@@ -2,7 +2,7 @@ package com.flexicore.ui.component.rest.app;
 
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.TenantToUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import com.wizzdi.flexicore.security.request.SecurityUserCreate;
 import com.wizzdi.flexicore.security.request.TenantToUserCreate;
@@ -21,7 +21,7 @@ public class TestEntities {
     @Autowired
     private SecurityUserService securityUserService;
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired
     private TenantToUserService tenantToUserService;
 

@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.service.request.GeoHashRequest;
@@ -33,7 +33,7 @@ public class GeoHashController implements Plugin {
     public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(
             
             @RequestBody GeoHashRequest geoHashRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         geoHashService.validate(geoHashRequest, securityContext);
         return geoHashService.getAllGeoHashAreas(geoHashRequest, securityContext);
     }
@@ -43,7 +43,7 @@ public class GeoHashController implements Plugin {
     public void calculateReverseGeoHash(
             
             @RequestBody @Valid MappedPOIFilter mappedPOIFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         geoHashService.calculateReverseGeoHash(mappedPOIFilter, securityContext);
     }
 }

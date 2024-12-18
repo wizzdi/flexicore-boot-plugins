@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -52,7 +52,7 @@ public class MapIconService implements Plugin {
    * @param securityContext
    * @return created MapIcon
    */
-  public MapIcon createMapIcon(MapIconCreate mapIconCreate, SecurityContextBase securityContext) {
+  public MapIcon createMapIcon(MapIconCreate mapIconCreate, SecurityContext securityContext) {
     MapIcon mapIcon = createMapIconNoMerge(mapIconCreate, securityContext);
     this.repository.merge(mapIcon);
     return mapIcon;
@@ -60,12 +60,12 @@ public class MapIconService implements Plugin {
 
 
   @Cacheable(cacheNames = CACHE_NAME, key = "#mapIconCreate.externalId+'|'+#mapIconCreate.relatedType", cacheManager = "mapIconCacheManager")
-  public MapIcon getOrCreateMapIcon(MapIconCreate mapIconCreate, SecurityContextBase securityContextBase) {
+  public MapIcon getOrCreateMapIcon(MapIconCreate mapIconCreate, SecurityContext SecurityContext) {
     String externalId = mapIconCreate.getExternalId();
     String relatedType = mapIconCreate.getRelatedType();
     return listAllMapIcons(new MapIconFilter().setRelatedType(Collections.singleton(relatedType))
-            .setExternalId(Collections.singleton(externalId)), null).stream().filter(f -> f.getSecurity().getTenant().getId().equals(securityContextBase.getTenantToCreateIn().getId()))
-            .findFirst().orElseGet(() -> createMapIcon(mapIconCreate, securityContextBase));
+            .setExternalId(Collections.singleton(externalId)), null).stream().filter(f -> f.getTenant().getId().equals(SecurityContext.getTenantToCreateIn().getId()))
+            .findFirst().orElseGet(() -> createMapIcon(mapIconCreate, SecurityContext));
   }
 
   @EventListener
@@ -84,7 +84,7 @@ public class MapIconService implements Plugin {
    * @return created MapIcon unmerged
    */
   public MapIcon createMapIconNoMerge(
-      MapIconCreate mapIconCreate, SecurityContextBase securityContext) {
+      MapIconCreate mapIconCreate, SecurityContext securityContext) {
     MapIcon mapIcon = new MapIcon();
     mapIcon.setId(UUID.randomUUID().toString());
     updateMapIconNoMerge(mapIcon, mapIconCreate);
@@ -131,7 +131,7 @@ public class MapIconService implements Plugin {
    * @param securityContext
    * @return mapIcon
    */
-  public MapIcon updateMapIcon(MapIconUpdate mapIconUpdate, SecurityContextBase securityContext) {
+  public MapIcon updateMapIcon(MapIconUpdate mapIconUpdate, SecurityContext securityContext) {
     MapIcon mapIcon = mapIconUpdate.getMapIcon();
     if (updateMapIconNoMerge(mapIcon, mapIconUpdate)) {
       this.repository.merge(mapIcon);
@@ -145,7 +145,7 @@ public class MapIconService implements Plugin {
    * @return PaginationResponse containing paging information for MapIcon
    */
   public PaginationResponse<MapIcon> getAllMapIcons(
-      MapIconFilter mapIconFilter, SecurityContextBase securityContext) {
+      MapIconFilter mapIconFilter, SecurityContext securityContext) {
     List<MapIcon> list = listAllMapIcons(mapIconFilter, securityContext);
     long count = this.repository.countAllMapIcons(mapIconFilter, securityContext);
     return new PaginationResponse<>(list, mapIconFilter.getPageSize(), count);
@@ -157,17 +157,17 @@ public class MapIconService implements Plugin {
    * @return List of MapIcon
    */
   public List<MapIcon> listAllMapIcons(
-      MapIconFilter mapIconFilter, SecurityContextBase securityContext) {
+      MapIconFilter mapIconFilter, SecurityContext securityContext) {
     return this.repository.listAllMapIcons(mapIconFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -175,7 +175,7 @@ public class MapIconService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -183,7 +183,7 @@ public class MapIconService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

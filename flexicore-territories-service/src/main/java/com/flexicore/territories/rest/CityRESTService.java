@@ -3,7 +3,7 @@ package com.flexicore.territories.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.City_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.CityCreate;
 import com.flexicore.territories.request.CityFilter;
 import com.flexicore.territories.request.CityUpdate;
@@ -35,9 +35,9 @@ public class CityRESTService implements Plugin {
 
 	@PostMapping("/getAllCities")
 	public PaginationResponse<City> getAllCities(
-			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CityFilter filtering, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(filtering, securityContextBase);
-		return service.getAllCities(securityContextBase, filtering);
+			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CityFilter filtering, @RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(filtering, SecurityContext);
+		return service.getAllCities(SecurityContext, filtering);
 	}
 
 	@Operation(description = "update city",summary = "update city")
@@ -45,14 +45,14 @@ public class CityRESTService implements Plugin {
 	public City updateCity(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CityUpdate updateContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		City city = service.getByIdOrNull(updateContainer.getId(), City.class, City_.security, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		City city = service.getByIdOrNull(updateContainer.getId(), City.class,SecurityContext);
 		if (city == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no City with id " + updateContainer.getId());
 		}
 		updateContainer.setCity(city);
-		service.validate(updateContainer, securityContextBase);
-		return service.updateCity(updateContainer, securityContextBase);
+		service.validate(updateContainer, SecurityContext);
+		return service.updateCity(updateContainer, SecurityContext);
 	}
 
 	@Operation(description = "create city",summary = "create city")
@@ -61,9 +61,9 @@ public class CityRESTService implements Plugin {
 	public City createCity(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CityCreate creationContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(creationContainer, securityContextBase);
-		return service.createCity(creationContainer, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(creationContainer, SecurityContext);
+		return service.createCity(creationContainer, SecurityContext);
 	}
 
 
@@ -72,7 +72,7 @@ public class CityRESTService implements Plugin {
 	@DeleteMapping("deleteCity/{id}")
 	public void deleteCity(
 			
-			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.deleteCity(id, securityContextBase);
+			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.deleteCity(id, SecurityContext);
 	}
 }

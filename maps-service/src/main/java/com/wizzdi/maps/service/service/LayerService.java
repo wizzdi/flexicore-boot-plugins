@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -35,7 +35,7 @@ public class LayerService implements Plugin {
    * @return created Layer
    */
   public Layer createLayer(
-      LayerCreate layerCreate, SecurityContextBase securityContext) {
+      LayerCreate layerCreate, SecurityContext securityContext) {
     Layer layer = createLayerNoMerge(layerCreate, securityContext);
     this.repository.merge(layer);
     return layer;
@@ -47,7 +47,7 @@ public class LayerService implements Plugin {
    * @return created Layer unmerged
    */
   public Layer createLayerNoMerge(
-      LayerCreate layerCreate, SecurityContextBase securityContext) {
+      LayerCreate layerCreate, SecurityContext securityContext) {
     Layer layer = new Layer();
     layer.setId(UUID.randomUUID().toString());
     updateLayerNoMerge(layer, layerCreate);
@@ -88,7 +88,7 @@ public class LayerService implements Plugin {
    * @return layer
    */
   public Layer updateLayer(
-      LayerUpdate layerUpdate, SecurityContextBase securityContext) {
+      LayerUpdate layerUpdate, SecurityContext securityContext) {
     Layer layer = layerUpdate.getLayer();
     if (updateLayerNoMerge(layer, layerUpdate)) {
       this.repository.merge(layer);
@@ -102,7 +102,7 @@ public class LayerService implements Plugin {
    * @return PaginationResponse containing paging information for Layer
    */
   public PaginationResponse<Layer> getAllLayers(
-      LayerFilter layerFilter, SecurityContextBase securityContext) {
+      LayerFilter layerFilter, SecurityContext securityContext) {
     List<Layer> list = listAllLayers(layerFilter, securityContext);
     long count = this.repository.countAllLayers(layerFilter, securityContext);
     return new PaginationResponse<>(list, layerFilter.getPageSize(), count);
@@ -114,17 +114,17 @@ public class LayerService implements Plugin {
    * @return List of Layer
    */
   public List<Layer> listAllLayers(
-      LayerFilter layerFilter, SecurityContextBase securityContext) {
+      LayerFilter layerFilter, SecurityContext securityContext) {
     return this.repository.listAllLayers(layerFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -132,7 +132,7 @@ public class LayerService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -140,7 +140,7 @@ public class LayerService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

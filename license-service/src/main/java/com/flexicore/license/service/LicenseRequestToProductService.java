@@ -10,7 +10,7 @@ import com.flexicore.license.request.LicenseRequestToProductFiltering;
 import com.flexicore.license.request.LicenseRequestToProductUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Extension
@@ -43,19 +44,19 @@ public class LicenseRequestToProductService implements Plugin {
 
 
 
-   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -80,19 +81,19 @@ public class LicenseRequestToProductService implements Plugin {
     public void massMerge(List<?> toMerge) {
         repository.massMerge(toMerge);
     }
-    public LicenseRequestToProduct createLicenseRequestToProduct(LicenseRequestToProductCreate pluginCreationContainer, SecurityContextBase securityContext) {
+    public LicenseRequestToProduct createLicenseRequestToProduct(LicenseRequestToProductCreate pluginCreationContainer, SecurityContext securityContext) {
         LicenseRequestToProduct licenseRequestToProduct = createLicenseRequestToProductNoMerge(pluginCreationContainer, securityContext);
         repository.merge(licenseRequestToProduct);
-        licenseRequestUpdateEventEvent.publishEvent(new LicenseRequestUpdateEvent().setLicenseRequest(licenseRequestToProduct.getLicenseRequest()).setSecurityContextBase(securityContext));
+        licenseRequestUpdateEventEvent.publishEvent(new LicenseRequestUpdateEvent().setLicenseRequest(licenseRequestToProduct.getLicenseRequest()).setSecurityContext(securityContext));
 
         return licenseRequestToProduct;
 
 
     }
 
-    public LicenseRequestToProduct createLicenseRequestToProductNoMerge(LicenseRequestToProductCreate licenseRequestToProductCreate, SecurityContextBase securityContext) {
+    public LicenseRequestToProduct createLicenseRequestToProductNoMerge(LicenseRequestToProductCreate licenseRequestToProductCreate, SecurityContext securityContext) {
         LicenseRequestToProduct licenseRequestToProduct = new LicenseRequestToProduct();
-        licenseRequestToProduct.setId(Baseclass.getBase64ID());
+        licenseRequestToProduct.setId(UUID.randomUUID().toString());
         updateLicenseRequestToProductNoMerge(licenseRequestToProduct, licenseRequestToProductCreate);
         BaseclassService.createSecurityObjectNoMerge(licenseRequestToProduct,securityContext);
         return licenseRequestToProduct;
@@ -112,24 +113,24 @@ public class LicenseRequestToProductService implements Plugin {
     private ApplicationEventPublisher licenseRequestUpdateEventEvent;
 
 
-    public LicenseRequestToProduct updateLicenseRequestToProduct(LicenseRequestToProductUpdate licenseRequestToProductUpdate, SecurityContextBase securityContext) {
+    public LicenseRequestToProduct updateLicenseRequestToProduct(LicenseRequestToProductUpdate licenseRequestToProductUpdate, SecurityContext securityContext) {
         LicenseRequestToProduct licenseRequestToProduct = licenseRequestToProductUpdate.getLicenseRequestToProduct();
         if (updateLicenseRequestToProductNoMerge(licenseRequestToProduct, licenseRequestToProductUpdate)) {
             repository.merge(licenseRequestToProduct);
-            licenseRequestUpdateEventEvent.publishEvent(new LicenseRequestUpdateEvent().setLicenseRequest(licenseRequestToProduct.getLicenseRequest()).setSecurityContextBase(securityContext));
+            licenseRequestUpdateEventEvent.publishEvent(new LicenseRequestUpdateEvent().setLicenseRequest(licenseRequestToProduct.getLicenseRequest()).setSecurityContext(securityContext));
 
         }
         return licenseRequestToProduct;
     }
 
-    public List<LicenseRequestToProduct> listAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContextBase securityContext) {
+    public List<LicenseRequestToProduct> listAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContext securityContext) {
         return repository.listAllLicenseRequestToProducts(licenseRequestToProductFiltering, securityContext);
     }
 
-    public void validate(LicenseRequestToProductCreate licenseRequestToProductCreate, SecurityContextBase securityContext) {
+    public void validate(LicenseRequestToProductCreate licenseRequestToProductCreate, SecurityContext securityContext) {
         licenseRequestToEntityService.validate(licenseRequestToProductCreate, securityContext);
         String licensingProductId=licenseRequestToProductCreate.getLicensingProductId();
-        LicensingProduct licensingProduct=licensingProductId!=null?getByIdOrNull(licensingProductId, LicensingProduct.class, LicensingProduct_.security,securityContext):null;
+        LicensingProduct licensingProduct=licensingProductId!=null?getByIdOrNull(licensingProductId, LicensingProduct.class, securityContext):null;
         if(licensingProduct==null && licensingProductId!=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No License product with id "+licensingProductId);
         }
@@ -137,11 +138,11 @@ public class LicenseRequestToProductService implements Plugin {
 
     }
 
-    public void validate(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContextBase securityContext) {
+    public void validate(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContext securityContext) {
         licenseRequestToEntityService.validate(licenseRequestToProductFiltering,securityContext);
     }
 
-    public PaginationResponse<LicenseRequestToProduct> getAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContextBase securityContext) {
+    public PaginationResponse<LicenseRequestToProduct> getAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContext securityContext) {
         List<LicenseRequestToProduct> list = listAllLicenseRequestToProducts(licenseRequestToProductFiltering, securityContext);
         long count = repository.countAllLicenseRequestToProducts(licenseRequestToProductFiltering, securityContext);
         return new PaginationResponse<>(list, licenseRequestToProductFiltering, count);

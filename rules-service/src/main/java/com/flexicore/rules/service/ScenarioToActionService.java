@@ -2,7 +2,7 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.ScenarioToActionRepository;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioAction;
@@ -10,7 +10,7 @@ import com.flexicore.rules.model.ScenarioToAction;
 import com.flexicore.rules.request.ScenarioToActionCreate;
 import com.flexicore.rules.request.ScenarioToActionFilter;
 import com.flexicore.rules.request.ScenarioToActionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -44,7 +44,7 @@ public class ScenarioToActionService implements Plugin {
    * @return created ScenarioToAction
    */
   public ScenarioToAction createScenarioToAction(
-      ScenarioToActionCreate scenarioToActionCreate, SecurityContextBase securityContext) {
+      ScenarioToActionCreate scenarioToActionCreate, SecurityContext securityContext) {
     ScenarioToAction scenarioToAction =
         createScenarioToActionNoMerge(scenarioToActionCreate, securityContext);
     this.repository.merge(scenarioToAction);
@@ -57,7 +57,7 @@ public class ScenarioToActionService implements Plugin {
    * @return created ScenarioToAction unmerged
    */
   public ScenarioToAction createScenarioToActionNoMerge(
-      ScenarioToActionCreate scenarioToActionCreate, SecurityContextBase securityContext) {
+      ScenarioToActionCreate scenarioToActionCreate, SecurityContext securityContext) {
     ScenarioToAction scenarioToAction = new ScenarioToAction();
     scenarioToAction.setId(UUID.randomUUID().toString());
     updateScenarioToActionNoMerge(scenarioToAction, scenarioToActionCreate);
@@ -110,7 +110,7 @@ public class ScenarioToActionService implements Plugin {
    * @return scenarioToAction
    */
   public ScenarioToAction updateScenarioToAction(
-      ScenarioToActionUpdate scenarioToActionUpdate, SecurityContextBase securityContext) {
+      ScenarioToActionUpdate scenarioToActionUpdate, SecurityContext securityContext) {
     ScenarioToAction scenarioToAction = scenarioToActionUpdate.getScenarioToAction();
     if (updateScenarioToActionNoMerge(scenarioToAction, scenarioToActionUpdate)) {
       this.repository.merge(scenarioToAction);
@@ -124,7 +124,7 @@ public class ScenarioToActionService implements Plugin {
    * @return PaginationResponse containing paging information for ScenarioToAction
    */
   public PaginationResponse<ScenarioToAction> getAllScenarioToActions(
-      ScenarioToActionFilter scenarioToActionFilter, SecurityContextBase securityContext) {
+      ScenarioToActionFilter scenarioToActionFilter, SecurityContext securityContext) {
     List<ScenarioToAction> list = listAllScenarioToActions(scenarioToActionFilter, securityContext);
     long count = this.repository.countAllScenarioToActions(scenarioToActionFilter, securityContext);
     return new PaginationResponse<>(list, scenarioToActionFilter, count);
@@ -136,7 +136,7 @@ public class ScenarioToActionService implements Plugin {
    * @return List of ScenarioToAction
    */
   public List<ScenarioToAction> listAllScenarioToActions(
-      ScenarioToActionFilter scenarioToActionFilter, SecurityContextBase securityContext) {
+      ScenarioToActionFilter scenarioToActionFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarioToActions(scenarioToActionFilter, securityContext);
   }
 
@@ -146,7 +146,7 @@ public class ScenarioToActionService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioToActionFilter is not valid
    */
   public void validate(
-      ScenarioToActionFilter scenarioToActionFilter, SecurityContextBase securityContext) {
+      ScenarioToActionFilter scenarioToActionFilter, SecurityContext securityContext) {
     basicService.validate(scenarioToActionFilter, securityContext);
 
     Set<String> scenarioActionIds =
@@ -160,7 +160,6 @@ public class ScenarioToActionService implements Plugin {
                 .listByIds(
                     ScenarioAction.class,
                     scenarioActionIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -178,7 +177,7 @@ public class ScenarioToActionService implements Plugin {
         scenarioIds.isEmpty()
             ? new HashMap<>()
             : this.repository
-                .listByIds(Scenario.class, scenarioIds, SecuredBasic_.security, securityContext)
+                .listByIds(Scenario.class, scenarioIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     scenarioIds.removeAll(scenario.keySet());
@@ -194,7 +193,7 @@ public class ScenarioToActionService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioToActionCreate is not valid
    */
   public void validate(
-      ScenarioToActionCreate scenarioToActionCreate, SecurityContextBase securityContext) {
+      ScenarioToActionCreate scenarioToActionCreate, SecurityContext securityContext) {
     basicService.validate(scenarioToActionCreate, securityContext);
 
     String scenarioActionId = scenarioToActionCreate.getScenarioActionId();
@@ -202,7 +201,7 @@ public class ScenarioToActionService implements Plugin {
         scenarioActionId == null
             ? null
             : this.repository.getByIdOrNull(
-                scenarioActionId, ScenarioAction.class, SecuredBasic_.security, securityContext);
+                scenarioActionId, ScenarioAction.class,  securityContext);
     if (scenarioActionId != null && scenarioAction == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No ScenarioAction with id " + scenarioActionId);
@@ -214,7 +213,7 @@ public class ScenarioToActionService implements Plugin {
         scenarioId == null
             ? null
             : this.repository.getByIdOrNull(
-                scenarioId, Scenario.class, SecuredBasic_.security, securityContext);
+                scenarioId, Scenario.class,  securityContext);
     if (scenarioId != null && scenario == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Scenario with id " + scenarioId);
@@ -223,12 +222,12 @@ public class ScenarioToActionService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -236,7 +235,7 @@ public class ScenarioToActionService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -244,7 +243,7 @@ public class ScenarioToActionService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

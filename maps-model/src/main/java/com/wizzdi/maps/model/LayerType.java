@@ -1,7 +1,7 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class LayerType extends SecuredBasic {
+public class LayerType extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = Layer.class,mappedBy = "layerType")
     private List<Layer> layers=new ArrayList<>();

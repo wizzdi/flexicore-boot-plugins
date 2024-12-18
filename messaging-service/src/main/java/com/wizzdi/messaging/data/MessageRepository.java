@@ -2,7 +2,7 @@ package com.wizzdi.messaging.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BaseclassRepository;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -37,7 +37,7 @@ public class MessageRepository implements Plugin {
 	private BasicRepository basicRepository;
 
 
-	public List<Message> listAllMessages(MessageFilter MessageFilter, SecurityContextBase securityContext) {
+	public List<Message> listAllMessages(MessageFilter MessageFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Message> q = cb.createQuery(Message.class);
 		Root<Message> r = q.from(Message.class);
@@ -50,7 +50,7 @@ public class MessageRepository implements Plugin {
 
 	}
 
-	public <T extends Message> void addMessagePredicates(MessageFilter messageFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContextBase securityContext) {
+	public <T extends Message> void addMessagePredicates(MessageFilter messageFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContext securityContext) {
 		
 		if(messageFilter.getBasicPropertiesFilter()==null){
 			messageFilter.setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.NON_DELETED_ONLY));
@@ -98,7 +98,7 @@ public class MessageRepository implements Plugin {
 
 	}
 
-	public long countAllMessages(MessageFilter MessageFilter, SecurityContextBase securityContext) {
+	public long countAllMessages(MessageFilter MessageFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<Message> r = q.from(Message.class);
@@ -120,19 +120,19 @@ public class MessageRepository implements Plugin {
 		basicRepository.massMerge(toMerge);
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return baseclassRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
@@ -144,7 +144,7 @@ public class MessageRepository implements Plugin {
 		return baseclassRepository.findByIdOrNull(type, id);
 	}
 
-	public List<UnreadMessagesSummaryItem> getMessageSummary(MessageFilter messageFilter, SecurityContextBase securityContext) {
+	public List<UnreadMessagesSummaryItem> getMessageSummary(MessageFilter messageFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<UnreadMessagesSummaryItem> q = cb.createQuery(UnreadMessagesSummaryItem.class);
 		Root<Message> r = q.from(Message.class);

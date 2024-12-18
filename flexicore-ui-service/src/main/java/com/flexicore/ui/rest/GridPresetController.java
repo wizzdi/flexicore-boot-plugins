@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.request.GridPresetCopy;
 import com.flexicore.ui.request.GridPresetCreate;
 import com.flexicore.ui.request.GridPresetUpdate;
@@ -52,7 +52,7 @@ public class GridPresetController implements Plugin {
 	public PaginationResponse<GridPreset> getAllGridPresets(
 			 @RequestBody
 			GridPresetFiltering gridPresetFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		return service.getAllGridPresets(gridPresetFiltering, securityContext);
 
 	}
@@ -64,8 +64,8 @@ public class GridPresetController implements Plugin {
 	public GridPreset updateGridPreset(
 			 @RequestBody
 			GridPresetUpdate updateGridPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
-		GridPreset gridPreset = updateGridPreset.getId() != null ? service.getByIdOrNull(updateGridPreset.getId(), GridPreset.class, GridPreset_.security, securityContext) : null;
+			@RequestAttribute SecurityContext securityContext) {
+		GridPreset gridPreset = updateGridPreset.getId() != null ? service.getByIdOrNull(updateGridPreset.getId(), GridPreset.class,securityContext) : null;
 		if (gridPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no GridPreset with id  "
 					+ updateGridPreset.getId());
@@ -84,7 +84,7 @@ public class GridPresetController implements Plugin {
 	public GridPreset createGridPreset(
 			 @RequestBody
 			GridPresetCreate createGridPreset,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(createGridPreset, securityContext);
 		return service.createGridPreset(createGridPreset, securityContext);
 
@@ -97,7 +97,7 @@ public class GridPresetController implements Plugin {
 	public GridPreset copyGridPreset(
 			 @RequestBody
 			GridPresetCopy gridPresetCopy,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(gridPresetCopy, securityContext);
 		return service.copyGridPreset(gridPresetCopy, securityContext);
 

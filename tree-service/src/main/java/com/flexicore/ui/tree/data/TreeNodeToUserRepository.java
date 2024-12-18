@@ -3,7 +3,7 @@ package com.flexicore.ui.tree.data;
 import com.flexicore.model.Baseclass;
 
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.model.TreeNodeToUser;
 import com.flexicore.ui.tree.model.TreeNodeToUser_;
@@ -34,7 +34,7 @@ public class TreeNodeToUserRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
 
 
-    public List<TreeNodeToUser> getAllTreeNodeToUserLinks(Set<String> ids, SecurityContextBase securityContext) {
+    public List<TreeNodeToUser> getAllTreeNodeToUserLinks(Set<String> ids, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<TreeNodeToUser> q = cb.createQuery(TreeNodeToUser.class);
         Root<TreeNodeToUser> r = q.from(TreeNodeToUser.class);
@@ -50,19 +50,19 @@ public class TreeNodeToUserRepository implements Plugin {
         return query.getResultList();
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class PricingScheme extends SecuredBasic {
+public class PricingScheme extends Baseclass {
 
     private PricingModel pricingModel;
     @ManyToOne(targetEntity = Money.class)

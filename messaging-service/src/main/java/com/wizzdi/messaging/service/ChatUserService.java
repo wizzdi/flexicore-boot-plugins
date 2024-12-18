@@ -2,7 +2,7 @@ package com.wizzdi.messaging.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -24,6 +24,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -41,20 +42,20 @@ public class ChatUserService implements Plugin {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	public ChatUser getChatUser(SecurityContextBase securityContext) {
+	public ChatUser getChatUser(SecurityContext securityContext) {
 		return chatUserProviders.stream().filter(f -> f.getType().isAssignableFrom(securityContext.getUser().getClass())).findFirst().map(f -> f.getChatUser(securityContext)).orElse(null);
 	}
 
-	public ChatUser createChatUser(ChatUserCreate chatUserCreate, SecurityContextBase securityContext) {
+	public ChatUser createChatUser(ChatUserCreate chatUserCreate, SecurityContext securityContext) {
 		ChatUser chatUser = createChatUserNoMerge(chatUserCreate, securityContext);
 		chatUserRepository.merge(chatUser);
 		return chatUser;
 	}
 
 
-	public ChatUser createChatUserNoMerge(ChatUserCreate chatUserCreate, SecurityContextBase securityContext) {
+	public ChatUser createChatUserNoMerge(ChatUserCreate chatUserCreate, SecurityContext securityContext) {
 		ChatUser chatUser = new ChatUser();
-		chatUser.setId(Baseclass.getBase64ID());
+		chatUser.setId(UUID.randomUUID().toString());
 		updateChatUserNoMerge(chatUserCreate, chatUser);
 		BaseclassService.createSecurityObjectNoMerge(chatUser,securityContext);
 		return chatUser;
@@ -65,7 +66,7 @@ public class ChatUserService implements Plugin {
 
 	}
 
-	public ChatUser updateChatUser(ChatUserUpdate chatUserUpdate, SecurityContextBase securityContext) {
+	public ChatUser updateChatUser(ChatUserUpdate chatUserUpdate, SecurityContext securityContext) {
 		ChatUser ChatUser = chatUserUpdate.getChatUser();
 		if (updateChatUserNoMerge(chatUserUpdate, ChatUser)) {
 			chatUserRepository.merge(ChatUser);
@@ -73,42 +74,42 @@ public class ChatUserService implements Plugin {
 		return ChatUser;
 	}
 
-	public void validate(ChatUserCreate chatUserCreate, SecurityContextBase securityContext) {
+	public void validate(ChatUserCreate chatUserCreate, SecurityContext securityContext) {
 		basicService.validate(chatUserCreate,securityContext);
 
 	}
 
-	public void validate(ChatUserFilter chatUserFilter, SecurityContextBase securityContext) {
+	public void validate(ChatUserFilter chatUserFilter, SecurityContext securityContext) {
 		basicService.validate(chatUserFilter, securityContext);
 
 
 	}
 
 
-	public PaginationResponse<ChatUser> getAllChatUsers(ChatUserFilter ChatUserFilter, SecurityContextBase securityContext) {
+	public PaginationResponse<ChatUser> getAllChatUsers(ChatUserFilter ChatUserFilter, SecurityContext securityContext) {
 		List<ChatUser> list = listAllChatUsers(ChatUserFilter, securityContext);
 		long count = chatUserRepository.countAllChatUsers(ChatUserFilter, securityContext);
 		return new PaginationResponse<>(list, ChatUserFilter, count);
 	}
 
-	public List<ChatUser> listAllChatUsers(ChatUserFilter ChatUserFilter, SecurityContextBase securityContext) {
+	public List<ChatUser> listAllChatUsers(ChatUserFilter ChatUserFilter, SecurityContext securityContext) {
 		return chatUserRepository.listAllChatUsers(ChatUserFilter, securityContext);
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return chatUserRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return chatUserRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatUserRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return chatUserRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

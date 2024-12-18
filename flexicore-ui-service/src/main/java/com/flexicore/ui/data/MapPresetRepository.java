@@ -10,7 +10,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.MapPreset;
 import com.flexicore.ui.request.MapPresetFiltering;
 import org.pf4j.Extension;
@@ -35,7 +35,7 @@ public class MapPresetRepository implements Plugin {
 
     public List<MapPreset> listAllMapPresets(
             MapPresetFiltering mapPresetFiltering,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<MapPreset> q = cb.createQuery(MapPreset.class);
         Root<MapPreset> r = q.from(MapPreset.class);
@@ -49,15 +49,15 @@ public class MapPresetRepository implements Plugin {
 
     public <T extends MapPreset> void addMapPresetPredicates(List<Predicate> preds,
                                         CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r,
-                                        MapPresetFiltering mapPresetFiltering,SecurityContextBase securityContextBase) {
-        presetRepository.addPresetPredicates(preds, cb,q, r, mapPresetFiltering,securityContextBase);
+                                        MapPresetFiltering mapPresetFiltering,SecurityContext SecurityContext) {
+        presetRepository.addPresetPredicates(preds, cb,q, r, mapPresetFiltering,SecurityContext);
 
 
     }
 
     public long countAllMapPresets(
             MapPresetFiltering mapPresetFiltering,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<MapPreset> r = q.from(MapPreset.class);
@@ -70,19 +70,19 @@ public class MapPresetRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return presetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

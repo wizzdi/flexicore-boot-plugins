@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.billing.model.payment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.flexicore.billing.model.billing.Charge;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 
 import jakarta.persistence.Entity;
@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
 @Entity
-public class InvoiceItem extends SecuredBasic {
+public class InvoiceItem extends Baseclass {
 
     @ManyToOne(targetEntity = Invoice.class)
     private Invoice invoice;

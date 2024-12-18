@@ -1,13 +1,13 @@
 package com.wizzdi.maps.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Building extends SecuredBasic {
+public class Building extends Baseclass {
 
   @JoinColumn(nullable = false)
   @ManyToOne(targetEntity = MappedPOI.class)

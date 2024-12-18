@@ -14,7 +14,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.ui.dashboard.model.GridLayout;
 import com.flexicore.ui.dashboard.request.GridLayoutFilter;
@@ -38,7 +38,7 @@ public class GridLayoutRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
 
     public List<GridLayout> listAllGridLayout(GridLayoutFilter gridLayoutFilter,
-                                              SecurityContextBase securityContext) {
+                                              SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<GridLayout> q = cb.createQuery(GridLayout.class);
         Root<GridLayout> r = q.from(GridLayout.class);
@@ -51,14 +51,14 @@ public class GridLayoutRepository implements Plugin {
     }
 
     public <T extends GridLayout> void addGridLayoutPredicates(List<Predicate> preds, CriteriaBuilder cb,
-                                                               CommonAbstractCriteria q, From<?, T> r, GridLayoutFilter gridLayoutFilter, SecurityContextBase securityContext) {
+                                                               CommonAbstractCriteria q, From<?, T> r, GridLayoutFilter gridLayoutFilter, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
 
     }
 
     public long countAllGridLayout(GridLayoutFilter gridLayoutFilter,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<GridLayout> r = q.from(GridLayout.class);
@@ -70,19 +70,19 @@ public class GridLayoutRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

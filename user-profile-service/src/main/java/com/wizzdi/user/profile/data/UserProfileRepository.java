@@ -3,7 +3,7 @@ package com.wizzdi.user.profile.data;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.SecurityUser_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
@@ -38,7 +38,7 @@ public class UserProfileRepository implements Plugin {
 
     public List<UserProfile> listAllUserProfiles(
             UserProfileFilter userProfileFilter,
-            SecurityContextBase securityContextBase) {
+            SecurityContext SecurityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<UserProfile> q = cb.createQuery(UserProfile.class);
         Root<UserProfile> r = q.from(UserProfile.class);
@@ -62,7 +62,7 @@ public class UserProfileRepository implements Plugin {
     }
 
     public long countAllUserProfiles(UserProfileFilter userProfileFilter,
-                                 SecurityContextBase securityContextBase) {
+                                 SecurityContext SecurityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<UserProfile> r = q.from(UserProfile.class);

@@ -2,7 +2,7 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.VideoServer;
 import com.wizzdi.video.conference.service.request.VideoServerCreate;
@@ -20,7 +20,7 @@ public interface IVideoServerService {
    * @return created VideoServer
    */
   VideoServer createVideoServer(
-      VideoServerCreate videoServerCreate, SecurityContextBase securityContext);
+      VideoServerCreate videoServerCreate, SecurityContext securityContext);
 
   /**
    * @param videoServerCreate Object Used to Create Entity_1
@@ -28,7 +28,7 @@ public interface IVideoServerService {
    * @return created VideoServer unmerged
    */
   VideoServer createVideoServerNoMerge(
-      VideoServerCreate videoServerCreate, SecurityContextBase securityContext);
+      VideoServerCreate videoServerCreate, SecurityContext securityContext);
 
   /**
    * @param videoServerCreate Object Used to Create Entity_1
@@ -43,7 +43,7 @@ public interface IVideoServerService {
    * @return videoServer
    */
   VideoServer updateVideoServer(
-      VideoServerUpdate videoServerUpdate, SecurityContextBase securityContext);
+      VideoServerUpdate videoServerUpdate, SecurityContext securityContext);
 
   /**
    * @param videoServerFilter Object Used to List Entity_1
@@ -51,7 +51,7 @@ public interface IVideoServerService {
    * @return PaginationResponse containing paging information for VideoServer
    */
   PaginationResponse<VideoServer> getAllVideoServers(
-      VideoServerFilter videoServerFilter, SecurityContextBase securityContext);
+      VideoServerFilter videoServerFilter, SecurityContext securityContext);
 
   /**
    * @param videoServerFilter Object Used to List Entity_1
@@ -59,38 +59,38 @@ public interface IVideoServerService {
    * @return List of VideoServer
    */
   List<VideoServer> listAllVideoServers(
-      VideoServerFilter videoServerFilter, SecurityContextBase securityContext);
+      VideoServerFilter videoServerFilter, SecurityContext securityContext);
 
   /**
    * @param videoServerFilter Object Used to List Entity_1
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if videoServerFilter is not valid
    */
-  void validate(VideoServerFilter videoServerFilter, SecurityContextBase securityContext);
+  void validate(VideoServerFilter videoServerFilter, SecurityContext securityContext);
 
   /**
    * @param videoServerCreate Object Used to Create Entity_1
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if videoServerCreate is not valid
    */
-  void validate(VideoServerCreate videoServerCreate, SecurityContextBase securityContext);
+  void validate(VideoServerCreate videoServerCreate, SecurityContext securityContext);
 
   <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext);
+      Class<T> c, Set<String> ids, SecurityContext securityContext);
 
-  <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext);
+  <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext);
 
   <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext);
+      SecurityContext securityContext);
 
   <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext);
+      SecurityContext securityContext);
 
   <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute);

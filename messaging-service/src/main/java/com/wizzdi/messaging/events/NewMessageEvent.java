@@ -1,23 +1,23 @@
 package com.wizzdi.messaging.events;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.messaging.model.Message;
 
 public class NewMessageEvent {
 
 	private final Message message;
-	private final SecurityContextBase securityContextBase;
+	private final SecurityContext SecurityContext;
 
-	public NewMessageEvent(Message message,SecurityContextBase securityContextBase) {
+	public NewMessageEvent(Message message,SecurityContext SecurityContext) {
 		this.message = message;
-		this.securityContextBase=securityContextBase;
+		this.SecurityContext=SecurityContext;
 	}
 
 	public Message getMessage() {
 		return message;
 	}
 
-	public SecurityContextBase getSecurityContextBase() {
-		return securityContextBase;
+	public SecurityContext getSecurityContext() {
+		return SecurityContext;
 	}
 }

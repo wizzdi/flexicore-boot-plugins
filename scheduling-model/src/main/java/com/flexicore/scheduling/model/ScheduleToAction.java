@@ -1,6 +1,6 @@
 package com.flexicore.scheduling.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.OffsetDateTime;
 
 @Entity
-public class ScheduleToAction extends SecuredBasic {
+public class ScheduleToAction extends Baseclass {
 
   @ManyToOne(targetEntity = Schedule.class)
   private Schedule schedule;

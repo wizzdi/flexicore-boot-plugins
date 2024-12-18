@@ -3,7 +3,7 @@ package com.flexicore.ui.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.ConfigurationPresetRepository;
 import com.flexicore.ui.model.ConfigurationPreset;
 import com.flexicore.ui.request.ConfigurationPresetCreate;
@@ -39,7 +39,7 @@ public class ConfigurationPresetService implements Plugin {
     @Autowired
     private PresetService presetService;
 
-    public ConfigurationPreset updateConfigurationPreset(ConfigurationPresetUpdate updateConfigurationPreset, SecurityContextBase securityContext) {
+    public ConfigurationPreset updateConfigurationPreset(ConfigurationPresetUpdate updateConfigurationPreset, SecurityContext securityContext) {
         if (updateConfigurationPresetNoMerge(updateConfigurationPreset, updateConfigurationPreset.getConfigurationPreset())) {
             configurationPresetRepository.merge(updateConfigurationPreset.getConfigurationPreset());
         }
@@ -58,25 +58,25 @@ public class ConfigurationPresetService implements Plugin {
     }
 
 
-    public PaginationResponse<ConfigurationPreset> getAllConfigurationPresets(ConfigurationPresetFiltering configurationPresetFiltering, SecurityContextBase securityContext) {
+    public PaginationResponse<ConfigurationPreset> getAllConfigurationPresets(ConfigurationPresetFiltering configurationPresetFiltering, SecurityContext securityContext) {
         List<ConfigurationPreset> list = listAllConfigurationPresets(configurationPresetFiltering, securityContext);
         long count = configurationPresetRepository.countAllConfigurationPresets(configurationPresetFiltering, securityContext);
         return new PaginationResponse<>(list, configurationPresetFiltering,
                 count);
     }
 
-    public List<ConfigurationPreset> listAllConfigurationPresets(ConfigurationPresetFiltering configurationPresetFiltering, SecurityContextBase securityContext) {
+    public List<ConfigurationPreset> listAllConfigurationPresets(ConfigurationPresetFiltering configurationPresetFiltering, SecurityContext securityContext) {
         return configurationPresetRepository.listAllConfigurationPresets(configurationPresetFiltering, securityContext);
     }
 
-    public ConfigurationPreset createConfigurationPreset(ConfigurationPresetCreate createConfigurationPreset, SecurityContextBase securityContext) {
+    public ConfigurationPreset createConfigurationPreset(ConfigurationPresetCreate createConfigurationPreset, SecurityContext securityContext) {
         ConfigurationPreset configurationPreset = createConfigurationPresetNoMerge(createConfigurationPreset, securityContext);
         configurationPresetRepository.merge(configurationPreset);
         return configurationPreset;
 
     }
 
-    private ConfigurationPreset createConfigurationPresetNoMerge(ConfigurationPresetCreate createConfigurationPreset, SecurityContextBase securityContext) {
+    private ConfigurationPreset createConfigurationPresetNoMerge(ConfigurationPresetCreate createConfigurationPreset, SecurityContext securityContext) {
         ConfigurationPreset configurationPreset = new ConfigurationPreset();
         configurationPreset.setId(UUID.randomUUID().toString());
         updateConfigurationPresetNoMerge(createConfigurationPreset, configurationPreset);
@@ -84,24 +84,24 @@ public class ConfigurationPresetService implements Plugin {
         return configurationPreset;
     }
 
-    public void validate(ConfigurationPresetCreate createConfigurationPreset, SecurityContextBase securityContext) {
+    public void validate(ConfigurationPresetCreate createConfigurationPreset, SecurityContext securityContext) {
         presetService.validate(createConfigurationPreset, securityContext);
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return configurationPresetRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return configurationPresetRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return configurationPresetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return configurationPresetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

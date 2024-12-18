@@ -3,8 +3,8 @@ package com.flexicore.ui.tree.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.model.Preset_;
 import com.flexicore.ui.tree.data.TreeNodeRepository;
@@ -45,7 +45,7 @@ public class TreeNodeService implements Plugin {
     private BasicService basicService;
 
     
-    public TreeNode createTreeNode(TreeNodeCreate treeNodeCreate, SecurityContextBase securityContext) {
+    public TreeNode createTreeNode(TreeNodeCreate treeNodeCreate, SecurityContext securityContext) {
         TreeNode treeNode=new TreeNode();
         treeNode.setId(UUID.randomUUID().toString());
         updateTreeNodeNoMerge(treeNodeCreate,treeNode);
@@ -54,31 +54,31 @@ public class TreeNodeService implements Plugin {
         return treeNode;
     }
 
-    public void validate(TreeNodeCreate treeNodeCreate, SecurityContextBase securityContext) {
+    public void validate(TreeNodeCreate treeNodeCreate, SecurityContext securityContext) {
         basicService.validate(treeNodeCreate,securityContext);
         String parentId = treeNodeCreate.getParentId();
-        TreeNode parent= parentId !=null?getByIdOrNull(parentId,TreeNode.class, TreeNode_.security,securityContext):null;
+        TreeNode parent= parentId !=null?getByIdOrNull(parentId,TreeNode.class, securityContext):null;
         if(parent==null && parentId !=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree Node With id "+ parentId);
         }
         treeNodeCreate.setParent(parent);
 
         String dynamicExecutionId = treeNodeCreate.getDynamicExecutionId();
-        DynamicExecution dynamicExecution= dynamicExecutionId !=null?getByIdOrNull(dynamicExecutionId,DynamicExecution.class, SecuredBasic_.security,securityContext):null;
+        DynamicExecution dynamicExecution= dynamicExecutionId !=null?getByIdOrNull(dynamicExecutionId,DynamicExecution.class, securityContext):null;
         if(dynamicExecution==null&& dynamicExecutionId !=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Dynamic Execution with id "+ dynamicExecutionId);
         }
         treeNodeCreate.setDynamicExecution(dynamicExecution);
 
         String presenterId = treeNodeCreate.getPresenterId();
-        Preset presenter= presenterId !=null?getByIdOrNull(presenterId, Preset.class, Preset_.security,securityContext):null;
+        Preset presenter= presenterId !=null?getByIdOrNull(presenterId, Preset.class, securityContext):null;
         if(presenter==null && presenterId !=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Preset With id "+ presenterId);
         }
         treeNodeCreate.setPresenter(presenter);
 
         String iconId = treeNodeCreate.getIconId();
-        FileResource icon= iconId !=null?getByIdOrNull(iconId, FileResource.class, FileResource_.security,securityContext):null;
+        FileResource icon= iconId !=null?getByIdOrNull(iconId, FileResource.class, securityContext):null;
         if(icon==null && iconId !=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No FileResource With id "+ iconId);
         }
@@ -87,11 +87,11 @@ public class TreeNodeService implements Plugin {
 
     }
 
-    public void validate(TreeNodeFilter treeNodeFilter, SecurityContextBase securityContext) {
+    public void validate(TreeNodeFilter treeNodeFilter, SecurityContext securityContext) {
         basicService.validate(treeNodeFilter,securityContext);
         basicService.validate(treeNodeFilter.getBasicPropertiesFilter(),securityContext);
         Set<String> parentId = treeNodeFilter.getParentId();
-        Map<String,TreeNode> parent= parentId.isEmpty()?new HashMap<>():listByIds(TreeNode.class,parentId,TreeNode_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+        Map<String,TreeNode> parent= parentId.isEmpty()?new HashMap<>():listByIds(TreeNode.class,parentId,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
         parentId.removeAll(parent.keySet());
         if(!parentId.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree Nodes With ids "+ parentId);
@@ -162,7 +162,7 @@ public class TreeNodeService implements Plugin {
 
 
     
-    public PaginationResponse<TreeNode> getAllTreeNodes(TreeNodeFilter treeFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<TreeNode> getAllTreeNodes(TreeNodeFilter treeFilter, SecurityContext securityContext) {
         List<TreeNode> list= treeNodeRepository.getAllTreeNodes(treeFilter,securityContext);
         long count= treeNodeRepository.countAllTreeNodes(treeFilter,securityContext);
         return new PaginationResponse<>(list,treeFilter,count);
@@ -171,7 +171,7 @@ public class TreeNodeService implements Plugin {
 
 
     
-    public TreeNode updateTreeNode(TreeNodeUpdate treeNodeUpdate, SecurityContextBase securityContext) {
+    public TreeNode updateTreeNode(TreeNodeUpdate treeNodeUpdate, SecurityContext securityContext) {
         TreeNode treeNode = treeNodeUpdate.getTreeNode();
         if(updateTreeNodeNoMerge(treeNodeUpdate, treeNode)){
             treeNodeRepository.merge(treeNode);
@@ -179,19 +179,19 @@ public class TreeNodeService implements Plugin {
         return treeNode;
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return treeNodeRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return treeNodeRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeNodeRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return treeNodeRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

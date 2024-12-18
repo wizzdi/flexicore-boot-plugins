@@ -1,6 +1,6 @@
 package com.flexicore.ui.tree.app;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.model.TreeNode;
 import com.flexicore.ui.tree.request.TreeCreate;
 import com.flexicore.ui.tree.request.TreeNodeCreate;
@@ -22,7 +22,7 @@ public class TestEntities {
     private JsonConverterImplementationHolder jsonConverterImplementationHolder;
 
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired
     private TreeNodeService treeNodeService;
     @Autowired

@@ -3,8 +3,8 @@ package com.flexicore.ui.dashboard.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.data.CellContentElementRepository;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.model.CellContentElement;
@@ -43,7 +43,7 @@ public class CellContentElementService implements Plugin {
 	@Autowired
 	private BasicService baseclassNewService;
 
-	public CellContentElement updateCellContentElement(CellContentElementUpdate cellContentElementUpdate, SecurityContextBase securityContext) {
+	public CellContentElement updateCellContentElement(CellContentElementUpdate cellContentElementUpdate, SecurityContext securityContext) {
 		if (CellContentElementUpdateNoMerge(cellContentElementUpdate,
 				cellContentElementUpdate.getCellContentElement())) {
 			cellContentElementRepository.merge(cellContentElementUpdate.getCellContentElement());
@@ -74,13 +74,13 @@ public class CellContentElementService implements Plugin {
 
 	public List<CellContentElement> listAllCellContentElement(
 			CellContentElementFilter cellContentElementFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return cellContentElementRepository.listAllCellContentElement(cellContentElementFilter,
 				securityContext);
 	}
 
 	public CellContentElement createCellContentElement(CellContentElementCreate createCellContentElement,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		CellContentElement cellContentElement = createCellContentElementNoMerge(createCellContentElement,
 				securityContext);
 		cellContentElementRepository.merge(cellContentElement);
@@ -89,7 +89,7 @@ public class CellContentElementService implements Plugin {
 	}
 
 	public CellContentElement createCellContentElementNoMerge(
-			CellContentElementCreate createCellContentElement, SecurityContextBase securityContext) {
+			CellContentElementCreate createCellContentElement, SecurityContext securityContext) {
 		CellContentElement cellContentElement = new CellContentElement();
 		cellContentElement.setId(UUID.randomUUID().toString());
 		CellContentElementUpdateNoMerge(createCellContentElement, cellContentElement);
@@ -99,7 +99,7 @@ public class CellContentElementService implements Plugin {
 
 	public PaginationResponse<CellContentElement> getAllCellContentElement(
 			CellContentElementFilter cellContentElementFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<CellContentElement> list = listAllCellContentElement(cellContentElementFilter,
 				securityContext);
 		long count = cellContentElementRepository.countAllCellContentElement(
@@ -108,10 +108,10 @@ public class CellContentElementService implements Plugin {
 	}
 
 	public void validate(CellContentElementCreate createCellContentElement,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createCellContentElement, securityContext);
 		String cellContentId=createCellContentElement.getCellContentId();
-		CellContent cellContent=cellContentId!=null?getByIdOrNull(cellContentId, CellContent.class,SecuredBasic_.security,securityContext):null;
+		CellContent cellContent=cellContentId!=null?getByIdOrNull(cellContentId, CellContent.class,securityContext):null;
 		if(cellContent==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContent with id "+cellContentId);
 		}
@@ -120,11 +120,11 @@ public class CellContentElementService implements Plugin {
 	}
 
 	public void validate(CellContentElementFilter cellContentElementFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		baseclassNewService.validate(cellContentElementFilter, securityContext);
 
 		Set<String> cellContentIds= cellContentElementFilter.getCellContentIds();
-		Map<String,CellContent> cellContentMap=cellContentIds.isEmpty()?new HashMap<>():cellContentElementRepository.listByIds(CellContent.class,cellContentIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String,CellContent> cellContentMap=cellContentIds.isEmpty()?new HashMap<>():cellContentElementRepository.listByIds(CellContent.class,cellContentIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		cellContentIds.removeAll(cellContentMap.keySet());
 		if(!cellContentIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No CellContent with ids "+cellContentIds);
@@ -134,19 +134,19 @@ public class CellContentElementService implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return cellContentElementRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return cellContentElementRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellContentElementRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellContentElementRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.Gateway_;
 import com.wizzdi.basic.iot.model.Remote;
@@ -35,7 +35,7 @@ public class GatewayRepository implements Plugin {
     @Autowired
     private RemoteRepository remoteRepository;
 
-    public List<Gateway> getAllGateways(SecurityContextBase securityContext,
+    public List<Gateway> getAllGateways(SecurityContext securityContext,
                                            GatewayFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Gateway> q = cb.createQuery(Gateway.class);
@@ -48,7 +48,7 @@ public class GatewayRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllGateways(SecurityContextBase securityContext,
+    public long countAllGateways(SecurityContext securityContext,
                                    GatewayFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -61,26 +61,26 @@ public class GatewayRepository implements Plugin {
     }
 
     public <T extends Gateway> void addGatewayPredicates(GatewayFilter filtering,
-                                                           CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         remoteRepository.addRemotePredicates(filtering,cb,q,r,preds,securityContext);
 
 
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return remoteRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return remoteRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return remoteRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return remoteRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

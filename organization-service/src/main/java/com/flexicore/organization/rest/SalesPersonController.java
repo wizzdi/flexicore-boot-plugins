@@ -12,7 +12,7 @@ import com.flexicore.organization.request.SalesPersonCreate;
 import com.flexicore.organization.request.SalesPersonFiltering;
 import com.flexicore.organization.request.SalesPersonUpdate;
 import com.flexicore.organization.service.SalesPersonService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -42,7 +42,7 @@ public class SalesPersonController implements Plugin {
 	public PaginationResponse<SalesPerson> getAllSalesPeople(
 
 			@RequestBody SalesPersonFiltering filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllSalesPeople(securityContext, filtering);
 	}
@@ -54,7 +54,7 @@ public class SalesPersonController implements Plugin {
 	public SalesPerson createSalesPerson(
 
 			@RequestBody SalesPersonCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		return service.createSalesPerson(creationContainer, securityContext);
 	}
@@ -66,9 +66,9 @@ public class SalesPersonController implements Plugin {
 	public SalesPerson updateSalesPerson(
 
 			@RequestBody SalesPersonUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		SalesPerson salesPerson = service.getByIdOrNull(
-				updateContainer.getId(), SalesPerson.class, SalesPerson_.security,
+				updateContainer.getId(), SalesPerson.class, 
 				securityContext);
 		if (salesPerson == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no SalesPerson with id "

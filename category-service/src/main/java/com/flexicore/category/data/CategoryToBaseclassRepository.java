@@ -12,7 +12,7 @@ import com.flexicore.category.request.CategoryToBaseclassFilter;
 import com.flexicore.model.Baseclass;
 
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -54,7 +54,7 @@ public class CategoryToBaseclassRepository implements Plugin {
 		return query.executeUpdate()> 0;
 	}
 
-	public List<CategoryToBaseClass> listAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContextBase securityContext) {
+	public List<CategoryToBaseClass> listAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<CategoryToBaseClass> q = cb.createQuery(CategoryToBaseClass.class);
 		Root<CategoryToBaseClass> r = q.from(CategoryToBaseClass.class);
@@ -68,12 +68,12 @@ public class CategoryToBaseclassRepository implements Plugin {
 	}
 
 	public <T extends CategoryToBaseClass> void addCategoryToBaseclassPredicates(CategoryToBaseclassFilter categoryToBaseclassFilter, From<?,T> r,
-																				 CommonAbstractCriteria q, CriteriaBuilder cb, List<Predicate> preds, SecurityContextBase securityContext) {
+																				 CommonAbstractCriteria q, CriteriaBuilder cb, List<Predicate> preds, SecurityContext securityContext) {
 		securedBasicRepository.addSecuredBasicPredicates(null,cb,q,r,preds,securityContext);
 
 	}
 
-	public long countAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContextBase securityContext) {
+	public long countAllCategoryToBaseclass(CategoryToBaseclassFilter categoryToBaseclassFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<CategoryToBaseClass> r = q.from(CategoryToBaseClass.class);
@@ -84,19 +84,19 @@ public class CategoryToBaseclassRepository implements Plugin {
 		return query.getSingleResult();
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

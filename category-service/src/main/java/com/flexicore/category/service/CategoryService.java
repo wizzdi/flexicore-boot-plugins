@@ -15,7 +15,7 @@ import com.flexicore.category.request.CategoryUpdate;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -52,7 +52,7 @@ public class CategoryService implements Plugin {
     }
 
 
-    public PaginationResponse<Category> getAllCategories(CategoryFilter categoryFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<Category> getAllCategories(CategoryFilter categoryFilter, SecurityContext securityContext) {
 
         List<Category> list = categoryRepository.listAllCategories(categoryFilter, securityContext);
         long count = categoryRepository.countAllCategories(categoryFilter, securityContext);
@@ -60,12 +60,12 @@ public class CategoryService implements Plugin {
     }
 
 
-    public List<Category> listAllCategories(CategoryFilter categoryFilter, SecurityContextBase securityContext) {
+    public List<Category> listAllCategories(CategoryFilter categoryFilter, SecurityContext securityContext) {
         return categoryRepository.listAllCategories(categoryFilter, securityContext);
     }
 
 
-    public Category createCategoryNoMerge(CategoryCreate categoryCreate, SecurityContextBase securityContext) {
+    public Category createCategoryNoMerge(CategoryCreate categoryCreate, SecurityContext securityContext) {
         Category category = new Category();
         category.setId(UUID.randomUUID().toString());
         updateCategoryNoMerge(categoryCreate, category);
@@ -74,14 +74,14 @@ public class CategoryService implements Plugin {
     }
 
 
-    public Category createCategory(CategoryCreate categoryCreate, SecurityContextBase securityContext) {
+    public Category createCategory(CategoryCreate categoryCreate, SecurityContext securityContext) {
         Category category = createCategoryNoMerge(categoryCreate, securityContext);
         categoryRepository.merge(category);
         return category;
     }
 
 
-    public Category updateCategory(CategoryUpdate categoryUpdate, SecurityContextBase securityContext) {
+    public Category updateCategory(CategoryUpdate categoryUpdate, SecurityContext securityContext) {
         Category category = categoryUpdate.getCategory();
         if (updateCategoryNoMerge(categoryUpdate, category)) {
             categoryRepository.merge(category);
@@ -95,28 +95,28 @@ public class CategoryService implements Plugin {
     }
 
 
-    public void validate(CategoryCreate categoryCreate, SecurityContextBase securityContext) {
+    public void validate(CategoryCreate categoryCreate, SecurityContext securityContext) {
         basicService.validate(categoryCreate, securityContext);
     }
 
-    public void validate(CategoryFilter filtering, SecurityContextBase securityContext) {
+    public void validate(CategoryFilter filtering, SecurityContext securityContext) {
 
         basicService.validate(filtering, securityContext);
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return categoryRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return categoryRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return categoryRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return categoryRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

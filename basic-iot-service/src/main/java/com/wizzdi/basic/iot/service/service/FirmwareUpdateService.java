@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.FirmwareUpdate;
 import com.wizzdi.basic.iot.service.data.FirmwareUpdateRepository;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateCreate;
@@ -40,19 +40,19 @@ public class FirmwareUpdateService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -79,25 +79,25 @@ public class FirmwareUpdateService implements Plugin {
     }
 
     public PaginationResponse<FirmwareUpdate> getAllFirmwareUpdates(
-            SecurityContextBase securityContext, FirmwareUpdateFilter filtering) {
+            SecurityContext securityContext, FirmwareUpdateFilter filtering) {
         List<FirmwareUpdate> list = listAllFirmwareUpdates(securityContext, filtering);
         long count = repository.countAllFirmwareUpdates(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<FirmwareUpdate> listAllFirmwareUpdates(SecurityContextBase securityContext, FirmwareUpdateFilter firmwareUpdateFilter) {
+    public List<FirmwareUpdate> listAllFirmwareUpdates(SecurityContext securityContext, FirmwareUpdateFilter firmwareUpdateFilter) {
         return repository.getAllFirmwareUpdates(securityContext, firmwareUpdateFilter);
     }
 
     public FirmwareUpdate createFirmwareUpdate(FirmwareUpdateCreate creationContainer,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         FirmwareUpdate firmwareUpdate = createFirmwareUpdateNoMerge(creationContainer, securityContext);
         repository.merge(firmwareUpdate);
         return firmwareUpdate;
     }
 
     public FirmwareUpdate createFirmwareUpdateNoMerge(FirmwareUpdateCreate creationContainer,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         FirmwareUpdate firmwareUpdate = new FirmwareUpdate();
         firmwareUpdate.setId(UUID.randomUUID().toString());
 
@@ -138,7 +138,7 @@ public class FirmwareUpdateService implements Plugin {
     }
 
     public FirmwareUpdate updateFirmwareUpdate(FirmwareUpdateUpdate firmwareUpdateUpdate,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         FirmwareUpdate firmwareUpdate = firmwareUpdateUpdate.getFirmwareUpdate();
         if (updateFirmwareUpdateNoMerge(firmwareUpdate, firmwareUpdateUpdate)) {
             repository.merge(firmwareUpdate);

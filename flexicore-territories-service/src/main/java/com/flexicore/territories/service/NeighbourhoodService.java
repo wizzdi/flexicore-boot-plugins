@@ -5,7 +5,7 @@ import com.flexicore.model.Basic;
 import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.City_;
 import com.flexicore.model.territories.Neighbourhood;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.NeighbourhoodRepository;
 import com.flexicore.territories.request.NeighbourhoodCreate;
 import com.flexicore.territories.request.NeighbourhoodFilter;
@@ -36,13 +36,18 @@ public class NeighbourhoodService implements Plugin {
 	@Autowired
 	private BasicService basicService;
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
 	}
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
+	}
+
 
 	public Neighbourhood updateNeighbourhood(
 			NeighbourhoodUpdate updateContainer,
-			SecurityContextBase securityContextBase) {
+			SecurityContext SecurityContext) {
 		Neighbourhood neighbourhood = updateContainer.getNeighbourhood();
 		if (updateNeighbourhoodNoMerge(neighbourhood, updateContainer)) {
 			repository.merge(neighbourhood);
@@ -50,9 +55,9 @@ public class NeighbourhoodService implements Plugin {
 		}
 		return neighbourhood;
 	}
-	public void validate(NeighbourhoodFilter neighbourhoodFiltering, SecurityContextBase securityContextBase) {
+	public void validate(NeighbourhoodFilter neighbourhoodFiltering, SecurityContext SecurityContext) {
 		Set<String> citiesIds = neighbourhoodFiltering.getCitiesIds();
-		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds, City_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Map<String,City> cityMap = citiesIds.isEmpty()?new HashMap<>():repository.listByIds(City.class,citiesIds, SecurityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		citiesIds.removeAll(cityMap.keySet());
 		if(!citiesIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Cities with ids "+citiesIds);
@@ -61,11 +66,11 @@ public class NeighbourhoodService implements Plugin {
 	}
 
 		
-	public void validate(NeighbourhoodCreate neighbourhoodCreationContainer, SecurityContextBase securityContextBase) {
+	public void validate(NeighbourhoodCreate neighbourhoodCreationContainer, SecurityContext SecurityContext) {
 		basicService.validate(neighbourhoodCreationContainer,
-				securityContextBase);
+				SecurityContext);
 		String cityId = neighbourhoodCreationContainer.getCityId();
-		City city = cityId!=null?getByIdOrNull(cityId, City.class, City_.security, securityContextBase):null;
+		City city = cityId!=null?getByIdOrNull(cityId, City.class,SecurityContext):null;
 		if (city == null&&cityId!=null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no City with id " + cityId);
 		}
@@ -91,23 +96,23 @@ public class NeighbourhoodService implements Plugin {
 
 
 	public List<Neighbourhood> listAllNeighbourhoods(
-			SecurityContextBase securityContextBase, NeighbourhoodFilter filtering) {
-		return repository.getAllNeighbourhoods(securityContextBase,filtering);
+			SecurityContext SecurityContext, NeighbourhoodFilter filtering) {
+		return repository.getAllNeighbourhoods(SecurityContext,filtering);
 	}
 
 	
 	public PaginationResponse<Neighbourhood> getAllNeighbourhoods(
-			SecurityContextBase securityContextBase, NeighbourhoodFilter filtering) {
-		List<Neighbourhood> list = listAllNeighbourhoods(securityContextBase,filtering);
-		long count=repository.countAllNeighbourhoods(securityContextBase,filtering);
+			SecurityContext SecurityContext, NeighbourhoodFilter filtering) {
+		List<Neighbourhood> list = listAllNeighbourhoods(SecurityContext,filtering);
+		long count=repository.countAllNeighbourhoods(SecurityContext,filtering);
 		return new PaginationResponse<>(list,filtering,count);
 	}
 
 	
 	public Neighbourhood createNeighbourhood(
 			NeighbourhoodCreate creationContainer,
-			SecurityContextBase securityContextBase) {
-		Neighbourhood neighbourhood = createNeighbourhoodNoMerge(creationContainer, securityContextBase);
+			SecurityContext SecurityContext) {
+		Neighbourhood neighbourhood = createNeighbourhoodNoMerge(creationContainer, SecurityContext);
 		repository.merge(neighbourhood);
 		return neighbourhood;
 	}
@@ -115,10 +120,10 @@ public class NeighbourhoodService implements Plugin {
 	
 	public Neighbourhood createNeighbourhoodNoMerge(
 			NeighbourhoodCreate creationContainer,
-			SecurityContextBase securityContextBase) {
+			SecurityContext SecurityContext) {
 
-		Neighbourhood neighbourhood = new Neighbourhood().setId(Baseclass.getBase64ID());
-		BaseclassService.createSecurityObjectNoMerge(neighbourhood,securityContextBase);
+		Neighbourhood neighbourhood = new Neighbourhood().setId(UUID.randomUUID().toString());
+		BaseclassService.createSecurityObjectNoMerge(neighbourhood,SecurityContext);
 		updateNeighbourhoodNoMerge(neighbourhood, creationContainer);
 		return neighbourhood;
 	}

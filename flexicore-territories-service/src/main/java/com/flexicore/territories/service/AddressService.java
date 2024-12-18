@@ -3,7 +3,7 @@ package com.flexicore.territories.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.AddressRepository;
 import com.flexicore.territories.reponse.AddressImportResponse;
 import com.flexicore.territories.request.*;
@@ -64,16 +64,18 @@ public class AddressService implements Plugin {
 
 
 
-	public <T extends Address> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, Address_.security, securityContext);
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
+
 
 	public Address updateAddress(AddressUpdate updateContainer,
-								 com.flexicore.security.SecurityContextBase securityContextBase) {
+								 SecurityContext SecurityContext) {
 		Address address = updateContainer.getAddress();
 		if (updateAddressNoMerge(address, updateContainer)) {
 			repository.merge(address);
@@ -83,9 +85,9 @@ public class AddressService implements Plugin {
 	}
 
 	public void validate(AddressFilter addressFiltering,
-						 SecurityContextBase securityContextBase) {
+						 SecurityContext SecurityContext) {
 		Set<String> streetIds = addressFiltering.getStreetsIds();
-		Map<String, Street> streetMap = streetIds.isEmpty() ? new HashMap<>() : repository.listByIds(Street.class, streetIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, Street> streetMap = streetIds.isEmpty() ? new HashMap<>() : repository.listByIds(Street.class, streetIds,SecurityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		streetIds.removeAll(streetMap.keySet());
 		if (!streetIds.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Street with ids " + streetIds);
@@ -93,7 +95,7 @@ public class AddressService implements Plugin {
 		addressFiltering.setStreets(new ArrayList<>(streetMap.values()));
 
 		Set<String> neighbourhoodIds = addressFiltering.getNeighbourhoodIds();
-		Map<String, Neighbourhood> neighbourhoodMap = neighbourhoodIds.isEmpty() ? new HashMap<>() : repository.listByIds(Neighbourhood.class, neighbourhoodIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, Neighbourhood> neighbourhoodMap = neighbourhoodIds.isEmpty() ? new HashMap<>() : repository.listByIds(Neighbourhood.class, neighbourhoodIds,SecurityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		neighbourhoodIds.removeAll(neighbourhoodMap.keySet());
 		if (!neighbourhoodIds.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Neighbourhoods with ids " + neighbourhoodIds);
@@ -102,7 +104,7 @@ public class AddressService implements Plugin {
 
 
 		Set<String> stateIds = addressFiltering.getStateIds();
-		Map<String, State> stateMap = stateIds.isEmpty() ? new HashMap<>() : repository.listByIds(State.class, stateIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, State> stateMap = stateIds.isEmpty() ? new HashMap<>() : repository.listByIds(State.class, stateIds,SecurityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		stateIds.removeAll(stateMap.keySet());
 		if (!stateIds.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No States with ids " + stateIds);
@@ -110,7 +112,7 @@ public class AddressService implements Plugin {
 		addressFiltering.setStates(new ArrayList<>(stateMap.values()));
 
 		Set<String> countryIds = addressFiltering.getCountryIds();
-		Map<String, Country> countryMap = countryIds.isEmpty() ? new HashMap<>() : repository.listByIds(Country.class, countryIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, Country> countryMap = countryIds.isEmpty() ? new HashMap<>() : repository.listByIds(Country.class, countryIds,SecurityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		countryIds.removeAll(countryMap.keySet());
 		if (!countryIds.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Countries with ids " + countryIds);
@@ -118,7 +120,7 @@ public class AddressService implements Plugin {
 		addressFiltering.setCountries(new ArrayList<>(countryMap.values()));
 
 		Set<String> citiesIds = addressFiltering.getCitiesIds();
-		Map<String, City> cityMap = citiesIds.isEmpty() ? new HashMap<>() : repository.listByIds(City.class, citiesIds, Street_.security, securityContextBase).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, City> cityMap = citiesIds.isEmpty() ? new HashMap<>() : repository.listByIds(City.class, citiesIds,SecurityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		citiesIds.removeAll(cityMap.keySet());
 		if (!citiesIds.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Cities with ids " + citiesIds);
@@ -129,11 +131,11 @@ public class AddressService implements Plugin {
 	}
 
 	public void validate(AddressCreate addressCreationContainer,
-						 SecurityContextBase securityContextBase) {
-		basicService.validate(addressCreationContainer, securityContextBase);
+						 SecurityContext SecurityContext) {
+		basicService.validate(addressCreationContainer, SecurityContext);
 		String streetId = addressCreationContainer.getStreetId();
 		Street street = streetId != null ? getByIdOrNull(streetId,
-				Street.class, Street_.security, securityContextBase) : null;
+				Street.class,  SecurityContext) : null;
 		if (street == null && streetId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Street with id " + streetId);
 		}
@@ -141,7 +143,7 @@ public class AddressService implements Plugin {
 
 		String neighbourhoodId = addressCreationContainer.getNeighbourhoodId();
 		Neighbourhood neighbourhood = neighbourhoodId != null ? getByIdOrNull(neighbourhoodId,
-				Neighbourhood.class, Neighbourhood_.security, securityContextBase) : null;
+				Neighbourhood.class,  SecurityContext) : null;
 		if (neighbourhood == null && neighbourhoodId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Neighbourhood with id " + neighbourhoodId);
 		}
@@ -186,23 +188,23 @@ public class AddressService implements Plugin {
 
 
 	public PaginationResponse<Address> getAllAddresses(
-			SecurityContextBase securityContextBase, AddressFilter filtering) {
-		List<Address> list = listAllAddresses(securityContextBase, filtering);
-		long count = repository.countAllAddresses(securityContextBase, filtering);
+			SecurityContext SecurityContext, AddressFilter filtering) {
+		List<Address> list = listAllAddresses(SecurityContext, filtering);
+		long count = repository.countAllAddresses(SecurityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 
-	public List<Address> listAllAddresses(SecurityContextBase securityContextBase,
+	public List<Address> listAllAddresses(SecurityContext SecurityContext,
 										 AddressFilter filtering) {
-		return repository.getAllAddresses(securityContextBase, filtering);
+		return repository.getAllAddresses(SecurityContext, filtering);
 
 	}
 
 
 	public Address createAddress(AddressCreate creationContainer,
-								 SecurityContextBase securityContextBase) {
-		Address address = createAddressNoMerge(creationContainer, securityContextBase);
+								 SecurityContext SecurityContext) {
+		Address address = createAddressNoMerge(creationContainer, SecurityContext);
 		repository.merge(address);
 		return address;
 	}
@@ -210,16 +212,16 @@ public class AddressService implements Plugin {
 
 	public Address createAddressNoMerge(
 			AddressCreate creationContainer,
-			SecurityContextBase securityContextBase) {
+			SecurityContext SecurityContext) {
 
-		Address address = new Address().setId(Baseclass.getBase64ID());
-		BaseclassService.createSecurityObjectNoMerge(address,securityContextBase);
+		Address address = new Address().setId(UUID.randomUUID().toString());
+		BaseclassService.createSecurityObjectNoMerge(address,SecurityContext);
 		updateAddressNoMerge(address, creationContainer);
 		return address;
 	}
 
 	public AddressImportResponse importAddresses(
-			SecurityContextBase securityContextBase,
+			SecurityContext SecurityContext,
 			AddressImportRequest addressImportRequest) {
 		AddressImportResponse addressImportResponse = new AddressImportResponse();
 		String url = addressImportRequest.getUrl();
@@ -235,12 +237,12 @@ public class AddressService implements Plugin {
 			CountryFilter countryFiltering = new CountryFilter();
 			countryFiltering.setBasicPropertiesFilter(new BasicPropertiesFilter().setNameLike("%Israel%"));
 
-			Country israel = countryService.listAllCountries(securityContextBase, countryFiltering).parallelStream().findFirst().orElse(null);
+			Country israel = countryService.listAllCountries(SecurityContext, countryFiltering).parallelStream().findFirst().orElse(null);
 			if (israel == null) {
-				israel = countryService.createCountry(new CountryCreate().setName("Israel"), securityContextBase);
+				israel = countryService.createCountry(new CountryCreate().setName("Israel"), SecurityContext);
 			}
-			Map<String, City> existingCities = cityService.listAllCities(securityContextBase, new CityFilter()).parallelStream().filter(f -> f.getExternalId() != null).collect(Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a));
-			Map<String, Map<String, Street>> existingStreets = streetService.listAllStreets(securityContextBase, new StreetFilter()).parallelStream().filter(f -> f.getExternalId() != null && f.getCity() != null && f.getCity().getExternalId() != null).collect(Collectors.groupingBy(f -> f.getCity().getExternalId(), Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a)));
+			Map<String, City> existingCities = cityService.listAllCities(SecurityContext, new CityFilter()).parallelStream().filter(f -> f.getExternalId() != null).collect(Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a));
+			Map<String, Map<String, Street>> existingStreets = streetService.listAllStreets(SecurityContext, new StreetFilter()).parallelStream().filter(f -> f.getExternalId() != null && f.getCity() != null && f.getCity().getExternalId() != null).collect(Collectors.groupingBy(f -> f.getCity().getExternalId(), Collectors.toMap(f -> f.getExternalId(), f -> f, (a, b) -> a)));
 			List<Object> toMerge = new ArrayList<>();
 
 			for (StreetEntry streetEntry : data) {
@@ -248,7 +250,7 @@ public class AddressService implements Plugin {
 				City city = existingCities.get(cityId);
 				CityCreate cityCreationContainer = new CityCreate().setExternalId(cityId).setCountry(israel).setName(streetEntry.getCityName());
 				if (city == null) {
-					city = cityService.createCityNoMerge(cityCreationContainer, securityContextBase);
+					city = cityService.createCityNoMerge(cityCreationContainer, SecurityContext);
 					toMerge.add(city);
 					existingCities.put(cityId, city);
 					addressImportResponse.setCreatedCities(addressImportResponse.getCreatedCities() + 1);
@@ -266,7 +268,7 @@ public class AddressService implements Plugin {
 				Street street = existingStreets.computeIfAbsent(cityId, f -> new HashMap<>()).get(streetId);
 				StreetCreate streetCreationContainer = new StreetCreate().setExternalId(streetId).setCity(city).setName(streetEntry.getStreetName());
 				if (street == null) {
-					street = streetService.createStreetNoMerge(streetCreationContainer, securityContextBase);
+					street = streetService.createStreetNoMerge(streetCreationContainer, SecurityContext);
 					toMerge.add(street);
 					existingStreets.computeIfAbsent(cityId, f -> new HashMap<>()).put(streetId, street);
 					addressImportResponse.setCreatedStreet(addressImportResponse.getCreatedStreet() + 1);

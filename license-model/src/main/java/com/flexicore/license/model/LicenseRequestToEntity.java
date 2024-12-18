@@ -7,7 +7,7 @@
 package com.flexicore.license.model;
 
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 
 @Entity
 
-public class LicenseRequestToEntity extends SecuredBasic {
+public class LicenseRequestToEntity extends Baseclass {
 
 
 	public LicenseRequestToEntity() {

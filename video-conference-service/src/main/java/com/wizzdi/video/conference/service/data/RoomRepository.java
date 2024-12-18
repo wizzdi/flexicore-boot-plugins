@@ -3,7 +3,7 @@ package com.wizzdi.video.conference.service.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -37,7 +37,7 @@ public class RoomRepository implements Plugin, IRoomRepository {
    * @return List of Room
    */
   @Override
-  public List<Room> listAllRooms(RoomFilter filtering, SecurityContextBase securityContext) {
+  public List<Room> listAllRooms(RoomFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Room> q = cb.createQuery(Room.class);
     Root<Room> r = q.from(Room.class);
@@ -56,7 +56,7 @@ public class RoomRepository implements Plugin, IRoomRepository {
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
         filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -76,7 +76,7 @@ public class RoomRepository implements Plugin, IRoomRepository {
    * @return count of Room
    */
   @Override
-  public Long countAllRooms(RoomFilter filtering, SecurityContextBase securityContext) {
+  public Long countAllRooms(RoomFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<Room> r = q.from(Room.class);
@@ -89,13 +89,13 @@ public class RoomRepository implements Plugin, IRoomRepository {
 
   @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -104,7 +104,7 @@ public class RoomRepository implements Plugin, IRoomRepository {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -113,7 +113,7 @@ public class RoomRepository implements Plugin, IRoomRepository {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

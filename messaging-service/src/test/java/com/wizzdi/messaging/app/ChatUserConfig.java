@@ -1,7 +1,7 @@
 package com.wizzdi.messaging.app;
 
 import com.flexicore.model.SecurityUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.messaging.interfaces.ChatUserProvider;
 import com.wizzdi.messaging.model.ChatUser;
 import org.springframework.context.annotation.Bean;
@@ -14,9 +14,9 @@ public class ChatUserConfig {
 	public ChatUserProvider<SecurityUser> chatUserProvider(){
 		return new ChatUserProvider<>() {
 			@Override
-			public ChatUser getChatUser(SecurityContextBase securityContextBase) {
-				if (securityContextBase instanceof ChatUserSecurityContext) {
-					return ((ChatUserSecurityContext) securityContextBase).getChatUser();
+			public ChatUser getChatUser(SecurityContext SecurityContext) {
+				if (SecurityContext instanceof ChatUserSecurityContext) {
+					return ((ChatUserSecurityContext) SecurityContext).getChatUser();
 				}
 				return null;
 			}

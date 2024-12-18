@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.dynamic.invoker.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -35,7 +35,7 @@ public class DynamicInvokerEmailController implements Plugin, Invoker {
     @Operation(summary = "sendEmail", description = "Sends MappedPOI Status History email")
     public SendDynamicEmailResponse sendEmail(
             @Valid @RequestBody SendDynamicInvokerRequest sendDynamicInvokerRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         dynamicInvokerExportService.validateExportDynamicInvoker(sendDynamicInvokerRequest.getExportDynamicInvoker(),securityContext);
 
         return dynamicInvokerEmailService.sendEmail(sendDynamicInvokerRequest, securityContext);
@@ -45,7 +45,7 @@ public class DynamicInvokerEmailController implements Plugin, Invoker {
     @Operation(summary = "sendEmailPlain", description = "Sends email plain")
     public SendDynamicEmailResponse sendEmailPlain(
             @Valid @RequestBody SendEmailPlainRequest sendDynamicInvokerRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return dynamicInvokerEmailService.sendEmailPlain(sendDynamicInvokerRequest, securityContext);
     }

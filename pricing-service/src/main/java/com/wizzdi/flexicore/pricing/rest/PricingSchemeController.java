@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 
 import com.wizzdi.flexicore.pricing.model.price.PricingScheme;
@@ -40,7 +40,7 @@ public class PricingSchemeController implements Plugin {
     public PaginationResponse<PricingScheme> getAllPricingSchemes(
 
             
-            @RequestBody PricingSchemeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PricingSchemeFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPricingSchemes(securityContext, filtering);
     }
@@ -53,7 +53,7 @@ public class PricingSchemeController implements Plugin {
 
             
             @RequestBody PricingSchemeCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPricingScheme(creationContainer, securityContext);
@@ -67,10 +67,10 @@ public class PricingSchemeController implements Plugin {
 
             
             @RequestBody PricingSchemeUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PricingScheme pricingScheme = service.getByIdOrNull(updateContainer.getId(),
-                PricingScheme.class, PricingScheme_.security, securityContext);
+                PricingScheme.class,  securityContext);
         if (pricingScheme == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PricingScheme with id "
                     + updateContainer.getId());

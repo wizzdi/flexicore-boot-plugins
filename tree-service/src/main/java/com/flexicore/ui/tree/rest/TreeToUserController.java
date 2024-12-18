@@ -7,7 +7,7 @@
 package com.flexicore.ui.tree.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.request.SaveTreeNodeStatusRequest;
 import com.flexicore.ui.tree.request.TreeNodeStatusRequest;
 import com.flexicore.ui.tree.response.SaveTreeNodeStatusResponse;
@@ -44,7 +44,7 @@ public class TreeToUserController implements Plugin {
 	public SaveTreeNodeStatusResponse saveTreeNodeStatus(
 			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Stores  a list of NodeID,boolean pairs") SaveTreeNodeStatusRequest saveTreeNodeStatusRequest,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(saveTreeNodeStatusRequest,securityContext);
 
 		return service.saveTreeNodeStatus(saveTreeNodeStatusRequest, securityContext);
@@ -59,7 +59,7 @@ public class TreeToUserController implements Plugin {
 	public TreeNodeStatusResponse getTreeNodeStatus(
 			@org.springframework.web.bind.annotation.RequestBody
 			TreeNodeStatusRequest treeNodeStatusRequest,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(treeNodeStatusRequest,securityContext);
 
 		return service.getTreeNodeStatus(treeNodeStatusRequest, securityContext);

@@ -1,11 +1,11 @@
 package com.flexicore.rules.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class ScenarioToAction extends SecuredBasic {
+public class ScenarioToAction extends Baseclass {
 
   private boolean enabled;
 

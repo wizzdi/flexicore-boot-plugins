@@ -7,12 +7,12 @@
 package com.flexicore.ui.component.model;
 
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class UIComponent extends SecuredBasic {
+public class UIComponent extends Baseclass {
 
 
 

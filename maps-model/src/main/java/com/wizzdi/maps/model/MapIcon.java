@@ -1,7 +1,7 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecurityTenant;
 import com.wizzdi.flexicore.file.model.FileResource;
 
@@ -12,7 +12,7 @@ import java.util.List;
 @Table(indexes = {
         @Index(name = "mapicon_idx",columnList = "externalId,relatedType")
 })
-public class MapIcon extends SecuredBasic {
+public class MapIcon extends Baseclass {
 
   @OneToMany(targetEntity = MappedPOI.class, mappedBy = "mapIcon")
   @JsonIgnore
@@ -108,7 +108,7 @@ public class MapIcon extends SecuredBasic {
 
   @Transient
   public SecurityTenant getRelatedTenant(){
-    return getSecurity()!=null?getSecurity().getTenant():null;
+    return getTenant();
   }
 
   @Override

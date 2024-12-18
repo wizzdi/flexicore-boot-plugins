@@ -1,6 +1,6 @@
 package com.wizzdi.flexicore.billing.model.payment;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.organization.model.Customer;
 
 
@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class PaymentMethod extends SecuredBasic {
+public class PaymentMethod extends Baseclass {
 
     @ManyToOne(targetEntity = Customer.class)
     private Customer customer;

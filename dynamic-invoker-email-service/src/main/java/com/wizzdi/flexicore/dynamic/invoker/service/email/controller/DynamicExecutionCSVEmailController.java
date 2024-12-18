@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.dynamic.invoker.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
@@ -33,7 +33,7 @@ public class DynamicExecutionCSVEmailController implements Plugin, Invoker {
     @Operation(summary = "sendEmail", description = "Sends CSV email")
     public SendDynamicEmailResponse sendEmail(
             @Valid @RequestBody SendDynamicExecutionRequest sendDynamicExecutionRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         dynamicInvokerExportService.validateExportDynamicExecution(sendDynamicExecutionRequest.getExportDynamicExecution(), securityContext);
         return invokerCSVEmailService.sendEmail(sendDynamicExecutionRequest,securityContext);
     }

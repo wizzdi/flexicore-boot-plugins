@@ -5,7 +5,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.Country;
 import com.flexicore.model.territories.Country_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.CountryRepository;
 import com.flexicore.territories.reponse.ImportCountriesResponse;
 import com.flexicore.territories.reponse.ImportedCountry;
@@ -32,6 +32,8 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @PluginInfo(version = 1)
@@ -55,41 +57,48 @@ public class CountryService implements Plugin {
 	private ObjectMapper territoriesObjectMapper;
 
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public void deleteCountry(String countryid, SecurityContextBase securityContextBase) {
-		Country country = getByIdOrNull(countryid, Country.class, Country_.security, securityContextBase);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
+	}
+
+
+
+
+	public void deleteCountry(String countryid, SecurityContext SecurityContext) {
+		Country country = getByIdOrNull(countryid, Country.class,  SecurityContext);
 		repository.remove(country);
 	}
 
 
-	public List<Country> listAllCountries(SecurityContextBase securityContextBase,
+	public List<Country> listAllCountries(SecurityContext SecurityContext,
 										  CountryFilter filtering) {
 
-		return repository.listAllCountries(securityContextBase, filtering);
+		return repository.listAllCountries(SecurityContext, filtering);
 	}
 
 
 	public PaginationResponse<Country> getAllCountries(
-			SecurityContextBase securityContextBase, CountryFilter filtering) {
+			SecurityContext SecurityContext, CountryFilter filtering) {
 
-		List<Country> list = repository.listAllCountries(securityContextBase,
+		List<Country> list = repository.listAllCountries(SecurityContext,
 				filtering);
-		long count = repository.countAllCountries(securityContextBase, filtering);
+		long count = repository.countAllCountries(SecurityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 
 	public void validate(CountryFilter filtering,
-						 SecurityContextBase securityContextBase) {
-		basicService.validate(filtering, securityContextBase);
+						 SecurityContext SecurityContext) {
+		basicService.validate(filtering, SecurityContext);
 	}
 
 
 	public Country updateCountry(CountryUpdate updateContainer,
-								 com.flexicore.security.SecurityContextBase securityContextBase) {
+								 SecurityContext SecurityContext) {
 		Country country = updateContainer.getCountry();
 		if (updateCountryNoMerge(country, updateContainer)) {
 			repository.merge(country);
@@ -100,17 +109,17 @@ public class CountryService implements Plugin {
 
 
 	public Country createCountry(CountryCreate creationContainer,
-								 com.flexicore.security.SecurityContextBase securityContextBase) {
-		Country country = createCountryNoMerge(creationContainer, securityContextBase);
+								 SecurityContext SecurityContext) {
+		Country country = createCountryNoMerge(creationContainer, SecurityContext);
 		repository.merge(country);
 		return country;
 	}
 
 	public Country createCountryNoMerge(
 			CountryCreate creationContainer,
-			SecurityContextBase securityContextBase) {
-		Country country = new Country().setId(Baseclass.getBase64ID());
-		BaseclassService.createSecurityObjectNoMerge(country,securityContextBase);
+			SecurityContext SecurityContext) {
+		Country country = new Country().setId(UUID.randomUUID().toString());
+		BaseclassService.createSecurityObjectNoMerge(country,SecurityContext);
 		updateCountryNoMerge(country, creationContainer);
 		return country;
 	}
@@ -128,7 +137,7 @@ public class CountryService implements Plugin {
 	}
 
 	public ImportCountriesResponse importCountries(
-			SecurityContextBase securityContextBase,
+			SecurityContext SecurityContext,
 			ImportCountriesRequest addressImportRequest) {
 		ImportCountriesResponse importCountriesResponse = new ImportCountriesResponse();
 
@@ -138,11 +147,11 @@ public class CountryService implements Plugin {
 				String body = response.getBody();
 				ImportedCountry[] importedCountries = territoriesObjectMapper.readValue(body, ImportedCountry[].class);
 				List<Object> toMerge = new ArrayList<>();
-				Map<String, Country> existingCountries = listAllCountries(securityContextBase, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
+				Map<String, Country> existingCountries = listAllCountries(SecurityContext, new CountryFilter()).parallelStream().filter(f -> f.getCountryCode() != null).collect(Collectors.toMap(f -> f.getCountryCode(), f -> f, (a, b) -> a));
 				for (ImportedCountry importedCountry : importedCountries) {
 					if (existingCountries.get(importedCountry.getCode()) == null) {
 						CountryCreate creationContainer = new CountryCreate().setCountryCode(importedCountry.getCode()).setName(importedCountry.getName());
-						Country country = createCountryNoMerge(creationContainer, securityContextBase);
+						Country country = createCountryNoMerge(creationContainer, SecurityContext);
 						existingCountries.put(country.getCountryCode(), country);
 						toMerge.add(country);
 						importCountriesResponse.setCreatedCountries(importCountriesResponse.getCreatedCountries() + 1);

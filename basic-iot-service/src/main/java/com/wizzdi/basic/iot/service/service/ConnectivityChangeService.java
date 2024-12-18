@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.ConnectivityChange;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.Remote_;
@@ -37,19 +37,19 @@ public class ConnectivityChangeService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -76,10 +76,10 @@ public class ConnectivityChangeService implements Plugin {
     }
 
     public void validateFiltering(ConnectivityChangeFilter connectivityChangeFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(connectivityChangeFilter, securityContext);
         Set<String> remoteIds=connectivityChangeFilter.getRemoteIds();
-        Map<String,Remote> remoteMap=remoteIds.isEmpty()?new HashMap<>():listByIds(Remote.class,remoteIds,Remote_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+        Map<String,Remote> remoteMap=remoteIds.isEmpty()?new HashMap<>():listByIds(Remote.class,remoteIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
         remoteIds.removeAll(remoteMap.keySet());
         if(!remoteIds.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Remote with ids "+remoteIds);
@@ -88,31 +88,31 @@ public class ConnectivityChangeService implements Plugin {
     }
 
     public PaginationResponse<ConnectivityChange> getAllConnectivityChanges(
-            SecurityContextBase securityContext, ConnectivityChangeFilter filtering) {
+            SecurityContext securityContext, ConnectivityChangeFilter filtering) {
         List<ConnectivityChange> list = listAllConnectivityChanges(securityContext, filtering);
         long count = repository.countAllConnectivityChanges(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<ConnectivityChange> listAllConnectivityChanges(SecurityContextBase securityContext, ConnectivityChangeFilter connectivityChangeFilter) {
+    public List<ConnectivityChange> listAllConnectivityChanges(SecurityContext securityContext, ConnectivityChangeFilter connectivityChangeFilter) {
         return repository.getAllConnectivityChanges(securityContext, connectivityChangeFilter);
     }
 
     public ConnectivityChange createConnectivityChange(ConnectivityChangeCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         ConnectivityChange connectivityChange = createConnectivityChangeNoMerge(creationContainer, securityContext);
         repository.merge(connectivityChange);
         return connectivityChange;
     }
 
     public ConnectivityChange createConnectivityChangeNoMerge(ConnectivityChangeCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         ConnectivityChange connectivityChange = new ConnectivityChange();
         connectivityChange.setId(UUID.randomUUID().toString());
 
         updateConnectivityChangeNoMerge(connectivityChange, creationContainer);
         if(connectivityChange.getRemote()!=null){
-            connectivityChange.setSecurity(connectivityChange.getRemote().getSecurity());
+            connectivityChange.setSecurityId(connectivityChange.getRemote().getSecurityId());
         }
         else{
             throw new RuntimeException("cannot create ConnectivityChange without remote");
@@ -147,7 +147,7 @@ public class ConnectivityChangeService implements Plugin {
     }
 
     public ConnectivityChange updateConnectivityChange(ConnectivityChangeUpdate connectivityChangeUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         ConnectivityChange connectivityChange = connectivityChangeUpdate.getConnectivityChange();
         if (updateConnectivityChangeNoMerge(connectivityChange, connectivityChangeUpdate)) {
             repository.merge(connectivityChange);
@@ -164,10 +164,10 @@ public class ConnectivityChangeService implements Plugin {
     }
 
     public void validate(ConnectivityChangeCreate connectivityChangeCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(connectivityChangeCreate, securityContext);
         String remoteId=connectivityChangeCreate.getRemoteId();
-        Remote remote=remoteId==null?null:getByIdOrNull(remoteId,Remote.class, Remote_.security,securityContext);
+        Remote remote=remoteId==null?null:getByIdOrNull(remoteId,Remote.class, securityContext);
         if(remoteId!=null&&remote==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Remote with id "+remoteId);
         }

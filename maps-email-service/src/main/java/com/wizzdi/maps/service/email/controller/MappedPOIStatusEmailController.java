@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.email.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.maps.model.MappedPOI;
@@ -31,7 +31,7 @@ public class MappedPOIStatusEmailController implements Plugin, Invoker {
     @Operation(summary = "sendEmail", description = "Sends MappedPOI Status email")
     public SendStatusEmailResponse sendEmail(
             @Valid @RequestBody SendStatusEmailRequest sendStatusEmailRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         if (sendStatusEmailRequest.getCsvFormat() == null) {
             sendStatusEmailRequest.setCsvFormat(CSVFormat.EXCEL);
         }

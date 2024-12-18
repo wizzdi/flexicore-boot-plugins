@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MappedPOI;
@@ -31,11 +31,11 @@ public class MappedPOIRelatedService implements Plugin {
     private MappedPOIRelatedRepository mappedPOIRelatedRepository;
 
 
-    public void validate(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public void validate(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         mappedPOIService.validate(mappedPOIFilter,securityContext);
     }
 
-    public PaginationResponse<MappedPOIRelated> getAllMappedPOIRelated(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<MappedPOIRelated> getAllMappedPOIRelated(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         Map<String,Basic> related=new HashMap<>();
         PaginationResponse<MappedPOI> paginationResponse = mappedPOIService.getAllMappedPOIs(mappedPOIFilter, securityContext);
         List<MappedPOI> mappedPOIS = paginationResponse.getList();

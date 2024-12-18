@@ -2,14 +2,14 @@ package com.flexicore.scheduling.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
 import com.flexicore.scheduling.data.ScheduleTimeslotRepository;
 import com.flexicore.scheduling.request.ScheduleTimeslotCreate;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleTimeslotUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -39,7 +39,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public ScheduleTimeslot createScheduleTimeslot(
-      ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext) {
+      ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContext securityContext) {
     ScheduleTimeslot scheduleTimeslot =
         createScheduleTimeslotNoMerge(scheduleTimeslotCreate, securityContext);
     repository.merge(scheduleTimeslot);
@@ -53,7 +53,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public ScheduleTimeslot createScheduleTimeslotNoMerge(
-      ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContextBase securityContext) {
+      ScheduleTimeslotCreate scheduleTimeslotCreate, SecurityContext securityContext) {
     ScheduleTimeslot scheduleTimeslot = new ScheduleTimeslot();
     scheduleTimeslot.setId(UUID.randomUUID().toString());
     updateScheduleTimeslotNoMerge(scheduleTimeslot, scheduleTimeslotCreate);
@@ -193,7 +193,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public ScheduleTimeslot updateScheduleTimeslot(
-      ScheduleTimeslotUpdate scheduleTimeslotUpdate, SecurityContextBase securityContext) {
+      ScheduleTimeslotUpdate scheduleTimeslotUpdate, SecurityContext securityContext) {
     ScheduleTimeslot scheduleTimeslot = scheduleTimeslotUpdate.getScheduleTimeslot();
     if (updateScheduleTimeslotNoMerge(scheduleTimeslot, scheduleTimeslotUpdate)) {
       repository.merge(scheduleTimeslot);
@@ -208,7 +208,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public PaginationResponse<ScheduleTimeslot> getAllScheduleTimeslots(
-      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
+      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContext securityContext) {
     List<ScheduleTimeslot> list = listAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
     long count = repository.countAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
     return new PaginationResponse<>(list, scheduleTimeslotFilter, count);
@@ -221,7 +221,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public List<ScheduleTimeslot> listAllScheduleTimeslots(
-      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
+      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContext securityContext) {
     return repository.listAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
   }
 
@@ -232,7 +232,7 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public void validate(
-      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContextBase securityContext) {
+      ScheduleTimeslotFilter scheduleTimeslotFilter, SecurityContext securityContext) {
     basicService.validate(scheduleTimeslotFilter, securityContext);
 
     Set<String> scheduleIds =
@@ -243,7 +243,7 @@ public class ScheduleTimeslotService implements Plugin  {
         scheduleIds.isEmpty()
             ? new HashMap<>()
             : repository
-                .listByIds(Schedule.class, scheduleIds, SecuredBasic_.security, securityContext)
+                .listByIds(Schedule.class, scheduleIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     scheduleIds.removeAll(schedule.keySet());
@@ -261,13 +261,13 @@ public class ScheduleTimeslotService implements Plugin  {
    */
 
   public void validate(
-      ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
+      ScheduleTimeslotCreate stc, SecurityContext securityContext) {
     validateBase(stc, securityContext);
 
 
   }
 
-  private void validateBase(ScheduleTimeslotCreate stc, SecurityContextBase securityContext) {
+  private void validateBase(ScheduleTimeslotCreate stc, SecurityContext securityContext) {
     basicService.validate(stc, securityContext);
 
     String scheduleId = stc.getScheduleId();
@@ -275,7 +275,7 @@ public class ScheduleTimeslotService implements Plugin  {
         scheduleId == null
             ? null
             : repository.getByIdOrNull(
-                scheduleId, Schedule.class, SecuredBasic_.security, securityContext);
+                scheduleId, Schedule.class,  securityContext);
     if (scheduleId != null && schedule == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId);
@@ -284,19 +284,19 @@ public class ScheduleTimeslotService implements Plugin  {
   }
 
   public void validateUpdate(
-          ScheduleTimeslotUpdate stc, SecurityContextBase securityContext) {
+          ScheduleTimeslotUpdate stc, SecurityContext securityContext) {
    validateBase(stc, securityContext);
   }
 
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -305,7 +305,7 @@ public class ScheduleTimeslotService implements Plugin  {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -314,7 +314,7 @@ public class ScheduleTimeslotService implements Plugin  {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

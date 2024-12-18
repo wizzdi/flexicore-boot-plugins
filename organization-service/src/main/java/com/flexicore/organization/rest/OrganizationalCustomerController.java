@@ -12,7 +12,7 @@ import com.flexicore.organization.request.OrganizationalCustomerCreate;
 import com.flexicore.organization.request.OrganizationalCustomerFiltering;
 import com.flexicore.organization.request.OrganizationalCustomerUpdate;
 import com.flexicore.organization.service.OrganizationalCustomerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -44,7 +44,7 @@ public class OrganizationalCustomerController implements Plugin {
 	@PostMapping("/getAllOrganizationalCustomers")
 	public PaginationResponse<OrganizationalCustomer> getAllOrganizationalCustomers(
 
-			@RequestBody OrganizationalCustomerFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody OrganizationalCustomerFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllOrganizationalCustomers(securityContext, filtering);
 	}
@@ -56,7 +56,7 @@ public class OrganizationalCustomerController implements Plugin {
 	public OrganizationalCustomer createOrganizationalCustomer(
 
 			@RequestBody OrganizationalCustomerCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createOrganizationalCustomer(creationContainer, securityContext);
@@ -69,10 +69,10 @@ public class OrganizationalCustomerController implements Plugin {
 	public OrganizationalCustomer updateOrganizationalCustomer(
 
 			@RequestBody OrganizationalCustomerUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		OrganizationalCustomer organizationalCustomer = service.getByIdOrNull(updateContainer.getId(),
-				OrganizationalCustomer.class, OrganizationalCustomer_.security, securityContext);
+				OrganizationalCustomer.class,  securityContext);
 		if (organizationalCustomer == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no OrganizationalCustomer with id "
 					+ updateContainer.getId());

@@ -8,14 +8,14 @@ package com.flexicore.category.model;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Clazz;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @SuppressWarnings("serial")
 @Entity
-public class CategoryToClazz extends SecuredBasic {
+public class CategoryToClazz extends Baseclass {
 
 	public CategoryToClazz() {
 	}
@@ -23,8 +23,7 @@ public class CategoryToClazz extends SecuredBasic {
 
 	@ManyToOne(targetEntity = Category.class)
 	private Category category;
-	@ManyToOne(targetEntity = Baseclass.class)
-	private Clazz clazz;
+	private String type;
 
 	@ManyToOne(targetEntity = Category.class)
 
@@ -37,14 +36,18 @@ public class CategoryToClazz extends SecuredBasic {
 		return (T) this;
 	}
 
-	@ManyToOne(targetEntity = Clazz.class)
 
-	public Clazz getClazz() {
-		return clazz;
+	public String getType() {
+		return type;
 	}
 
-	public <T extends CategoryToClazz> T setClazz(Clazz baseclass) {
-		this.clazz = baseclass;
+	public <T extends CategoryToClazz> T setType(String type) {
+		this.type = type;
 		return (T) this;
+	}
+
+
+	public Clazz getClazz() {
+		return new Clazz(type);
 	}
 }

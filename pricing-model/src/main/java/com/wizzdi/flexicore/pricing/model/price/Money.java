@@ -1,12 +1,12 @@
 package com.wizzdi.flexicore.pricing.model.price;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Money extends SecuredBasic {
+public class Money extends Baseclass {
 
     @ManyToOne(targetEntity = Currency.class)
     private Currency currency;

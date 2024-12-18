@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -34,7 +34,7 @@ public class LocationHistoryService implements Plugin {
    * @return created LocationHistory
    */
   public LocationHistory createLocationHistory(
-      LocationHistoryCreate locationHistoryCreate, SecurityContextBase securityContext) {
+      LocationHistoryCreate locationHistoryCreate, SecurityContext securityContext) {
     LocationHistory locationHistory =
         createLocationHistoryNoMerge(locationHistoryCreate, securityContext);
     this.repository.merge(locationHistory);
@@ -47,7 +47,7 @@ public class LocationHistoryService implements Plugin {
    * @return created LocationHistory unmerged
    */
   public LocationHistory createLocationHistoryNoMerge(
-      LocationHistoryCreate locationHistoryCreate, SecurityContextBase securityContext) {
+      LocationHistoryCreate locationHistoryCreate, SecurityContext securityContext) {
     LocationHistory locationHistory = new LocationHistory();
     locationHistory.setId(UUID.randomUUID().toString());
     updateLocationHistoryNoMerge(locationHistory, locationHistoryCreate);
@@ -132,7 +132,7 @@ public class LocationHistoryService implements Plugin {
    * @return locationHistory
    */
   public LocationHistory updateLocationHistory(
-      LocationHistoryUpdate locationHistoryUpdate, SecurityContextBase securityContext) {
+      LocationHistoryUpdate locationHistoryUpdate, SecurityContext securityContext) {
     LocationHistory locationHistory = locationHistoryUpdate.getLocationHistory();
     if (updateLocationHistoryNoMerge(locationHistory, locationHistoryUpdate)) {
       this.repository.merge(locationHistory);
@@ -146,7 +146,7 @@ public class LocationHistoryService implements Plugin {
    * @return PaginationResponse containing paging information for LocationHistory
    */
   public PaginationResponse<LocationHistory> getAllLocationHistories(
-      LocationHistoryFilter locationHistoryFilter, SecurityContextBase securityContext) {
+      LocationHistoryFilter locationHistoryFilter, SecurityContext securityContext) {
     List<LocationHistory> list = listAllLocationHistories(locationHistoryFilter, securityContext);
     long count = this.repository.countAllLocationHistories(locationHistoryFilter, securityContext);
     return new PaginationResponse<>(list, locationHistoryFilter.getPageSize(), count);
@@ -158,17 +158,17 @@ public class LocationHistoryService implements Plugin {
    * @return List of LocationHistory
    */
   public List<LocationHistory> listAllLocationHistories(
-      LocationHistoryFilter locationHistoryFilter, SecurityContextBase securityContext) {
+      LocationHistoryFilter locationHistoryFilter, SecurityContext securityContext) {
     return this.repository.listAllLocationHistories(locationHistoryFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -176,7 +176,7 @@ public class LocationHistoryService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -184,7 +184,7 @@ public class LocationHistoryService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

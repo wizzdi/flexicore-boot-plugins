@@ -1,7 +1,7 @@
 package com.flexicore.model.territories;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Neighbourhood extends SecuredBasic {
+public class Neighbourhood extends Baseclass {
 
 
 	public Neighbourhood() {

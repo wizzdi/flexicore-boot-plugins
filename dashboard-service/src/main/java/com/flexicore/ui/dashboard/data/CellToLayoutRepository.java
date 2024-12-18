@@ -11,7 +11,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import jakarta.persistence.metamodel.SingularAttribute;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 
 import com.flexicore.ui.dashboard.model.*;
@@ -35,7 +35,7 @@ private EntityManager em;
 private SecuredBasicRepository securedBasicRepository;
 
 	public List<CellToLayout> listAllCellToLayout(CellToLayoutFilter cellToLayoutFilter,
-                                                  SecurityContextBase securityContext) {
+                                                  SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<CellToLayout> q = cb.createQuery(CellToLayout.class);
 		Root<CellToLayout> r = q.from(CellToLayout.class);
@@ -48,7 +48,7 @@ private SecuredBasicRepository securedBasicRepository;
 	}
 
 	public <T extends CellToLayout> void addCellToLayoutPredicates(List<Predicate> preds, CriteriaBuilder cb,
-                                                                   CommonAbstractCriteria q, From<?,T> r, CellToLayoutFilter cellToLayoutFilter, SecurityContextBase securityContext) {
+                                                                   CommonAbstractCriteria q, From<?,T> r, CellToLayoutFilter cellToLayoutFilter, SecurityContext securityContext) {
 
 		if(cellToLayoutFilter.getCellContents()!=null &&!cellToLayoutFilter.getCellContents().isEmpty()){
 			Set<String> ids= cellToLayoutFilter.getCellContents().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -73,7 +73,7 @@ private SecuredBasicRepository securedBasicRepository;
 	}
 
 	public long countAllCellToLayout(CellToLayoutFilter cellToLayoutFilter,
-                                     SecurityContextBase securityContext) {
+                                     SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<CellToLayout> r = q.from(CellToLayout.class);
@@ -85,19 +85,19 @@ private SecuredBasicRepository securedBasicRepository;
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

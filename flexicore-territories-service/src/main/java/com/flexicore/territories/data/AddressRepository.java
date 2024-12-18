@@ -3,7 +3,7 @@ package com.flexicore.territories.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.AddressFilter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -33,13 +33,13 @@ public class AddressRepository implements Plugin {
 	@Autowired
 	private BaseclassRepository baseclassRepository;
 
-	public List<Address> getAllAddresses(SecurityContextBase securityContextBase,
+	public List<Address> getAllAddresses(SecurityContext SecurityContext,
 			AddressFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Address> q = cb.createQuery(Address.class);
 		Root<Address> r = q.from(Address.class);
 		List<Predicate> preds = new ArrayList<>();
-		addAddressPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addAddressPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(r).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Address> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
@@ -47,13 +47,13 @@ public class AddressRepository implements Plugin {
 
 	}
 
-	public long countAllAddresses(SecurityContextBase securityContextBase,
+	public long countAllAddresses(SecurityContext SecurityContext,
 			AddressFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<Address> r = q.from(Address.class);
 		List<Predicate> preds = new ArrayList<>();
-		addAddressPredicate(filtering, q,cb, r, preds,securityContextBase);
+		addAddressPredicate(filtering, q,cb, r, preds,SecurityContext);
 		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
 
 		TypedQuery<Long> query = em.createQuery(q);
@@ -63,7 +63,7 @@ public class AddressRepository implements Plugin {
 
 	public <T extends Address> void addAddressPredicate(AddressFilter filtering,
 									 CommonAbstractCriteria q,
-									 CriteriaBuilder cb, From<?,T> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+									 CriteriaBuilder cb, From<?,T> r, List<Predicate> preds, SecurityContext SecurityContext) {
 		if (filtering.getExternalIds() != null
 				&& !filtering.getExternalIds().isEmpty()) {
 			preds.add(r.get(Address_.externalId).in(filtering.getExternalIds()));
@@ -110,9 +110,8 @@ public class AddressRepository implements Plugin {
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
-		if(securityContextBase!=null){
-			Join<T, Baseclass> join=r.join(Address_.security);
-			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
+		if(SecurityContext!=null){
+			baseclassRepository.addBaseclassPredicates(cb,q,r,preds,SecurityContext);
 		}
 
 	}
@@ -121,13 +120,14 @@ public class AddressRepository implements Plugin {
 		return baseclassRepository.findByIds(c,requested,Address_.id);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return baseclassRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
+
 
 	@Transactional
 	public void merge(Object base) {

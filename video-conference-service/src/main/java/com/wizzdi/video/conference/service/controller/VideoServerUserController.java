@@ -1,7 +1,7 @@
 package com.wizzdi.video.conference.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.VideoServerUser;
@@ -34,7 +34,7 @@ public class VideoServerUserController implements Plugin {
   public JitsiTokenResponse getJitsiToken(
           
           @RequestBody JitsiTokenRequest jitsiTokenRequest,
-          @RequestAttribute SecurityContextBase securityContext) {
+          @RequestAttribute SecurityContext securityContext) {
     videoServerUserService.validate(jitsiTokenRequest,securityContext);
     return videoServerUserService.getJitsiToken(jitsiTokenRequest, securityContext);
   }
@@ -43,7 +43,7 @@ public class VideoServerUserController implements Plugin {
   public VideoServerUser createVideoServerUser(
       
       @RequestBody VideoServerUserCreate videoServerUserCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     videoServerUserService.validate(videoServerUserCreate, securityContext);
     return videoServerUserService.createVideoServerUser(videoServerUserCreate, securityContext);
   }
@@ -53,11 +53,11 @@ public class VideoServerUserController implements Plugin {
   public VideoServerUser updateVideoServerUser(
       
       @RequestBody VideoServerUserUpdate videoServerUserUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String videoServerUserId = videoServerUserUpdate.getId();
     VideoServerUser videoServerUser =
         videoServerUserService.getByIdOrNull(
-            videoServerUserId, VideoServerUser.class, VideoServerUser_.security, securityContext);
+            videoServerUserId, VideoServerUser.class,  securityContext);
     if (videoServerUser == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No VideoServerUser with id " + videoServerUserId);
@@ -72,7 +72,7 @@ public class VideoServerUserController implements Plugin {
   public PaginationResponse<VideoServerUser> getAllVideoServerUsers(
       
       @RequestBody VideoServerUserFilter videoServerUserFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     videoServerUserService.validate(videoServerUserFilter, securityContext);
     return videoServerUserService.getAllVideoServerUsers(videoServerUserFilter, securityContext);
   }

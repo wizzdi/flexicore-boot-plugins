@@ -7,7 +7,7 @@ import com.flexicore.scheduling.request.ScheduleToActionCreate;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
 import com.flexicore.scheduling.request.ScheduleToActionUpdate;
 import com.flexicore.scheduling.service.ScheduleToActionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScheduleToActionController implements Plugin {
   public ScheduleToAction createScheduleToAction(
       
       @RequestBody ScheduleToActionCreate scheduleToActionCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleToActionService.validate(scheduleToActionCreate, securityContext);
     return scheduleToActionService.createScheduleToAction(scheduleToActionCreate, securityContext);
   }
@@ -42,13 +42,12 @@ public class ScheduleToActionController implements Plugin {
   public ScheduleToAction updateScheduleToAction(
       
       @RequestBody ScheduleToActionUpdate scheduleToActionUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String scheduleToActionId = scheduleToActionUpdate.getId();
     ScheduleToAction scheduleToAction =
         scheduleToActionService.getByIdOrNull(
             scheduleToActionId,
             ScheduleToAction.class,
-            ScheduleToAction_.security,
             securityContext);
     if (scheduleToAction == null) {
       throw new ResponseStatusException(
@@ -66,7 +65,7 @@ public class ScheduleToActionController implements Plugin {
   public PaginationResponse<ScheduleToAction> getAllScheduleToActions(
       
       @RequestBody ScheduleToActionFilter scheduleToActionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleToActionService.validate(scheduleToActionFilter, securityContext);
     return scheduleToActionService.getAllScheduleToActions(scheduleToActionFilter, securityContext);
   }

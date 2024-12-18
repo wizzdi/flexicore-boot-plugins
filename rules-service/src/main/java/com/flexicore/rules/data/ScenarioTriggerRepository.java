@@ -6,7 +6,7 @@ import com.flexicore.rules.model.ScenarioTriggerType;
 import com.flexicore.rules.model.ScenarioTriggerType_;
 import com.flexicore.rules.model.ScenarioTrigger_;
 import com.flexicore.rules.request.ScenarioTriggerFilter;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -37,7 +37,7 @@ public class ScenarioTriggerRepository implements Plugin {
    * @return List of ScenarioTrigger
    */
   public List<ScenarioTrigger> listAllScenarioTriggers(
-          ScenarioTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioTriggerFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioTrigger> q = cb.createQuery(ScenarioTrigger.class);
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
@@ -55,7 +55,7 @@ public class ScenarioTriggerRepository implements Plugin {
           CommonAbstractCriteria q,
           From<?, T> r,
           List<Predicate> preds,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
@@ -134,8 +134,7 @@ public class ScenarioTriggerRepository implements Plugin {
     }
     if(scenarioTriggerFilter.getTenants()!=null&&!scenarioTriggerFilter.getTenants().isEmpty()){
       Set<String> ids=scenarioTriggerFilter.getTenants().parallelStream().map(f->f.getId()).collect(Collectors.toSet());
-      Join<T,Baseclass> join=r.join(ScenarioTrigger_.security);
-      Join<Baseclass, SecurityTenant> tenantJoin=join.join(Baseclass_.tenant);
+      Join<T, SecurityTenant> tenantJoin=r.join(Baseclass_.tenant);
       preds.add(tenantJoin.get(Basic_.id).in(ids));
     }
   }
@@ -145,7 +144,7 @@ public class ScenarioTriggerRepository implements Plugin {
    * @return count of ScenarioTrigger
    */
   public Long countAllScenarioTriggers(
-          ScenarioTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioTriggerFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioTrigger> r = q.from(ScenarioTrigger.class);
@@ -157,12 +156,12 @@ public class ScenarioTriggerRepository implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-          Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+          Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-          String id, Class<T> c, SecurityContextBase securityContext) {
+          String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -170,7 +169,7 @@ public class ScenarioTriggerRepository implements Plugin {
           String id,
           Class<T> c,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -178,7 +177,7 @@ public class ScenarioTriggerRepository implements Plugin {
           Class<T> c,
           Set<String> ids,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

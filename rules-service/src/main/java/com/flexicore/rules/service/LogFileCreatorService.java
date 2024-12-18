@@ -3,7 +3,7 @@ package com.flexicore.rules.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioTrigger;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.request.FileResourceCreate;
@@ -29,7 +29,7 @@ public class LogFileCreatorService implements Plugin {
 
 
     public FileResource createLogFileNoMerge(Baseclass security, String logPrefix, String name) {
-        SecurityContextBase securityContext = securityContextProvider.getSecurityContext(security.getCreator());
+        SecurityContext securityContext = securityContextProvider.getSecurityContext(security.getCreator());
         securityContext.setTenantToCreateIn(security.getTenant());
         File log = new File(fileResourceService.generateNewPathForFileResource(logPrefix + replaceWhiteSpacesWithUnderscore(name), securityContext.getUser()) + ".log");
         FileResourceCreate fileResourceCreate = new FileResourceCreate()

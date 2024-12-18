@@ -6,7 +6,7 @@ import com.flexicore.category.request.CategoryCreate;
 import com.flexicore.category.request.CategoryFilter;
 import com.flexicore.category.service.CategoryService;
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.UiFieldRepository;
 import com.flexicore.ui.model.*;
 import com.flexicore.ui.request.*;
@@ -69,9 +69,9 @@ public class UiFieldService implements Plugin {
     private Clazz presetClazz;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContextBase;
+    private SecurityContext adminSecurityContext;
 
-    public UiField updateUiField(UiFieldUpdate updateUiField, SecurityContextBase securityContext) {
+    public UiField updateUiField(UiFieldUpdate updateUiField, SecurityContext securityContext) {
         if (updateUiFieldNoMerge(updateUiField, updateUiField.getUiField())) {
             uiFieldRepository.merge(updateUiField.getUiField());
         }
@@ -115,13 +115,13 @@ public class UiFieldService implements Plugin {
     }
 
     public List<UiField> listAllUiFields(UiFieldFiltering uiFieldFiltering,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         return uiFieldRepository.listAllUiFields(uiFieldFiltering,
                 securityContext);
     }
 
     public UiField createUiField(UiFieldCreate createUiField,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         UiField uiField = createUiFieldNoMerge(createUiField, securityContext);
         uiFieldRepository.merge(uiField);
         return uiField;
@@ -129,7 +129,7 @@ public class UiFieldService implements Plugin {
     }
 
     public UiField createUiFieldNoMerge(UiFieldCreate createUiField,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         UiField uiField = new UiField();
         uiField.setId(UUID.randomUUID().toString());
         updateUiFieldNoMerge(createUiField, uiField);
@@ -138,7 +138,7 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(PresetToUserCreate linkPresetToUser,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         presetToEntityService.validate(linkPresetToUser, securityContext);
         String userId = linkPresetToUser.getUserId();
         SecurityUser securityUser = userId != null ? getByIdOrNull(userId, SecurityUser.class, null, securityContext) : null;
@@ -149,7 +149,7 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(PresetToRoleCreate presetToRoleCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         presetToEntityService.validate(presetToRoleCreate, securityContext);
 
         String roleId = presetToRoleCreate.getRoleId();
@@ -161,7 +161,7 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(PresetToTenantCreate presetToTenantCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         presetToEntityService.validate(presetToTenantCreate, securityContext);
 
         String tenantId = presetToTenantCreate.getPreferredTenantId();
@@ -174,7 +174,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToRole createPresetToRole(
             PresetToRoleCreate presetToRoleCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToRole toRet;
         PresetToRoleFilter presetToRoleFilter = new PresetToRoleFilter()
                 .setRoles(Collections.singletonList(presetToRoleCreate.getRole()))
@@ -192,7 +192,7 @@ public class UiFieldService implements Plugin {
 
     private PresetToRole createPresetToRoleNoMerge(
             PresetToRoleCreate presetToRoleCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToRole presetToRole = new PresetToRole();
         presetToRole.setId(UUID.randomUUID().toString());
         updatePresetToRoleNoMerge(presetToRoleCreate, presetToRole);
@@ -202,7 +202,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToTenant createPresetToTenant(
             PresetToTenantCreate presetToTenantCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToTenant toRet;
         PresetToTenantFilter presetToTenantFilter = new PresetToTenantFilter()
                 .setTenants(Collections.singletonList(presetToTenantCreate.getPreferredTenant()))
@@ -220,7 +220,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToTenant createPresetToTenantNoMerge(
             PresetToTenantCreate presetToTenantCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToTenant presetToTenant = new PresetToTenant();
         presetToTenant.setId(UUID.randomUUID().toString());
         updatePresetToTenantNoMerge(presetToTenantCreate, presetToTenant);
@@ -230,7 +230,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToUser createPresetToUser(
             PresetToUserCreate presetToUserCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToUser toRet;
         PresetToUserFilter presetToUserFilter = new PresetToUserFilter()
                 .setUsers(Collections.singletonList(presetToUserCreate.getUser()))
@@ -248,7 +248,7 @@ public class UiFieldService implements Plugin {
 
     private PresetToUser createPresetToUserNoMerge(
             PresetToUserCreate presetToUserCreate,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         PresetToUser presetToUser = new PresetToUser();
         presetToUser.setId(UUID.randomUUID().toString());
         updatePresetToUserNoMerge(presetToUserCreate, presetToUser);
@@ -270,7 +270,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToTenant updatePresetToTenant(
             PresetToTenantUpdate updateLinkPresetToTenant,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         if (updatePresetToTenantNoMerge(updateLinkPresetToTenant, updateLinkPresetToTenant.getPresetToTenant())) {
             uiFieldRepository.merge(updateLinkPresetToTenant.getPresetToTenant());
         }
@@ -279,7 +279,7 @@ public class UiFieldService implements Plugin {
 
     public PresetToUser updatePresetToUser(
             PresetToUserUpdate updateLinkPresetToUser,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         if (updatePresetToUserNoMerge(updateLinkPresetToUser, updateLinkPresetToUser.getPresetToUser())) {
             uiFieldRepository.merge(updateLinkPresetToUser.getPresetToUser());
         }
@@ -295,7 +295,7 @@ public class UiFieldService implements Plugin {
         return update;
     }
 
-    public PresetToRole updatePresetToRole(PresetToRoleUpdate updateLinkPresetToRole, SecurityContextBase securityContext) {
+    public PresetToRole updatePresetToRole(PresetToRoleUpdate updateLinkPresetToRole, SecurityContext securityContext) {
         if (updatePresetToRoleNoMerge(updateLinkPresetToRole, updateLinkPresetToRole.getPresetToRole())) {
             uiFieldRepository.merge(updateLinkPresetToRole.getPresetToRole());
         }
@@ -313,9 +313,9 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(PresetToRoleFilter presetToRoleFilter,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         Set<String> roleIds = presetToRoleFilter.getRoleIds();
-        Map<String, Role> map = roleIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(Role.class, roleIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Role> map = roleIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(Role.class, roleIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         roleIds.removeAll(map.keySet());
         if (!roleIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Roles with ids " + roleIds);
@@ -326,19 +326,19 @@ public class UiFieldService implements Plugin {
 
     public PaginationResponse<PresetToRoleContainer> getAllPresetToRole(
             PresetToRoleFilter presetToRoleFilter,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         List<PresetToRoleContainer> list = listAllPresetToRole(presetToRoleFilter, securityContext).parallelStream().map(f -> new PresetToRoleContainer(f)).collect(Collectors.toList());
         long count = uiFieldRepository.countAllPresetToRoles(presetToRoleFilter, securityContext);
         return new PaginationResponse<>(list, presetToRoleFilter, count);
     }
 
-    private List<PresetToRole> listAllPresetToRole(PresetToRoleFilter presetToRoleFilter, SecurityContextBase securityContext) {
+    private List<PresetToRole> listAllPresetToRole(PresetToRoleFilter presetToRoleFilter, SecurityContext securityContext) {
         return uiFieldRepository.listAllPresetToRoles(presetToRoleFilter, securityContext);
     }
 
-    public void validate(PresetToTenantFilter presetToTenantFilter, SecurityContextBase securityContext) {
+    public void validate(PresetToTenantFilter presetToTenantFilter, SecurityContext securityContext) {
         Set<String> tenantIds = presetToTenantFilter.getTenantIdsForPreset();
-        Map<String, SecurityTenant> map = tenantIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityTenant.class, tenantIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityTenant> map = tenantIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityTenant.class, tenantIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         tenantIds.removeAll(map.keySet());
         if (!tenantIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Tenants with ids " + tenantIds);
@@ -347,20 +347,20 @@ public class UiFieldService implements Plugin {
 
     }
 
-    public PaginationResponse<PresetToTenantContainer> getAllPresetToTenant(PresetToTenantFilter presetToTenantFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<PresetToTenantContainer> getAllPresetToTenant(PresetToTenantFilter presetToTenantFilter, SecurityContext securityContext) {
         List<PresetToTenantContainer> list = listAllPresetToTenant(presetToTenantFilter, securityContext).parallelStream().map(f -> new PresetToTenantContainer(f)).collect(Collectors.toList());
         long count = uiFieldRepository.countAllPresetToTenants(presetToTenantFilter, securityContext);
         return new PaginationResponse<>(list, presetToTenantFilter, count);
     }
 
-    private List<PresetToTenant> listAllPresetToTenant(PresetToTenantFilter presetToTenantFilter, SecurityContextBase securityContext) {
+    private List<PresetToTenant> listAllPresetToTenant(PresetToTenantFilter presetToTenantFilter, SecurityContext securityContext) {
         return uiFieldRepository.listAllPresetToTenants(presetToTenantFilter,
                 securityContext);
     }
 
-    public void validate(PresetToUserFilter presetToUserFilter, SecurityContextBase securityContext) {
+    public void validate(PresetToUserFilter presetToUserFilter, SecurityContext securityContext) {
         Set<String> userIds = presetToUserFilter.getUserIds();
-        Map<String, SecurityUser> map = userIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityUser.class, userIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityUser> map = userIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(SecurityUser.class, userIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         userIds.removeAll(map.keySet());
         if (!userIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Users with ids " + userIds);
@@ -369,20 +369,20 @@ public class UiFieldService implements Plugin {
 
     }
 
-    public PaginationResponse<PresetToUserContainer> getAllPresetToUser(PresetToUserFilter presetToUserFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<PresetToUserContainer> getAllPresetToUser(PresetToUserFilter presetToUserFilter, SecurityContext securityContext) {
         List<PresetToUserContainer> list = listAllPresetToUser(presetToUserFilter, securityContext).parallelStream().map(f -> new PresetToUserContainer(f)).collect(Collectors.toList());
         long count = uiFieldRepository.countAllPresetToUsers(
                 presetToUserFilter, securityContext);
         return new PaginationResponse<>(list, presetToUserFilter, count);
     }
 
-    private List<PresetToUser> listAllPresetToUser(PresetToUserFilter presetToUserFilter, SecurityContextBase securityContext) {
+    private List<PresetToUser> listAllPresetToUser(PresetToUserFilter presetToUserFilter, SecurityContext securityContext) {
         return uiFieldRepository.listAllPresetToUsers(presetToUserFilter,
                 securityContext);
     }
 
     public PaginationResponse<UiField> getAllUiFields(
-            UiFieldFiltering uiFieldFiltering, SecurityContextBase securityContext) {
+            UiFieldFiltering uiFieldFiltering, SecurityContext securityContext) {
         List<UiField> list = listAllUiFields(uiFieldFiltering, securityContext);
         long count = uiFieldRepository.countAllUiFields(uiFieldFiltering,
                 securityContext);
@@ -390,7 +390,7 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(MassCreateUiFields massCreateUiFields,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         GridPreset preset = massCreateUiFields.getGridPresetId() != null
                 ? getByIdOrNull(massCreateUiFields.getGridPresetId(),
                 GridPreset.class, null, securityContext) : null;
@@ -422,14 +422,14 @@ public class UiFieldService implements Plugin {
 
     }
 
-    public void validate(UiFieldCreate createUiField, SecurityContextBase securityContext) {
+    public void validate(UiFieldCreate createUiField, SecurityContext securityContext) {
         basicService.validate(createUiField, securityContext);
         Category category = categoryService.createCategory(
                 new CategoryCreate().setName(createUiField.getCategoryName()),
                 securityContext);
         createUiField.setCategory(category);
         String presetId = createUiField.getPresetId();
-        Preset preset = presetId != null ? getByIdOrNull(presetId, Preset.class, Preset_.security, securityContext) : null;
+        Preset preset = presetId != null ? getByIdOrNull(presetId, Preset.class,securityContext) : null;
         if (presetId!=null&&preset == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Preset with id " + presetId);
         }
@@ -438,7 +438,7 @@ public class UiFieldService implements Plugin {
 
     public List<UiField> massCreateUiFields(
             MassCreateUiFields massCreateUiFields,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         List<UiField> toMerge = new ArrayList<>();
         for (UiFieldCreate uiField : massCreateUiFields.getUiFields()) {
             toMerge.add(createUiFieldNoMerge(
@@ -450,10 +450,10 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(UiFieldFiltering uiFieldFiltering,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(uiFieldFiltering, securityContext);
         Set<String> gridPresetIds = uiFieldFiltering.getPresetIds();
-        Map<String, GridPreset> gridPresetMap = gridPresetIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(GridPreset.class, gridPresetIds, GridPreset_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, GridPreset> gridPresetMap = gridPresetIds.isEmpty() ? new HashMap<>() : uiFieldRepository.listByIds(GridPreset.class, gridPresetIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         gridPresetIds.removeAll(gridPresetMap.keySet());
         if (!gridPresetIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Grid Presets with ids " + gridPresetIds);
@@ -472,7 +472,7 @@ public class UiFieldService implements Plugin {
     }
 
     public void validate(PreferedPresetRequest preferedPresetRequest,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
 
     }
 
@@ -481,18 +481,19 @@ public class UiFieldService implements Plugin {
     public void handlePresetPermissionGroupCreated(BasicCreated<PermissionGroupToBaseclass> baseclassCreated) {
         PermissionGroupToBaseclass permissionGroupToBaseclass = baseclassCreated.getBaseclass();
         PermissionGroup permissionGroup = permissionGroupToBaseclass.getPermissionGroup();
-        if (permissionGroupToBaseclass.getBaseclass().getClazz().getId().equals(presetClazz.getId())) {
-            Baseclass baseclass = permissionGroupToBaseclass.getBaseclass();
-            List<Preset> presets = presetService.listAllPresets(new ConfigurationPresetFiltering().setRelatedBaseclass(Collections.singletonList(baseclass)), null);
+        if (permissionGroupToBaseclass.getSecuredType().equals(presetClazz.name())) {
+            String baseclass = permissionGroupToBaseclass.getSecuredId();
+            List<Preset> presets = presetService.listAllPresets(new PresetFiltering().setRelatedBaseclass(Collections.singleton(baseclass)), null);
             for (Preset preset : presets) {
                 logger.info("preset " + preset.getName() + "(" + preset.getId() + ") was attached to permission group " + permissionGroup.getName() + "(" + permissionGroup.getId() + ") , will attach ui fields as well");
 
-                List<UiField> fields = listAllUiFields(new UiFieldFiltering().setPresets(Collections.singletonList(preset)), adminSecurityContextBase);
+                List<UiField> fields = listAllUiFields(new UiFieldFiltering().setPresets(Collections.singletonList(preset)), adminSecurityContext);
                 for (UiField field : fields) {
                     PermissionGroupToBaseclassCreate createPermissionGroupLinkRequest = new PermissionGroupToBaseclassCreate()
                             .setPermissionGroup(permissionGroup)
-                            .setBaseclass(field.getSecurity());
-                    permissionGroupToBaseclassService.createPermissionGroupToBaseclass(createPermissionGroupLinkRequest, adminSecurityContextBase);
+                            .setSecuredId(field.getSecurityId())
+                                    .setSecuredType(Clazz.ofClass(field.getClass()));
+                    permissionGroupToBaseclassService.createPermissionGroupToBaseclass(createPermissionGroupLinkRequest, adminSecurityContext);
 
 
                 }
@@ -507,25 +508,25 @@ public class UiFieldService implements Plugin {
 
     public List<Preset> getPreferredPresets(
             PreferedPresetRequest preferedPresetRequest,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return presetToEntityService.getPreferredPresets(preferedPresetRequest,
                 securityContext);
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return uiFieldRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return uiFieldRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return uiFieldRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return uiFieldRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -551,13 +552,13 @@ public class UiFieldService implements Plugin {
         uiFieldRepository.massMerge(toMerge);
     }
 
-    public UiField deleteUIField(UiField uiField, SecurityContextBase securityContext) {
+    public UiField deleteUIField(UiField uiField, SecurityContext securityContext) {
         uiField.setSoftDelete(true);
         merge(uiField);
         return uiField;
     }
 
-    public void validateCreate(UiFieldCreate uiFieldCreate, SecurityContextBase securityContext) {
+    public void validateCreate(UiFieldCreate uiFieldCreate, SecurityContext securityContext) {
         validate(uiFieldCreate,securityContext);
         if(uiFieldCreate.getPreset()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"preset must be provided");

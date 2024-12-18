@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -33,7 +33,7 @@ public class LayerTypeController implements Plugin {
   @Operation(summary = "updateLayerType", description = "Updates LayerType")
   public LayerType updateLayerType(
       @Validated(Update.class) @RequestBody LayerTypeUpdate layerTypeUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerTypeService.updateLayerType(layerTypeUpdate, securityContext);
   }
@@ -42,7 +42,7 @@ public class LayerTypeController implements Plugin {
   @Operation(summary = "getAllLayerTypes", description = "lists LayerTypes")
   public PaginationResponse<LayerType> getAllLayerTypes(
       @Valid @RequestBody LayerTypeFilter layerTypeFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerTypeService.getAllLayerTypes(layerTypeFilter, securityContext);
   }
@@ -51,7 +51,7 @@ public class LayerTypeController implements Plugin {
   @Operation(summary = "createLayerType", description = "Creates LayerType")
   public LayerType createLayerType(
       @Validated(Create.class) @RequestBody LayerTypeCreate layerTypeCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return layerTypeService.createLayerType(layerTypeCreate, securityContext);
   }

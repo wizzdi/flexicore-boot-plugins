@@ -1,12 +1,12 @@
 package com.wizzdi.flexicore.billing.model.payment;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class PaymentMethodType extends SecuredBasic {
+public class PaymentMethodType extends Baseclass {
 
     private String canonicalClassName;
 

@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.DeviceType_;
 import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
@@ -33,7 +33,7 @@ public class DeviceTypeRepository implements Plugin {
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
 
-    public List<DeviceType> getAllDeviceTypes(SecurityContextBase securityContext,
+    public List<DeviceType> getAllDeviceTypes(SecurityContext securityContext,
                                            DeviceTypeFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<DeviceType> q = cb.createQuery(DeviceType.class);
@@ -46,7 +46,7 @@ public class DeviceTypeRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllDeviceTypes(SecurityContextBase securityContext,
+    public long countAllDeviceTypes(SecurityContext securityContext,
                                    DeviceTypeFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -59,26 +59,26 @@ public class DeviceTypeRepository implements Plugin {
     }
 
     public <T extends DeviceType> void addDeviceTypePredicates(DeviceTypeFilter filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
 
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

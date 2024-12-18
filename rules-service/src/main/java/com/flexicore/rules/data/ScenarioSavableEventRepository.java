@@ -7,7 +7,7 @@ import com.flexicore.rules.model.ScenarioSavableEvent;
 import com.flexicore.rules.model.ScenarioSavableEvent_;
 import com.flexicore.rules.model.ScenarioTrigger;
 import com.flexicore.rules.request.ScenarioSavableEventFilter;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -37,7 +37,7 @@ public class ScenarioSavableEventRepository implements Plugin {
    * @return List of ScenarioSavableEvent
    */
   public List<ScenarioSavableEvent> listAllScenarioSavableEvents(
-      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioSavableEvent> q = cb.createQuery(ScenarioSavableEvent.class);
     Root<ScenarioSavableEvent> r = q.from(ScenarioSavableEvent.class);
@@ -55,7 +55,7 @@ public class ScenarioSavableEventRepository implements Plugin {
       CommonAbstractCriteria q,
       From<?, T> r,
       List<Predicate> preds,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(
         scenarioSavableEventFilter.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
@@ -76,7 +76,7 @@ public class ScenarioSavableEventRepository implements Plugin {
    * @return count of ScenarioSavableEvent
    */
   public Long countAllScenarioSavableEvents(
-      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContextBase securityContext) {
+      ScenarioSavableEventFilter scenarioSavableEventFilter, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioSavableEvent> r = q.from(ScenarioSavableEvent.class);
@@ -88,12 +88,12 @@ public class ScenarioSavableEventRepository implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -101,7 +101,7 @@ public class ScenarioSavableEventRepository implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -109,7 +109,7 @@ public class ScenarioSavableEventRepository implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

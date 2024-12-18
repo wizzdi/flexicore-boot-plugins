@@ -8,7 +8,7 @@ import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
 import com.flexicore.scheduling.response.ActionResult;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -41,7 +41,7 @@ public class ScheduleService implements Plugin  {
    */
 
   public Schedule createSchedule(
-      ScheduleCreate scheduleCreate, SecurityContextBase securityContext) {
+      ScheduleCreate scheduleCreate, SecurityContext securityContext) {
     Schedule schedule = createScheduleNoMerge(scheduleCreate, securityContext);
     repository.merge(schedule);
     return schedule;
@@ -54,7 +54,7 @@ public class ScheduleService implements Plugin  {
    */
 
   public Schedule createScheduleNoMerge(
-      ScheduleCreate scheduleCreate, SecurityContextBase securityContext) {
+      ScheduleCreate scheduleCreate, SecurityContext securityContext) {
     Schedule schedule = new Schedule();
     schedule.setId(UUID.randomUUID().toString());
     updateScheduleNoMerge(schedule, scheduleCreate);
@@ -156,7 +156,7 @@ public class ScheduleService implements Plugin  {
    */
 
   public Schedule updateSchedule(
-      ScheduleUpdate scheduleUpdate, SecurityContextBase securityContext) {
+      ScheduleUpdate scheduleUpdate, SecurityContext securityContext) {
     Schedule schedule = scheduleUpdate.getSchedule();
     if (updateScheduleNoMerge(schedule, scheduleUpdate)) {
       repository.merge(schedule);
@@ -171,7 +171,7 @@ public class ScheduleService implements Plugin  {
    */
 
   public PaginationResponse<Schedule> getAllSchedules(
-      ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
+      ScheduleFilter scheduleFilter, SecurityContext securityContext) {
     List<Schedule> list = listAllSchedules(scheduleFilter, securityContext);
     long count = repository.countAllSchedules(scheduleFilter, securityContext);
     return new PaginationResponse<>(list, scheduleFilter, count);
@@ -184,7 +184,7 @@ public class ScheduleService implements Plugin  {
    */
 
   public List<Schedule> listAllSchedules(
-      ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
+      ScheduleFilter scheduleFilter, SecurityContext securityContext) {
     return repository.listAllSchedules(scheduleFilter, securityContext);
   }
 
@@ -194,7 +194,7 @@ public class ScheduleService implements Plugin  {
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleFilter is not valid
    */
 
-  public void validate(ScheduleFilter scheduleFilter, SecurityContextBase securityContext) {
+  public void validate(ScheduleFilter scheduleFilter, SecurityContext securityContext) {
     basicService.validate(scheduleFilter, securityContext);
   }
 
@@ -204,7 +204,7 @@ public class ScheduleService implements Plugin  {
    * @throws org.springframework.web.server.ResponseStatusException  if scheduleCreate is not valid
    */
 
-  public void validate(ScheduleCreate sc, SecurityContextBase securityContext) {
+  public void validate(ScheduleCreate sc, SecurityContext securityContext) {
     basicService.validate(sc, securityContext);
     if(sc.getSelectedTimeZone()!=null){
       if (sc.getTimeFrameStart() != null) {
@@ -230,13 +230,13 @@ public class ScheduleService implements Plugin  {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -245,7 +245,7 @@ public class ScheduleService implements Plugin  {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -254,7 +254,7 @@ public class ScheduleService implements Plugin  {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

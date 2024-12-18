@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.FirmwareInstallationState;
 import com.wizzdi.basic.iot.model.FirmwareUpdateInstallation;
 import com.wizzdi.basic.iot.model.Remote;
@@ -45,19 +45,19 @@ public class FirmwareUpdateInstallationService implements Plugin {
     @Autowired
     private RemoteService remoteService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -84,31 +84,31 @@ public class FirmwareUpdateInstallationService implements Plugin {
     }
 
     public PaginationResponse<FirmwareUpdateInstallation> getAllFirmwareUpdateInstallations(
-            SecurityContextBase securityContext, FirmwareUpdateInstallationFilter filtering) {
+            SecurityContext securityContext, FirmwareUpdateInstallationFilter filtering) {
         List<FirmwareUpdateInstallation> list = listAllFirmwareUpdateInstallations(securityContext, filtering);
         long count = repository.countAllFirmwareUpdateInstallations(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<FirmwareUpdateInstallation> listAllFirmwareUpdateInstallations(SecurityContextBase securityContext, FirmwareUpdateInstallationFilter firmwareUpdateInstallationFilter) {
+    public List<FirmwareUpdateInstallation> listAllFirmwareUpdateInstallations(SecurityContext securityContext, FirmwareUpdateInstallationFilter firmwareUpdateInstallationFilter) {
         return repository.getAllFirmwareUpdateInstallations(securityContext, firmwareUpdateInstallationFilter);
     }
 
     public FirmwareUpdateInstallation createFirmwareUpdateInstallation(FirmwareUpdateInstallationCreate creationContainer,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         FirmwareUpdateInstallation firmwareUpdateInstallation = createFirmwareUpdateInstallationNoMerge(creationContainer, securityContext);
         repository.merge(firmwareUpdateInstallation);
         return firmwareUpdateInstallation;
     }
 
     public FirmwareUpdateInstallation createFirmwareUpdateInstallationNoMerge(FirmwareUpdateInstallationCreate creationContainer,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         FirmwareUpdateInstallation firmwareUpdateInstallation = new FirmwareUpdateInstallation();
         firmwareUpdateInstallation.setId(UUID.randomUUID().toString());
 
         updateFirmwareUpdateInstallationNoMerge(firmwareUpdateInstallation, creationContainer);
         if(firmwareUpdateInstallation.getTargetRemote()!=null){
-            firmwareUpdateInstallation.setSecurity(firmwareUpdateInstallation.getTargetRemote().getSecurity());
+            firmwareUpdateInstallation.setSecurityId(firmwareUpdateInstallation.getTargetRemote().getSecurityId());
         }
         else{
             throw new RuntimeException("cannot create FirmwareUpdateInstallation without targetRemote");
@@ -165,7 +165,7 @@ public class FirmwareUpdateInstallationService implements Plugin {
     }
 
     public FirmwareUpdateInstallation updateFirmwareUpdateInstallation(FirmwareUpdateInstallationUpdate firmwareUpdateInstallationUpdate,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         FirmwareUpdateInstallation firmwareUpdateInstallation = firmwareUpdateInstallationUpdate.getFirmwareUpdateInstallation();
         if (updateFirmwareUpdateInstallationNoMerge(firmwareUpdateInstallation, firmwareUpdateInstallationUpdate)) {
             repository.merge(firmwareUpdateInstallation);
@@ -174,7 +174,7 @@ public class FirmwareUpdateInstallationService implements Plugin {
     }
 
 
-    public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate, SecurityContextBase securityContext) {
+    public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate, SecurityContext securityContext) {
         List<Remote> remotes = remoteService.listAllRemotes(securityContext, firmwareUpdateInstallationMassCreate.getRemoteFilter());
         return remotes.stream().map(f->createFirmwareUpdateInstallation(new FirmwareUpdateInstallationCreate()
                 .setTargetRemote(f)

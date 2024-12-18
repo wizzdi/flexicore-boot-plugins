@@ -10,10 +10,11 @@ import com.flexicore.organization.model.SalesRegion;
 import com.flexicore.organization.request.SalesRegionCreate;
 import com.flexicore.organization.request.SalesRegionFiltering;
 import com.flexicore.organization.request.SalesRegionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
@@ -39,19 +40,18 @@ public class SalesRegionService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -78,7 +78,7 @@ public class SalesRegionService implements Plugin {
 	}
 
 	public PaginationResponse<SalesRegion> getAllSalesRegions(
-			SecurityContextBase securityContext, SalesRegionFiltering filtering) {
+			SecurityContext securityContext, SalesRegionFiltering filtering) {
 
 		List<SalesRegion> endpoints = repository.listAllSalesRegions(securityContext, filtering);
 		long count = repository.countAllSalesRegions(securityContext, filtering);
@@ -86,7 +86,7 @@ public class SalesRegionService implements Plugin {
 	}
 
 	public SalesRegion createSalesRegion(SalesRegionCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		SalesRegion salesRegion = createSalesRegionNoMerge(creationContainer,
 				securityContext);
 		repository.merge(salesRegion);
@@ -94,9 +94,9 @@ public class SalesRegionService implements Plugin {
 	}
 
 	public SalesRegion createSalesRegionNoMerge(
-			SalesRegionCreate creationContainer, SecurityContextBase securityContext) {
+			SalesRegionCreate creationContainer, SecurityContext securityContext) {
 		SalesRegion salesRegion = new SalesRegion();
-		salesRegion.setId(Baseclass.getBase64ID());
+		salesRegion.setId(UUID.randomUUID().toString());
 
 		updateSalesRegionNoMerge(salesRegion, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(salesRegion, securityContext);
@@ -106,7 +106,7 @@ public class SalesRegionService implements Plugin {
 	}
 
 	public SalesRegion updateSalesRegion(SalesRegionUpdate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		SalesRegion salesRegion = creationContainer.getSalesRegion();
 		if (updateSalesRegionNoMerge(salesRegion, creationContainer)) {
 			repository.merge(salesRegion);
@@ -122,7 +122,7 @@ public class SalesRegionService implements Plugin {
 	}
 
 	public void validateFiltering(SalesRegionFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(filtering,securityContext);
 
 	}

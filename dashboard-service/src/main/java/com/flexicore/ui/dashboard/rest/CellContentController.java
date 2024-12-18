@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.CellContent;
 import com.flexicore.ui.dashboard.request.CellContentCreate;
 import com.flexicore.ui.dashboard.request.CellContentFiltering;
@@ -45,7 +45,7 @@ public class CellContentController implements Plugin {
 	public PaginationResponse<CellContent> getAllCellContent(
 			@RequestBody
 			CellContentFiltering cellContentFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(cellContentFiltering, securityContext);
 		return service.getAllCellContent(cellContentFiltering, securityContext);
 
@@ -57,9 +57,9 @@ public class CellContentController implements Plugin {
 	@PutMapping("updateCellContent")
 	public CellContent updateCellContent(
 			@RequestBody
-			CellContentUpdate updateCellContent, @RequestAttribute SecurityContextBase securityContext) {
+			CellContentUpdate updateCellContent, @RequestAttribute SecurityContext securityContext) {
 		CellContent cellContent = updateCellContent.getId() != null ? service.getByIdOrNull(
-				updateCellContent.getId(), CellContent.class, SecuredBasic_.security, securityContext) : null;
+				updateCellContent.getId(), CellContent.class,  securityContext) : null;
 		if (cellContent == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateCellContent.getId());
@@ -77,7 +77,7 @@ public class CellContentController implements Plugin {
 	@PostMapping("createCellContent")
 	public CellContent createCellContent(
 			@RequestBody
-			CellContentCreate createCellContent, @RequestAttribute SecurityContextBase securityContext) {
+			CellContentCreate createCellContent, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createCellContent, securityContext);
 		return service.createCellContent(createCellContent, securityContext);
 

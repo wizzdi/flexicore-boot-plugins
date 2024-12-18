@@ -23,7 +23,7 @@ import com.flexicore.license.request.LicenseRequestUpdate;
 import com.flexicore.model.*;
 import com.flexicore.license.model.*;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 
 import com.google.crypto.tink.CleartextKeysetHandle;
@@ -107,19 +107,19 @@ public class LicenseRequestService implements Plugin {
     private ApplicationEventPublisher updateLicensingCacheEvent;
 
 
-   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -144,7 +144,7 @@ public class LicenseRequestService implements Plugin {
     public void massMerge(List<?> toMerge) {
         repository.massMerge(toMerge);
     }
-    public LicenseRequest createLicenseRequest(LicenseRequestCreate licenseRequestCreate, SecurityContextBase securityContext) {
+    public LicenseRequest createLicenseRequest(LicenseRequestCreate licenseRequestCreate, SecurityContext securityContext) {
         List<Object> toMerge=new ArrayList<>();
         String macAddress = null;
         try {
@@ -171,13 +171,13 @@ public class LicenseRequestService implements Plugin {
     @EventListener
     public void licenseRequestUpdated(LicenseRequestUpdateEvent licenseRequest) {
         logger.info("License request updated event");
-        updateLicenseFile(licenseRequest.getLicenseRequest(), licenseRequest.getSecurityContextBase());
+        updateLicenseFile(licenseRequest.getLicenseRequest(), licenseRequest.getSecurityContext());
         updateLicensingCacheEvent.publishEvent(new UpdateLicensingCache());
     }
 
-    public LicenseRequest createLicenseRequestNoMerge(LicenseRequestCreate licenseRequestCreate, SecurityContextBase securityContext) {
+    public LicenseRequest createLicenseRequestNoMerge(LicenseRequestCreate licenseRequestCreate, SecurityContext securityContext) {
         LicenseRequest licenseRequest = new LicenseRequest();
-        licenseRequest.setId(Baseclass.getBase64ID());
+        licenseRequest.setId(UUID.randomUUID().toString());
         BaseclassService.createSecurityObjectNoMerge(licenseRequest,securityContext);
         updateLicenseRequestNoMerge(licenseRequest, licenseRequestCreate);
         return licenseRequest;
@@ -215,7 +215,7 @@ public class LicenseRequestService implements Plugin {
     }
 
 
-    public LicenseRequest updateLicenseRequest(LicenseRequestUpdate licenseRequestUpdate, SecurityContextBase securityContext) {
+    public LicenseRequest updateLicenseRequest(LicenseRequestUpdate licenseRequestUpdate, SecurityContext securityContext) {
         LicenseRequest licenseRequest = licenseRequestUpdate.getLicenseRequest();
         if (updateLicenseRequestNoMerge(licenseRequest, licenseRequestUpdate)) {
             repository.merge(licenseRequest);
@@ -225,11 +225,11 @@ public class LicenseRequestService implements Plugin {
         return licenseRequest;
     }
 
-    public List<LicenseRequest> listAllLicenseRequests(LicenseRequestFiltering licenseRequestFiltering, SecurityContextBase securityContext) {
+    public List<LicenseRequest> listAllLicenseRequests(LicenseRequestFiltering licenseRequestFiltering, SecurityContext securityContext) {
         return repository.listAllLicenseRequests(licenseRequestFiltering, securityContext);
     }
 
-    public void validate(LicenseRequestCreate licenseRequestCreate, SecurityContextBase securityContext) {
+    public void validate(LicenseRequestCreate licenseRequestCreate, SecurityContext securityContext) {
         basicService.validate(licenseRequestCreate, securityContext);
         String licenseId = licenseRequestCreate.getLicenseId();
         FileResource license = licenseId != null ? getByIdOrNull(licenseId, FileResource.class, null, securityContext) : null;
@@ -238,7 +238,7 @@ public class LicenseRequestService implements Plugin {
         }
         licenseRequestCreate.setLicense(license);
         String licensedTenantId = licenseRequestCreate.getLicensedTenantId();
-        SecurityTenant tenant = licensedTenantId != null ? getByIdOrNull(licensedTenantId, SecurityTenant.class,SecuredBasic_.security,  securityContext) : null;
+        SecurityTenant tenant = licensedTenantId != null ? getByIdOrNull(licensedTenantId, SecurityTenant.class,  securityContext) : null;
         if (licensedTenantId!=null&&tenant == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No SecurityTenant with id " + licensedTenantId);
         }
@@ -432,7 +432,7 @@ public class LicenseRequestService implements Plugin {
     }
 
 
-    public void updateLicenseFile(LicenseRequest licenseRequest, SecurityContextBase securityContext) {
+    public void updateLicenseFile(LicenseRequest licenseRequest, SecurityContext securityContext) {
         LicenseHolder licenseHolder = getLicenseHolder(licenseRequest);
         FileResource fileResource = licenseRequest.getRequestFile();
         File file = fileResource != null ? new File(fileResource.getFullPath()) : new File(fileResourceService.generateNewPathForFileResource(licenseRequest.getId() + ".req", securityContext.getUser()));
@@ -469,18 +469,18 @@ public class LicenseRequestService implements Plugin {
         return new LicenseHolder(licenseRequest,links);
     }
 
-    public void validate(LicenseRequestFiltering licenseRequestFiltering, SecurityContextBase securityContext) {
+    public void validate(LicenseRequestFiltering licenseRequestFiltering, SecurityContext securityContext) {
         basicService.validate(licenseRequestFiltering, securityContext);
     }
 
-    public PaginationResponse<LicenseRequest> getAllLicenseRequests(LicenseRequestFiltering licenseRequestFiltering, SecurityContextBase securityContext) {
+    public PaginationResponse<LicenseRequest> getAllLicenseRequests(LicenseRequestFiltering licenseRequestFiltering, SecurityContext securityContext) {
         List<LicenseRequest> list = listAllLicenseRequests(licenseRequestFiltering, securityContext);
         long count = repository.countAllLicenseRequests(licenseRequestFiltering, securityContext);
         return new PaginationResponse<>(list, licenseRequestFiltering, count);
     }
 
 
-    public void validateCreate(LicenseRequestCreate licenseRequestCreate,SecurityContextBase securityContext) {
+    public void validateCreate(LicenseRequestCreate licenseRequestCreate,SecurityContext securityContext) {
         validate(licenseRequestCreate,securityContext);
         if(licenseRequestCreate.getLicensedTenant()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"SecurityTenant Must be provided");

@@ -3,8 +3,8 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.OneTimePriceRepository;
 import com.wizzdi.flexicore.pricing.model.price.Frequency;
@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -37,19 +38,19 @@ public class OneTimePriceService implements Plugin {
     @Autowired
     private PriceService priceService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -76,32 +77,32 @@ public class OneTimePriceService implements Plugin {
     }
 
     public void validateFiltering(OneTimePriceFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         priceService.validateFiltering(filtering, securityContext);
     }
 
     public PaginationResponse<OneTimePrice> getAllOneTimePrice(
-            SecurityContextBase securityContext, OneTimePriceFiltering filtering) {
+            SecurityContext securityContext, OneTimePriceFiltering filtering) {
         List<OneTimePrice> list = listAllOneTimePrice(securityContext, filtering);
         long count = repository.countAllOneTimePrice(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<OneTimePrice> listAllOneTimePrice(SecurityContextBase securityContext, OneTimePriceFiltering filtering) {
+    public List<OneTimePrice> listAllOneTimePrice(SecurityContext securityContext, OneTimePriceFiltering filtering) {
         return repository.getAllOneTimePrice(securityContext, filtering);
     }
 
     public OneTimePrice createOneTimePrice(OneTimePriceCreate creationContainer,
-                                           SecurityContextBase securityContext) {
+                                           SecurityContext securityContext) {
         OneTimePrice oneTimePrice = createOneTimePriceNoMerge(creationContainer, securityContext);
         repository.merge(oneTimePrice);
         return oneTimePrice;
     }
 
     private OneTimePrice createOneTimePriceNoMerge(OneTimePriceCreate creationContainer,
-                                                   SecurityContextBase securityContext) {
+                                                   SecurityContext securityContext) {
         OneTimePrice oneTimePrice = new OneTimePrice();
-        oneTimePrice.setId(Baseclass.getBase64ID());
+        oneTimePrice.setId(UUID.randomUUID().toString());
 
         updateOneTimePriceNoMerge(oneTimePrice, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(oneTimePrice, securityContext);
@@ -125,7 +126,7 @@ public class OneTimePriceService implements Plugin {
     }
 
     public OneTimePrice updateOneTimePrice(OneTimePriceUpdate updateContainer,
-                                           SecurityContextBase securityContext) {
+                                           SecurityContext securityContext) {
         OneTimePrice oneTimePrice = updateContainer.getOneTimePrice();
         if (updateOneTimePriceNoMerge(oneTimePrice, updateContainer)) {
             repository.merge(oneTimePrice);
@@ -134,11 +135,11 @@ public class OneTimePriceService implements Plugin {
     }
 
     public void validate(OneTimePriceCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         priceService.validate(creationContainer, securityContext);
 
         String frequencyId=creationContainer.getFrequencyId();
-        Frequency frequency=frequencyId==null?null:getByIdOrNull(frequencyId,Frequency.class, SecuredBasic_.security,securityContext);
+        Frequency frequency=frequencyId==null?null:getByIdOrNull(frequencyId,Frequency.class, securityContext);
         if(frequency==null&&frequencyId!=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no frequency with id "+frequencyId);
         }
@@ -146,7 +147,7 @@ public class OneTimePriceService implements Plugin {
 
 
         String pricingSchemeId=creationContainer.getPricingSchemeId();
-        PricingScheme pricingScheme=pricingSchemeId==null?null:getByIdOrNull(pricingSchemeId,PricingScheme.class, SecuredBasic_.security,securityContext);
+        PricingScheme pricingScheme=pricingSchemeId==null?null:getByIdOrNull(pricingSchemeId,PricingScheme.class, securityContext);
         if(pricingScheme==null&&pricingSchemeId!=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no pricingScheme with id "+pricingSchemeId);
         }

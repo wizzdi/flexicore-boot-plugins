@@ -7,7 +7,7 @@ import com.flexicore.scheduling.data.ScheduleToActionRepository;
 import com.flexicore.scheduling.request.ScheduleToActionCreate;
 import com.flexicore.scheduling.request.ScheduleToActionFilter;
 import com.flexicore.scheduling.request.ScheduleToActionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -39,7 +39,7 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public ScheduleToAction createScheduleToAction(
-      ScheduleToActionCreate scheduleToActionCreate, SecurityContextBase securityContext) {
+      ScheduleToActionCreate scheduleToActionCreate, SecurityContext securityContext) {
     ScheduleToAction scheduleToAction =
         createScheduleToActionNoMerge(scheduleToActionCreate, securityContext);
     repository.merge(scheduleToAction);
@@ -53,7 +53,7 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public ScheduleToAction createScheduleToActionNoMerge(
-      ScheduleToActionCreate scheduleToActionCreate, SecurityContextBase securityContext) {
+      ScheduleToActionCreate scheduleToActionCreate, SecurityContext securityContext) {
     ScheduleToAction scheduleToAction = new ScheduleToAction();
     scheduleToAction.setId(UUID.randomUUID().toString());
     updateScheduleToActionNoMerge(scheduleToAction, scheduleToActionCreate);
@@ -111,7 +111,7 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public ScheduleToAction updateScheduleToAction(
-      ScheduleToActionUpdate scheduleToActionUpdate, SecurityContextBase securityContext) {
+      ScheduleToActionUpdate scheduleToActionUpdate, SecurityContext securityContext) {
     ScheduleToAction scheduleToAction = scheduleToActionUpdate.getScheduleToAction();
     if (updateScheduleToActionNoMerge(scheduleToAction, scheduleToActionUpdate)) {
       repository.merge(scheduleToAction);
@@ -126,7 +126,7 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public PaginationResponse<ScheduleToAction> getAllScheduleToActions(
-      ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext) {
+      ScheduleToActionFilter scheduleToActionFilter, SecurityContext securityContext) {
     List<ScheduleToAction> list = listAllScheduleToActions(scheduleToActionFilter, securityContext);
     long count = repository.countAllScheduleToActions(scheduleToActionFilter, securityContext);
     return new PaginationResponse<>(list, scheduleToActionFilter, count);
@@ -139,7 +139,7 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public List<ScheduleToAction> listAllScheduleToActions(
-      ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext) {
+      ScheduleToActionFilter scheduleToActionFilter, SecurityContext securityContext) {
     List<ScheduleToAction> scheduleToActions = repository.listAllScheduleToActions(scheduleToActionFilter, securityContext);
     scheduleToActions.stream().forEach(f->{
       if (f.getLastExecution() != null) {
@@ -156,10 +156,10 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public void validate(
-      ScheduleToActionFilter scheduleToActionFilter, SecurityContextBase securityContext) {
+      ScheduleToActionFilter scheduleToActionFilter, SecurityContext securityContext) {
     basicService.validate(scheduleToActionFilter, securityContext);
     Set<String> scheduleIds = scheduleToActionFilter.getScheduleIds();
-    Map<String, Schedule> scheduleMap = scheduleIds.isEmpty() ? new HashMap<>() : repository.listByIds(Schedule.class, scheduleIds, Schedule_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+    Map<String, Schedule> scheduleMap = scheduleIds.isEmpty() ? new HashMap<>() : repository.listByIds(Schedule.class, scheduleIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
     scheduleIds.removeAll(scheduleMap.keySet());
     if (!scheduleIds.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule with ids " + scheduleIds + " were found, invalid schedule ids provided");
@@ -167,7 +167,7 @@ public class ScheduleToActionService implements Plugin {
     scheduleToActionFilter.setSchedule(new ArrayList<>(scheduleMap.values()));
 
     Set<String> scheduleActionIds = scheduleToActionFilter.getScheduleActionIds();
-    Map<String, ScheduleAction> scheduleActionMap = scheduleActionIds.isEmpty() ? new HashMap<>() : repository.listByIds(ScheduleAction.class, scheduleActionIds, ScheduleAction_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+    Map<String, ScheduleAction> scheduleActionMap = scheduleActionIds.isEmpty() ? new HashMap<>() : repository.listByIds(ScheduleAction.class, scheduleActionIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
     scheduleActionIds.removeAll(scheduleActionMap.keySet());
     if (!scheduleActionIds.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ScheduleAction with ids " + scheduleActionIds + " were found, invalid scheduleAction ids provided");
@@ -183,17 +183,17 @@ public class ScheduleToActionService implements Plugin {
    */
 
   public void validate(
-      ScheduleToActionCreate scheduleToActionCreate, SecurityContextBase securityContext) {
+      ScheduleToActionCreate scheduleToActionCreate, SecurityContext securityContext) {
     basicService.validate(scheduleToActionCreate, securityContext);
     String scheduleId = scheduleToActionCreate.getScheduleId();
-    Schedule schedule = scheduleId == null ? null : repository.getByIdOrNull(scheduleId, Schedule.class, Schedule_.security, securityContext);
+    Schedule schedule = scheduleId == null ? null : repository.getByIdOrNull(scheduleId, Schedule.class,securityContext);
     if (scheduleId != null && schedule == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId + " was found, invalid schedule id provided");
     }
     scheduleToActionCreate.setSchedule(schedule);
 
     String scheduleActionId = scheduleToActionCreate.getScheduleActionId();
-    ScheduleAction scheduleAction = scheduleActionId == null ? null : repository.getByIdOrNull(scheduleActionId, ScheduleAction.class, ScheduleAction_.security, securityContext);
+    ScheduleAction scheduleAction = scheduleActionId == null ? null : repository.getByIdOrNull(scheduleActionId, ScheduleAction.class,securityContext);
     if (scheduleActionId != null && scheduleAction == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ScheduleAction with id " + scheduleActionId + " was found, invalid scheduleAction id provided");
     }
@@ -202,13 +202,13 @@ public class ScheduleToActionService implements Plugin {
 
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -217,7 +217,7 @@ public class ScheduleToActionService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -226,7 +226,7 @@ public class ScheduleToActionService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

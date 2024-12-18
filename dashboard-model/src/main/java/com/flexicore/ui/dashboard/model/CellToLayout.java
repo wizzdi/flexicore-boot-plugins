@@ -1,7 +1,7 @@
 package com.flexicore.ui.dashboard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class CellToLayout extends SecuredBasic {
+public class CellToLayout extends Baseclass {
     @ManyToOne(targetEntity = GridLayoutCell.class)
     private GridLayoutCell gridLayoutCell;
     @ManyToOne(targetEntity = CellContent.class)

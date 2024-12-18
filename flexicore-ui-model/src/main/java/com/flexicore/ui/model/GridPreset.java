@@ -63,10 +63,10 @@ public class GridPreset extends Preset {
 	}
 
 	public String getTenantName(){
-		return Optional.ofNullable(getSecurity()).map(f->f.getTenant()).map(f->f.getName()).orElse(null);
+		return Optional.ofNullable(getTenant()).map(f->f.getName()).orElse(null);
 	}
 
 	public String getCreatorName(){
-		return Optional.ofNullable(getSecurity()).map(f->f.getCreator()).map(f->f.getName()).orElse(null);
+		return Optional.ofNullable(getCreator()).map(f->f.getName()).orElse(null);
 	}
 }

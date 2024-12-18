@@ -1,7 +1,7 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import java.util.List;
 import jakarta.persistence.*;
 
@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 @Table(indexes = {
         @Index(name = "room_idx",columnList = "buildingFloor_id")
 })
-public class Room extends SecuredBasic {
+public class Room extends Baseclass {
 
   @JoinColumn(nullable = false)
   @ManyToOne(targetEntity = BuildingFloor.class)

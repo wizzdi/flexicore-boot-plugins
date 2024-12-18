@@ -4,7 +4,7 @@ import com.flexicore.license.model.LicensingProduct;
 import com.flexicore.license.request.LicensingProductFiltering;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class LicensingProductRepository implements Plugin {
 	private LicensingEntityRepository licensingEntityRepository;
 
 
-	public List<LicensingProduct> listAllLicensingProducts(LicensingProductFiltering licensingProductFiltering, SecurityContextBase securityContext) {
+	public List<LicensingProduct> listAllLicensingProducts(LicensingProductFiltering licensingProductFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<LicensingProduct> q = cb.createQuery(LicensingProduct.class);
 		Root<LicensingProduct> r = q.from(LicensingProduct.class);
@@ -44,11 +44,11 @@ public class LicensingProductRepository implements Plugin {
 		return query.getResultList();
 	}
 
-	public <T extends LicensingProduct> void addLicensingProductsPredicates(LicensingProductFiltering licensingProductFiltering,CriteriaBuilder cb, CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContextBase securityContext) {
+	public <T extends LicensingProduct> void addLicensingProductsPredicates(LicensingProductFiltering licensingProductFiltering,CriteriaBuilder cb, CommonAbstractCriteria q, From<?,T> r, List<Predicate> preds,SecurityContext securityContext) {
 		licensingEntityRepository.addLicensingEntitiesPredicates(licensingProductFiltering, cb,q,r, preds,securityContext);
 	}
 
-	public long countAllLicensingProducts(LicensingProductFiltering licensingProductFiltering, SecurityContextBase securityContext) {
+	public long countAllLicensingProducts(LicensingProductFiltering licensingProductFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<LicensingProduct> r = q.from(LicensingProduct.class);
@@ -59,19 +59,19 @@ public class LicensingProductRepository implements Plugin {
 		return query.getSingleResult();
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return licensingEntityRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return licensingEntityRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return licensingEntityRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return licensingEntityRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

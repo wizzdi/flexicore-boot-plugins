@@ -1,7 +1,7 @@
 package com.wizzdi.video.conference.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.VideoServer;
@@ -32,7 +32,7 @@ public class VideoServerController implements Plugin {
   public VideoServer createVideoServer(
       
       @RequestBody VideoServerCreate videoServerCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     videoServerService.validate(videoServerCreate, securityContext);
     return videoServerService.createVideoServer(videoServerCreate, securityContext);
   }
@@ -42,11 +42,11 @@ public class VideoServerController implements Plugin {
   public VideoServer updateVideoServer(
       
       @RequestBody VideoServerUpdate videoServerUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String videoServerId = videoServerUpdate.getId();
     VideoServer videoServer =
         videoServerService.getByIdOrNull(
-            videoServerId, VideoServer.class, VideoServer_.security, securityContext);
+            videoServerId, VideoServer.class,  securityContext);
     if (videoServer == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No VideoServer with id " + videoServerId);
@@ -61,7 +61,7 @@ public class VideoServerController implements Plugin {
   public PaginationResponse<VideoServer> getAllVideoServers(
       
       @RequestBody VideoServerFilter videoServerFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     videoServerService.validate(videoServerFilter, securityContext);
     return videoServerService.getAllVideoServers(videoServerFilter, securityContext);
   }

@@ -1,11 +1,11 @@
 package com.wizzdi.flexicore.billing.model.billing;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class ChargeReference extends SecuredBasic {
+public class ChargeReference extends Baseclass {
 
     private String chargeReference;
 

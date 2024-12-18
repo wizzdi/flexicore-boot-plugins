@@ -3,14 +3,14 @@ package com.flexicore.organization.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.organization.data.EmployeeRepository;
 import com.flexicore.organization.model.Employee;
 import com.flexicore.organization.model.Organization;
 import com.flexicore.organization.request.EmployeeCreate;
 import com.flexicore.organization.request.EmployeeFiltering;
 import com.flexicore.organization.request.EmployeeUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -41,19 +41,18 @@ public class EmployeeService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -81,7 +80,7 @@ public class EmployeeService implements Plugin {
 
 	
 	public PaginationResponse<Employee> listAllEmployees(
-			SecurityContextBase securityContext, EmployeeFiltering filtering) {
+			SecurityContext securityContext, EmployeeFiltering filtering) {
 
 		List<Employee> endpoints = repository.listAllEmployees(securityContext,
 				filtering);
@@ -90,7 +89,7 @@ public class EmployeeService implements Plugin {
 	}
 
 	public Employee createEmployee(EmployeeCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 
 		Employee employee = createEmployeeNoMerge(creationContainer,
 				securityContext);
@@ -101,9 +100,9 @@ public class EmployeeService implements Plugin {
 
 	
 	public Employee createEmployeeNoMerge(EmployeeCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Employee employee = new Employee();
-		employee.setId(Baseclass.getBase64ID());
+		employee.setId(UUID.randomUUID().toString());
 
 		updateEmployeeNoMerge(employee, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(employee, securityContext);
@@ -112,7 +111,7 @@ public class EmployeeService implements Plugin {
 	}
 
 	public Employee updateEmployee(EmployeeUpdate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Employee employee = creationContainer.getEmployee();
 		if (updateEmployeeNoMerge(employee, creationContainer)) {
 			repository.merge(employee);
@@ -136,10 +135,10 @@ public class EmployeeService implements Plugin {
 	}
 
 	public void validateFiltering(EmployeeFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(filtering,securityContext);
 		Set<String> organizationIds=filtering.getOrganizationsIds();
-		Map<String, Organization> map=organizationIds.isEmpty()?new HashMap<>():listByIds(Organization.class,organizationIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String, Organization> map=organizationIds.isEmpty()?new HashMap<>():listByIds(Organization.class,organizationIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		organizationIds.remove(map.keySet());
 		if(!organizationIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no organizations with ids "+organizationIds);
@@ -149,9 +148,9 @@ public class EmployeeService implements Plugin {
 
 	}
 
-	public void validate(EmployeeCreate creationContainer, SecurityContextBase securityContext) {
+	public void validate(EmployeeCreate creationContainer, SecurityContext securityContext) {
 		String organizationId = creationContainer.getOrganizationId();
-		Organization organization = organizationId == null ? null : getByIdOrNull(organizationId, Organization.class, SecuredBasic_.security, securityContext);
+		Organization organization = organizationId == null ? null : getByIdOrNull(organizationId, Organization.class,securityContext);
 		if (organization == null && organizationId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Organization with id " + organizationId);
 		}

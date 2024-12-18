@@ -5,21 +5,20 @@ import com.flexicore.model.SecurityOperation;
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
 import com.flexicore.model.security.SecurityPolicy;
-import com.flexicore.security.SecurityContextBase;
-import com.flexicore.security.SecurityPermissions;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.messaging.model.ChatUser;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-public class ChatUserSecurityContext extends SecurityContextBase {
+public class ChatUserSecurityContext extends SecurityContext {
 
 	private ChatUser chatUser;
-	private final SecurityContextBase securityContextBase;
+	private final SecurityContext SecurityContext;
 
-	public ChatUserSecurityContext(SecurityContextBase securityContextBase) {
-		this.securityContextBase = securityContextBase;
+	public ChatUserSecurityContext(SecurityContext SecurityContext) {
+		this.SecurityContext = SecurityContext;
 	}
 
 	public ChatUser getChatUser() {
@@ -33,51 +32,48 @@ public class ChatUserSecurityContext extends SecurityContextBase {
 
 	@Override
 	public List<SecurityTenant> getTenants() {
-		return securityContextBase.getTenants();
+		return SecurityContext.getTenants();
 	}
 
 	@Override
 	public SecurityUser getUser() {
-		return securityContextBase.getUser();
+		return SecurityContext.getUser();
 	}
 
 	@Override
 	public SecurityOperation getOperation() {
-		return securityContextBase.getOperation();
+		return SecurityContext.getOperation();
 	}
 
 	@Override
 	public Map<String, List<Role>> getRoleMap() {
-		return securityContextBase.getRoleMap();
+		return SecurityContext.getRoleMap();
 	}
 
 	@Override
 	public boolean isImpersonated() {
-		return securityContextBase.isImpersonated();
+		return SecurityContext.isImpersonated();
 	}
 
 	@Override
 	public OffsetDateTime getExpiresDate() {
-		return securityContextBase.getExpiresDate();
+		return SecurityContext.getExpiresDate();
 	}
 
 	@Override
 	public SecurityTenant getTenantToCreateIn() {
-		return securityContextBase.getTenantToCreateIn();
+		return SecurityContext.getTenantToCreateIn();
 	}
 
 	@Override
 	public List<SecurityPolicy> getSecurityPolicies() {
-		return securityContextBase.getSecurityPolicies();
+		return SecurityContext.getSecurityPolicies();
 	}
 
 	@Override
 	public List<Role> getAllRoles() {
-		return securityContextBase.getAllRoles();
+		return SecurityContext.getAllRoles();
 	}
 
-	@Override
-	public SecurityPermissions getSecurityPermissions() {
-		return securityContextBase.getSecurityPermissions();
-	}
+
 }

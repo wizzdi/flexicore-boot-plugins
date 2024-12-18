@@ -2,13 +2,13 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.JSFunctionRepository;
 import com.flexicore.rules.model.JSFunction;
 import com.flexicore.rules.request.JSFunctionCreate;
 import com.flexicore.rules.request.JSFunctionFilter;
 import com.flexicore.rules.request.JSFunctionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -40,7 +40,7 @@ public class JSFunctionService implements Plugin {
    * @return created JSFunction
    */
   public JSFunction createJSFunction(
-          JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+          JSFunctionCreate jSFunctionCreate, SecurityContext securityContext) {
     JSFunction jSFunction = createJSFunctionNoMerge(jSFunctionCreate, securityContext);
     this.repository.merge(jSFunction);
     return jSFunction;
@@ -52,7 +52,7 @@ public class JSFunctionService implements Plugin {
    * @return created JSFunction unmerged
    */
   public JSFunction createJSFunctionNoMerge(
-          JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+          JSFunctionCreate jSFunctionCreate, SecurityContext securityContext) {
     JSFunction jSFunction = new JSFunction();
     jSFunction.setId(UUID.randomUUID().toString());
     updateJSFunctionNoMerge(jSFunction, jSFunctionCreate);
@@ -100,7 +100,7 @@ public class JSFunctionService implements Plugin {
    * @return jSFunction
    */
   public JSFunction updateJSFunction(
-          JSFunctionUpdate jSFunctionUpdate, SecurityContextBase securityContext) {
+          JSFunctionUpdate jSFunctionUpdate, SecurityContext securityContext) {
     JSFunction jSFunction = jSFunctionUpdate.getJSFunction();
     if (updateJSFunctionNoMerge(jSFunction, jSFunctionUpdate)) {
       this.repository.merge(jSFunction);
@@ -114,7 +114,7 @@ public class JSFunctionService implements Plugin {
    * @return PaginationResponse containing paging information for JSFunction
    */
   public PaginationResponse<JSFunction> getAllJSFunctions(
-          JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+          JSFunctionFilter jSFunctionFilter, SecurityContext securityContext) {
     List<JSFunction> list = listAllJSFunctions(jSFunctionFilter, securityContext);
     long count = this.repository.countAllJSFunctions(jSFunctionFilter, securityContext);
     return new PaginationResponse<>(list, jSFunctionFilter, count);
@@ -126,7 +126,7 @@ public class JSFunctionService implements Plugin {
    * @return List of JSFunction
    */
   public List<JSFunction> listAllJSFunctions(
-          JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+          JSFunctionFilter jSFunctionFilter, SecurityContext securityContext) {
     return this.repository.listAllJSFunctions(jSFunctionFilter, securityContext);
   }
 
@@ -135,7 +135,7 @@ public class JSFunctionService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionFilter is not valid
    */
-  public void validate(JSFunctionFilter jSFunctionFilter, SecurityContextBase securityContext) {
+  public void validate(JSFunctionFilter jSFunctionFilter, SecurityContext securityContext) {
     basicService.validate(jSFunctionFilter, securityContext);
 
 
@@ -146,7 +146,7 @@ public class JSFunctionService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if jSFunctionCreate is not valid
    */
-  public void validate(JSFunctionCreate jSFunctionCreate, SecurityContextBase securityContext) {
+  public void validate(JSFunctionCreate jSFunctionCreate, SecurityContext securityContext) {
     basicService.validate(jSFunctionCreate, securityContext);
 
     String evaluatingJSCodeId = jSFunctionCreate.getEvaluatingJSCodeId();
@@ -154,7 +154,7 @@ public class JSFunctionService implements Plugin {
             evaluatingJSCodeId == null
                     ? null
                     : this.repository.getByIdOrNull(
-                    evaluatingJSCodeId, FileResource.class, SecuredBasic_.security, securityContext);
+                    evaluatingJSCodeId, FileResource.class,  securityContext);
     if (evaluatingJSCodeId != null && evaluatingJSCode == null) {
       throw new ResponseStatusException(
               HttpStatus.BAD_REQUEST, "No FileResource with id " + evaluatingJSCodeId);
@@ -163,12 +163,12 @@ public class JSFunctionService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-          Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+          Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-          String id, Class<T> c, SecurityContextBase securityContext) {
+          String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -176,7 +176,7 @@ public class JSFunctionService implements Plugin {
           String id,
           Class<T> c,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -184,7 +184,7 @@ public class JSFunctionService implements Plugin {
           Class<T> c,
           Set<String> ids,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

@@ -1,8 +1,8 @@
 package com.wizzdi.messaging.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.messaging.model.MessageReceiverDevice;
@@ -31,7 +31,7 @@ public class MessageReceiverDeviceController implements Plugin {
 
 	@PostMapping("/createMessageReceiverDevice")
 	@Operation(description = "creates MessageReceiverDevice",summary = "creates MessageReceiverDevice")
-	public MessageReceiverDevice createMessageReceiverDevice( @RequestBody MessageReceiverDeviceCreate messageReceiverDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
+	public MessageReceiverDevice createMessageReceiverDevice( @RequestBody MessageReceiverDeviceCreate messageReceiverDeviceCreate, @RequestAttribute SecurityContext securityContext){
 		messageReceiverDeviceService.validate(messageReceiverDeviceCreate,securityContext);
 		return messageReceiverDeviceService.getOrCreateMessageReceiverDevice(messageReceiverDeviceCreate,securityContext);
 	}
@@ -39,7 +39,7 @@ public class MessageReceiverDeviceController implements Plugin {
 	@PostMapping("/getAllMessageReceiverDevices")
 	@Operation(description = "returns MessageReceiverDevices",summary = "returns MessageReceiverDevices")
 
-	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices( @RequestBody MessageReceiverDeviceFilter messageReceiverDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices( @RequestBody MessageReceiverDeviceFilter messageReceiverDeviceFilter, @RequestAttribute SecurityContext securityContext){
 		messageReceiverDeviceService.validate(messageReceiverDeviceFilter,securityContext);
 		return messageReceiverDeviceService.getAllMessageReceiverDevices(messageReceiverDeviceFilter,securityContext);
 	}
@@ -47,9 +47,9 @@ public class MessageReceiverDeviceController implements Plugin {
 	@PutMapping("/updateMessageReceiverDevice")
 	@Operation(description = "updates MessageReceiverDevice",summary = "updates MessageReceiverDevice")
 
-	public MessageReceiverDevice updateMessageReceiverDevice( @RequestBody MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public MessageReceiverDevice updateMessageReceiverDevice( @RequestBody MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, @RequestAttribute SecurityContext securityContext){
 		String id=messageReceiverDeviceUpdate.getId();
-		MessageReceiverDevice messageReceiverDevice=id!=null? messageReceiverDeviceService.getByIdOrNull(id,MessageReceiverDevice.class, SecuredBasic_.security,securityContext):null;
+		MessageReceiverDevice messageReceiverDevice=id!=null? messageReceiverDeviceService.getByIdOrNull(id,MessageReceiverDevice.class, securityContext):null;
 		if(messageReceiverDevice==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no MessageReceiverDevice user with id "+id);
 		}

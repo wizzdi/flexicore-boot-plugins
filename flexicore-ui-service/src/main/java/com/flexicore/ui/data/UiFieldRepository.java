@@ -9,7 +9,7 @@ import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.request.UiFieldFiltering;
 import com.flexicore.ui.model.*;
 import com.flexicore.ui.model.PresetToRole;
@@ -43,7 +43,7 @@ public class UiFieldRepository implements Plugin {
 
     public List<PresetToRole> listAllPresetToRoles(
             PresetToRoleFilter presetToRoleFilter,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<PresetToRole> q = cb.createQuery(PresetToRole.class);
         Root<PresetToRole> r = q.from(PresetToRole.class);
@@ -56,7 +56,7 @@ public class UiFieldRepository implements Plugin {
     }
 
     public <T extends PresetToEntity> void addPresetLinkPredicates(
-            List<Predicate> preds, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, PresetLinkFilter presetToRoleFilter, SecurityContextBase securityContextBase) {
+            List<Predicate> preds, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, PresetLinkFilter presetToRoleFilter, SecurityContext SecurityContext) {
         if (presetToRoleFilter.getPresets() != null && !presetToRoleFilter.getPresets().isEmpty()) {
             Set<String> ids = presetToRoleFilter.getPresets().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, Preset> join = cb.treat(r.join(PresetToEntity_.preset), Preset.class);
@@ -67,8 +67,8 @@ public class UiFieldRepository implements Plugin {
 
     public <T extends PresetToRole> void addPresetToRolePredicates(List<Predicate> preds,
                                                                    CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r,
-                                                                   PresetToRoleFilter presetToRoleFilter, SecurityContextBase securityContextBase) {
-        addPresetLinkPredicates(preds, cb, q, r, presetToRoleFilter, securityContextBase);
+                                                                   PresetToRoleFilter presetToRoleFilter, SecurityContext SecurityContext) {
+        addPresetLinkPredicates(preds, cb, q, r, presetToRoleFilter, SecurityContext);
         if (presetToRoleFilter.getRoles() != null && !presetToRoleFilter.getRoles().isEmpty()) {
             Set<String> ids = presetToRoleFilter.getRoles().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, Role> join = r.join(PresetToRole_.role);
@@ -78,7 +78,7 @@ public class UiFieldRepository implements Plugin {
     }
 
     public long countAllPresetToRoles(PresetToRoleFilter presetToRoleFilter,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<PresetToRole> r = q.from(PresetToRole.class);
@@ -91,7 +91,7 @@ public class UiFieldRepository implements Plugin {
 
     public List<PresetToTenant> listAllPresetToTenants(
             PresetToTenantFilter presetToTenantFilter,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<PresetToTenant> q = cb.createQuery(PresetToTenant.class);
         Root<PresetToTenant> r = q.from(PresetToTenant.class);
@@ -105,8 +105,8 @@ public class UiFieldRepository implements Plugin {
 
     public <T extends PresetToTenant> void addPresetToTenantPredicates(List<Predicate> preds,
                                                                        CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r,
-                                                                       PresetToTenantFilter presetToTenantFilter, SecurityContextBase securityContextBase) {
-        addPresetLinkPredicates(preds, cb, q, r, presetToTenantFilter, securityContextBase);
+                                                                       PresetToTenantFilter presetToTenantFilter, SecurityContext SecurityContext) {
+        addPresetLinkPredicates(preds, cb, q, r, presetToTenantFilter, SecurityContext);
         if (presetToTenantFilter.getTenants() != null && !presetToTenantFilter.getTenants().isEmpty()) {
             Set<String> ids = presetToTenantFilter.getTenants().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, SecurityTenant> join = r.join(PresetToTenant_.tenant);
@@ -117,7 +117,7 @@ public class UiFieldRepository implements Plugin {
 
     public long countAllPresetToTenants(
             PresetToTenantFilter presetToTenantFilter,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<PresetToTenant> r = q.from(PresetToTenant.class);
@@ -130,7 +130,7 @@ public class UiFieldRepository implements Plugin {
 
     public List<PresetToUser> listAllPresetToUsers(
             PresetToUserFilter presetToUserFilter,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<PresetToUser> q = cb.createQuery(PresetToUser.class);
         Root<PresetToUser> r = q.from(PresetToUser.class);
@@ -144,8 +144,8 @@ public class UiFieldRepository implements Plugin {
 
     public <T extends PresetToUser> void addPresetToUserPredicates(List<Predicate> preds,
                                            CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r,
-                                           PresetToUserFilter presetToUserFilter,SecurityContextBase securityContextBase) {
-        addPresetLinkPredicates(preds, cb,q, r, presetToUserFilter,securityContextBase);
+                                           PresetToUserFilter presetToUserFilter,SecurityContext SecurityContext) {
+        addPresetLinkPredicates(preds, cb,q, r, presetToUserFilter,SecurityContext);
         if (presetToUserFilter.getUsers() != null && !presetToUserFilter.getUsers().isEmpty()) {
             Set<String> ids = presetToUserFilter.getUsers().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, SecurityUser> join = r.join(PresetToUser_.user);
@@ -155,7 +155,7 @@ public class UiFieldRepository implements Plugin {
     }
 
     public long countAllPresetToUsers(PresetToUserFilter presetToUserFilter,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<PresetToUser> r = q.from(PresetToUser.class);
@@ -167,7 +167,7 @@ public class UiFieldRepository implements Plugin {
     }
 
     public List<UiField> listAllUiFields(UiFieldFiltering uiFieldFiltering,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<UiField> q = cb.createQuery(UiField.class);
         Root<UiField> r = q.from(UiField.class);
@@ -181,8 +181,8 @@ public class UiFieldRepository implements Plugin {
 
     public <T extends UiField> void addUiFieldPredicates(List<Predicate> preds,
                                       CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r,
-                                      UiFieldFiltering uiFieldFiltering,SecurityContextBase securityContextBase) {
-        securedBasicRepository.addSecuredBasicPredicates(null,cb,q,r,preds,securityContextBase);
+                                      UiFieldFiltering uiFieldFiltering,SecurityContext SecurityContext) {
+        securedBasicRepository.addSecuredBasicPredicates(null,cb,q,r,preds,SecurityContext);
         if (uiFieldFiltering.getPresets() != null && !uiFieldFiltering.getPresets().isEmpty()) {
             Set<String> ids = uiFieldFiltering.getPresets().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, Preset> join = r.join(UiField_.preset);
@@ -191,7 +191,7 @@ public class UiFieldRepository implements Plugin {
     }
 
     public long countAllUiFields(UiFieldFiltering uiFieldFiltering,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<UiField> r = q.from(UiField.class);
@@ -202,19 +202,19 @@ public class UiFieldRepository implements Plugin {
         return query.getSingleResult();
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.PresetToPreset;
 import com.flexicore.ui.request.PresetToPresetCreate;
 import com.flexicore.ui.request.PresetToPresetFiltering;
@@ -49,7 +49,7 @@ public class PresetToPresetController implements Plugin {
 	public PaginationResponse<PresetToPreset> getAllPresetToPresets(
 			 @RequestBody 
 			PresetToPresetFiltering presetToPresetFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(presetToPresetFiltering,securityContext);
 		return service.getAllPresetToPresets(presetToPresetFiltering, securityContext);
 
@@ -61,9 +61,9 @@ public class PresetToPresetController implements Plugin {
 	@PutMapping("updatePresetToPreset")
 	public PresetToPreset updatePresetToPreset(
 			 @RequestBody 
-			PresetToPresetUpdate updatePresetToPreset, @RequestAttribute SecurityContextBase securityContext) {
+			PresetToPresetUpdate updatePresetToPreset, @RequestAttribute SecurityContext securityContext) {
 		PresetToPreset presetToPreset = updatePresetToPreset.getId() != null ? service.getByIdOrNull(
-				updatePresetToPreset.getId(), PresetToPreset.class, PresetToPreset_.security, securityContext) : null;
+				updatePresetToPreset.getId(), PresetToPreset.class,  securityContext) : null;
 		if (presetToPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no PresetToPreset with id  " + updatePresetToPreset.getId());
 		}
@@ -80,7 +80,7 @@ public class PresetToPresetController implements Plugin {
 	@PostMapping("createPresetToPreset")
 	public PresetToPreset createPresetToPreset(
 			 @RequestBody 
-			PresetToPresetCreate createPresetToPreset, @RequestAttribute SecurityContextBase securityContext) {
+			PresetToPresetCreate createPresetToPreset, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createPresetToPreset, securityContext);
 		return service.createPresetToPreset(createPresetToPreset, securityContext);
 

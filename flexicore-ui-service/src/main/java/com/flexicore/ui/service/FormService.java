@@ -7,8 +7,8 @@ import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionServic
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.FormRepository;
 import com.flexicore.ui.model.Form;
 import com.flexicore.ui.model.UiField;
@@ -48,13 +48,13 @@ public class FormService implements Plugin {
 	private DynamicExecutionService dynamicExecutionService;
 
 	public PaginationResponse<Form> getAllForms(FormFiltering formFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<Form> list = listAllForms(formFiltering, securityContext);
 		long count = formRepository.countAllForms(formFiltering, securityContext);
 		return new PaginationResponse<>(list, formFiltering, count);
 	}
 
-	public List<Form> listAllForms(FormFiltering formFiltering, SecurityContextBase securityContext) {
+	public List<Form> listAllForms(FormFiltering formFiltering, SecurityContext securityContext) {
 		return formRepository.listAllForms(formFiltering, securityContext);
 	}
 
@@ -69,7 +69,7 @@ public class FormService implements Plugin {
 	}
 
 	public Form updateForm(FormUpdate updatePreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (updateFormNoMerge(updatePreset, updatePreset.getForm())) {
 			formRepository.merge(updatePreset.getForm());
 		}
@@ -78,7 +78,7 @@ public class FormService implements Plugin {
 	}
 
 	public Form createForm(FormCreate createPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Form preset = createFormNoMerge(createPreset, securityContext);
 		formRepository.merge(preset);
 		return preset;
@@ -86,7 +86,7 @@ public class FormService implements Plugin {
 	}
 
 	public Form createFormNoMerge(FormCreate createPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Form preset = new Form();
 		preset.setId(UUID.randomUUID().toString());
 		updateFormNoMerge(createPreset, preset);
@@ -95,26 +95,26 @@ public class FormService implements Plugin {
 	}
 
 
-	public void validateCopy(FormCopy formCopy, SecurityContextBase securityContext) {
+	public void validateCopy(FormCopy formCopy, SecurityContext securityContext) {
 		validate(formCopy, securityContext);
 		String formId = formCopy.getId();
-		Form form = formId != null ? getByIdOrNull(formId, Form.class, Form_.security, securityContext) : null;
+		Form form = formId != null ? getByIdOrNull(formId, Form.class,securityContext) : null;
 		if (form == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Grid Preset With id " + formId);
 		}
 		formCopy.setForm(form);
 	}
 
-	public void validate(FormCreate createForm, SecurityContextBase securityContext) {
+	public void validate(FormCreate createForm, SecurityContext securityContext) {
 		String dynamicExecutionId = createForm.getDynamicExecutionId();
-		DynamicExecution dynamicExecution = dynamicExecutionId == null ? null : dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, SecuredBasic_.security, securityContext);
+		DynamicExecution dynamicExecution = dynamicExecutionId == null ? null : dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class,securityContext);
 		if (dynamicExecution == null && dynamicExecutionId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Dynamic Execution with id " + dynamicExecutionId);
 		}
 		createForm.setDynamicExecution(dynamicExecution);
 	}
 
-	public Form copyForm(FormCopy formCopy, SecurityContextBase securityContext) {
+	public Form copyForm(FormCopy formCopy, SecurityContext securityContext) {
 		List<Object> toMerge = new ArrayList<>();
 		FormCreate formCreate = getCreateContainer(formCopy.getForm());
 		Form form = createFormNoMerge(formCreate, securityContext);
@@ -140,19 +140,19 @@ public class FormService implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return formRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return formRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return formRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return formRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

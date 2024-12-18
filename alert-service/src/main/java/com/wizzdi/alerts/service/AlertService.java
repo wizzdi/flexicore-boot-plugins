@@ -7,7 +7,7 @@ import com.wizzdi.alerts.request.AlertFilter;
 import com.wizzdi.alerts.request.AlertUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -33,7 +33,7 @@ public class AlertService implements Plugin {
    * @param securityContext
    * @return created Alert
    */
-  public Alert createAlert(AlertCreate alertCreate, SecurityContextBase securityContext) {
+  public Alert createAlert(AlertCreate alertCreate, SecurityContext securityContext) {
     Alert alert = createAlertNoMerge(alertCreate, securityContext);
     this.repository.merge(alert);
     return alert;
@@ -44,7 +44,7 @@ public class AlertService implements Plugin {
    * @param securityContext
    * @return created Alert unmerged
    */
-  public Alert createAlertNoMerge(AlertCreate alertCreate, SecurityContextBase securityContext) {
+  public Alert createAlertNoMerge(AlertCreate alertCreate, SecurityContext securityContext) {
     Alert alert = new Alert();
     alert.setId(UUID.randomUUID().toString());
     updateAlertNoMerge(alert, alertCreate);
@@ -104,7 +104,7 @@ public class AlertService implements Plugin {
    * @param securityContext
    * @return alert
    */
-  public Alert updateAlert(AlertUpdate alertUpdate, SecurityContextBase securityContext) {
+  public Alert updateAlert(AlertUpdate alertUpdate, SecurityContext securityContext) {
     Alert alert = alertUpdate.getAlert();
     if (updateAlertNoMerge(alert, alertUpdate)) {
       this.repository.merge(alert);
@@ -118,7 +118,7 @@ public class AlertService implements Plugin {
    * @return PaginationResponse containing paging information for Alert
    */
   public PaginationResponse<Alert> getAllAlerts(
-          AlertFilter alertFilter, SecurityContextBase securityContext) {
+          AlertFilter alertFilter, SecurityContext securityContext) {
     List<Alert> list = listAllAlerts(alertFilter, securityContext);
     long count = this.repository.countAllAlerts(alertFilter, securityContext);
     return new PaginationResponse<>(list, alertFilter.getPageSize(), count);
@@ -129,17 +129,17 @@ public class AlertService implements Plugin {
    * @param securityContext
    * @return List of Alert
    */
-  public List<Alert> listAllAlerts(AlertFilter alertFilter, SecurityContextBase securityContext) {
+  public List<Alert> listAllAlerts(AlertFilter alertFilter, SecurityContext securityContext) {
     return this.repository.listAllAlerts(alertFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -147,7 +147,7 @@ public class AlertService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -155,7 +155,7 @@ public class AlertService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

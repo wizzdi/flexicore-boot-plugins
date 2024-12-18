@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.request;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.maps.model.MappedPOI;
 
 import jakarta.persistence.criteria.*;
@@ -14,5 +14,5 @@ public interface PredicateAdder<E> {
             CriteriaQuery<?> q,
             From<?, T> r,
             List<Predicate> preds,
-            SecurityContextBase securityContext);
+            SecurityContext securityContext);
 }

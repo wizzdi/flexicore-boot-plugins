@@ -6,7 +6,7 @@ import com.flexicore.rules.model.ScenarioTriggerType;
 import com.flexicore.rules.request.ScenarioTriggerTypeCreate;
 import com.flexicore.rules.request.ScenarioTriggerTypeFilter;
 import com.flexicore.rules.service.ScenarioTriggerTypeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteCreatedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteStatusChangedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteUpdatedTrigger;
@@ -34,7 +34,7 @@ public class BasicIOTTriggerTypeCreator implements Plugin {
 
 
     @Bean
-    public BasicIOTTriggerTypeHolder basicIOTTriggerTypeHolder(ScenarioTriggerTypeService scenarioTriggerTypeService, SecurityContextBase adminSecurityContext){
+    public BasicIOTTriggerTypeHolder basicIOTTriggerTypeHolder(ScenarioTriggerTypeService scenarioTriggerTypeService, SecurityContext adminSecurityContext){
         Set<String> typeNames = triggerTypes.stream().map(f -> f.type().getCanonicalName()).collect(Collectors.toSet());
         Map<String,ScenarioTriggerType> existing=scenarioTriggerTypeService.listAllScenarioTriggerTypes(new ScenarioTriggerTypeFilter().setEventCanonicalName(typeNames),null).stream().collect(java.util.stream.Collectors.toMap(f->f.getEventCanonicalName(), f->f));
         for (TriggerTypeHolder triggerHolder : triggerTypes) {

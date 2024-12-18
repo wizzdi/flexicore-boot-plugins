@@ -1,7 +1,7 @@
 package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Customer extends SecuredBasic {
+public class Customer extends Baseclass {
 
 	private String externalId;
 

@@ -2,7 +2,7 @@ package com.wizzdi.messaging.firebase.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.messaging.connectors.firebase.model.FirebaseEnabledDevice;
@@ -31,7 +31,7 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 	private MessageReceiverDeviceRepository messageReceiverDeviceRepository;
 
 
-	public List<FirebaseEnabledDevice> listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContextBase securityContext) {
+	public List<FirebaseEnabledDevice> listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<FirebaseEnabledDevice> q = cb.createQuery(FirebaseEnabledDevice.class);
 		Root<FirebaseEnabledDevice> r = q.from(FirebaseEnabledDevice.class);
@@ -44,14 +44,14 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 
 	}
 
-	public <T extends FirebaseEnabledDevice> void addFirebaseEnabledDevicePredicates(FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContextBase securityContext) {
+	public <T extends FirebaseEnabledDevice> void addFirebaseEnabledDevicePredicates(FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContext securityContext) {
 
 		messageReceiverDeviceRepository.addMessageReceiverDevicePredicates(firebaseEnabledDeviceFilter,cb,q,r,predicates,securityContext);
 
 
 	}
 
-	public long countAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContextBase securityContext) {
+	public long countAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<FirebaseEnabledDevice> r = q.from(FirebaseEnabledDevice.class);
@@ -63,19 +63,19 @@ public class FirebaseEnabledDeviceRepository implements Plugin {
 
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -4,7 +4,7 @@ import com.flexicore.model.territories.Address;
 import com.flexicore.organization.model.Organization;
 import com.flexicore.organization.request.OrganizationCreate;
 import com.flexicore.organization.service.OrganizationService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ public class TestEntities {
     private OrganizationService organizationService;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
     @Bean
     public Organization organization(){

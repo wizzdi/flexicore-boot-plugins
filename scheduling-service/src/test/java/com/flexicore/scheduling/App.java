@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.scheduling.model.Schedule;
 import com.flexicore.scheduling.model.ScheduleAction;
 import com.flexicore.scheduling.model.ScheduleTimeslot;
@@ -61,8 +61,8 @@ public class App {
                             Schedule.class,
                             ScheduleToAction.class,
                             ScheduleTimeslot.class,
-                            JsonConverter.class,
-                            SecuredBasic.class)));
+                            JsonConverter.class
+                            )));
   }
 
   @Bean

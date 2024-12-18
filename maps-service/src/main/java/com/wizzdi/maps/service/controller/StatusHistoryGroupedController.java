@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -31,7 +31,7 @@ public class StatusHistoryGroupedController implements Plugin, Invoker {
   public PaginationResponse<StatusHistoryGroupedEntry> listAllStatusHistoriesGrouped(
       
       @RequestBody StatusHistoryGroupedRequest statusHistoryGroupedRequest,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     statusHistoryGroupedService.validate(statusHistoryGroupedRequest, securityContext);
     StatusHistoryGroupedResponse statusHistoryGroupedResponse = statusHistoryGroupedService.listAllStatusHistoriesGrouped(statusHistoryGroupedRequest, securityContext);

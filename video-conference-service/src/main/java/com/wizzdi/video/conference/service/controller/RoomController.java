@@ -1,7 +1,7 @@
 package com.wizzdi.video.conference.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.Room;
@@ -32,7 +32,7 @@ public class RoomController implements Plugin {
   public Room createRoom(
       
       @RequestBody RoomCreate roomCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     roomService.validate(roomCreate, securityContext);
     return roomService.createRoom(roomCreate, securityContext);
   }
@@ -42,9 +42,9 @@ public class RoomController implements Plugin {
   public Room updateRoom(
       
       @RequestBody RoomUpdate roomUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String roomId = roomUpdate.getId();
-    Room room = roomService.getByIdOrNull(roomId, Room.class, Room_.security, securityContext);
+    Room room = roomService.getByIdOrNull(roomId, Room.class,securityContext);
     if (room == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with id " + roomId);
     }
@@ -58,7 +58,7 @@ public class RoomController implements Plugin {
   public PaginationResponse<Room> getAllRooms(
       
       @RequestBody RoomFilter roomFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     roomService.validate(roomFilter, securityContext);
     return roomService.getAllRooms(roomFilter, securityContext);
   }

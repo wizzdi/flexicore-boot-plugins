@@ -1,6 +1,7 @@
 package com.wizzdi.alerts;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
@@ -8,7 +9,7 @@ import jakarta.persistence.Lob;
 import java.time.OffsetDateTime;
 
 @Entity
-public class Alert extends SecuredBasic {
+public class Alert extends Baseclass {
 
   private AlertLevel alertLevel;
 

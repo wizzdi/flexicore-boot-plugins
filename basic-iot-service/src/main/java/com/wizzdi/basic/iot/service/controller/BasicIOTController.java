@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Device_;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
@@ -36,7 +36,7 @@ public class BasicIOTController implements Plugin {
     @Operation(summary = "Run fixing connectivity off with default icon fix")
     @GetMapping("/fixIcons")
     public long fixIcons(
-           @RequestAttribute SecurityContextBase securityContext) {
+           @RequestAttribute SecurityContext securityContext) {
 
         return basicIOTLogic.fixIcons(securityContext);
     }

@@ -2,7 +2,7 @@ package com.flexicore.ui.service;
 
 
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.GridPresetRepository;
 import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.model.GridPreset_;
@@ -60,7 +60,7 @@ public class GridPresetService implements Plugin {
 	private DynamicExecutionService dynamicExecutionService;
 	@Autowired
 	@Lazy
-	private SecurityContextBase adminSecurityContextBase;
+	private SecurityContext adminSecurityContext;
 	@Autowired
 	@Lazy
 	@Qualifier("gridPresetClazz")
@@ -68,7 +68,7 @@ public class GridPresetService implements Plugin {
 
 	public PaginationResponse<GridPreset> getAllGridPresets(
 			GridPresetFiltering gridPresetFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<GridPreset> list = listAllGridPresets(gridPresetFiltering,
 				securityContext);
 		long count = gridPresetRepository.countAllGridPresets(
@@ -78,7 +78,7 @@ public class GridPresetService implements Plugin {
 
 	public List<GridPreset> listAllGridPresets(
 			GridPresetFiltering gridPresetFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return gridPresetRepository.listAllGridPresets(gridPresetFiltering,
 				securityContext);
 	}
@@ -111,7 +111,7 @@ public class GridPresetService implements Plugin {
 	}
 
 	public GridPreset updateGridPreset(GridPresetUpdate updatePreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (updateGridPresetNoMerge(updatePreset, updatePreset.getPreset())) {
 			gridPresetRepository.merge(updatePreset.getPreset());
 		}
@@ -120,7 +120,7 @@ public class GridPresetService implements Plugin {
 	}
 
 	public GridPreset createGridPreset(GridPresetCreate createPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		GridPreset preset = createGridPresetNoMerge(createPreset,
 				securityContext);
 		gridPresetRepository.merge(preset);
@@ -129,7 +129,7 @@ public class GridPresetService implements Plugin {
 	}
 
 	public GridPreset createGridPresetNoMerge(GridPresetCreate createPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		GridPreset preset = new GridPreset();
 		preset.setId(UUID.randomUUID().toString());
 		updateGridPresetNoMerge(createPreset, preset);
@@ -139,10 +139,10 @@ public class GridPresetService implements Plugin {
 
 
 	public void validateCopy(GridPresetCopy gridPresetCopy,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		validate(gridPresetCopy, securityContext);
 		String gridPresetId = gridPresetCopy.getId();
-		GridPreset gridPreset = gridPresetId != null ? getByIdOrNull(gridPresetId, GridPreset.class, GridPreset_.security, securityContext) : null;
+		GridPreset gridPreset = gridPresetId != null ? getByIdOrNull(gridPresetId, GridPreset.class,securityContext) : null;
 		if (gridPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Grid Preset With id " + gridPresetId);
 		}
@@ -150,9 +150,9 @@ public class GridPresetService implements Plugin {
 	}
 
 	public void validate(GridPresetCreate createGridPreset,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		String dynamicExecutionId = createGridPreset.getDynamicExecutionId();
-		DynamicExecution dynamicExecution = dynamicExecutionId == null ? null : dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class, SecuredBasic_.security, securityContext);
+		DynamicExecution dynamicExecution = dynamicExecutionId == null ? null : dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class,securityContext);
 		if (dynamicExecution == null && dynamicExecutionId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Dynamic Execution with id " + dynamicExecutionId);
 		}
@@ -160,7 +160,7 @@ public class GridPresetService implements Plugin {
 	}
 
 	public GridPreset copyGridPreset(GridPresetCopy gridPresetCopy,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<Object> toMerge = new ArrayList<>();
 		GridPresetCreate gridPresetCreate = getCreateContainer(gridPresetCopy.getPreset());
 		GridPreset gridPreset = createGridPresetNoMerge(gridPresetCreate, securityContext);
@@ -183,19 +183,18 @@ public class GridPresetService implements Plugin {
 	public void handlePresetPermissionGroupCreated(BasicCreated<PermissionGroupToBaseclass> baseclassCreated){
 		PermissionGroupToBaseclass permissionGroupToBaseclass = baseclassCreated.getBaseclass();
 		PermissionGroup permissionGroup=permissionGroupToBaseclass.getPermissionGroup();
-		if(permissionGroupToBaseclass.getBaseclass().getClazz().getId().equals(gridPresetClazz.getId())){
-			SecurityContextBase securityContext=adminSecurityContextBase;
-			Baseclass baseclass= permissionGroupToBaseclass.getBaseclass();
-			List<GridPreset> presets=listAllGridPresets(new GridPresetFiltering().setRelatedBaseclass(Collections.singletonList(baseclass)),null);
+		if(permissionGroupToBaseclass.getSecuredType().equals(gridPresetClazz.name())){
+			SecurityContext securityContext=adminSecurityContext;
+			String baseclass= permissionGroupToBaseclass.getSecuredId();
+			List<GridPreset> presets=listAllGridPresets(new GridPresetFiltering().setRelatedBaseclass(Collections.singleton(baseclass)),null);
 			for (GridPreset preset : presets) {
 				if(preset.getDynamicExecution()!=null){
 					logger.info("grid preset "+preset.getName() +"("+preset.getId()+") was attached to permission group "+permissionGroup.getName()+"("+permissionGroup.getId()+") , will attach dynamic execution");
-					if(preset.getDynamicExecution().getSecurity()!=null){
 						PermissionGroupToBaseclassCreate createPermissionGroupLinkRequest = new PermissionGroupToBaseclassCreate()
 								.setPermissionGroup(permissionGroup)
-								.setBaseclass(preset.getDynamicExecution().getSecurity());
+								.setSecuredId(preset.getDynamicExecution().getSecurityId())
+										.setSecuredType(Clazz.ofClass(DynamicExecution.class));
 						permissionGroupToBaseclassService.createPermissionGroupToBaseclass(createPermissionGroupLinkRequest,securityContext);
-					}
 
 
 				}
@@ -215,19 +214,19 @@ public class GridPresetService implements Plugin {
 				.setName(preset.getName());
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return gridPresetRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return gridPresetRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridPresetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridPresetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

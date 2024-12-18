@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.GraphTemplate;
 import com.flexicore.ui.dashboard.request.GraphTemplateCreate;
 import com.flexicore.ui.dashboard.request.GraphTemplateFilter;
@@ -45,7 +45,7 @@ public class GraphTemplateController implements Plugin {
 	public PaginationResponse<GraphTemplate> getAllGraphTemplate(
 			@RequestBody
 			GraphTemplateFilter graphTemplateFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(graphTemplateFilter, securityContext);
 		return service.getAllGraphTemplate(graphTemplateFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class GraphTemplateController implements Plugin {
 	@PutMapping("updateGraphTemplate")
 	public GraphTemplate updateGraphTemplate(
 			@RequestBody
-			GraphTemplateUpdate updateGraphTemplate, @RequestAttribute SecurityContextBase securityContext) {
+			GraphTemplateUpdate updateGraphTemplate, @RequestAttribute SecurityContext securityContext) {
 		GraphTemplate graphTemplate = updateGraphTemplate.getId() != null ? service.getByIdOrNull(
-				updateGraphTemplate.getId(), GraphTemplate.class, SecuredBasic_.security, securityContext) : null;
+				updateGraphTemplate.getId(), GraphTemplate.class,  securityContext) : null;
 		if (graphTemplate == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGraphTemplate.getId());
@@ -77,7 +77,7 @@ public class GraphTemplateController implements Plugin {
 	@PostMapping("createGraphTemplate")
 	public GraphTemplate createGraphTemplate(
 			@RequestBody
-			GraphTemplateCreate createGraphTemplate, @RequestAttribute SecurityContextBase securityContext) {
+			GraphTemplateCreate createGraphTemplate, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createGraphTemplate, securityContext);
 		return service.createGraphTemplate(createGraphTemplate, securityContext);
 

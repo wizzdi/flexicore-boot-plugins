@@ -1,8 +1,8 @@
 package com.wizzdi.messaging.firebase.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -35,7 +35,7 @@ public class FirebaseEnabledDeviceController implements Plugin {
 
 	@PostMapping("/createFirebaseEnabledDevice")
 	@Operation(description = "creates FirebaseEnabledDevice",summary = "creates FirebaseEnabledDevice")
-	public FirebaseEnabledDevice createFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, @RequestAttribute SecurityContextBase securityContext){
+	public FirebaseEnabledDevice createFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, @RequestAttribute SecurityContext securityContext){
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceCreate,securityContext);
 		return firebaseEnabledDeviceService.getOrCreateFirebaseEnabledDevice(firebaseEnabledDeviceCreate,securityContext);
 	}
@@ -43,7 +43,7 @@ public class FirebaseEnabledDeviceController implements Plugin {
 	@PostMapping("/getAllFirebaseEnabledDevices")
 	@Operation(description = "returns FirebaseEnabledDevices",summary = "returns FirebaseEnabledDevices")
 
-	public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices( @RequestBody FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices( @RequestBody FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, @RequestAttribute SecurityContext securityContext){
 		firebaseEnabledDeviceService.validate(firebaseEnabledDeviceFilter,securityContext);
 		return firebaseEnabledDeviceService.getAllFirebaseEnabledDevices(firebaseEnabledDeviceFilter,securityContext);
 	}
@@ -51,9 +51,9 @@ public class FirebaseEnabledDeviceController implements Plugin {
 	@PutMapping("/updateFirebaseEnabledDevice")
 	@Operation(description = "updates FirebaseEnabledDevice",summary = "updates FirebaseEnabledDevice")
 
-	public FirebaseEnabledDevice updateFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public FirebaseEnabledDevice updateFirebaseEnabledDevice( @RequestBody FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, @RequestAttribute SecurityContext securityContext){
 		String id=firebaseEnabledDeviceUpdate.getId();
-		FirebaseEnabledDevice firebaseEnabledDevice=id!=null? firebaseEnabledDeviceService.getByIdOrNull(id,FirebaseEnabledDevice.class, SecuredBasic_.security,securityContext):null;
+		FirebaseEnabledDevice firebaseEnabledDevice=id!=null? firebaseEnabledDeviceService.getByIdOrNull(id,FirebaseEnabledDevice.class, securityContext):null;
 		if(firebaseEnabledDevice==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no FirebaseEnabledDevice with id "+id);
 		}

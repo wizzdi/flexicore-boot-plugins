@@ -1,7 +1,7 @@
 package com.flexicore.organization.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Industry extends SecuredBasic {
+public class Industry extends Baseclass {
 
     @JsonIgnore
     @OneToMany(targetEntity = IndustryToCustomer.class,mappedBy = "industry")

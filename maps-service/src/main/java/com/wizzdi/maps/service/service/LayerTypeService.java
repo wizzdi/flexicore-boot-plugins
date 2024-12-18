@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -35,7 +35,7 @@ public class LayerTypeService implements Plugin {
    * @return created LayerType
    */
   public LayerType createLayerType(
-      LayerTypeCreate layerTypeCreate, SecurityContextBase securityContext) {
+      LayerTypeCreate layerTypeCreate, SecurityContext securityContext) {
     LayerType layerType = createLayerTypeNoMerge(layerTypeCreate, securityContext);
     this.repository.merge(layerType);
     return layerType;
@@ -47,7 +47,7 @@ public class LayerTypeService implements Plugin {
    * @return created LayerType unmerged
    */
   public LayerType createLayerTypeNoMerge(
-      LayerTypeCreate layerTypeCreate, SecurityContextBase securityContext) {
+      LayerTypeCreate layerTypeCreate, SecurityContext securityContext) {
     LayerType layerType = new LayerType();
     layerType.setId(UUID.randomUUID().toString());
     updateLayerTypeNoMerge(layerType, layerTypeCreate);
@@ -74,7 +74,7 @@ public class LayerTypeService implements Plugin {
    * @return layerType
    */
   public LayerType updateLayerType(
-      LayerTypeUpdate layerTypeUpdate, SecurityContextBase securityContext) {
+      LayerTypeUpdate layerTypeUpdate, SecurityContext securityContext) {
     LayerType layerType = layerTypeUpdate.getLayerType();
     if (updateLayerTypeNoMerge(layerType, layerTypeUpdate)) {
       this.repository.merge(layerType);
@@ -88,7 +88,7 @@ public class LayerTypeService implements Plugin {
    * @return PaginationResponse containing paging information for LayerType
    */
   public PaginationResponse<LayerType> getAllLayerTypes(
-      LayerTypeFilter layerTypeFilter, SecurityContextBase securityContext) {
+      LayerTypeFilter layerTypeFilter, SecurityContext securityContext) {
     List<LayerType> list = listAllLayerTypes(layerTypeFilter, securityContext);
     long count = this.repository.countAllLayerTypes(layerTypeFilter, securityContext);
     return new PaginationResponse<>(list, layerTypeFilter.getPageSize(), count);
@@ -100,17 +100,17 @@ public class LayerTypeService implements Plugin {
    * @return List of LayerType
    */
   public List<LayerType> listAllLayerTypes(
-      LayerTypeFilter layerTypeFilter, SecurityContextBase securityContext) {
+      LayerTypeFilter layerTypeFilter, SecurityContext securityContext) {
     return this.repository.listAllLayerTypes(layerTypeFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -118,7 +118,7 @@ public class LayerTypeService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -126,7 +126,7 @@ public class LayerTypeService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

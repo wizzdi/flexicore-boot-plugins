@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.Tier;
 import com.wizzdi.flexicore.pricing.model.price.Tier_;
@@ -39,7 +39,7 @@ public class TierController implements Plugin {
     public PaginationResponse<Tier> getAllTier(
 
             
-            @RequestBody TierFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody TierFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllTier(securityContext, filtering);
     }
@@ -51,7 +51,7 @@ public class TierController implements Plugin {
     public Tier createTier(
             
             @RequestBody TierCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createTier(creationContainer, securityContext);
@@ -65,10 +65,10 @@ public class TierController implements Plugin {
 
             
             @RequestBody TierUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Tier tier = service.getByIdOrNull(updateContainer.getId(),
-                Tier.class, Tier_.security, securityContext);
+                Tier.class,  securityContext);
         if (tier == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Tier with id "
                     + updateContainer.getId());

@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class LocationHistoryController implements Plugin {
   @Operation(summary = "updateLocationHistory", description = "Updates LocationHistory")
   public LocationHistory updateLocationHistory(
       @Validated(Update.class) @RequestBody LocationHistoryUpdate locationHistoryUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return locationHistoryService.updateLocationHistory(locationHistoryUpdate, securityContext);
   }
@@ -41,7 +41,7 @@ public class LocationHistoryController implements Plugin {
   @Operation(summary = "getAllLocationHistories", description = "lists LocationHistories")
   public PaginationResponse<LocationHistory> getAllLocationHistories(
       @Valid @RequestBody LocationHistoryFilter locationHistoryFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return locationHistoryService.getAllLocationHistories(locationHistoryFilter, securityContext);
   }
@@ -50,7 +50,7 @@ public class LocationHistoryController implements Plugin {
   @Operation(summary = "createLocationHistory", description = "Creates LocationHistory")
   public LocationHistory createLocationHistory(
       @Validated(Create.class) @RequestBody LocationHistoryCreate locationHistoryCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return locationHistoryService.createLocationHistory(locationHistoryCreate, securityContext);
   }

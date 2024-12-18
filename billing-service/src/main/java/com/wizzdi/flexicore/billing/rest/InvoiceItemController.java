@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class InvoiceItemController implements Plugin {
     public PaginationResponse<InvoiceItem> getAllInvoiceItems(
 
             
-            @RequestBody InvoiceItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody InvoiceItemFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllInvoiceItems(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class InvoiceItemController implements Plugin {
 
             
             @RequestBody InvoiceItemCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createInvoiceItem(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class InvoiceItemController implements Plugin {
 
             
             @RequestBody InvoiceItemUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         InvoiceItem invoiceItem = service.getByIdOrNull(updateContainer.getId(),
-                InvoiceItem.class, InvoiceItem_.security, securityContext);
+                InvoiceItem.class,  securityContext);
         if (invoiceItem == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no InvoiceItem with id "
                     + updateContainer.getId());

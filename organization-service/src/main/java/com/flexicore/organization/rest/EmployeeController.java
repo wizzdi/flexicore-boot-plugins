@@ -12,7 +12,7 @@ import com.flexicore.organization.request.EmployeeCreate;
 import com.flexicore.organization.request.EmployeeFiltering;
 import com.flexicore.organization.request.EmployeeUpdate;
 import com.flexicore.organization.service.EmployeeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,7 +46,7 @@ public class EmployeeController implements Plugin {
 	public PaginationResponse<Employee> listAllEmployees(
 
 			@RequestBody EmployeeFiltering filtering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.listAllEmployees(securityContext, filtering);
 	}
@@ -58,7 +58,7 @@ public class EmployeeController implements Plugin {
 	public Employee createEmployee(
 
 			@RequestBody EmployeeCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer,securityContext);
 		return service.createEmployee(creationContainer, securityContext);
 	}
@@ -70,9 +70,9 @@ public class EmployeeController implements Plugin {
 	public Employee updateEmployee(
 
 			@RequestBody EmployeeUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		Employee employee = service.getByIdOrNull(updateContainer.getId(),
-				Employee.class, Employee_.security, securityContext);
+				Employee.class,  securityContext);
 		if (employee == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Employee with id "
 					+ updateContainer.getId());

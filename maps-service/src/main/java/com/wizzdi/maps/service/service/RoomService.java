@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -36,7 +36,7 @@ public class RoomService implements Plugin {
    * @param securityContext
    * @return created Room
    */
-  public Room createRoom(RoomCreate roomCreate, SecurityContextBase securityContext) {
+  public Room createRoom(RoomCreate roomCreate, SecurityContext securityContext) {
     Room room = createRoomNoMerge(roomCreate, securityContext);
     this.repository.merge(room);
     return room;
@@ -47,7 +47,7 @@ public class RoomService implements Plugin {
    * @param securityContext
    * @return created Room unmerged
    */
-  public Room createRoomNoMerge(RoomCreate roomCreate, SecurityContextBase securityContext) {
+  public Room createRoomNoMerge(RoomCreate roomCreate, SecurityContext securityContext) {
     Room room = new Room();
     room.setId(UUID.randomUUID().toString());
     updateRoomNoMerge(room, roomCreate);
@@ -98,7 +98,7 @@ public class RoomService implements Plugin {
    * @param securityContext
    * @return room
    */
-  public Room updateRoom(RoomUpdate roomUpdate, SecurityContextBase securityContext) {
+  public Room updateRoom(RoomUpdate roomUpdate, SecurityContext securityContext) {
     Room room = roomUpdate.getRoom();
     if (updateRoomNoMerge(room, roomUpdate)) {
       this.repository.merge(room);
@@ -112,7 +112,7 @@ public class RoomService implements Plugin {
    * @return PaginationResponse containing paging information for Room
    */
   public PaginationResponse<Room> getAllRooms(
-      RoomFilter roomFilter, SecurityContextBase securityContext) {
+      RoomFilter roomFilter, SecurityContext securityContext) {
     List<Room> list = listAllRooms(roomFilter, securityContext);
     long count = this.repository.countAllRooms(roomFilter, securityContext);
     return new PaginationResponse<>(list, roomFilter.getPageSize(), count);
@@ -123,17 +123,17 @@ public class RoomService implements Plugin {
    * @param securityContext
    * @return List of Room
    */
-  public List<Room> listAllRooms(RoomFilter roomFilter, SecurityContextBase securityContext) {
+  public List<Room> listAllRooms(RoomFilter roomFilter, SecurityContext securityContext) {
     return this.repository.listAllRooms(roomFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -141,7 +141,7 @@ public class RoomService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -149,7 +149,7 @@ public class RoomService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
@@ -174,7 +174,7 @@ public class RoomService implements Plugin {
     this.repository.massMerge(toMerge);
   }
 
-  public Room getOrCreateByExternalId(BuildingFloor buildingFloor, String roomId, SecurityContextBase gatewaySecurityContext) {
+  public Room getOrCreateByExternalId(BuildingFloor buildingFloor, String roomId, SecurityContext gatewaySecurityContext) {
     String externalId= "%s_%s".formatted(gatewaySecurityContext.getTenantToCreateIn().getId(), roomId);
     return listAllRooms(new RoomFilter().setExternalId(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createRoom(new RoomCreate().setBuildingFloor(buildingFloor).setExternalId(externalId).setName(roomId),gatewaySecurityContext));
   }

@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Remote;
@@ -52,8 +52,8 @@ public class StateHistoryCreator implements Plugin {
             return;
         }
 
-        SecurityContextBase securityContext = securityContextProvider.getSecurityContext(remote.getSecurity().getCreator());
-        securityContext.setTenantToCreateIn(remote.getSecurity().getTenant());
+        SecurityContext securityContext = securityContextProvider.getSecurityContext(remote.getCreator());
+        securityContext.setTenantToCreateIn(remote.getTenant());
         StateHistoryCreate stateHistoryCreate = new StateHistoryCreate()
                 .setRemote(remote)
                 .setTimeAtState(OffsetDateTime.now())

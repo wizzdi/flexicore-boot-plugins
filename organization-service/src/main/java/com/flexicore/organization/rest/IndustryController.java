@@ -12,7 +12,7 @@ import com.flexicore.organization.request.IndustryCreate;
 import com.flexicore.organization.request.IndustryFiltering;
 import com.flexicore.organization.request.IndustryUpdate;
 import com.flexicore.organization.service.IndustryService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -44,7 +44,7 @@ public class IndustryController implements Plugin {
 	@PostMapping("/getAllIndustries")
 	public PaginationResponse<Industry> getAllIndustries(
 
-			@RequestBody IndustryFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody IndustryFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllIndustries(securityContext, filtering);
 	}
@@ -56,7 +56,7 @@ public class IndustryController implements Plugin {
 	public Industry createIndustry(
 
 			@RequestBody IndustryCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createIndustry(creationContainer, securityContext);
@@ -69,10 +69,10 @@ public class IndustryController implements Plugin {
 	public Industry updateIndustry(
 
 			@RequestBody IndustryUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		Industry industry = service.getByIdOrNull(updateContainer.getId(),
-				Industry.class, Industry_.security, securityContext);
+				Industry.class,  securityContext);
 		if (industry == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Industry with id "
 					+ updateContainer.getId());

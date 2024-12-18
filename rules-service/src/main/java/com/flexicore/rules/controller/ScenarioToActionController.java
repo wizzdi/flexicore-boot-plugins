@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioToActionCreate;
 import com.flexicore.rules.request.ScenarioToActionFilter;
 import com.flexicore.rules.request.ScenarioToActionUpdate;
 import com.flexicore.rules.service.ScenarioToActionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioToActionController implements Plugin {
   public ScenarioToAction createScenarioToAction(
       
       @RequestBody ScenarioToActionCreate scenarioToActionCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToActionService.validate(scenarioToActionCreate, securityContext);
     return scenarioToActionService.createScenarioToAction(scenarioToActionCreate, securityContext);
@@ -43,14 +43,13 @@ public class ScenarioToActionController implements Plugin {
   public ScenarioToAction updateScenarioToAction(
       
       @RequestBody ScenarioToActionUpdate scenarioToActionUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioToActionId = scenarioToActionUpdate.getId();
     ScenarioToAction scenarioToAction =
         scenarioToActionService.getByIdOrNull(
             scenarioToActionId,
             ScenarioToAction.class,
-            ScenarioToAction_.security,
             securityContext);
     if (scenarioToAction == null) {
       throw new ResponseStatusException(
@@ -66,7 +65,7 @@ public class ScenarioToActionController implements Plugin {
   public PaginationResponse<ScenarioToAction> getAllScenarioToActions(
       
       @RequestBody ScenarioToActionFilter scenarioToActionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToActionService.validate(scenarioToActionFilter, securityContext);
     return scenarioToActionService.getAllScenarioToActions(scenarioToActionFilter, securityContext);

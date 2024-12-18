@@ -6,7 +6,7 @@ import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.CellContentRepository;
@@ -41,7 +41,7 @@ public class CellContentService implements Plugin {
 	@Autowired
 	private BasicService  baseclassNewService;
 
-	public CellContent updateCellContent(CellContentUpdate cellContentUpdate, SecurityContextBase securityContext) {
+	public CellContent updateCellContent(CellContentUpdate cellContentUpdate, SecurityContext securityContext) {
 		if (CellContentUpdateNoMerge(cellContentUpdate,
 				cellContentUpdate.getCellContent())) {
 			cellContentRepository.merge(cellContentUpdate.getCellContent());
@@ -62,13 +62,13 @@ public class CellContentService implements Plugin {
 
 	public List<CellContent> listAllCellContent(
 			CellContentFiltering cellContentFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return cellContentRepository.listAllCellContent(cellContentFiltering,
 				securityContext);
 	}
 
 	public CellContent createCellContent(CellContentCreate createCellContent,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		CellContent cellContent = createCellContentNoMerge(createCellContent,
 				securityContext);
 		cellContentRepository.merge(cellContent);
@@ -77,7 +77,7 @@ public class CellContentService implements Plugin {
 	}
 
 	public CellContent createCellContentNoMerge(
-			CellContentCreate createCellContent, SecurityContextBase securityContext) {
+			CellContentCreate createCellContent, SecurityContext securityContext) {
 		CellContent cellContent = new CellContent();
 		cellContent.setId(UUID.randomUUID().toString());
 		CellContentUpdateNoMerge(createCellContent, cellContent);
@@ -87,7 +87,7 @@ public class CellContentService implements Plugin {
 
 	public PaginationResponse<CellContent> getAllCellContent(
 			CellContentFiltering cellContentFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<CellContent> list = listAllCellContent(cellContentFiltering,
 				securityContext);
 		long count = cellContentRepository.countAllCellContent(
@@ -96,30 +96,30 @@ public class CellContentService implements Plugin {
 	}
 
 	public void validate(CellContentCreate createCellContent,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createCellContent, securityContext);
 
 	}
 
 	public void validate(CellContentFiltering cellContentFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(cellContentFiltering, securityContext);
 
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return cellContentRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return cellContentRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellContentRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return cellContentRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.flexicore.rules.events.ScenarioEvent;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 public class EvaluateScenarioScriptContext {
 	@JsonIgnore
 	private Logger logger;
-	private SecurityContextBase securityContext;
+	private SecurityContext securityContext;
 	private List<ScenarioTrigger> scenarioTriggers;
 	private List<DataSource> scenarioToDataSources;
 	private ScenarioEvent scenarioEvent;
@@ -44,12 +44,12 @@ public class EvaluateScenarioScriptContext {
 		return (T) this;
 	}
 
-	public SecurityContextBase getSecurityContext() {
+	public SecurityContext getSecurityContext() {
 		return securityContext;
 	}
 
 	public <T extends EvaluateScenarioScriptContext> T setSecurityContext(
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		this.securityContext = securityContext;
 		return (T) this;
 	}

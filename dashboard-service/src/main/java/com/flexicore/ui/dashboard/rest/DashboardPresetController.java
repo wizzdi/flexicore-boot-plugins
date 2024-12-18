@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.DashboardPreset;
 import com.flexicore.ui.dashboard.request.DashboardPresetCreate;
 import com.flexicore.ui.dashboard.request.DashboardPresetFilter;
@@ -45,7 +45,7 @@ public class DashboardPresetController implements Plugin {
 	public PaginationResponse<DashboardPreset> getAllDashboardPreset(
 			@RequestBody
 			DashboardPresetFilter dashboardPresetFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(dashboardPresetFilter,securityContext);
 		return service.getAllDashboardPreset(dashboardPresetFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class DashboardPresetController implements Plugin {
 	@PutMapping("updateDashboardPreset")
 	public DashboardPreset updateDashboardPreset(
 			@RequestBody
-			DashboardPresetUpdate updateDashboardPreset, @RequestAttribute SecurityContextBase securityContext) {
+			DashboardPresetUpdate updateDashboardPreset, @RequestAttribute SecurityContext securityContext) {
 		DashboardPreset dashboardPreset = updateDashboardPreset.getId() != null ? service.getByIdOrNull(
-				updateDashboardPreset.getId(), DashboardPreset.class, SecuredBasic_.security, securityContext) : null;
+				updateDashboardPreset.getId(), DashboardPreset.class,  securityContext) : null;
 		if (dashboardPreset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateDashboardPreset.getId());
@@ -77,7 +77,7 @@ public class DashboardPresetController implements Plugin {
 	@PostMapping("createDashboardPreset")
 	public DashboardPreset createDashboardPreset(
 			@RequestBody
-			DashboardPresetCreate createDashboardPreset, @RequestAttribute SecurityContextBase securityContext) {
+			DashboardPresetCreate createDashboardPreset, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createDashboardPreset, securityContext);
 		return service.createDashboardPreset(createDashboardPreset, securityContext);
 

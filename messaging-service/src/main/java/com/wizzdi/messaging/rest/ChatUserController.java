@@ -1,7 +1,7 @@
 package com.wizzdi.messaging.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.messaging.interfaces.ChatUserProvider;
@@ -34,7 +34,7 @@ public class ChatUserController implements Plugin {
 
 	@PostMapping("/createChatUser")
 	@Operation(description = "creates ChatUser",summary = "creates ChatUser")
-	public ChatUser createChatUser( @RequestBody ChatUserCreate chatUserCreate, @RequestAttribute SecurityContextBase securityContext){
+	public ChatUser createChatUser( @RequestBody ChatUserCreate chatUserCreate, @RequestAttribute SecurityContext securityContext){
 		chatUserService.validate(chatUserCreate,securityContext);
 		return chatUserService.createChatUser(chatUserCreate,securityContext);
 	}
@@ -42,7 +42,7 @@ public class ChatUserController implements Plugin {
 	@PostMapping("/getAllChatUsers")
 	@Operation(description = "returns ChatUsers",summary = "returns ChatUsers")
 
-	public PaginationResponse<ChatUser> getAllChatUsers( @RequestBody ChatUserFilter chatUserFilter, @RequestAttribute SecurityContextBase securityContext){
+	public PaginationResponse<ChatUser> getAllChatUsers( @RequestBody ChatUserFilter chatUserFilter, @RequestAttribute SecurityContext securityContext){
 		chatUserService.validate(chatUserFilter,securityContext);
 		return chatUserService.getAllChatUsers(chatUserFilter,securityContext);
 	}
@@ -50,9 +50,9 @@ public class ChatUserController implements Plugin {
 	@PutMapping("/updateChatUser")
 	@Operation(description = "updates ChatUser",summary = "updates ChatUser")
 
-	public ChatUser updateChatUser( @RequestBody ChatUserUpdate chatUserUpdate, @RequestAttribute SecurityContextBase securityContext){
+	public ChatUser updateChatUser( @RequestBody ChatUserUpdate chatUserUpdate, @RequestAttribute SecurityContext securityContext){
 		String id=chatUserUpdate.getId();
-		ChatUser chatUser=id!=null? chatUserService.getByIdOrNull(id,ChatUser.class, ChatUser_.security,securityContext):null;
+		ChatUser chatUser=id!=null? chatUserService.getByIdOrNull(id,ChatUser.class, securityContext):null;
 		if(chatUser==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ChatUser user with id "+id);
 		}

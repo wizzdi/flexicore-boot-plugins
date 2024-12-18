@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.*;
 
@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 @Table(indexes = {
         @Index(name = "pending_gateway_idx",columnList = "gatewayId,registeredGateway_id")
 })
-public class PendingGateway extends SecuredBasic {
+public class PendingGateway extends Baseclass {
 
     @Lob
     private String gatewayId;

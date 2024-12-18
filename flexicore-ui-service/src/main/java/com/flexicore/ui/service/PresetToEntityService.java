@@ -4,7 +4,7 @@ package com.flexicore.ui.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityEntity;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.PresetToEntityRepository;
 import com.flexicore.ui.model.*;
 import com.flexicore.ui.request.PreferedPresetRequest;
@@ -62,7 +62,7 @@ public class PresetToEntityService implements Plugin {
 
 	public PresetToEntity presetToEntityUpdate(
 			PresetToEntityUpdate presetToEntityUpdate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (presetToEntityUpdateNoMerge(presetToEntityUpdate, presetToEntityUpdate.getPresetToEntity())) {
 			presetToEntityRepository.merge(presetToEntityUpdate.getPresetToEntity());
 		}
@@ -91,9 +91,9 @@ public class PresetToEntityService implements Plugin {
 	}
 
 	public void validate(PresetToEntityCreate presetToEntityCreate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		String presetId = presetToEntityCreate.getPresetId();
-		Preset preset = presetId != null ? getByIdOrNull(presetId, Preset.class, Preset_.security, securityContext) : null;
+		Preset preset = presetId != null ? getByIdOrNull(presetId, Preset.class,securityContext) : null;
 		if (preset == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no preset with id " + presetId);
 		}
@@ -102,19 +102,19 @@ public class PresetToEntityService implements Plugin {
 
 	public PaginationResponse<PresetToEntity> getAllPresetToEntities(
 			PresetToEntityFiltering presetToEntityFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<PresetToEntity> list = listAllPresetToEntities(presetToEntityFiltering, securityContext);
 		long count = presetToEntityRepository.countAllPresetToEntities(presetToEntityFiltering, securityContext);
 		return new PaginationResponse<>(list, presetToEntityFiltering, count);
 	}
 
-	public List<PresetToEntity> listAllPresetToEntities(PresetToEntityFiltering presetToEntityFiltering, SecurityContextBase securityContext) {
+	public List<PresetToEntity> listAllPresetToEntities(PresetToEntityFiltering presetToEntityFiltering, SecurityContext securityContext) {
 		return presetToEntityRepository.listAllPresetToEntities(presetToEntityFiltering, securityContext);
 	}
 
 	public PresetToEntity presetToEntityCreate(
 			PresetToEntityCreate presetToEntityCreate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		PresetToEntity presetToEntity = presetToEntityCreateNoMerge(presetToEntityCreate, securityContext);
 		presetToEntityRepository.merge(presetToEntity);
 		return presetToEntity;
@@ -123,7 +123,7 @@ public class PresetToEntityService implements Plugin {
 
 	private PresetToEntity presetToEntityCreateNoMerge(
 			PresetToEntityCreate presetToEntityCreate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		PresetToEntity presetToEntity = new PresetToEntity();
 		presetToEntity.setId(UUID.randomUUID().toString());
 		presetToEntityUpdateNoMerge(presetToEntityCreate, presetToEntity);
@@ -131,7 +131,7 @@ public class PresetToEntityService implements Plugin {
 		return presetToEntity;
 	}
 
-	public List<Preset> getPreferredPresets(PreferedPresetRequest preferedPresetRequest, SecurityContextBase securityContext) {
+	public List<Preset> getPreferredPresets(PreferedPresetRequest preferedPresetRequest, SecurityContext securityContext) {
 		Map<String, List<PresetToEntity>> map = new HashMap<>();
 		PresetToEntityFiltering presetToEntityFiltering = new PresetToEntityFiltering();
 		List<SecurityEntity> rightside = new ArrayList<>(securityContext.getTenants());
@@ -152,19 +152,19 @@ public class PresetToEntityService implements Plugin {
 
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return presetToEntityRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return presetToEntityRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return presetToEntityRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return presetToEntityRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

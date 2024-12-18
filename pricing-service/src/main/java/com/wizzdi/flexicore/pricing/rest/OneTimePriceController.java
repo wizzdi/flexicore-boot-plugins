@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.OneTimePrice;
 import com.wizzdi.flexicore.pricing.model.price.OneTimePrice_;
@@ -39,7 +39,7 @@ public class OneTimePriceController implements Plugin {
     public PaginationResponse<OneTimePrice> getAllOneTimePrice(
 
             
-            @RequestBody OneTimePriceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody OneTimePriceFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllOneTimePrice(securityContext, filtering);
     }
@@ -51,7 +51,7 @@ public class OneTimePriceController implements Plugin {
     public OneTimePrice createOneTimePrice(
             
             @RequestBody OneTimePriceCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createOneTimePrice(creationContainer, securityContext);
@@ -65,10 +65,10 @@ public class OneTimePriceController implements Plugin {
 
             
             @RequestBody OneTimePriceUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         OneTimePrice oneTimePrice = service.getByIdOrNull(updateContainer.getId(),
-                OneTimePrice.class, OneTimePrice_.security, securityContext);
+                OneTimePrice.class,  securityContext);
         if (oneTimePrice == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no OneTimePrice with id "
                     + updateContainer.getId());

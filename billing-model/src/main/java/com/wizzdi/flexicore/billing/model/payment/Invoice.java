@@ -1,7 +1,7 @@
 package com.wizzdi.flexicore.billing.model.payment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 
 import jakarta.persistence.Column;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Invoice extends SecuredBasic {
+public class Invoice extends Baseclass {
 
 
     @JsonIgnore

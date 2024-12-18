@@ -5,7 +5,7 @@ import com.flexicore.license.model.LicensingEntity_;
 import com.flexicore.license.request.LicensingEntityFiltering;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -34,7 +34,7 @@ public class LicensingEntityRepository implements Plugin {
 	private SecuredBasicRepository securedBasicRepository;
 
 
-	public List<LicensingEntity> listAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContextBase securityContext) {
+	public List<LicensingEntity> listAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<LicensingEntity> q = cb.createQuery(LicensingEntity.class);
 		Root<LicensingEntity> r = q.from(LicensingEntity.class);
@@ -46,14 +46,14 @@ public class LicensingEntityRepository implements Plugin {
 		return query.getResultList();
 	}
 
-	public <T extends LicensingEntity> void addLicensingEntitiesPredicates(LicensingEntityFiltering licensingEntityFiltering,CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r,  List<Predicate> preds,SecurityContextBase securityContext) {
+	public <T extends LicensingEntity> void addLicensingEntitiesPredicates(LicensingEntityFiltering licensingEntityFiltering,CriteriaBuilder cb,CommonAbstractCriteria q, From<?,T> r,  List<Predicate> preds,SecurityContext securityContext) {
 	    securedBasicRepository.addSecuredBasicPredicates(licensingEntityFiltering.getBasicPropertiesFilter(), cb,q,r,preds,securityContext);
 		if (licensingEntityFiltering.getCanonicalNames() != null && !licensingEntityFiltering.getCanonicalNames().isEmpty()) {
 			preds.add(r.get(LicensingEntity_.canonicalName).in(licensingEntityFiltering.getCanonicalNames()));
 		}
 	}
 
-	public long countAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContextBase securityContext) {
+	public long countAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<LicensingEntity> r = q.from(LicensingEntity.class);
@@ -64,19 +64,19 @@ public class LicensingEntityRepository implements Plugin {
 		return query.getSingleResult();
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

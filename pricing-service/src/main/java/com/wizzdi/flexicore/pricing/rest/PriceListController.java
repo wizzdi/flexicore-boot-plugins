@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class PriceListController implements Plugin {
     public PaginationResponse<PriceList> getAllPriceLists(
 
             
-            @RequestBody PriceListFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PriceListFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPriceLists(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class PriceListController implements Plugin {
 
             
             @RequestBody PriceListCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPriceList(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class PriceListController implements Plugin {
 
             
             @RequestBody PriceListUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PriceList priceList = service.getByIdOrNull(updateContainer.getId(),
-                PriceList.class, PriceList_.security, securityContext);
+                PriceList.class,  securityContext);
         if (priceList == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PriceList with id "
                     + updateContainer.getId());

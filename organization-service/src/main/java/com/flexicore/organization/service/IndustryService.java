@@ -12,7 +12,7 @@ import com.flexicore.organization.model.Industry;
 import com.flexicore.organization.request.IndustryCreate;
 import com.flexicore.organization.request.IndustryFiltering;
 import com.flexicore.organization.request.IndustryUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -42,19 +42,17 @@ public class IndustryService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -81,33 +79,33 @@ public class IndustryService implements Plugin {
 	}
 
 	public void validateFiltering(IndustryFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(filtering, securityContext);
 		Set<String> customerIds = filtering.getCustomerIds();
-		Map<String, Customer> customers = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds, Customer_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, Customer> customers = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		customerIds.removeAll(customers.keySet());
 		if (!customerIds.isEmpty()) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Organization with ids " + customerIds);
 		}
 		filtering.setCustomers(new ArrayList<>(customers.values()));
 	}
 
-	public PaginationResponse<Industry> getAllIndustries(SecurityContextBase securityContext, IndustryFiltering filtering) {
+	public PaginationResponse<Industry> getAllIndustries(SecurityContext securityContext, IndustryFiltering filtering) {
 		List<Industry> list = repository.getAllIndustries(securityContext, filtering);
 		long count = repository.countAllIndustries(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	public Industry createIndustry(IndustryCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Industry industry = createIndustryNoMerge(creationContainer, securityContext);
 		repository.merge(industry);
 		return industry;
 	}
 
 	private Industry createIndustryNoMerge(IndustryCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Industry industry = new Industry();
-		industry.setId(Baseclass.getBase64ID());
+		industry.setId(UUID.randomUUID().toString());
 		updateIndustryNoMerge(industry, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(industry, securityContext);
 
@@ -122,7 +120,7 @@ public class IndustryService implements Plugin {
 	}
 
 	public Industry updateIndustry(IndustryUpdate updateContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		Industry industry = updateContainer.getIndustry();
 		if (updateIndustryNoMerge(industry, updateContainer)) {
 			repository.merge(industry);
@@ -131,7 +129,7 @@ public class IndustryService implements Plugin {
 	}
 
 	public void validate(IndustryCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(creationContainer, securityContext);
 	}
 }

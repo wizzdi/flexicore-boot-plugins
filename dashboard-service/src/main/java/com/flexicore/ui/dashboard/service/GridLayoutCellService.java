@@ -2,12 +2,12 @@ package com.flexicore.ui.dashboard.service;
 
 
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GridLayoutCellRepository;
@@ -44,7 +44,7 @@ public class GridLayoutCellService implements Plugin {
 	@Autowired
 	private BasicService  baseclassNewService;
 
-	public GridLayoutCell updateGridLayoutCell(GridLayoutCellUpdate gridLayoutCellUpdate, SecurityContextBase securityContext) {
+	public GridLayoutCell updateGridLayoutCell(GridLayoutCellUpdate gridLayoutCellUpdate, SecurityContext securityContext) {
 		if (GridLayoutCellUpdateNoMerge(gridLayoutCellUpdate,
 				gridLayoutCellUpdate.getGridLayoutCell())) {
 			gridLayoutCellRepository.merge(gridLayoutCellUpdate.getGridLayoutCell());
@@ -71,13 +71,13 @@ public class GridLayoutCellService implements Plugin {
 
 	public List<GridLayoutCell> listAllGridLayoutCell(
 			GridLayoutCellFilter gridLayoutCellFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return gridLayoutCellRepository.listAllGridLayoutCell(gridLayoutCellFilter,
 				securityContext);
 	}
 
 	public GridLayoutCell createGridLayoutCell(GridLayoutCellCreate createGridLayoutCell,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		GridLayoutCell gridLayoutCell = createGridLayoutCellNoMerge(createGridLayoutCell,
 				securityContext);
 		gridLayoutCellRepository.merge(gridLayoutCell);
@@ -86,7 +86,7 @@ public class GridLayoutCellService implements Plugin {
 	}
 
 	public GridLayoutCell createGridLayoutCellNoMerge(
-			GridLayoutCellCreate createGridLayoutCell, SecurityContextBase securityContext) {
+			GridLayoutCellCreate createGridLayoutCell, SecurityContext securityContext) {
 		GridLayoutCell gridLayoutCell = new GridLayoutCell();
 		gridLayoutCell.setId(UUID.randomUUID().toString());
 		GridLayoutCellUpdateNoMerge(createGridLayoutCell, gridLayoutCell);
@@ -96,7 +96,7 @@ public class GridLayoutCellService implements Plugin {
 
 	public PaginationResponse<GridLayoutCell> getAllGridLayoutCell(
 			GridLayoutCellFilter gridLayoutCellFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<GridLayoutCell> list = listAllGridLayoutCell(gridLayoutCellFilter,
 				securityContext);
 		long count = gridLayoutCellRepository.countAllGridLayoutCell(
@@ -105,10 +105,10 @@ public class GridLayoutCellService implements Plugin {
 	}
 
 	public void validate(GridLayoutCellCreate createGridLayoutCell,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createGridLayoutCell, securityContext);
 		String gridLayoutId=createGridLayoutCell.getGridLayoutId();
-		GridLayout dynamicExecution=gridLayoutId!=null?getByIdOrNull(gridLayoutId, GridLayout.class,SecuredBasic_.security,securityContext):null;
+		GridLayout dynamicExecution=gridLayoutId!=null?getByIdOrNull(gridLayoutId, GridLayout.class,securityContext):null;
 		if(dynamicExecution==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with id "+gridLayoutId);
 		}
@@ -117,11 +117,11 @@ public class GridLayoutCellService implements Plugin {
 	}
 
 	public void validate(GridLayoutCellFilter gridLayoutCellFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		baseclassNewService.validate(gridLayoutCellFilter, securityContext);
 
 		Set<String> gridLayoutIds= gridLayoutCellFilter.getGridLayoutIds();
-		Map<String, GridLayout> dashboardPresetMap=gridLayoutIds.isEmpty()?new HashMap<>():gridLayoutCellRepository.listByIds(GridLayout.class,gridLayoutIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
+		Map<String, GridLayout> dashboardPresetMap=gridLayoutIds.isEmpty()?new HashMap<>():gridLayoutCellRepository.listByIds(GridLayout.class,gridLayoutIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f,(a, b)->a));
 		gridLayoutIds.removeAll(dashboardPresetMap.keySet());
 		if(!gridLayoutIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with ids "+gridLayoutIds);
@@ -131,19 +131,19 @@ public class GridLayoutCellService implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return gridLayoutCellRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return gridLayoutCellRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridLayoutCellRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return gridLayoutCellRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

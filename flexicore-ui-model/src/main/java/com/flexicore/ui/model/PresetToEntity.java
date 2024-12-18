@@ -1,7 +1,7 @@
 package com.flexicore.ui.model;
 
 import com.flexicore.model.Baseclass;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import com.flexicore.model.SecurityEntity;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Transient;
 
 @Entity
-public class PresetToEntity extends SecuredBasic {
+public class PresetToEntity extends Baseclass {
 
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset preset;

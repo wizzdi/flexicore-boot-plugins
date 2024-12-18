@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class InvoiceController implements Plugin {
     public PaginationResponse<Invoice> getAllInvoices(
 
             
-            @RequestBody InvoiceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody InvoiceFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllInvoices(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class InvoiceController implements Plugin {
 
             
             @RequestBody InvoiceCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createInvoice(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class InvoiceController implements Plugin {
 
             
             @RequestBody InvoiceUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Invoice invoice = service.getByIdOrNull(updateContainer.getId(),
-                Invoice.class, Invoice_.security, securityContext);
+                Invoice.class,  securityContext);
         if (invoice == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Invoice with id "
                     + updateContainer.getId());

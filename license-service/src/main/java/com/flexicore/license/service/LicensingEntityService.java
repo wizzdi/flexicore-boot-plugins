@@ -8,7 +8,7 @@ import com.flexicore.license.request.LicensingEntityFiltering;
 import com.flexicore.license.request.LicensingEntityUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Extension
@@ -38,19 +39,19 @@ public class LicensingEntityService implements Plugin {
 
 
 
-   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+   public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -75,7 +76,7 @@ public class LicensingEntityService implements Plugin {
     public void massMerge(List<?> toMerge) {
         repository.massMerge(toMerge);
     }
-    public LicensingEntity createLicensingEntity(LicensingEntityCreate pluginCreationContainer, SecurityContextBase securityContext) {
+    public LicensingEntity createLicensingEntity(LicensingEntityCreate pluginCreationContainer, SecurityContext securityContext) {
         LicensingEntity licensingEntity = createLicensingEntityNoMerge(pluginCreationContainer, securityContext);
         repository.merge(licensingEntity);
         return licensingEntity;
@@ -83,9 +84,9 @@ public class LicensingEntityService implements Plugin {
 
     }
 
-    public LicensingEntity createLicensingEntityNoMerge(LicensingEntityCreate licensingEntityCreate, SecurityContextBase securityContext) {
+    public LicensingEntity createLicensingEntityNoMerge(LicensingEntityCreate licensingEntityCreate, SecurityContext securityContext) {
         LicensingEntity licensingEntity = new LicensingEntity();
-        licensingEntity.setId(Baseclass.getBase64ID());
+        licensingEntity.setId(UUID.randomUUID().toString());
         updateLicensingEntityNoMerge(licensingEntity, licensingEntityCreate);
         BaseclassService.createSecurityObjectNoMerge(licensingEntity,securityContext);
         return licensingEntity;
@@ -101,7 +102,7 @@ public class LicensingEntityService implements Plugin {
     }
 
 
-    public LicensingEntity updateLicensingEntity(LicensingEntityUpdate licensingEntityUpdate, SecurityContextBase securityContext) {
+    public LicensingEntity updateLicensingEntity(LicensingEntityUpdate licensingEntityUpdate, SecurityContext securityContext) {
         LicensingEntity licensingEntity = licensingEntityUpdate.getLicensingEntity();
         if (updateLicensingEntityNoMerge(licensingEntity, licensingEntityUpdate)) {
             repository.merge(licensingEntity);
@@ -109,20 +110,20 @@ public class LicensingEntityService implements Plugin {
         return licensingEntity;
     }
 
-    public List<LicensingEntity> listAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContextBase securityContext) {
+    public List<LicensingEntity> listAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContext securityContext) {
         return repository.listAllLicensingEntities(licensingEntityFiltering, securityContext);
     }
 
-    public void validate(LicensingEntityCreate licensingEntityCreate, SecurityContextBase securityContext) {
+    public void validate(LicensingEntityCreate licensingEntityCreate, SecurityContext securityContext) {
         basicService.validate(licensingEntityCreate, securityContext);
 
     }
 
-    public void validate(LicensingEntityFiltering licensingEntityFiltering, SecurityContextBase securityContext) {
+    public void validate(LicensingEntityFiltering licensingEntityFiltering, SecurityContext securityContext) {
         basicService.validate(licensingEntityFiltering,securityContext);
     }
 
-    public PaginationResponse<LicensingEntity> getAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContextBase securityContext) {
+    public PaginationResponse<LicensingEntity> getAllLicensingEntities(LicensingEntityFiltering licensingEntityFiltering, SecurityContext securityContext) {
         List<LicensingEntity> list = listAllLicensingEntities(licensingEntityFiltering, securityContext);
         long count = repository.countAllLicensingEntities(licensingEntityFiltering, securityContext);
         return new PaginationResponse<>(list, licensingEntityFiltering, count);

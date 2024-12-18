@@ -8,7 +8,7 @@ package com.flexicore.license.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecurityTenant;
 import com.wizzdi.flexicore.file.model.FileResource;
 
@@ -21,7 +21,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 @Entity
 
-public class LicenseRequest extends SecuredBasic {
+public class LicenseRequest extends Baseclass {
 
 	@Lob
 	private String macAddress;

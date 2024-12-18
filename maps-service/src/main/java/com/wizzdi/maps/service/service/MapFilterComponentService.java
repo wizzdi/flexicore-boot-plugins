@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.SoftDeleteOption;
@@ -36,7 +36,7 @@ public class MapFilterComponentService implements Plugin {
     private MappedPOIService mappedPOIService;
     private static final Logger logger= LoggerFactory.getLogger(MappedPOIRelatedService.class);
 
-    public void validate(MapFilterComponentRequest mapFilterComponentRequest, SecurityContextBase securityContextBase){
+    public void validate(MapFilterComponentRequest mapFilterComponentRequest, SecurityContext SecurityContext){
 
         if(mapFilterComponentRequest.getMappedPOIFilter()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"mapped poi filter must be provided");
@@ -49,7 +49,7 @@ public class MapFilterComponentService implements Plugin {
             mapFilterComponentRequest.setFilterComponentPropertyProvider(new StandardFilterComponentProvider());
         }
 
-        mappedPOIService.validate(mapFilterComponentRequest.getMappedPOIFilter(),securityContextBase);
+        mappedPOIService.validate(mapFilterComponentRequest.getMappedPOIFilter(),SecurityContext);
         if(mapFilterComponentRequest.getBasicPropertiesFilter()==null){
             mapFilterComponentRequest.setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.DEFAULT));
         }
@@ -58,7 +58,7 @@ public class MapFilterComponentService implements Plugin {
 
 
 
-    public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(MapFilterComponentRequest mapFilterComponentRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(MapFilterComponentRequest mapFilterComponentRequest, SecurityContext securityContext) {
         List<Tuple> list=mapFilterComponentRepository.listAllMapFilterComponents(mapFilterComponentRequest,securityContext);
         long count=mapFilterComponentRepository.countAllMapFilterComponents(mapFilterComponentRequest,securityContext);
         List<MapFilterComponent> converted=list.stream().map(this::toMapFilterComponent).filter(Objects::nonNull).collect(Collectors.toList());

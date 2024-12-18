@@ -8,7 +8,7 @@ import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.*;
 import com.flexicore.rules.response.EvaluateScenarioResponse;
 import com.flexicore.rules.response.EvaluateTriggerResponse;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokerRequest;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokersResponse;
@@ -115,7 +115,7 @@ public class ScenarioManager implements Plugin {
                 return;
             }
             Set<String> tenantIds = tenants.stream().map(f -> f.getId()).collect(Collectors.toSet());
-            List<ScenarioTrigger> triggers = triggerForTenantService.getTriggers(scenarioEvent.getClass().getCanonicalName()).stream().filter(f -> f.getSecurity() != null && tenantIds.contains(f.getSecurity().getTenant().getId())).toList();
+            List<ScenarioTrigger> triggers = triggerForTenantService.getTriggers(scenarioEvent.getClass().getCanonicalName()).stream().filter(f ->  tenantIds.contains(f.getTenant().getId())).toList();
 
 
             List<ScenarioTrigger> activeTriggers = new ArrayList<>();
@@ -158,8 +158,8 @@ public class ScenarioManager implements Plugin {
                     .setScenarioTrigger(activeTriggers);
             List<ScenarioToTrigger> scenarioToTriggers = activeTriggers.isEmpty() ? new ArrayList<>() : scenarioToTriggerService.listAllScenarioToTriggers(scenarioToTriggerFilter, null);
             Map<String, Scenario> scenarioMap = scenarioToTriggers.stream().collect(Collectors.toMap(f -> f.getScenario().getId(), f -> f.getScenario(), (a, b) -> a));
-            Map<String, SecurityUser> creatorMap = scenarioMap.values().stream().map(f -> f.getSecurity()).map(f -> f.getCreator()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
-            Map<String, SecurityContextBase> securityContextMap = creatorMap.entrySet().stream().collect(Collectors.toMap(f -> f.getKey(), f -> securityContextProvider.getSecurityContext(f.getValue())));
+            Map<String, SecurityUser> creatorMap = scenarioMap.values().stream().map(f -> f.getCreator()).collect(Collectors.toMap(f -> f.getId(), f -> f, (a, b) -> a));
+            Map<String, SecurityContext> securityContextMap = creatorMap.entrySet().stream().collect(Collectors.toMap(f -> f.getKey(), f -> securityContextProvider.getSecurityContext(f.getValue())));
             Map<String, List<ScenarioToTrigger>> triggersForScenario = scenarioToTriggers.stream().collect(Collectors.groupingBy(f -> f.getScenario().getId()));
             ScenarioToDataSourceFilter scenarioToDataSourceFilter = new ScenarioToDataSourceFilter()
                     .setEnabled(true)
@@ -179,7 +179,7 @@ public class ScenarioManager implements Plugin {
                 Scenario scenario = scenarioMap.get(scenarioId);
                 long started = System.nanoTime();
                 try {
-                    SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
+                    SecurityContext securityContext = securityContextMap.get(scenario.getCreator().getId()).setTenantToCreateIn(scenario.getTenant());
                     List<ScenarioTrigger> scenarioToTriggerList = entry.getValue().stream().map(f -> f.getScenarioTrigger()).collect(Collectors.toList());
                     List<DataSource> scenarioToDataSources = scenarioToDataSource.getOrDefault(scenarioId, new ArrayList<>()).stream().sorted(Comparator.comparing(f -> f.getOrdinal())).map(f -> f.getDataSource()).collect(Collectors.toList());
                     List<ActionContext> scenarioActions = actionsByScenario.getOrDefault(scenarioId, new ArrayList<>()).stream().map(f -> f.getScenarioAction()).collect(Collectors.toMap(f -> f.getId(), f -> dynamicExecutionService.getExecuteInvokerRequest(f.getDynamicExecution(), securityContext), (a, b) -> a)).entrySet().stream().map(f -> new ActionContext(f.getKey(), f.getValue())).toList();
@@ -208,7 +208,7 @@ public class ScenarioManager implements Plugin {
                         try {
                             ExecuteInvokerRequest executeInvokerRequest = entry.getValue();
                             Scenario scenario = evaluateScenarioResponse.getEvaluateScenarioRequest().getScenario();
-                            SecurityContextBase securityContext = securityContextMap.get(scenario.getSecurity().getCreator().getId()).setTenantToCreateIn(scenario.getSecurity().getTenant());
+                            SecurityContext securityContext = securityContextMap.get(scenario.getCreator().getId()).setTenantToCreateIn(scenario.getTenant());
                             Logger scenarioTriggerLogger = getLogger(scenario.getId(), scenario.getLogFileResource().getFullPath());
 
                             String message = "Executing action %s(%s) for scenario %s(%s)".formatted(scenarioAction.getName(), scenarioAction.getId(), scenario.getName(), scenario.getId());

@@ -7,7 +7,7 @@ import com.wizzdi.flexicore.billing.request.ChargeFiltering;
 import com.wizzdi.flexicore.billing.request.ChargeUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.billing.Charge;
 import com.wizzdi.flexicore.billing.model.billing.ChargeReference;
 import com.wizzdi.flexicore.billing.model.payment.InvoiceItem;
@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -39,19 +40,19 @@ public class ChargeService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -78,34 +79,34 @@ public class ChargeService implements Plugin {
     }
 
     public void validateFiltering(ChargeFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
 
 
     }
 
     public PaginationResponse<Charge> getAllCharges(
-            SecurityContextBase securityContext, ChargeFiltering filtering) {
+            SecurityContext securityContext, ChargeFiltering filtering) {
         List<Charge> list = listAllCharges(securityContext, filtering);
         long count = repository.countAllCharges(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<Charge> listAllCharges(SecurityContextBase securityContext, ChargeFiltering filtering) {
+    public List<Charge> listAllCharges(SecurityContext securityContext, ChargeFiltering filtering) {
         return repository.getAllCharges(securityContext, filtering);
     }
 
     public Charge createCharge(ChargeCreate chargeCreate,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         Charge charge = createChargeNoMerge(chargeCreate, securityContext);
         repository.merge(charge);
         return charge;
     }
 
     public Charge createChargeNoMerge(ChargeCreate chargeCreate,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         Charge charge = new Charge();
-        charge.setId(Baseclass.getBase64ID());
+        charge.setId(UUID.randomUUID().toString());
 
         updateChargeNoMerge(charge, chargeCreate);
         BaseclassService.createSecurityObjectNoMerge(charge, securityContext);
@@ -138,7 +139,7 @@ public class ChargeService implements Plugin {
     }
 
     public Charge updateCharge(ChargeUpdate chargeUpdate,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         Charge charge = chargeUpdate.getCharge();
         if (updateChargeNoMerge(charge, chargeUpdate)) {
             repository.merge(charge);
@@ -146,25 +147,25 @@ public class ChargeService implements Plugin {
         return charge;
     }
 
-    public void validate(ChargeCreate chargeCreate, SecurityContextBase securityContext) {
+    public void validate(ChargeCreate chargeCreate, SecurityContext securityContext) {
         basicService.validate(chargeCreate, securityContext);
 
         String moneyId = chargeCreate.getMoneyId();
-        Money money = moneyId == null ? null : getByIdOrNull(moneyId, Money.class, Money_.security, securityContext);
+        Money money = moneyId == null ? null : getByIdOrNull(moneyId, Money.class,securityContext);
         if (money == null && moneyId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Money with id " + moneyId);
         }
         chargeCreate.setMoney(money);
 
         String chargeReferenceId = chargeCreate.getChargeReferenceId();
-        ChargeReference chargeReference = chargeReferenceId == null ? null : getByIdOrNull(chargeReferenceId, ChargeReference.class, Money_.security, securityContext);
+        ChargeReference chargeReference = chargeReferenceId == null ? null : getByIdOrNull(chargeReferenceId, ChargeReference.class,securityContext);
         if (chargeReference == null && chargeReferenceId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ChargeReference with id " + chargeReferenceId);
         }
         chargeCreate.setChargeReference(chargeReference);
 
         String invoiceItemId = chargeCreate.getInvoiceItemId();
-        InvoiceItem invoiceItem = invoiceItemId == null ? null : getByIdOrNull(invoiceItemId, InvoiceItem.class, Money_.security, securityContext);
+        InvoiceItem invoiceItem = invoiceItemId == null ? null : getByIdOrNull(invoiceItemId, InvoiceItem.class,securityContext);
         if (invoiceItem == null && invoiceItemId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No InvoiceItem with id " + invoiceItemId);
         }

@@ -7,10 +7,10 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.IOperation;
-import com.flexicore.annotations.IOperation.Access;
 import com.flexicore.annotations.OperationsInside;
 import com.wizzdi.basic.iot.service.service.DownloadFirmwareService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
+import com.wizzdi.segmantix.model.Access;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;

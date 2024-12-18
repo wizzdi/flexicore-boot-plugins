@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.model.territories.Address;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MapIcon;
@@ -66,7 +66,7 @@ public class MapFilterComponentTest {
     @Qualifier("historyIcons")
     private Map<String, MapIcon> historyIcons;
     @Autowired
-    private SecurityContextBase securityContext;
+    private SecurityContext securityContext;
     @Autowired
     private MapFilterComponentService mapFilterComponentService;
     @Autowired

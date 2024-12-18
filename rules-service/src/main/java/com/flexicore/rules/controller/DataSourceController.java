@@ -7,7 +7,7 @@ import com.flexicore.rules.request.DataSourceCreate;
 import com.flexicore.rules.request.DataSourceFilter;
 import com.flexicore.rules.request.DataSourceUpdate;
 import com.flexicore.rules.service.DataSourceService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class DataSourceController implements Plugin {
   public DataSource createDataSource(
       
       @RequestBody DataSourceCreate dataSourceCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     dataSourceService.validate(dataSourceCreate, securityContext);
     return dataSourceService.createDataSource(dataSourceCreate, securityContext);
@@ -43,7 +43,7 @@ public class DataSourceController implements Plugin {
   public PaginationResponse<DataSource> getAllDataSources(
       
       @RequestBody DataSourceFilter dataSourceFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     dataSourceService.validate(dataSourceFilter, securityContext);
     return dataSourceService.getAllDataSources(dataSourceFilter, securityContext);
@@ -54,12 +54,12 @@ public class DataSourceController implements Plugin {
   public DataSource updateDataSource(
       
       @RequestBody DataSourceUpdate dataSourceUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String dataSourceId = dataSourceUpdate.getId();
     DataSource dataSource =
         dataSourceService.getByIdOrNull(
-            dataSourceId, DataSource.class, DataSource_.security, securityContext);
+            dataSourceId, DataSource.class,  securityContext);
     if (dataSource == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No DataSource with id " + dataSourceId);

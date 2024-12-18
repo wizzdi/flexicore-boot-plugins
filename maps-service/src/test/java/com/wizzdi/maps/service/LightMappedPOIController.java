@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MappedPOI;
@@ -30,7 +30,7 @@ public class LightMappedPOIController implements Plugin {
     public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(
             
             @RequestBody LightMapFilterComponentRequest mapFilterComponentRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         lightMappedPOIService.validate(mapFilterComponentRequest, securityContext);
         return lightMappedPOIService.getAllMapFilterComponents(mapFilterComponentRequest, securityContext);
     }
@@ -40,7 +40,7 @@ public class LightMappedPOIController implements Plugin {
     public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(
             
             @RequestBody ExtendedGeoHashRequest geoHashRequest,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         lightMappedPOIService.validate(geoHashRequest, securityContext);
         return lightMappedPOIService.getAllGeoHashAreas(geoHashRequest, securityContext);
     }
@@ -50,7 +50,7 @@ public class LightMappedPOIController implements Plugin {
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
             
             @RequestBody ExtendedMappedPOIFilter mappedPOIFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         lightMappedPOIService.validate(mappedPOIFilter, securityContext);
         return lightMappedPOIService.getAllMappedPOIs(mappedPOIFilter, securityContext);
     }

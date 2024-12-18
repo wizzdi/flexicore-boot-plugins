@@ -1,13 +1,13 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class PresetToPreset extends SecuredBasic {
+public class PresetToPreset extends Baseclass {
 
 	@ManyToOne(targetEntity = Preset.class)
 	private Preset parentPreset;

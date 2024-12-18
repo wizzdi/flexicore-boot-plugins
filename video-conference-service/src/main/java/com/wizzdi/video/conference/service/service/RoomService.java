@@ -2,8 +2,8 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -43,7 +43,7 @@ public class RoomService implements Plugin, IRoomService {
    * @return created Room
    */
   @Override
-  public Room createRoom(RoomCreate roomCreate, SecurityContextBase securityContext) {
+  public Room createRoom(RoomCreate roomCreate, SecurityContext securityContext) {
     Room room = createRoomNoMerge(roomCreate, securityContext);
     repository.merge(room);
     return room;
@@ -55,7 +55,7 @@ public class RoomService implements Plugin, IRoomService {
    * @return created Room unmerged
    */
   @Override
-  public Room createRoomNoMerge(RoomCreate roomCreate, SecurityContextBase securityContext) {
+  public Room createRoomNoMerge(RoomCreate roomCreate, SecurityContext securityContext) {
     Room room = new Room();
     room.setId(UUID.randomUUID().toString());
     updateRoomNoMerge(roomCreate, room);
@@ -89,7 +89,7 @@ public class RoomService implements Plugin, IRoomService {
    * @return room
    */
   @Override
-  public Room updateRoom(RoomUpdate roomUpdate, SecurityContextBase securityContext) {
+  public Room updateRoom(RoomUpdate roomUpdate, SecurityContext securityContext) {
     Room room = roomUpdate.getRoom();
     if (updateRoomNoMerge(roomUpdate, room)) {
       repository.merge(room);
@@ -104,7 +104,7 @@ public class RoomService implements Plugin, IRoomService {
    */
   @Override
   public PaginationResponse<Room> getAllRooms(
-      RoomFilter roomFilter, SecurityContextBase securityContext) {
+      RoomFilter roomFilter, SecurityContext securityContext) {
     List<Room> list = listAllRooms(roomFilter, securityContext);
     long count = repository.countAllRooms(roomFilter, securityContext);
     return new PaginationResponse<>(list, roomFilter, count);
@@ -116,7 +116,7 @@ public class RoomService implements Plugin, IRoomService {
    * @return List of Room
    */
   @Override
-  public List<Room> listAllRooms(RoomFilter roomFilter, SecurityContextBase securityContext) {
+  public List<Room> listAllRooms(RoomFilter roomFilter, SecurityContext securityContext) {
     return repository.listAllRooms(roomFilter, securityContext);
   }
 
@@ -126,7 +126,7 @@ public class RoomService implements Plugin, IRoomService {
    * @throws org.springframework.web.server.ResponseStatusException  if roomFilter is not valid
    */
   @Override
-  public void validate(RoomFilter roomFilter, SecurityContextBase securityContext) {
+  public void validate(RoomFilter roomFilter, SecurityContext securityContext) {
     basicService.validate(roomFilter, securityContext);
 
     Set<String> videoServerIds =
@@ -136,7 +136,7 @@ public class RoomService implements Plugin, IRoomService {
             ? new HashMap<>()
             : repository
                 .listByIds(
-                    VideoServer.class, videoServerIds, SecuredBasic_.security, securityContext)
+                    VideoServer.class, videoServerIds,  securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     videoServerIds.removeAll(videoServer.keySet());
@@ -153,7 +153,7 @@ public class RoomService implements Plugin, IRoomService {
    * @throws org.springframework.web.server.ResponseStatusException  if roomCreate is not valid
    */
   @Override
-  public void validate(RoomCreate roomCreate, SecurityContextBase securityContext) {
+  public void validate(RoomCreate roomCreate, SecurityContext securityContext) {
     basicService.validate(roomCreate, securityContext);
 
     String videoServerId = roomCreate.getVideoServerId();
@@ -161,7 +161,7 @@ public class RoomService implements Plugin, IRoomService {
         videoServerId == null
             ? null
             : repository.getByIdOrNull(
-                videoServerId, VideoServer.class, SecuredBasic_.security, securityContext);
+                videoServerId, VideoServer.class,  securityContext);
     if (videoServerId != null && videoServer == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No VideoServer with id " + videoServerId);
@@ -171,13 +171,13 @@ public class RoomService implements Plugin, IRoomService {
 
   @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
   @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -186,7 +186,7 @@ public class RoomService implements Plugin, IRoomService {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -195,7 +195,7 @@ public class RoomService implements Plugin, IRoomService {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

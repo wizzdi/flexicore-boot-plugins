@@ -1,12 +1,12 @@
 package com.wizzdi.maps.service;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Light extends SecuredBasic {
+public class Light extends Baseclass {
 
     @ManyToOne(targetEntity = LightOperator.class)
     private LightOperator lightOperator;

@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.RemoteRepository;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
@@ -59,19 +59,19 @@ public class RemoteService implements Plugin {
     @Autowired
     private DeviceTypeService deviceTypeService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -89,7 +89,7 @@ public class RemoteService implements Plugin {
 
 
     public void validateFiltering(RemoteFilter remoteFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(remoteFilter, securityContext);
         if(remoteFilter.getMappedPOIFilter()!=null){
             mappedPOIService.validate(remoteFilter.getMappedPOIFilter(),securityContext);
@@ -97,25 +97,25 @@ public class RemoteService implements Plugin {
     }
 
     public PaginationResponse<Remote> getAllRemotes(
-            SecurityContextBase securityContext, RemoteFilter filtering) {
+            SecurityContext securityContext, RemoteFilter filtering) {
         List<Remote> list = listAllRemotes(securityContext, filtering);
         long count = repository.countAllRemotes(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<Remote> listAllRemotes(SecurityContextBase securityContext, RemoteFilter remoteFilter) {
+    public List<Remote> listAllRemotes(SecurityContext securityContext, RemoteFilter remoteFilter) {
         return repository.getAllRemotes(securityContext, remoteFilter);
     }
 
     public Remote createRemote(RemoteCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Remote remote = createRemoteNoMerge(creationContainer, securityContext);
         repository.merge(remote,null);
         return remote;
     }
 
     public Remote createRemoteNoMerge(RemoteCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         Remote remote = new Remote();
         remote.setId(UUID.randomUUID().toString());
 
@@ -192,7 +192,7 @@ public class RemoteService implements Plugin {
     }
 
     public Remote updateRemote(RemoteUpdate remoteUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Remote remote = remoteUpdate.getRemote();
         RemoteUpdateResponse remoteUpdateResponse = updateRemoteNoMerge(remote, remoteUpdate);
         if (remoteUpdateResponse.updated()) {
@@ -201,7 +201,7 @@ public class RemoteService implements Plugin {
         return remote;
     }
 
-    public SecurityContextBase getRemoteSecurityContext(Remote remote) {
+    public SecurityContext getRemoteSecurityContext(Remote remote) {
         if(remote instanceof Device){
             return getRemoteSecurityContext(((Device) remote).getGateway());
         }
@@ -226,7 +226,7 @@ public class RemoteService implements Plugin {
     }
 
     public void validate(RemoteCreate remoteCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(remoteCreate, securityContext);
     }
 
@@ -240,8 +240,8 @@ public class RemoteService implements Plugin {
         return null;
     }
 
-    public FixRemotesResponse fixRemoteMapIcons(SecurityContextBase securityContext, RemoteFilter remoteFilter) {
-        SecurityContextBase copy = securityContextProvider.getSecurityContext(securityContext.getUser());
+    public FixRemotesResponse fixRemoteMapIcons(SecurityContext securityContext, RemoteFilter remoteFilter) {
+        SecurityContext copy = securityContextProvider.getSecurityContext(securityContext.getUser());
 
         List<Remote> remotes = listAllRemotes(securityContext, remoteFilter);
         List<Basic> toMerge=new ArrayList<>();
@@ -251,25 +251,25 @@ public class RemoteService implements Plugin {
         int fixedDeviceTypes=0;
 
         for (Remote remote : remotes) {
-            if(remote.getPreConnectivityLossIcon()!=null&&(!remote.getSecurity().getTenant().getId().equals(remote.getPreConnectivityLossIcon().getSecurity().getTenant().getId())||remote.getPreConnectivityLossIcon().isSoftDelete())){
+            if(remote.getPreConnectivityLossIcon()!=null&&(!remote.getTenant().getId().equals(remote.getPreConnectivityLossIcon().getTenant().getId())||remote.getPreConnectivityLossIcon().isSoftDelete())){
                 remote.setPreConnectivityLossIcon(null);
                 toMerge.add(remote);
                 fixedRemotes++;
             }
             MappedPOI mappedPOI = remote.getMappedPOI();
             if(mappedPOI !=null){
-                if(mappedPOI.getMapIcon()!=null&&(!mappedPOI.getMapIcon().getSecurity().getTenant().getId().equals(mappedPOI.getSecurity().getTenant().getId())||mappedPOI.getMapIcon().isSoftDelete())){
+                if(mappedPOI.getMapIcon()!=null&&(!mappedPOI.getMapIcon().getTenant().getId().equals(mappedPOI.getTenant().getId())||mappedPOI.getMapIcon().isSoftDelete())){
                     if(remote instanceof Device device&&device.getDeviceType()!=null){
                         DeviceType deviceType = device.getDeviceType();
-                        if(deviceType.isSoftDelete()||!deviceType.getSecurity().getTenant().getId().equals(remote.getSecurity().getTenant().getId())){
-                            copy.setTenantToCreateIn(remote.getSecurity().getTenant());
+                        if(deviceType.isSoftDelete()||!deviceType.getTenant().getId().equals(remote.getTenant().getId())){
+                            copy.setTenantToCreateIn(remote.getTenant());
                             DeviceType correctedType=deviceTypeService.getOrCreateDeviceType(deviceType.getName(),true, copy);
                             device.setDeviceType(correctedType);
                             toMerge.add(device);
                             fixedRemoteDeviceTypes++;
                         }
-                        if(deviceType.getDefaultMapIcon()==null||deviceType.getDefaultMapIcon().isSoftDelete()||!deviceType.getDefaultMapIcon().getSecurity().getTenant().getId().equals(deviceType.getSecurity().getTenant().getId())){
-                            copy.setTenantToCreateIn(deviceType.getSecurity().getTenant());
+                        if(deviceType.getDefaultMapIcon()==null||deviceType.getDefaultMapIcon().isSoftDelete()||!deviceType.getDefaultMapIcon().getTenant().getId().equals(deviceType.getTenant().getId())){
+                            copy.setTenantToCreateIn(deviceType.getTenant());
 
                             MapIcon correctedDefault=deviceTypeService.getOrCreateMapIcon(DeviceTypeService.UNKNOWN_STATUS_SUFFIX,deviceType.getName(),Device.class,copy);
                             deviceType.setDefaultMapIcon(correctedDefault);

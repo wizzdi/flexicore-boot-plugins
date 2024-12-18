@@ -3,7 +3,7 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.FrequencyRepository;
 import com.wizzdi.flexicore.pricing.model.price.Frequency;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -33,19 +34,19 @@ public class FrequencyService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -72,32 +73,32 @@ public class FrequencyService implements Plugin {
     }
 
     public void validateFiltering(FrequencyFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
     }
 
     public PaginationResponse<Frequency> getAllFrequencies(
-            SecurityContextBase securityContext, FrequencyFiltering filtering) {
+            SecurityContext securityContext, FrequencyFiltering filtering) {
         List<Frequency> list = listAllFrequencies(securityContext, filtering);
         long count = repository.countAllFrequencies(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<Frequency> listAllFrequencies(SecurityContextBase securityContext, FrequencyFiltering filtering) {
+    public List<Frequency> listAllFrequencies(SecurityContext securityContext, FrequencyFiltering filtering) {
         return repository.getAllFrequencies(securityContext, filtering);
     }
 
     public Frequency createFrequency(FrequencyCreate creationContainer,
-                                     SecurityContextBase securityContext) {
+                                     SecurityContext securityContext) {
         Frequency frequency = createFrequencyNoMerge(creationContainer, securityContext);
         repository.merge(frequency);
         return frequency;
     }
 
     private Frequency createFrequencyNoMerge(FrequencyCreate creationContainer,
-                                             SecurityContextBase securityContext) {
+                                             SecurityContext securityContext) {
         Frequency frequency = new Frequency();
-        frequency.setId(Baseclass.getBase64ID());
+        frequency.setId(UUID.randomUUID().toString());
 
         updateFrequencyNoMerge(frequency, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(frequency, securityContext);
@@ -121,7 +122,7 @@ public class FrequencyService implements Plugin {
     }
 
     public Frequency updateFrequency(FrequencyUpdate updateContainer,
-                                     SecurityContextBase securityContext) {
+                                     SecurityContext securityContext) {
         Frequency frequency = updateContainer.getFrequency();
         if (updateFrequencyNoMerge(frequency, updateContainer)) {
             repository.merge(frequency);
@@ -130,7 +131,7 @@ public class FrequencyService implements Plugin {
     }
 
     public void validate(FrequencyCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(creationContainer, securityContext);
     }
 }

@@ -5,7 +5,7 @@ import com.flexicore.annotations.rest.Update;
 import com.flexicore.annotations.rest.Write;
 import com.flexicore.model.Basic;
 import com.flexicore.model.SecurityTenant;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
@@ -83,7 +83,7 @@ public class MapsSocketHandler implements Plugin {
 				.setY(mappedPOI.getY())
 				.setMappedIconId(Optional.ofNullable(mappedPOI.getMapIcon()).map(f->f.getId()).orElse(null))
 				.setMappedPOIId(mappedPOI.getId())
-				.setTenantId(mappedPOI.getSecurity().getTenant().getId())
+				.setTenantId(mappedPOI.getTenant().getId())
 				.setId(UUID.randomUUID().toString());
 
 		sendMessageToTenantsSessions(mapIconChangedNotification);
@@ -126,7 +126,7 @@ public class MapsSocketHandler implements Plugin {
 	@Update
 	public void receiveMessage(@PathParam("authenticationKey") String authenticationKey,MappedPOINotification message, Session session) {
 		if (!validateSecurity(authenticationKey, session)) return;
-		SecurityContextBase securityContext = (SecurityContextBase) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
+		SecurityContext securityContext = (SecurityContext) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
 
 		logger.info("Received : " + message + ", session:" + session.getId());
 	}
@@ -141,8 +141,8 @@ public class MapsSocketHandler implements Plugin {
 			}
 			return false;
 		}
-		SecurityContextBase securityContextBase = authentication.getSecurityContextBase();
-		session.getUserProperties().put(SECURITY_CONTEXT_KEY, securityContextBase);
+		SecurityContext SecurityContext = authentication.getSecurityContext();
+		session.getUserProperties().put(SECURITY_CONTEXT_KEY, SecurityContext);
 		return true;
 	}
 
@@ -151,7 +151,7 @@ public class MapsSocketHandler implements Plugin {
 	public void open(@PathParam("authenticationKey") String authenticationKey, Session session) {
 		if (!validateSecurity(authenticationKey, session)) return;
 
-		SecurityContextBase securityContext = (SecurityContextBase) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
+		SecurityContext securityContext = (SecurityContext) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
 		List<?> tenants = securityContext.getTenants();
 		tenants.stream().filter(f->f instanceof SecurityTenant).map(f->(SecurityTenant)f).map(f->f.getId()).forEach(
 				f->sessions.computeIfAbsent(f,e->new ConcurrentLinkedQueue<>()).add(session)
@@ -164,7 +164,7 @@ public class MapsSocketHandler implements Plugin {
 	public void close(@PathParam("authenticationKey") String authenticationKey, CloseReason c, Session session) {
 		if (!validateSecurity(authenticationKey, session)) return;
 
-		SecurityContextBase securityContext = (SecurityContextBase) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
+		SecurityContext securityContext = (SecurityContext) session.getUserProperties().get(SECURITY_CONTEXT_KEY);
 		List<?> tenants = securityContext.getTenants();
 		tenants.stream().filter(f->f instanceof SecurityTenant).map(f->(SecurityTenant)f).map(Basic::getId).map(sessions::get)
 				.filter(f->f!=null).forEach(f-> f.remove(session));

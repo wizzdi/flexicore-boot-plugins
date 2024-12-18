@@ -3,7 +3,7 @@ package com.flexicore.rules.service;
 import com.flexicore.model.Baseclass;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.model.ScenarioTrigger;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.request.FileResourceCreate;
@@ -34,7 +34,7 @@ public class LogFileCreatorListener implements Plugin {
     public void onScenarioTriggerCreated(BasicCreated<ScenarioTrigger> scenarioTriggerCreated){
         ScenarioTrigger scenarioTrigger = scenarioTriggerCreated.getBaseclass();
         if(scenarioTrigger.getLogFileResource()==null&&!scenarioTrigger.isSoftDelete()){
-            FileResource logFileResource = logFileCreatorService.createLogFileNoMerge(scenarioTrigger.getSecurity(), LOG_TRIGGER, scenarioTrigger.getName());
+            FileResource logFileResource = logFileCreatorService.createLogFileNoMerge(scenarioTrigger, LOG_TRIGGER, scenarioTrigger.getName());
             scenarioTrigger.setLogFileResource(logFileResource);
             fileResourceService.massMerge(List.of(scenarioTrigger,logFileResource));
         }
@@ -46,7 +46,7 @@ public class LogFileCreatorListener implements Plugin {
     public void onScenarioCreated(BasicCreated<Scenario> scenarioCreated){
         Scenario scenario = scenarioCreated.getBaseclass();
         if(scenario.getLogFileResource()==null&&!scenario.isSoftDelete()){
-            FileResource logFileResource = logFileCreatorService.createLogFileNoMerge(scenario.getSecurity(), LOG_SCENARIO, scenario.getName());
+            FileResource logFileResource = logFileCreatorService.createLogFileNoMerge(scenario, LOG_SCENARIO, scenario.getName());
             scenario.setLogFileResource(logFileResource);
             fileResourceService.massMerge(List.of(scenario,logFileResource));
         }

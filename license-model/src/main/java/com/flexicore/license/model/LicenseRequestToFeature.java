@@ -29,6 +29,7 @@ public class LicenseRequestToFeature extends LicenseRequestToEntity {
 	}
 
 
+
 	@Override
 	public <T extends LicenseRequestToEntity> T setLicensingEntity(LicensingEntity licensingEntity) {
 		return super.setLicensingEntity(licensingEntity);

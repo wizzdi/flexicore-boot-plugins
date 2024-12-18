@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class MapGroupController implements Plugin {
   @Operation(summary = "updateMapGroup", description = "Updates MapGroup")
   public MapGroup updateMapGroup(
       @Validated(Update.class) @RequestBody MapGroupUpdate mapGroupUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupService.updateMapGroup(mapGroupUpdate, securityContext);
   }
@@ -41,7 +41,7 @@ public class MapGroupController implements Plugin {
   @Operation(summary = "getAllMapGroups", description = "lists MapGroups")
   public PaginationResponse<MapGroup> getAllMapGroups(
       @Valid @RequestBody MapGroupFilter mapGroupFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupService.getAllMapGroups(mapGroupFilter, securityContext);
   }
@@ -50,7 +50,7 @@ public class MapGroupController implements Plugin {
   @Operation(summary = "createMapGroup", description = "Creates MapGroup")
   public MapGroup createMapGroup(
       @Validated(Create.class) @RequestBody MapGroupCreate mapGroupCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupService.createMapGroup(mapGroupCreate, securityContext);
   }

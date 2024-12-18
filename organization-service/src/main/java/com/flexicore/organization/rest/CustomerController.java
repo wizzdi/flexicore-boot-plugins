@@ -12,7 +12,7 @@ import com.flexicore.organization.request.CustomerCreate;
 import com.flexicore.organization.request.CustomerFiltering;
 import com.flexicore.organization.request.CustomerUpdate;
 import com.flexicore.organization.service.CustomerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -47,7 +47,7 @@ public class CustomerController implements Plugin {
 	@PostMapping("/getAllCustomers")
 	public PaginationResponse<Customer> getAllCustomers(
 
-			@RequestBody CustomerFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody CustomerFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllCustomers(securityContext, filtering);
 	}
@@ -59,7 +59,7 @@ public class CustomerController implements Plugin {
 	public Customer createCustomer(
 
 			@RequestBody CustomerCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createCustomer(creationContainer, securityContext);
@@ -71,10 +71,10 @@ public class CustomerController implements Plugin {
 	public Customer updateCustomer(
 
 			@RequestBody CustomerUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		Customer customer = service.getByIdOrNull(updateContainer.getId(),
-				Customer.class, Customer_.security, securityContext);
+				Customer.class,  securityContext);
 		if (customer == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Customer with id "
 					+ updateContainer.getId());

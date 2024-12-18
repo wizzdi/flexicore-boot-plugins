@@ -1,7 +1,7 @@
 package com.flexicore.scheduling.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Schedule extends SecuredBasic {
+public class Schedule extends Baseclass {
 
   @JsonIgnore
   @OneToMany(targetEntity = ScheduleToAction.class, mappedBy = "schedule")

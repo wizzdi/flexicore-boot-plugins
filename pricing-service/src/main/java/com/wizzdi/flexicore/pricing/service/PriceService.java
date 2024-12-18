@@ -3,7 +3,7 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.PriceRepository;
 import com.wizzdi.flexicore.pricing.model.price.Price;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -33,19 +34,17 @@ public class PriceService implements Plugin {
 	@Autowired
 	private BasicService basicService;
 
-public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -72,32 +71,32 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public void validateFiltering(PriceFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
 		basicService.validate(filtering, securityContext);
 	}
 
 	public PaginationResponse<Price> getAllPrice(
-			SecurityContextBase securityContext, PriceFiltering filtering) {
+			SecurityContext securityContext, PriceFiltering filtering) {
 		List<Price> list = listAllPrice(securityContext, filtering);
 		long count = repository.countAllPrice(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
-	public List<Price> listAllPrice(SecurityContextBase securityContext, PriceFiltering filtering) {
+	public List<Price> listAllPrice(SecurityContext securityContext, PriceFiltering filtering) {
 		return repository.getAllPrice(securityContext, filtering);
 	}
 
 	public Price createPrice(PriceCreate creationContainer,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
 		Price price = createPriceNoMerge(creationContainer, securityContext);
 		repository.merge(price);
 		return price;
 	}
 
 	public Price createPriceNoMerge(PriceCreate creationContainer,
-                                       SecurityContextBase securityContext) {
+                                       SecurityContext securityContext) {
 		Price price = new Price();
-		price.setId(Baseclass.getBase64ID());
+		price.setId(UUID.randomUUID().toString());
 
 		updatePriceNoMerge(price, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(price,securityContext);
@@ -112,7 +111,7 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public Price updatePrice(PriceUpdate updateContainer,
-                                   SecurityContextBase securityContext) {
+                                   SecurityContext securityContext) {
 		Price price = updateContainer.getPrice();
 		if (updatePriceNoMerge(price, updateContainer)) {
 			repository.merge(price);
@@ -121,7 +120,7 @@ public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, Secu
 	}
 
 	public void validate(PriceCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
 		basicService.validate(creationContainer, securityContext);
 	}
 }

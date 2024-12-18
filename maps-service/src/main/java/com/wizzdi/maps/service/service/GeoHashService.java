@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.territories.Address;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MappedPOI;
@@ -29,7 +29,7 @@ public class GeoHashService implements Plugin {
     @Autowired
     private ReverseGeoHashService reverseGeoHashService;
 
-    public void validate(GeoHashRequest geoHashRequest, SecurityContextBase securityContext) {
+    public void validate(GeoHashRequest geoHashRequest, SecurityContext securityContext) {
         if(geoHashRequest.getPrecision()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"precision must be provided");
         }
@@ -43,17 +43,17 @@ public class GeoHashService implements Plugin {
         mappedPOIService.validate(geoHashRequest.getMappedPOIFilter(),securityContext);
     }
 
-    public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContext securityContext) {
         List<GeoHashResponse> list=listAllGeoHashAreas(geoHashRequest,securityContext);
         long count=list.size();
         return new PaginationResponse<>(list,list.size(),count);
     }
 
-    private List<GeoHashResponse> listAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContextBase securityContext) {
+    private List<GeoHashResponse> listAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContext securityContext) {
         return geoHashRepository.listAllGeoHashAreas(geoHashRequest,securityContext);
     }
 
-    public void calculateReverseGeoHash(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public void calculateReverseGeoHash(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         List<MappedPOI> mappedPOIS = mappedPOIService.listAllMappedPOIs(mappedPOIFilter, securityContext);
         for (MappedPOI pois : mappedPOIS) {
             if(pois.getLat()!=null&&pois.getLon()!=null){

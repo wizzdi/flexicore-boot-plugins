@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.GatewayCreate;
 import com.wizzdi.basic.iot.service.request.GatewayFilter;
@@ -88,7 +88,7 @@ public class GatewayControllerTest {
     private FileResourceService fileResourceService;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
     @BeforeAll
     public void init() throws IOException {

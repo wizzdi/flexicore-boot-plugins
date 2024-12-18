@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service;
 
 import com.flexicore.model.Basic_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.FilterComponentPropertyProvider;
@@ -31,7 +31,7 @@ public class LightMappedPOIService {
     @Autowired
     private LightRepository lightRepository;
 
-    public void validate(LightMapFilterComponentRequest mapFilterComponentRequest, SecurityContextBase securityContext) {
+    public void validate(LightMapFilterComponentRequest mapFilterComponentRequest, SecurityContext securityContext) {
         mapFilterComponentRequest.setCustom(true);
         mapFilterComponentService.validate(mapFilterComponentRequest,securityContext);
         mapFilterComponentRequest.setFilterComponentPropertyProvider(new FilterComponentPropertyProvider() {
@@ -56,12 +56,12 @@ public class LightMappedPOIService {
 
     }
 
-    public void validate(ExtendedMappedPOIFilter mapFilterComponentRequest, SecurityContextBase securityContext) {
+    public void validate(ExtendedMappedPOIFilter mapFilterComponentRequest, SecurityContext securityContext) {
         mappedPOIService.validate(mapFilterComponentRequest,securityContext);
 
         mapFilterComponentRequest.setPredicateAdder(new PredicateAdder<>() {
             @Override
-            public <T extends MappedPOI> void addPredicates(MappedPOIFilter mapFilterComponentRequest, CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+            public <T extends MappedPOI> void addPredicates(MappedPOIFilter mapFilterComponentRequest, CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
                 if(mapFilterComponentRequest instanceof ExtendedMappedPOIFilter){
                     Root<Light> lightR =  q.from(Light.class);
                     ExtendedMappedPOIFilter extendedMappedPOIFilter= (ExtendedMappedPOIFilter) mapFilterComponentRequest;
@@ -73,12 +73,12 @@ public class LightMappedPOIService {
         });
     }
 
-    public void validate(ExtendedGeoHashRequest extendedGeoHashRequest, SecurityContextBase securityContext) {
+    public void validate(ExtendedGeoHashRequest extendedGeoHashRequest, SecurityContext securityContext) {
         geoHashService.validate(extendedGeoHashRequest,securityContext);
 
         extendedGeoHashRequest.getMappedPOIFilter().setPredicateAdder(new PredicateAdder<>() {
             @Override
-            public <T extends MappedPOI> void addPredicates(MappedPOIFilter mapFilterComponentRequest, CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+            public <T extends MappedPOI> void addPredicates(MappedPOIFilter mapFilterComponentRequest, CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
                 if(mapFilterComponentRequest instanceof ExtendedMappedPOIFilter){
                     Root<Light> lightR =  q.from(Light.class);
                     ExtendedMappedPOIFilter extendedMappedPOIFilter= (ExtendedMappedPOIFilter) mapFilterComponentRequest;
@@ -90,15 +90,15 @@ public class LightMappedPOIService {
         });
     }
 
-    public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(LightMapFilterComponentRequest mapFilterComponentRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<MapFilterComponent> getAllMapFilterComponents(LightMapFilterComponentRequest mapFilterComponentRequest, SecurityContext securityContext) {
         return mapFilterComponentService.getAllMapFilterComponents(mapFilterComponentRequest,securityContext);
     }
 
-    public PaginationResponse<MappedPOI> getAllMappedPOIs(ExtendedMappedPOIFilter mapFilterComponentRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<MappedPOI> getAllMappedPOIs(ExtendedMappedPOIFilter mapFilterComponentRequest, SecurityContext securityContext) {
         return mappedPOIService.getAllMappedPOIs(mapFilterComponentRequest,securityContext);
     }
 
-    public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(ExtendedGeoHashRequest extendedGeoHashRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<GeoHashResponse> getAllGeoHashAreas(ExtendedGeoHashRequest extendedGeoHashRequest, SecurityContext securityContext) {
         return geoHashService.getAllGeoHashAreas(extendedGeoHashRequest,securityContext);
     }
 }

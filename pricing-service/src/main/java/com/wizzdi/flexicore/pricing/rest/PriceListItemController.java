@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -40,7 +40,7 @@ public class PriceListItemController implements Plugin {
     @PostMapping("/getAllPriceListItems")
     public PaginationResponse<PriceListItem> getAllPriceListItems(
             
-            @RequestBody PriceListItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PriceListItemFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPriceListItems(securityContext, filtering);
     }
@@ -53,7 +53,7 @@ public class PriceListItemController implements Plugin {
 
             
             @RequestBody PriceListItemCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPriceListItem(creationContainer, securityContext);
@@ -67,10 +67,10 @@ public class PriceListItemController implements Plugin {
 
             
             @RequestBody PriceListItemUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PriceListItem priceListItem = service.getByIdOrNull(updateContainer.getId(),
-                PriceListItem.class, PriceListItem_.security, securityContext);
+                PriceListItem.class,  securityContext);
         if (priceListItem == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PriceListItem with id "
                     + updateContainer.getId());

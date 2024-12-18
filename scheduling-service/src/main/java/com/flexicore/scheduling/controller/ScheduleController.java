@@ -7,7 +7,7 @@ import com.flexicore.scheduling.request.ScheduleCreate;
 import com.flexicore.scheduling.request.ScheduleFilter;
 import com.flexicore.scheduling.request.ScheduleUpdate;
 import com.flexicore.scheduling.service.ScheduleService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -33,7 +33,7 @@ public class ScheduleController implements Plugin, Invoker {
   public Schedule createSchedule(
       
       @RequestBody ScheduleCreate scheduleCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleService.validate(scheduleCreate, securityContext);
     return scheduleService.createSchedule(scheduleCreate, securityContext);
   }
@@ -43,11 +43,11 @@ public class ScheduleController implements Plugin, Invoker {
   public Schedule updateSchedule(
       
       @RequestBody ScheduleUpdate scheduleUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String scheduleId = scheduleUpdate.getId();
     Schedule schedule =
         scheduleService.getByIdOrNull(
-            scheduleId, Schedule.class, Schedule_.security, securityContext);
+            scheduleId, Schedule.class,  securityContext);
     if (schedule == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Schedule with id " + scheduleId);
@@ -62,7 +62,7 @@ public class ScheduleController implements Plugin, Invoker {
   public PaginationResponse<Schedule> getAllSchedules(
       
       @RequestBody ScheduleFilter scheduleFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleService.validate(scheduleFilter, securityContext);
     return scheduleService.getAllSchedules(scheduleFilter, securityContext);
   }

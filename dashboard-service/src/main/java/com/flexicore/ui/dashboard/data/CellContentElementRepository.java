@@ -15,7 +15,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.ui.dashboard.model.*;
 import com.flexicore.ui.dashboard.request.CellContentElementFilter;
@@ -40,7 +40,7 @@ public class CellContentElementRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
 
     public List<CellContentElement> listAllCellContentElement(CellContentElementFilter cellContentElementFilter,
-                                                              SecurityContextBase securityContext) {
+                                                              SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<CellContentElement> q = cb.createQuery(CellContentElement.class);
         Root<CellContentElement> r = q.from(CellContentElement.class);
@@ -53,8 +53,8 @@ public class CellContentElementRepository implements Plugin {
     }
 
     public <T extends CellContentElement> void addCellContentElementPredicates(List<Predicate> preds, CriteriaBuilder cb, CommonAbstractCriteria q,
-                                                                               From<?, T> r, CellContentElementFilter cellContentElementFilter, SecurityContextBase securityContextBase) {
-        securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContextBase);
+                                                                               From<?, T> r, CellContentElementFilter cellContentElementFilter, SecurityContext SecurityContext) {
+        securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, SecurityContext);
 
         if (cellContentElementFilter.getCellContents() != null && !cellContentElementFilter.getCellContents().isEmpty()) {
             Set<String> ids = cellContentElementFilter.getCellContents().stream().map(f -> f.getId()).collect(Collectors.toSet());
@@ -66,7 +66,7 @@ public class CellContentElementRepository implements Plugin {
     }
 
     public long countAllCellContentElement(CellContentElementFilter cellContentElementFilter,
-                                           SecurityContextBase securityContext) {
+                                           SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<CellContentElement> r = q.from(CellContentElement.class);
@@ -78,19 +78,19 @@ public class CellContentElementRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

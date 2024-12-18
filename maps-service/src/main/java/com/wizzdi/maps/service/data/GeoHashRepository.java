@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.data;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.model.MappedPOI_;
@@ -27,7 +27,7 @@ public class GeoHashRepository implements Plugin {
     private MappedPOIRepository mappedPOIRepository;
 
 
-    public List<GeoHashResponse> listAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContextBase securityContext) {
+    public List<GeoHashResponse> listAllGeoHashAreas(GeoHashRequest geoHashRequest, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<GeoHashResponse> q = cb.createQuery(GeoHashResponse.class);
         Root<MappedPOI> r = q.from(MappedPOI.class);
@@ -39,7 +39,7 @@ public class GeoHashRepository implements Plugin {
         return query.getResultList();
     }
 
-    private void addGeoHashAreasPredicate(GeoHashRequest geoHashRequest, CriteriaBuilder cb, CriteriaQuery<GeoHashResponse> q, From<?,MappedPOI> r, List<Predicate> preds, SecurityContextBase securityContext) {
+    private void addGeoHashAreasPredicate(GeoHashRequest geoHashRequest, CriteriaBuilder cb, CriteriaQuery<GeoHashResponse> q, From<?,MappedPOI> r, List<Predicate> preds, SecurityContext securityContext) {
         mappedPOIRepository.addMappedPOIPredicate(geoHashRequest.getMappedPOIFilter(),cb,q,r,preds,securityContext);
         String geoHashField="geoHash"+geoHashRequest.getPrecision();
 

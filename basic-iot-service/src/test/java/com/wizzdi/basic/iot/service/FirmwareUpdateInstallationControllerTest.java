@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.*;
@@ -93,7 +93,7 @@ public class FirmwareUpdateInstallationControllerTest {
     private ObjectHolder<FileResource> firmwareFile;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
     @BeforeAll
     public void init() {

@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationFilter;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -35,7 +35,7 @@ public class FirmwareUpdateInstallationRepository implements Plugin {
     private SecuredBasicRepository securedBasicRepository;
 
 
-    public List<FirmwareUpdateInstallation> getAllFirmwareUpdateInstallations(SecurityContextBase securityContext,
+    public List<FirmwareUpdateInstallation> getAllFirmwareUpdateInstallations(SecurityContext securityContext,
                                            FirmwareUpdateInstallationFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<FirmwareUpdateInstallation> q = cb.createQuery(FirmwareUpdateInstallation.class);
@@ -48,7 +48,7 @@ public class FirmwareUpdateInstallationRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllFirmwareUpdateInstallations(SecurityContextBase securityContext,
+    public long countAllFirmwareUpdateInstallations(SecurityContext securityContext,
                                    FirmwareUpdateInstallationFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -61,7 +61,7 @@ public class FirmwareUpdateInstallationRepository implements Plugin {
     }
 
     public <T extends FirmwareUpdateInstallation> void addFirmwareUpdateInstallationPredicates(FirmwareUpdateInstallationFilter filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(),cb,q,r,preds,securityContext);
         if(filtering.getFirmwareUpdates()!=null&&!filtering.getFirmwareUpdates().isEmpty()){
             Set<String> ids=filtering.getFirmwareUpdates().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -106,19 +106,19 @@ public class FirmwareUpdateInstallationRepository implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

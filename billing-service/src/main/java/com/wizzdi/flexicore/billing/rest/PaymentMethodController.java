@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class PaymentMethodController implements Plugin {
     public PaginationResponse<PaymentMethod> getAllPaymentMethods(
 
             
-            @RequestBody PaymentMethodFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PaymentMethodFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPaymentMethods(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class PaymentMethodController implements Plugin {
 
             
             @RequestBody PaymentMethodCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPaymentMethod(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class PaymentMethodController implements Plugin {
 
             
             @RequestBody PaymentMethodUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PaymentMethod paymentMethod = service.getByIdOrNull(updateContainer.getId(),
-                PaymentMethod.class, PaymentMethod_.security, securityContext);
+                PaymentMethod.class,  securityContext);
         if (paymentMethod == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PaymentMethod with id "
                     + updateContainer.getId());

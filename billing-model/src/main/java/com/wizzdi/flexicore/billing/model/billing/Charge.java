@@ -1,6 +1,6 @@
 package com.wizzdi.flexicore.billing.model.billing;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.billing.model.payment.Invoice;
 import com.wizzdi.flexicore.billing.model.payment.InvoiceItem;
 import com.wizzdi.flexicore.pricing.model.price.Money;
@@ -12,7 +12,7 @@ import jakarta.persistence.OneToOne;
 import java.time.OffsetDateTime;
 
 @Entity
-public class Charge extends SecuredBasic {
+public class Charge extends Baseclass {
 
     @ManyToOne(targetEntity = ChargeReference.class)
     private ChargeReference chargeReference;

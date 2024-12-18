@@ -105,14 +105,14 @@ public class LicenseEnforcer implements Plugin {
         List<LicenseRequestToQuantityFeature> licenseRequestToQuantityFeatures = licenseRequests.isEmpty() ? new ArrayList<>() : licenseRequestToQuantityFeatureService.listAllLicenseRequestToQuantityFeatures(new LicenseRequestToQuantityFeatureFiltering().setLicenseRequests(licenseRequests), null);
         Map<String, List<LicenseRequestToQuantityFeature>> links = licenseRequestToQuantityFeatures.parallelStream().filter(f -> f.getLicenseRequest() != null).collect(Collectors.groupingBy(f -> f.getLicenseRequest().getId()));
 
-        Set<String> clazzNames = new HashSet<>();
+        Set<Clazz> clazzNames = new HashSet<>();
         for (Map.Entry<String, List<LicenseRequestToQuantityFeature>> stringListEntry : links.entrySet()) {
             Boolean validated = null;
             for (LicenseRequestToQuantityFeature licenseRequestToQuantityFeature : stringListEntry.getValue()) {
                 if (validated == null) {
                     validated = licenseRequestService.isLicenseValid(licenseRequestToQuantityFeature.getLicenseRequest());
                 }
-                clazzNames.add(licenseRequestToQuantityFeature.getLicensingEntity().getCanonicalName());
+                clazzNames.add(licenseRequestToQuantityFeature.getLicensingEntity().getClazz());
                 String key = getKey(licenseRequestToQuantityFeature);
                 requestedLicense.put(key, licenseRequestToQuantityFeature.getQuantityLimit());
                 if (validated) {
@@ -120,7 +120,7 @@ public class LicenseEnforcer implements Plugin {
                 }
             }
         }
-        Map<String, Clazz> clazzMap = clazzNames.parallelStream().map(f -> Baseclass.getClazzByName(f)).filter(f -> f != null).collect(Collectors.toMap(f->f.getId(),f->f,(a,b)->a));
+        Map<String, Clazz> clazzMap = clazzNames.parallelStream().filter(f -> f != null).collect(Collectors.toMap(f->f.name(),f->f,(a,b)->a));
         List<ClazzCount> clazzCounts = clazzMap.isEmpty() ? new ArrayList<>() : licenseEnforcerRepository.getClazzCount(new ClazzCountRequest().setGroupByTenant(true).setClazzIds(clazzMap.keySet()));
         for (ClazzCount clazzCount : clazzCounts) {
             cachedCount.put(getKey(clazzCount.getTenantId(), clazzCount.getClazzName()), new AtomicLong(clazzCount.getCount()));

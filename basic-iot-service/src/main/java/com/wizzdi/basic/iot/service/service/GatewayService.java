@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.service;
 
 
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.service.data.GatewayRepository;
@@ -71,19 +71,19 @@ public class GatewayService implements Plugin {
     @Lazy
     private PublicKeyService publicKeyService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -101,11 +101,11 @@ public class GatewayService implements Plugin {
 
 
     public void validateFiltering(GatewayFilter gatewayFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         remoteService.validateFiltering(gatewayFilter, securityContext);
     }
     public void validateFiltering(ApproveGatewaysRequest gatewayFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         if(gatewayFilter.getPendingGatewayFilter()==null){
             throw new ResponseStatusException(BAD_REQUEST,"pendingGatewayFilter must be provided");
         }
@@ -114,25 +114,25 @@ public class GatewayService implements Plugin {
     }
 
     public PaginationResponse<Gateway> getAllGateways(
-            SecurityContextBase securityContext, GatewayFilter filtering) {
+            SecurityContext securityContext, GatewayFilter filtering) {
         List<Gateway> list = listAllGateways(securityContext, filtering);
         long count = repository.countAllGateways(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<Gateway> listAllGateways(SecurityContextBase securityContext, GatewayFilter gatewayFilter) {
+    public List<Gateway> listAllGateways(SecurityContext securityContext, GatewayFilter gatewayFilter) {
         return repository.getAllGateways(securityContext, gatewayFilter);
     }
 
     public Gateway createGateway(GatewayCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Gateway gateway = createGatewayNoMerge(creationContainer, securityContext);
         repository.merge(gateway,null);
         return gateway;
     }
 
     public Gateway createGatewayNoMerge(GatewayCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         Gateway gateway = new Gateway();
         gateway.setId(UUID.randomUUID().toString());
 
@@ -165,7 +165,7 @@ public class GatewayService implements Plugin {
     }
 
     public Gateway updateGateway(GatewayUpdate gatewayUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         Gateway gateway = gatewayUpdate.getGateway();
         RemoteUpdateResponse remoteUpdateResponse = updateGatewayNoMerge(gateway, gatewayUpdate);
         if (remoteUpdateResponse.updated()) {
@@ -183,13 +183,13 @@ public class GatewayService implements Plugin {
     }
 
     public void validate(GatewayCreate gatewayCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         remoteService.validate(gatewayCreate, securityContext);
 
     }
 
     public void validateCreate(GatewayCreate gatewayCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         validate(gatewayCreate, securityContext);
         if(gatewayCreate.getGatewayUser()==null){
             gatewayCreate.setGatewayUser(securityContext.getUser());
@@ -199,14 +199,14 @@ public class GatewayService implements Plugin {
         }
     }
 
-    public PaginationResponse<Gateway> approveGateways(SecurityContextBase securityContext, ApproveGatewaysRequest approveGatewaysRequest) {
+    public PaginationResponse<Gateway> approveGateways(SecurityContext securityContext, ApproveGatewaysRequest approveGatewaysRequest) {
         PendingGatewayFilter pendingGatewayFilter = approveGatewaysRequest.getPendingGatewayFilter();
         pendingGatewayFilter.setRegistered(false);
         List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, pendingGatewayFilter);
         return approveGateways(securityContext, pendingGateways);
     }
 
-    private PaginationResponse<Gateway> approveGateways(SecurityContextBase securityContext, List<PendingGateway> pendingGateways) {
+    private PaginationResponse<Gateway> approveGateways(SecurityContext securityContext, List<PendingGateway> pendingGateways) {
         List<Gateway> response=new ArrayList<>();
         for (PendingGateway pendingGateway : pendingGateways) {
             SecurityUser gatewaySecurityUser=createGatewaySecurityUser(securityContext,pendingGateway.getGatewayId());
@@ -224,14 +224,14 @@ public class GatewayService implements Plugin {
         return new PaginationResponse<>(response, response.size(), response.size());
     }
 
-    public SecurityUser createGatewaySecurityUser(SecurityContextBase securityContext, String gatewayId) {
+    public SecurityUser createGatewaySecurityUser(SecurityContext securityContext, String gatewayId) {
         List<Object> toMerge = new ArrayList<>();
         SecurityUser securityUser = createGatewaySecurityUserNoMerge(securityContext, gatewayId, toMerge);
         tenantToUserService.massMerge(toMerge);
         return securityUser;
     }
 
-    public SecurityUser createGatewaySecurityUserNoMerge(SecurityContextBase securityContext, String gatewayId, List<Object> toMerge) {
+    public SecurityUser createGatewaySecurityUserNoMerge(SecurityContext securityContext, String gatewayId, List<Object> toMerge) {
         SecurityUserCreate securityUserCreate=new SecurityUserCreate()
                 .setDescription("Automatically Created User for Gateway "+gatewayId)
                 .setName(gatewayId+"-User");
@@ -251,10 +251,10 @@ public class GatewayService implements Plugin {
                 .setDescription(pendingGateway.getDescription());
     }
 
-    public void validate(ImportGatewaysRequest importGatewaysRequest, SecurityContextBase securityContext) {
+    public void validate(ImportGatewaysRequest importGatewaysRequest, SecurityContext securityContext) {
 
         String csvId= importGatewaysRequest.getCsvId();;
-        FileResource csv=csvId!=null?getByIdOrNull(csvId,FileResource.class, SecuredBasic_.security,securityContext):null;
+        FileResource csv=csvId!=null?getByIdOrNull(csvId,FileResource.class, securityContext):null;
         if(csv==null){
             throw new ResponseStatusException(BAD_REQUEST,"csvId must be provided");
         }
@@ -262,7 +262,7 @@ public class GatewayService implements Plugin {
     }
 
 
-    public ImportGatewaysResponse importGateways(SecurityContextBase securityContext, ImportGatewaysRequest importGatewaysRequest) {
+    public ImportGatewaysResponse importGateways(SecurityContext securityContext, ImportGatewaysRequest importGatewaysRequest) {
         String fullPath = importGatewaysRequest.getCsv()
                 .getFullPath();
         try (Reader in = new InputStreamReader(new FileInputStream(fullPath),

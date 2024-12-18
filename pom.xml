@@ -110,8 +110,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <spring-boot.version>3.2.5</spring-boot.version>
-        <flexicore-boot-dependencies.version>6.0.1</flexicore-boot-dependencies.version>
+        <spring-boot.version>3.3.3</spring-boot.version>
+        <flexicore-boot-dependencies.version>7.0.0</flexicore-boot-dependencies.version>
 
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>

@@ -1,12 +1,12 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class ConsumerToOrganization extends SecuredBasic {
+public class ConsumerToOrganization extends Baseclass {
 
 	@ManyToOne(targetEntity = Consumer.class)
 	private Consumer consumer;

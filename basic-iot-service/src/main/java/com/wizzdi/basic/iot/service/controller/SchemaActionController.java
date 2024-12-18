@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.SchemaAction;
 import com.wizzdi.basic.iot.model.SchemaAction_;
 import com.wizzdi.basic.iot.service.request.SchemaActionCreate;
@@ -38,7 +38,7 @@ public class SchemaActionController implements Plugin {
     public PaginationResponse<SchemaAction> getAllSchemaActions(
 
             
-            @RequestBody SchemaActionFilter schemaActionFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody SchemaActionFilter schemaActionFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(schemaActionFilter, securityContext);
         return service.getAllSchemaActions(securityContext, schemaActionFilter);
     }
@@ -50,7 +50,7 @@ public class SchemaActionController implements Plugin {
     public SchemaAction createSchemaAction(
             
             @RequestBody SchemaActionCreate schemaActionCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(schemaActionCreate, securityContext);
 
         return service.createSchemaAction(schemaActionCreate, securityContext);
@@ -64,10 +64,10 @@ public class SchemaActionController implements Plugin {
 
             
             @RequestBody SchemaActionUpdate schemaActionUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(schemaActionUpdate, securityContext);
         SchemaAction schemaAction = service.getByIdOrNull(schemaActionUpdate.getId(),
-                SchemaAction.class, SchemaAction_.security, securityContext);
+                SchemaAction.class,  securityContext);
         if (schemaAction == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no SchemaAction with id "
                     + schemaActionUpdate.getId());

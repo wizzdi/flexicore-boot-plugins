@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service.app;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -22,7 +22,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 	@Autowired
 	@Qualifier("adminSecurityContext")
 	@Lazy
-	private SecurityContextBase securityContext;
+	private SecurityContext securityContext;
 
 
 	@Override

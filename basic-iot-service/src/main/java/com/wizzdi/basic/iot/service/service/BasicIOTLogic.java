@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
@@ -55,7 +55,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private static final Logger logger = LoggerFactory.getLogger(BasicIOTLogic.class);
 
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Autowired(required = false)
     @Lazy
     private BasicIOTClient basicIOTClient;
@@ -172,7 +172,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if (gatewayOptional.isEmpty()) {
             logger.warn("could not get gateway {}", iotMessage.getGatewayId());
         }
-        SecurityContextBase gatewaySecurityContext = gatewayOptional.map(f -> remoteService.getRemoteSecurityContext(f)).orElse(null);
+        SecurityContext gatewaySecurityContext = gatewayOptional.map(f -> remoteService.getRemoteSecurityContext(f)).orElse(null);
 
         if (gatewaySecurityContext == null) {
             logger.warn("could not find security context for gateway {}", iotMessage.getGatewayId());
@@ -229,7 +229,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return (System.currentTimeMillis() - lastKeepAliveReceived) < keepAliveBounceThreshold;
     }
 
-    private MessageHandleContext onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContext gatewaySecurityContext) {
         MessageHandleContext messageHandleContext = new MessageHandleContext(new ArrayList<>(), new ArrayList<>(), null);
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
         List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
@@ -276,7 +276,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     };
 
-    private UpdateKeepAliveResponse updateKeepAlive(OffsetDateTime lastSeen,SecurityContextBase gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
+    private UpdateKeepAliveResponse updateKeepAlive(OffsetDateTime lastSeen,SecurityContext gatewaySecurityContext, List<Remote> remotesWithKeepAlive) {
         MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         List<Remote> statusChanged = new ArrayList<>();
         if(lastSeen==null || lastSeen.isAfter(OffsetDateTime.now())){
@@ -339,7 +339,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         logger.debug("done fixing invalid status {} ",System.currentTimeMillis()-started);
     }
-    public long fixIcons(SecurityContextBase securityContext) {
+    public long fixIcons(SecurityContext securityContext) {
         long started=System.currentTimeMillis();
         fixInvalidStatus();
         return System.currentTimeMillis()-started;
@@ -451,7 +451,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private record GetOrCreateDeviceResponse(Device device, String newVersion,MessageHandleContext messageHandleContext) {
 
     }
-    private MessageHandleContext stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContext gatewaySecurityContext) {
         String newVersion=null;
         Remote remote=null;
         Map<String, Object> values = stateChanged.getValues();
@@ -592,7 +592,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return status;
     }
 
-    private MapIcon getOrCreateMapIcon(String status, Remote remote, SecurityContextBase gatewaySecurityContext) {
+    private MapIcon getOrCreateMapIcon(String status, Remote remote, SecurityContext gatewaySecurityContext) {
         if(remote instanceof Gateway){
             return gatewayMapIcon;
         }
@@ -611,7 +611,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
 
 
-    private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContextBase gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
+    private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContext gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
         MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         String newVersion;
         DeviceCreate deviceCreate = new DeviceCreate()
@@ -665,7 +665,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return new RegisterGatewayReceived().setRegisterGatewayId(registerGateway.getId());
     }
 
-    private MessageHandleContext updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContext gatewaySecurityContext) {
         GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, updateStateSchema.getDeviceId(), updateStateSchema.getDeviceType());
         Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
@@ -690,7 +690,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return messageHandleContext.withResponse(new UpdateStateSchemaReceived().setUpdateStateSchemaId(updateStateSchema.getId()));
     }
 
-    private MessageHandleContext setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+    private MessageHandleContext setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContext gatewaySecurityContext) {
         GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType());
         Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
@@ -708,7 +708,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return messageHandleContext.withResponse(new SetStateSchemaReceived().setSetStateSchemaId(setStateSchema.getId()).setFound(found));
     }
 
-    private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContextBase gatewaySecurityContext) {
+    private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContext gatewaySecurityContext) {
         StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setUserAddedSchema(false).setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
         StateSchemaCreate stateSchemaCreate=new StateSchemaCreate().setDeviceType(deviceType).setVersion(version).setStateSchemaJson(jsonSchema).setName(deviceType.getName()+" Schema V"+version);
         if(stateSchema==null){

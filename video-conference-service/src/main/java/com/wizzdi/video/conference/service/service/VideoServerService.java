@@ -2,7 +2,7 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -36,7 +36,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    */
   @Override
   public VideoServer createVideoServer(
-      VideoServerCreate videoServerCreate, SecurityContextBase securityContext) {
+      VideoServerCreate videoServerCreate, SecurityContext securityContext) {
     VideoServer videoServer = createVideoServerNoMerge(videoServerCreate, securityContext);
     repository.merge(videoServer);
     return videoServer;
@@ -49,7 +49,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    */
   @Override
   public VideoServer createVideoServerNoMerge(
-      VideoServerCreate videoServerCreate, SecurityContextBase securityContext) {
+      VideoServerCreate videoServerCreate, SecurityContext securityContext) {
     VideoServer videoServer = new VideoServer();
     videoServer.setId(UUID.randomUUID().toString());
     updateVideoServerNoMerge(videoServerCreate, videoServer);
@@ -84,7 +84,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    */
   @Override
   public VideoServer updateVideoServer(
-      VideoServerUpdate videoServerUpdate, SecurityContextBase securityContext) {
+      VideoServerUpdate videoServerUpdate, SecurityContext securityContext) {
     VideoServer videoServer = videoServerUpdate.getVideoServer();
     if (updateVideoServerNoMerge(videoServerUpdate, videoServer)) {
       repository.merge(videoServer);
@@ -99,7 +99,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    */
   @Override
   public PaginationResponse<VideoServer> getAllVideoServers(
-      VideoServerFilter videoServerFilter, SecurityContextBase securityContext) {
+      VideoServerFilter videoServerFilter, SecurityContext securityContext) {
     List<VideoServer> list = listAllVideoServers(videoServerFilter, securityContext);
     long count = repository.countAllVideoServers(videoServerFilter, securityContext);
     return new PaginationResponse<>(list, videoServerFilter, count);
@@ -112,7 +112,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    */
   @Override
   public List<VideoServer> listAllVideoServers(
-      VideoServerFilter videoServerFilter, SecurityContextBase securityContext) {
+      VideoServerFilter videoServerFilter, SecurityContext securityContext) {
     return repository.listAllVideoServers(videoServerFilter, securityContext);
   }
 
@@ -122,7 +122,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
    * @throws org.springframework.web.server.ResponseStatusException  if videoServerFilter is not valid
    */
   @Override
-  public void validate(VideoServerFilter videoServerFilter, SecurityContextBase securityContext) {
+  public void validate(VideoServerFilter videoServerFilter, SecurityContext securityContext) {
     basicService.validate(videoServerFilter, securityContext);
   }
 
@@ -132,19 +132,19 @@ public class VideoServerService implements Plugin, IVideoServerService {
    * @throws org.springframework.web.server.ResponseStatusException  if videoServerCreate is not valid
    */
   @Override
-  public void validate(VideoServerCreate videoServerCreate, SecurityContextBase securityContext) {
+  public void validate(VideoServerCreate videoServerCreate, SecurityContext securityContext) {
     basicService.validate(videoServerCreate, securityContext);
   }
 
   @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
   @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -153,7 +153,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -162,7 +162,7 @@ public class VideoServerService implements Plugin, IVideoServerService {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

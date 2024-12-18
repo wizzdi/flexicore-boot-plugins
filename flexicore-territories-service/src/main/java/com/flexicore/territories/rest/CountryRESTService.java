@@ -3,7 +3,7 @@ package com.flexicore.territories.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.model.territories.Country;
 import com.flexicore.model.territories.Country_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.reponse.ImportCountriesResponse;
 import com.flexicore.territories.request.CountryCreate;
 import com.flexicore.territories.request.CountryFilter;
@@ -37,8 +37,8 @@ public class CountryRESTService implements Plugin {
 	@DeleteMapping("deleteCountry/{id}")
 	public void deleteCountry(
 			
-			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.deleteCountry(id, securityContextBase);
+			@PathVariable("id") String id, @RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.deleteCountry(id, SecurityContext);
 	}
 
 	@Operation(description = "import countries",summary = "import countries")
@@ -47,9 +47,9 @@ public class CountryRESTService implements Plugin {
 	public ImportCountriesResponse importCountries(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody ImportCountriesRequest addressImportRequest,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
 
-		return service.importCountries(securityContextBase, addressImportRequest);
+		return service.importCountries(SecurityContext, addressImportRequest);
 	}
 
 
@@ -59,9 +59,9 @@ public class CountryRESTService implements Plugin {
 	public PaginationResponse<Country> getAllCountries(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CountryFilter filtering,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(filtering, securityContextBase);
-		return service.getAllCountries(securityContextBase, filtering);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(filtering, SecurityContext);
+		return service.getAllCountries(SecurityContext, filtering);
 	}
 
 	@Operation(description = "update country",summary = "update country")
@@ -71,14 +71,14 @@ public class CountryRESTService implements Plugin {
 	public Country updateCountry(
 
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CountryUpdate updateContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		Country country = service.getByIdOrNull(updateContainer.getId(), Country.class, Country_.security, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		Country country = service.getByIdOrNull(updateContainer.getId(), Country.class,SecurityContext);
 		if (country == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Country with id "
 					+ updateContainer.getId());
 		}
 		updateContainer.setCountry(country);
-		return service.updateCountry(updateContainer, securityContextBase);
+		return service.updateCountry(updateContainer, SecurityContext);
 	}
 
 	@Operation(description = "create country",summary = "create country")
@@ -87,7 +87,7 @@ public class CountryRESTService implements Plugin {
 	public Country createCountry(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody CountryCreate creationContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		return service.createCountry(creationContainer, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		return service.createCountry(creationContainer, SecurityContext);
 	}
 }

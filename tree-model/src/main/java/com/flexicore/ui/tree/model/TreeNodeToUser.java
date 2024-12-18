@@ -6,7 +6,7 @@
  ******************************************************************************/
 package com.flexicore.ui.tree.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.model.SecurityUser;
 
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import jakarta.persistence.ManyToOne;
 @SuppressWarnings("serial")
 @Entity
 
-public class TreeNodeToUser extends SecuredBasic {
+public class TreeNodeToUser extends Baseclass {
 
 	@ManyToOne(targetEntity = TreeNode.class)
 	private TreeNode treeNode;

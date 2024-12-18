@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.request.FormFieldCreate;
 import com.flexicore.ui.request.FormFieldFiltering;
 import com.flexicore.ui.request.FormFieldUpdate;
@@ -51,7 +51,7 @@ public class FormFieldController implements Plugin {
 	public PaginationResponse<FormField> getAllFormFields(
 			 @RequestBody
 			FormFieldFiltering formFieldFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(formFieldFiltering, securityContext);
 		return service.getAllFormFields(formFieldFiltering, securityContext);
 
@@ -64,8 +64,8 @@ public class FormFieldController implements Plugin {
 	public FormField updateFormField(
 			 @RequestBody
 			FormFieldUpdate formFieldUpdate,
-			@RequestAttribute SecurityContextBase securityContext) {
-		FormField formField = formFieldUpdate.getId() != null ? service.getByIdOrNull(formFieldUpdate.getId(), FormField.class, FormField_.security, securityContext) : null;
+			@RequestAttribute SecurityContext securityContext) {
+		FormField formField = formFieldUpdate.getId() != null ? service.getByIdOrNull(formFieldUpdate.getId(), FormField.class,securityContext) : null;
 		if (formField == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no FormField with id  " + formFieldUpdate.getId());
 		}
@@ -81,7 +81,7 @@ public class FormFieldController implements Plugin {
 	public FormField createFormField(
 			 @RequestBody
 			FormFieldCreate createFormField,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 
 		service.validateCreate(createFormField, securityContext);
 		return service.createFormField(createFormField, securityContext);

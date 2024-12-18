@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -38,7 +38,7 @@ public class MappedPOIController implements Plugin {
     public MappedPOI createMappedPOI(
             
           @Validated(Create.class) @RequestBody MappedPOICreate mappedPOICreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         mappedPOIService.validate(mappedPOICreate, securityContext);
         return mappedPOIService.createMappedPOI(mappedPOICreate, securityContext);
     }
@@ -48,7 +48,7 @@ public class MappedPOIController implements Plugin {
     public MappedPOI updateMappedPOI(
             
           @Validated(Update.class)  @RequestBody MappedPOIUpdate mappedPOIUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         mappedPOIService.validate(mappedPOIUpdate, securityContext);
         return mappedPOIService.updateMappedPOI(mappedPOIUpdate, securityContext);
@@ -59,7 +59,7 @@ public class MappedPOIController implements Plugin {
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
             
             @Valid @RequestBody MappedPOIFilter mappedPOIFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);
         return mappedPOIService.getAllMappedPOIs(mappedPOIFilter, securityContext);
     }
@@ -69,7 +69,7 @@ public class MappedPOIController implements Plugin {
     public PaginationResponse<MappedPoiDTO> getAllMappedPOIDTOs(
             
            @Valid @RequestBody MappedPOIFilter mappedPOIFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         mappedPOIService.validate(mappedPOIFilter, securityContext);
         return mappedPOIService.getAllMappedPOIDTOs(mappedPOIFilter, securityContext);
     }

@@ -6,7 +6,7 @@ import com.flexicore.model.territories.Country;
 import com.flexicore.model.territories.Country_;
 import com.flexicore.model.territories.State;
 import com.flexicore.model.territories.State_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.data.StateRepository;
 import com.flexicore.territories.request.StateCreate;
 import com.flexicore.territories.request.StateFilter;
@@ -38,28 +38,33 @@ public class StateService implements Plugin {
 	@Autowired
 	private BasicService basicService;
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
+	}
+
+
 	
-	public List<State> listAllStates(SecurityContextBase securityContextBase,
+	public List<State> listAllStates(SecurityContext SecurityContext,
 			StateFilter filtering) {
-		return repository.listAllStates(securityContextBase, filtering);
+		return repository.listAllStates(SecurityContext, filtering);
 
 	}
 
 	
 	public PaginationResponse<State> getAllStates(
-			SecurityContextBase securityContextBase, StateFilter filtering) {
-		List<State> list = repository.listAllStates(securityContextBase, filtering);
-		long count = repository.countAllStates(securityContextBase, filtering);
+			SecurityContext SecurityContext, StateFilter filtering) {
+		List<State> list = repository.listAllStates(SecurityContext, filtering);
+		long count = repository.countAllStates(SecurityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	
 	public State updateState(StateUpdate updateContainer,
-			SecurityContextBase securityContextBase) {
+			SecurityContext SecurityContext) {
 		State state = updateContainer.getState();
 		if (updateStateNoMerge(state, updateContainer)) {
 			repository.merge(state);
@@ -68,9 +73,9 @@ public class StateService implements Plugin {
 	}
 
 	public void validate(StateCreate stateCreate,
-			SecurityContextBase securityContextBase) {
+			SecurityContext SecurityContext) {
 		String countryId = stateCreate.getCountryId();
-		Country country = countryId != null ? getByIdOrNull(countryId, Country.class, Country_.security, securityContextBase) : null;
+		Country country = countryId != null ? getByIdOrNull(countryId, Country.class,SecurityContext) : null;
 		if (country == null && countryId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Country with id " + countryId);
 		}
@@ -78,10 +83,10 @@ public class StateService implements Plugin {
 	}
 
 	public void validate(StateFilter stateFiltering,
-						 SecurityContextBase securityContextBase) {
-		basicService.validate(stateFiltering, securityContextBase);
+						 SecurityContext SecurityContext) {
+		basicService.validate(stateFiltering, SecurityContext);
 		Set<String> countriesIds = stateFiltering.getCountriesIds();
-		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds, Country_.security,securityContextBase).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+		Map<String, Country> countryMap = countriesIds.isEmpty()?new HashMap<>():repository.listByIds(Country.class,countriesIds, SecurityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
 		countriesIds.removeAll(countryMap.keySet());
 		if(!countriesIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Countries with ids "+countriesIds);
@@ -91,9 +96,9 @@ public class StateService implements Plugin {
 	}
 
 	public State createStateNoMerge(StateCreate stateCreate,
-			SecurityContextBase securityContextBase) {
-		State state = new State().setId(Baseclass.getBase64ID());
-		BaseclassService.createSecurityObjectNoMerge(state,securityContextBase);
+			SecurityContext SecurityContext) {
+		State state = new State().setId(UUID.randomUUID().toString());
+		BaseclassService.createSecurityObjectNoMerge(state,SecurityContext);
 		updateStateNoMerge(state, stateCreate);
 		return state;
 
@@ -120,15 +125,15 @@ public class StateService implements Plugin {
 
 	
 	public State createState(StateCreate creationContainer,
-			SecurityContextBase securityContextBase) {
-		State state = createStateNoMerge(creationContainer, securityContextBase);
+			SecurityContext SecurityContext) {
+		State state = createStateNoMerge(creationContainer, SecurityContext);
 		repository.merge(state);
 		return state;
 	}
 
 	
-	public void deleteState(String stateid, SecurityContextBase securityContextBase) {
-		State state = getByIdOrNull(stateid, State.class, State_.security, securityContextBase);
+	public void deleteState(String stateid, SecurityContext SecurityContext) {
+		State state = getByIdOrNull(stateid, State.class,SecurityContext);
 		repository.remove(state);
 	}
 }

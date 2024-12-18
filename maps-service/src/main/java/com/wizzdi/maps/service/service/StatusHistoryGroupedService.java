@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.MapIcon;
@@ -28,8 +28,8 @@ public class StatusHistoryGroupedService implements Plugin {
     @Autowired
     private MappedPOIService mappedPOIService;
 
-    public StatusHistoryGroupedResponse listAllStatusHistoriesGrouped(StatusHistoryGroupedRequest statusHistoryGroupedRequest, SecurityContextBase securityContextBase){
-        Map<String, StatusHistory> lastEventsForMappedPOI = listLastEvents(new StatusHistoryForDateRequest(statusHistoryGroupedRequest), securityContextBase);
+    public StatusHistoryGroupedResponse listAllStatusHistoriesGrouped(StatusHistoryGroupedRequest statusHistoryGroupedRequest, SecurityContext SecurityContext){
+        Map<String, StatusHistory> lastEventsForMappedPOI = listLastEvents(new StatusHistoryForDateRequest(statusHistoryGroupedRequest), SecurityContext);
 
         Map<String,List<StatusHistory>> byStatus=lastEventsForMappedPOI.values().stream().collect(Collectors.groupingBy(f->f.getMapIcon().getId()));
         List<StatusHistoryGroupedEntry> entryList=new ArrayList<>();
@@ -42,13 +42,13 @@ public class StatusHistoryGroupedService implements Plugin {
 
     }
 
-    private Map<String, StatusHistory> listLastEvents(StatusHistoryForDateRequest statusHistoryGroupedRequest, SecurityContextBase securityContextBase) {
-        Set<String> mappedPOIS = mappedPOIService.listAllMappedPOIs(statusHistoryGroupedRequest.getMappedPOIFilter(), securityContextBase).stream().map(f->f.getId()).collect(Collectors.toSet());
+    private Map<String, StatusHistory> listLastEvents(StatusHistoryForDateRequest statusHistoryGroupedRequest, SecurityContext SecurityContext) {
+        Set<String> mappedPOIS = mappedPOIService.listAllMappedPOIs(statusHistoryGroupedRequest.getMappedPOIFilter(), SecurityContext).stream().map(f->f.getId()).collect(Collectors.toSet());
 
-        return mappedPOIS.isEmpty()?new HashMap<>():statusHistoryGroupedRepository.listLastEventForMappedPOI(statusHistoryGroupedRequest, securityContextBase).stream().filter(f->mappedPOIS.contains(f.getMappedPOI().getId())).collect(Collectors.toMap(f->f.getMappedPOI().getId(), f->f));
+        return mappedPOIS.isEmpty()?new HashMap<>():statusHistoryGroupedRepository.listLastEventForMappedPOI(statusHistoryGroupedRequest, SecurityContext).stream().filter(f->mappedPOIS.contains(f.getMappedPOI().getId())).collect(Collectors.toMap(f->f.getMappedPOI().getId(), f->f));
     }
 
-    public void validate(StatusHistoryGroupedRequest statusHistoryGroupedRequest, SecurityContextBase securityContext) {
+    public void validate(StatusHistoryGroupedRequest statusHistoryGroupedRequest, SecurityContext securityContext) {
         if(statusHistoryGroupedRequest.getStatusAtDate()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"statusAtDate must be provided");
         }
@@ -59,7 +59,7 @@ public class StatusHistoryGroupedService implements Plugin {
         mappedPOIService.validate(statusHistoryGroupedRequest.getMappedPOIFilter(), securityContext);
     }
 
-    public PaginationResponse<StatusHistory> getAllStatusHistoriesForDate(StatusHistoryForDateRequest statusHistoryForDateRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<StatusHistory> getAllStatusHistoriesForDate(StatusHistoryForDateRequest statusHistoryForDateRequest, SecurityContext securityContext) {
         List<StatusHistory> list=new ArrayList<>(listLastEvents(statusHistoryForDateRequest,securityContext).values());
         return new PaginationResponse<>(list,list.size(),list.size());
     }

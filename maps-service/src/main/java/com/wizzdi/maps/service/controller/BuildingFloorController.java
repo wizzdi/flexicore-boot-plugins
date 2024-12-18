@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -33,7 +33,7 @@ public class BuildingFloorController implements Plugin {
   @Operation(summary = "updateBuildingFloor", description = "Updates BuildingFloor")
   public BuildingFloor updateBuildingFloor(
       @Validated(Update.class) @RequestBody BuildingFloorUpdate buildingFloorUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingFloorService.updateBuildingFloor(buildingFloorUpdate, securityContext);
   }
@@ -42,7 +42,7 @@ public class BuildingFloorController implements Plugin {
   @Operation(summary = "getAllBuildingFloors", description = "lists BuildingFloors")
   public PaginationResponse<BuildingFloor> getAllBuildingFloors(
       @Valid @RequestBody BuildingFloorFilter buildingFloorFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingFloorService.getAllBuildingFloors(buildingFloorFilter, securityContext);
   }
@@ -51,7 +51,7 @@ public class BuildingFloorController implements Plugin {
   @Operation(summary = "createBuildingFloor", description = "Creates BuildingFloor")
   public BuildingFloor createBuildingFloor(
       @Validated(Create.class) @RequestBody BuildingFloorCreate buildingFloorCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return buildingFloorService.createBuildingFloor(buildingFloorCreate, securityContext);
   }

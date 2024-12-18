@@ -7,7 +7,7 @@
 package com.flexicore.ui.tree.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.tree.model.Tree;
 import com.flexicore.ui.tree.model.Tree_;
 import com.flexicore.ui.tree.request.TreeCreate;
@@ -46,7 +46,7 @@ public class TreeController implements Plugin {
 	public PaginationResponse<Tree> getAllTrees(
 			@org.springframework.web.bind.annotation.RequestBody
 			TreeFilter treeFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(treeFilter,securityContext);
 
 		return service.getAllTrees(treeFilter, securityContext);
@@ -59,8 +59,8 @@ public class TreeController implements Plugin {
 	public Tree updateTree(
 			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Provide treeId, root node ID , tree name , tree description") TreeUpdate updateTree,
-			@RequestAttribute SecurityContextBase securityContext) {
-		Tree tree=updateTree.getTreeId()!=null?service.getByIdOrNull(updateTree.getTreeId(),Tree.class, Tree_.security,securityContext):null;
+			@RequestAttribute SecurityContext securityContext) {
+		Tree tree=updateTree.getTreeId()!=null?service.getByIdOrNull(updateTree.getTreeId(),Tree.class, securityContext):null;
 		if(tree==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Tree with id "+updateTree.getTreeId());
 		}
@@ -78,7 +78,7 @@ public class TreeController implements Plugin {
 	public Tree createTree(
 			@org.springframework.web.bind.annotation.RequestBody
 			@RequestBody(description = "Tree name, description, root node ID , root node should be created before the tree is created") TreeCreate treeCreationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(treeCreationContainer,securityContext);
 
 		return service.createTree(treeCreationContainer, securityContext);

@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.maps.model.MapIcon;
 
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 @Table(indexes = {
         @Index(name = "device_type_idx",columnList = "name")
 })
-public class DeviceType extends SecuredBasic {
+public class DeviceType extends Baseclass {
 
     @ManyToOne(targetEntity = MapIcon.class)
     private MapIcon defaultMapIcon;

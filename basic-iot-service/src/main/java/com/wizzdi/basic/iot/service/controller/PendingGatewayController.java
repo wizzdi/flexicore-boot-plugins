@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.model.PendingGateway_;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
@@ -40,7 +40,7 @@ public class PendingGatewayController implements Plugin {
     public PaginationResponse<PendingGateway> getAllPendingGateways(
 
             
-            @RequestBody PendingGatewayFilter pendingGatewayFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PendingGatewayFilter pendingGatewayFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(pendingGatewayFilter, securityContext);
         return service.getAllPendingGateways(securityContext, pendingGatewayFilter);
     }
@@ -63,7 +63,7 @@ public class PendingGatewayController implements Plugin {
     public PendingGateway createPendingGateway(
             
             @RequestBody PendingGatewayCreate pendingGatewayCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(pendingGatewayCreate, securityContext);
 
         return service.createPendingGateway(pendingGatewayCreate, securityContext);
@@ -77,10 +77,10 @@ public class PendingGatewayController implements Plugin {
 
             
             @RequestBody PendingGatewayUpdate pendingGatewayUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(pendingGatewayUpdate, securityContext);
         PendingGateway pendingGateway = service.getByIdOrNull(pendingGatewayUpdate.getId(),
-                PendingGateway.class, PendingGateway_.security, securityContext);
+                PendingGateway.class,  securityContext);
         if (pendingGateway == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PendingGateway with id "
                     + pendingGatewayUpdate.getId());

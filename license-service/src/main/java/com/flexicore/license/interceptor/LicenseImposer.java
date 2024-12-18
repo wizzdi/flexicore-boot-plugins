@@ -14,7 +14,7 @@ import com.flexicore.license.service.LicenseRequestService;
 import com.flexicore.license.service.LicensingFeatureService;
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.SecurityUser;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.rest.interfaces.AspectPlugin;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -61,11 +61,11 @@ public class LicenseImposer implements AspectPlugin {
         String methodName = method.getName();
         logger.info("Method is: " + methodName + " , on Thread " + Thread.currentThread().getName());
         websocketSession = getWebsocketSession(parameters);
-        SecurityContextBase securityContext;
+        SecurityContext securityContext;
         if (websocketSession != null) {
-            securityContext = (SecurityContextBase) websocketSession.getUserProperties().get("securityContext");
+            securityContext = (SecurityContext) websocketSession.getUserProperties().get("securityContext");
         } else {
-            securityContext = (SecurityContextBase) parameters[parameters.length - 1];
+            securityContext = (SecurityContext) parameters[parameters.length - 1];
 
         }
 

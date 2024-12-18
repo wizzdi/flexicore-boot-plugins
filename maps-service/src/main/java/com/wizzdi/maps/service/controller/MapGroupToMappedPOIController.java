@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class MapGroupToMappedPOIController implements Plugin {
   @Operation(summary = "getAllMapGroupToMappedPOIs", description = "lists MapGroupToMappedPOIs")
   public PaginationResponse<MapGroupToMappedPOI> getAllMapGroupToMappedPOIs(
       @Valid @RequestBody MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupToMappedPOIService.getAllMapGroupToMappedPOIs(
         mapGroupToMappedPOIFilter, securityContext);
@@ -42,7 +42,7 @@ public class MapGroupToMappedPOIController implements Plugin {
   @Operation(summary = "updateMapGroupToMappedPOI", description = "Updates MapGroupToMappedPOI")
   public MapGroupToMappedPOI updateMapGroupToMappedPOI(
       @Validated(Update.class) @RequestBody MapGroupToMappedPOIUpdate mapGroupToMappedPOIUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupToMappedPOIService.updateMapGroupToMappedPOI(
         mapGroupToMappedPOIUpdate, securityContext);
@@ -52,7 +52,7 @@ public class MapGroupToMappedPOIController implements Plugin {
   @Operation(summary = "createMapGroupToMappedPOI", description = "Creates MapGroupToMappedPOI")
   public MapGroupToMappedPOI createMapGroupToMappedPOI(
       @Validated(Create.class) @RequestBody MapGroupToMappedPOICreate mapGroupToMappedPOICreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return mapGroupToMappedPOIService.createMapGroupToMappedPOI(
         mapGroupToMappedPOICreate, securityContext);

@@ -3,14 +3,14 @@ package com.flexicore.model.territories;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Street extends SecuredBasic {
+public class Street extends Baseclass {
 
 
 	public Street() {

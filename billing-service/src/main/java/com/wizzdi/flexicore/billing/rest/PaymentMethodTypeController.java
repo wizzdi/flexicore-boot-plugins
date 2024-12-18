@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.billing.request.PaymentMethodTypeCreate;
 import com.wizzdi.flexicore.billing.request.PaymentMethodTypeFiltering;
 import com.wizzdi.flexicore.billing.request.PaymentMethodTypeUpdate;
 import com.wizzdi.flexicore.billing.service.PaymentMethodTypeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.payment.PaymentMethodType;
 import com.wizzdi.flexicore.billing.model.payment.PaymentMethodType_;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -39,7 +39,7 @@ public class PaymentMethodTypeController implements Plugin {
     public PaginationResponse<PaymentMethodType> getAllPaymentMethodTypes(
 
             
-            @RequestBody PaymentMethodTypeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody PaymentMethodTypeFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllPaymentMethodTypes(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class PaymentMethodTypeController implements Plugin {
 
             
             @RequestBody PaymentMethodTypeCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createPaymentMethodType(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class PaymentMethodTypeController implements Plugin {
 
             
             @RequestBody PaymentMethodTypeUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         PaymentMethodType paymentMethodType = service.getByIdOrNull(updateContainer.getId(),
-                PaymentMethodType.class, PaymentMethodType_.security, securityContext);
+                PaymentMethodType.class,  securityContext);
         if (paymentMethodType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no PaymentMethodType with id "
                     + updateContainer.getId());

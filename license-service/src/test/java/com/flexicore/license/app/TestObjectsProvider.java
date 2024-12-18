@@ -9,7 +9,7 @@ import com.flexicore.license.request.LicensingProductCreate;
 import com.flexicore.license.service.LicenseRequestService;
 import com.flexicore.license.service.LicensingFeatureService;
 import com.flexicore.license.service.LicensingProductService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ public class TestObjectsProvider {
 	@Autowired
 	private LicenseRequestService licenseRequestService;
 	@Autowired
-	private SecurityContextBase adminSecurityContext;
+	private SecurityContext adminSecurityContext;
 
 	@Bean
 	@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

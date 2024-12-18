@@ -12,7 +12,7 @@ import com.flexicore.organization.request.CustomerDocumentCreate;
 import com.flexicore.organization.request.CustomerDocumentFiltering;
 import com.flexicore.organization.request.CustomerDocumentUpdate;
 import com.flexicore.organization.service.CustomerDocumentService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -45,7 +45,7 @@ public class CustomerDocumentController implements Plugin {
 	@PostMapping("/getAllCustomerDocuments")
 	public PaginationResponse<CustomerDocument> getAllCustomerDocuments(
 
-			@RequestBody CustomerDocumentFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody CustomerDocumentFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllCustomerDocuments(securityContext, filtering);
 	}
@@ -57,7 +57,7 @@ public class CustomerDocumentController implements Plugin {
 	public CustomerDocument createCustomerDocument(
 
 			@RequestBody CustomerDocumentCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createCustomerDocument(creationContainer, securityContext);
@@ -70,10 +70,10 @@ public class CustomerDocumentController implements Plugin {
 	public CustomerDocument updateCustomerDocument(
 
 			@RequestBody CustomerDocumentUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		CustomerDocument customerDocument = service.getByIdOrNull(updateContainer.getId(),
-				CustomerDocument.class, CustomerDocument_.security, securityContext);
+				CustomerDocument.class,  securityContext);
 		if (customerDocument == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no CustomerDocument with id "
 					+ updateContainer.getId());

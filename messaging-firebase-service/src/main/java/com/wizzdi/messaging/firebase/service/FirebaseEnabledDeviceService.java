@@ -2,7 +2,7 @@ package com.wizzdi.messaging.firebase.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.SoftDeleteOption;
@@ -24,6 +24,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -38,13 +39,13 @@ public class FirebaseEnabledDeviceService implements Plugin {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    public FirebaseEnabledDevice createFirebaseEnabledDevice(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContextBase securityContext) {
+    public FirebaseEnabledDevice createFirebaseEnabledDevice(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContext securityContext) {
         FirebaseEnabledDevice firebaseEnabledDevice = createFirebaseEnabledDeviceNoMerge(firebaseEnabledDeviceCreate, securityContext);
         firebaseEnabledDeviceRepository.merge(firebaseEnabledDevice);
         return firebaseEnabledDevice;
     }
 
-    public FirebaseEnabledDevice getOrCreateFirebaseEnabledDevice(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContextBase securityContext) {
+    public FirebaseEnabledDevice getOrCreateFirebaseEnabledDevice(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContext securityContext) {
         FirebaseEnabledDevice firebaseEnabledDevice = listAllFirebaseEnabledDevices(new FirebaseEnabledDeviceFilter().setChatUsers(Collections.singletonList(firebaseEnabledDeviceCreate.getOwner())).setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.BOTH)).setExternalIds(Collections.singleton(firebaseEnabledDeviceCreate.getExternalId())), securityContext).stream().findFirst().orElse(null);
         if (firebaseEnabledDevice == null) {
             firebaseEnabledDevice = createFirebaseEnabledDevice(firebaseEnabledDeviceCreate, securityContext);
@@ -57,9 +58,9 @@ public class FirebaseEnabledDeviceService implements Plugin {
         return firebaseEnabledDevice;
     }
 
-    public FirebaseEnabledDevice createFirebaseEnabledDeviceNoMerge(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContextBase securityContext) {
+    public FirebaseEnabledDevice createFirebaseEnabledDeviceNoMerge(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContext securityContext) {
         FirebaseEnabledDevice firebaseEnabledDevice = new FirebaseEnabledDevice();
-        firebaseEnabledDevice.setId(Baseclass.getBase64ID());
+        firebaseEnabledDevice.setId(UUID.randomUUID().toString());
         updateFirebaseEnabledDeviceNoMerge(firebaseEnabledDeviceCreate, firebaseEnabledDevice);
         BaseclassService.createSecurityObjectNoMerge(firebaseEnabledDevice, securityContext);
         return firebaseEnabledDevice;
@@ -69,7 +70,7 @@ public class FirebaseEnabledDeviceService implements Plugin {
         return messageReceiverDeviceService.updateMessageReceiverDeviceNoMerge(firebaseEnabledDeviceCreate, firebaseEnabledDevice);
     }
 
-    public FirebaseEnabledDevice updateFirebaseEnabledDevice(FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, SecurityContextBase securityContext) {
+    public FirebaseEnabledDevice updateFirebaseEnabledDevice(FirebaseEnabledDeviceUpdate firebaseEnabledDeviceUpdate, SecurityContext securityContext) {
         FirebaseEnabledDevice firebaseEnabledDevice = firebaseEnabledDeviceUpdate.getFirebaseEnabledDevice();
         if (updateFirebaseEnabledDeviceNoMerge(firebaseEnabledDeviceUpdate, firebaseEnabledDevice)) {
             firebaseEnabledDeviceRepository.merge(firebaseEnabledDevice);
@@ -78,12 +79,12 @@ public class FirebaseEnabledDeviceService implements Plugin {
         return firebaseEnabledDevice;
     }
 
-    public void validate(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContextBase securityContext) {
+    public void validate(FirebaseEnabledDeviceCreate firebaseEnabledDeviceCreate, SecurityContext securityContext) {
         messageReceiverDeviceService.validate(firebaseEnabledDeviceCreate, securityContext);
 
     }
 
-    public void validate(FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, SecurityContextBase securityContext) {
+    public void validate(FirebaseEnabledDeviceFilter firebaseEnabledDeviceFilter, SecurityContext securityContext) {
         messageReceiverDeviceService.validate(firebaseEnabledDeviceFilter, securityContext);
 
 
@@ -91,29 +92,29 @@ public class FirebaseEnabledDeviceService implements Plugin {
 
 
 
-    public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<FirebaseEnabledDevice> getAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContext securityContext) {
         List<FirebaseEnabledDevice> list = listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter, securityContext);
         long count = firebaseEnabledDeviceRepository.countAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter, securityContext);
         return new PaginationResponse<>(list, FirebaseEnabledDeviceFilter, count);
     }
 
-    public List<FirebaseEnabledDevice> listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContextBase securityContext) {
+    public List<FirebaseEnabledDevice> listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter FirebaseEnabledDeviceFilter, SecurityContext securityContext) {
         return firebaseEnabledDeviceRepository.listAllFirebaseEnabledDevices(FirebaseEnabledDeviceFilter, securityContext);
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return firebaseEnabledDeviceRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return firebaseEnabledDeviceRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return firebaseEnabledDeviceRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return firebaseEnabledDeviceRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

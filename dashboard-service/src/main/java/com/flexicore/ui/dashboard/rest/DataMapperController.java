@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.DataMapper;
 import com.flexicore.ui.dashboard.request.DataMapperCreate;
 import com.flexicore.ui.dashboard.request.DataMapperFilter;
@@ -45,7 +45,7 @@ public class DataMapperController implements Plugin {
 	public PaginationResponse<DataMapper> getAllDataMapper(
 			@RequestBody
 			DataMapperFilter dataMapperFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(dataMapperFilter, securityContext);
 		return service.getAllDataMapper(dataMapperFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class DataMapperController implements Plugin {
 	@PutMapping("updateDataMapper")
 	public DataMapper updateDataMapper(
 			@RequestBody
-			DataMapperUpdate updateDataMapper, @RequestAttribute SecurityContextBase securityContext) {
+			DataMapperUpdate updateDataMapper, @RequestAttribute SecurityContext securityContext) {
 		DataMapper dataMapper = updateDataMapper.getId() != null ? service.getByIdOrNull(
-				updateDataMapper.getId(), DataMapper.class, SecuredBasic_.security, securityContext) : null;
+				updateDataMapper.getId(), DataMapper.class,  securityContext) : null;
 		if (dataMapper == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateDataMapper.getId());
@@ -77,7 +77,7 @@ public class DataMapperController implements Plugin {
 	@PostMapping("createDataMapper")
 	public DataMapper createDataMapper(
 			@RequestBody
-			DataMapperCreate createDataMapper, @RequestAttribute SecurityContextBase securityContext) {
+			DataMapperCreate createDataMapper, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createDataMapper, securityContext);
 		return service.createDataMapper(createDataMapper, securityContext);
 

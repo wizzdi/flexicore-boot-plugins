@@ -2,13 +2,13 @@ package com.flexicore.ui.dashboard.service;
 
 
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import com.flexicore.ui.dashboard.data.GraphTemplateRepository;
@@ -43,7 +43,7 @@ public class GraphTemplateService implements Plugin {
 	@Autowired
 	private BasicService  baseclassNewService;
 
-	public GraphTemplate updateGraphTemplate(GraphTemplateUpdate graphTemplateUpdate, SecurityContextBase securityContext) {
+	public GraphTemplate updateGraphTemplate(GraphTemplateUpdate graphTemplateUpdate, SecurityContext securityContext) {
 		if (GraphTemplateUpdateNoMerge(graphTemplateUpdate,
 				graphTemplateUpdate.getGraphTemplate())) {
 			graphTemplateRepository.merge(graphTemplateUpdate.getGraphTemplate());
@@ -73,13 +73,13 @@ public class GraphTemplateService implements Plugin {
 
 	public List<GraphTemplate> listAllGraphTemplate(
 			GraphTemplateFilter graphTemplateFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return graphTemplateRepository.listAllGraphTemplate(graphTemplateFilter,
 				securityContext);
 	}
 
 	public GraphTemplate createGraphTemplate(GraphTemplateCreate createGraphTemplate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		GraphTemplate graphTemplate = createGraphTemplateNoMerge(createGraphTemplate,
 				securityContext);
 		graphTemplateRepository.merge(graphTemplate);
@@ -88,7 +88,7 @@ public class GraphTemplateService implements Plugin {
 	}
 
 	public GraphTemplate createGraphTemplateNoMerge(
-			GraphTemplateCreate createGraphTemplate, SecurityContextBase securityContext) {
+			GraphTemplateCreate createGraphTemplate, SecurityContext securityContext) {
 		GraphTemplate graphTemplate = new GraphTemplate();
 		graphTemplate.setId(UUID.randomUUID().toString());
 		GraphTemplateUpdateNoMerge(createGraphTemplate, graphTemplate);
@@ -98,7 +98,7 @@ public class GraphTemplateService implements Plugin {
 
 	public PaginationResponse<GraphTemplate> getAllGraphTemplate(
 			GraphTemplateFilter graphTemplateFilter,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<GraphTemplate> list = listAllGraphTemplate(graphTemplateFilter,
 				securityContext);
 		long count = graphTemplateRepository.countAllGraphTemplate(
@@ -107,10 +107,10 @@ public class GraphTemplateService implements Plugin {
 	}
 
 	public void validate(GraphTemplateCreate createGraphTemplate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		baseclassNewService.validate(createGraphTemplate, securityContext);
 		String fileResourceId=createGraphTemplate.getFileResourceId();
-		FileResource cellContent=fileResourceId!=null?getByIdOrNull(fileResourceId, FileResource.class, SecuredBasic_.security,securityContext):null;
+		FileResource cellContent=fileResourceId!=null?getByIdOrNull(fileResourceId, FileResource.class, securityContext):null;
 		if(cellContent==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No FileResource with id "+fileResourceId);
 		}
@@ -119,26 +119,26 @@ public class GraphTemplateService implements Plugin {
 	}
 
 	public void validate(GraphTemplateFilter graphTemplateFilter,
-						 SecurityContextBase securityContext) {
+						 SecurityContext securityContext) {
 		baseclassNewService.validate(graphTemplateFilter, securityContext);
 
 
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return graphTemplateRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return graphTemplateRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return graphTemplateRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return graphTemplateRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

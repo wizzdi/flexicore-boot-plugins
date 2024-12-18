@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.model.PendingGateway_;
@@ -34,7 +34,7 @@ public class PendingGatewayRepository implements Plugin {
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
 
-    public List<PendingGateway> getAllPendingGateways(SecurityContextBase securityContext,
+    public List<PendingGateway> getAllPendingGateways(SecurityContext securityContext,
                                            PendingGatewayFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<PendingGateway> q = cb.createQuery(PendingGateway.class);
@@ -47,7 +47,7 @@ public class PendingGatewayRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllPendingGateways(SecurityContextBase securityContext,
+    public long countAllPendingGateways(SecurityContext securityContext,
                                    PendingGatewayFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -60,7 +60,7 @@ public class PendingGatewayRepository implements Plugin {
     }
 
     public <T extends PendingGateway> void addPendingGatewayPredicates(PendingGatewayFilter filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
         if(filtering.getRegistered()!=null){
             Path<Gateway> gatewayPath = r.get(PendingGateway_.registeredGateway);
@@ -73,19 +73,19 @@ public class PendingGatewayRepository implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

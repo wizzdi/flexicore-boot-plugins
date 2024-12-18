@@ -4,7 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.organization.model.Supplier;
 import com.flexicore.organization.request.SupplierFiltering;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.pf4j.Extension;
@@ -30,7 +30,7 @@ public class SupplierRepository implements Plugin {
 	@Autowired
 	private OrganizationRepository organizationRepository;
 
-	public List<Supplier> getAllSuppliers(SecurityContextBase securityContext,
+	public List<Supplier> getAllSuppliers(SecurityContext securityContext,
 										  SupplierFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Supplier> q = cb.createQuery(Supplier.class);
@@ -44,7 +44,7 @@ public class SupplierRepository implements Plugin {
 	}
 
 
-	public Long countAllSuppliers(SecurityContextBase securityContext,
+	public Long countAllSuppliers(SecurityContext securityContext,
 								  SupplierFiltering filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -56,26 +56,26 @@ public class SupplierRepository implements Plugin {
 		return query.getSingleResult();
 	}
 
-	public <T extends Supplier> void addSupplierPredicate(SupplierFiltering filtering, CriteriaBuilder cb, CommonAbstractCriteria q,From<?,T> r, List<Predicate> preds,SecurityContextBase securityContext) {
+	public <T extends Supplier> void addSupplierPredicate(SupplierFiltering filtering, CriteriaBuilder cb, CommonAbstractCriteria q,From<?,T> r, List<Predicate> preds,SecurityContext securityContext) {
 
 		organizationRepository.addOrganizationPredicates(filtering,cb,q,r,preds,securityContext);
 	}
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return organizationRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return organizationRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return organizationRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return organizationRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

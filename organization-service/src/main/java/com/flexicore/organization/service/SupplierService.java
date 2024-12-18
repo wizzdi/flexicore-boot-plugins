@@ -9,7 +9,7 @@ import com.flexicore.organization.model.SupplierApi;
 import com.flexicore.organization.request.SupplierCreate;
 import com.flexicore.organization.request.SupplierFiltering;
 import com.flexicore.organization.request.SupplierUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -42,19 +43,18 @@ public class SupplierService implements Plugin {
 	private OrganizationService organizationService;
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -81,7 +81,7 @@ public class SupplierService implements Plugin {
 	}
 
 	public PaginationResponse<Supplier> listAllSuppliers(
-			SecurityContextBase securityContext, SupplierFiltering filtering) {
+			SecurityContext securityContext, SupplierFiltering filtering) {
 
 		List<Supplier> endpoints = repository.getAllSuppliers(securityContext,
 				filtering);
@@ -90,16 +90,16 @@ public class SupplierService implements Plugin {
 	}
 
 
-	public List<Supplier> getAllSuppliers(SecurityContextBase securityContext,
+	public List<Supplier> getAllSuppliers(SecurityContext securityContext,
 										  SupplierFiltering filtering) {
 		return repository.getAllSuppliers(securityContext, filtering);
 	}
 
 
 	public Supplier createSupplierNoMerge(SupplierCreate creationContainer,
-										  SecurityContextBase securityContext) {
+										  SecurityContext securityContext) {
 		Supplier supplier = new Supplier();
-		supplier.setId(Baseclass.getBase64ID());
+		supplier.setId(UUID.randomUUID().toString());
 
 		updateSupplierNoMerge(creationContainer, supplier);
 		BaseclassService.createSecurityObjectNoMerge(supplier, securityContext);
@@ -109,7 +109,7 @@ public class SupplierService implements Plugin {
 	}
 
 	public Supplier updateSupplier(SupplierUpdate creationContainer,
-								   SecurityContextBase securityContext) {
+								   SecurityContext securityContext) {
 		Supplier Supplier = creationContainer.getSupplier();
 		if (updateSupplierNoMerge(creationContainer, Supplier)) {
 			repository.merge(Supplier);
@@ -131,7 +131,7 @@ public class SupplierService implements Plugin {
 	}
 
 	public void validateFiltering(SupplierFiltering filtering,
-								  SecurityContextBase securityContext) {
+								  SecurityContext securityContext) {
 		organizationService.validateFiltering(filtering,securityContext);
 
 
@@ -139,7 +139,7 @@ public class SupplierService implements Plugin {
 
 
 	public void validateCreate(SupplierCreate creationContainer,
-							   SecurityContextBase securityContext) {
+							   SecurityContext securityContext) {
 		organizationService.validate(creationContainer,securityContext);
 		if (creationContainer.getName() == null
 				|| creationContainer.getName().isEmpty()) {
@@ -153,7 +153,7 @@ public class SupplierService implements Plugin {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Supplier with name " + creationContainer.getName() + " already exists");
 		}
 		String supplierApiId = creationContainer.getSupplierApiId();
-		SupplierApi supplierApi = supplierApiId != null ? getByIdOrNull(supplierApiId, SupplierApi.class, null, securityContext) : null;
+		SupplierApi supplierApi = supplierApiId != null ? getByIdOrNull(supplierApiId, SupplierApi.class, securityContext) : null;
 		if (supplierApi == null && supplierApiId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Supplier api id " + supplierApiId);
 		}
@@ -162,7 +162,7 @@ public class SupplierService implements Plugin {
 	}
 
 	public void validateUpdate(SupplierUpdate creationContainer,
-							   SecurityContextBase securityContext) {
+							   SecurityContext securityContext) {
 
 		if (creationContainer.getName() != null) {
 			SupplierFiltering supplierFiltering = new SupplierFiltering();
@@ -180,7 +180,7 @@ public class SupplierService implements Plugin {
 		}
 		String supplierApiId = creationContainer.getSupplierApiId();
 		SupplierApi supplierApi = supplierApiId != null ? getByIdOrNull(
-				supplierApiId, SupplierApi.class, null, securityContext) : null;
+				supplierApiId, SupplierApi.class,  securityContext) : null;
 		if (supplierApi == null && supplierApiId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Supplier api id " + supplierApiId);
 		}
@@ -189,7 +189,7 @@ public class SupplierService implements Plugin {
 	}
 
 	public Supplier createSupplier(SupplierCreate creationContainer,
-								   SecurityContextBase securityContext) {
+								   SecurityContext securityContext) {
 		Supplier Supplier = createSupplierNoMerge(creationContainer,
 				securityContext);
 		repository.merge(Supplier);

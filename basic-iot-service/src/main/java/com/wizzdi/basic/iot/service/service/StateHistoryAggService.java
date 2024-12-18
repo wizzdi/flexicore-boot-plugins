@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.service.data.StateHistoryAggRepository;
 import com.wizzdi.basic.iot.service.request.StateHistoryAggRequest;
 import com.wizzdi.basic.iot.service.response.StateHistoryAggEntry;
@@ -24,7 +24,7 @@ public class StateHistoryAggService implements Plugin {
     private StateHistoryAggRepository stateHistoryAggRepository;
 
 
-    public void validate(StateHistoryAggRequest stateHistoryFilter, SecurityContextBase securityContext) {
+    public void validate(StateHistoryAggRequest stateHistoryFilter, SecurityContext securityContext) {
         if(stateHistoryFilter.getStateHistoryFilter()==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"stateHistoryFilter must be set");
         }
@@ -35,7 +35,7 @@ public class StateHistoryAggService implements Plugin {
         }
     }
 
-    public PaginationResponse<StateHistoryAggEntry> getAllStateHistoriesAgg(SecurityContextBase securityContext, StateHistoryAggRequest stateHistoryFilter) {
+    public PaginationResponse<StateHistoryAggEntry> getAllStateHistoriesAgg(SecurityContext securityContext, StateHistoryAggRequest stateHistoryFilter) {
         List<StateHistoryAggEntry> list=stateHistoryAggRepository.listAllStateHistoriesAgg(stateHistoryFilter,securityContext);
         long count=list.size();
         return new PaginationResponse<>(list,stateHistoryFilter,count);

@@ -12,7 +12,7 @@ import com.flexicore.organization.model.SalesRegion;
 import com.flexicore.organization.request.SalesPersonToRegionCreate;
 import com.flexicore.organization.request.SalesPersonToRegionFiltering;
 import com.flexicore.organization.request.SalesPersonToRegionUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -40,19 +40,17 @@ public class SalesPersonToRegionService implements Plugin {
 	private BasicService basicService;
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -80,27 +78,27 @@ public class SalesPersonToRegionService implements Plugin {
 
 
 	public void validateFiltering(SalesPersonToRegionFiltering filtering,
-								  SecurityContextBase securityContext) {
+								  SecurityContext securityContext) {
 		basicService.validate(filtering, securityContext);
 
 	}
 
 
 	public PaginationResponse<SalesPersonToRegion> getAllSalesPersonToRegions(
-			SecurityContextBase securityContext, SalesPersonToRegionFiltering filtering) {
+			SecurityContext securityContext, SalesPersonToRegionFiltering filtering) {
 		List<SalesPersonToRegion> list = listAllSalesPersonToRegions(securityContext, filtering);
 		long count = repository.countAllSalesPersonToRegions(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 
-	public List<SalesPersonToRegion> listAllSalesPersonToRegions(SecurityContextBase securityContext,
+	public List<SalesPersonToRegion> listAllSalesPersonToRegions(SecurityContext securityContext,
 								   SalesPersonToRegionFiltering filtering) {
 		return repository.getAllSalesPersonToRegions(securityContext, filtering);
 	}
 
 	public SalesPersonToRegion createSalesPersonToRegion(SalesPersonToRegionCreate creationContainer,
-						   SecurityContextBase securityContext) {
+						   SecurityContext securityContext) {
 		SalesPersonToRegion salesPersonToRegion = createSalesPersonToRegionNoMerge(creationContainer, securityContext);
 		repository.merge(salesPersonToRegion);
 		return salesPersonToRegion;
@@ -108,9 +106,9 @@ public class SalesPersonToRegionService implements Plugin {
 
 
 	public SalesPersonToRegion createSalesPersonToRegionNoMerge(SalesPersonToRegionCreate creationContainer,
-								  SecurityContextBase securityContext) {
+								  SecurityContext securityContext) {
 		SalesPersonToRegion salesPersonToRegion = new SalesPersonToRegion();
-		salesPersonToRegion.setId(Baseclass.getBase64ID());
+		salesPersonToRegion.setId(UUID.randomUUID().toString());
 		updateSalesPersonToRegionNoMerge(salesPersonToRegion, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(salesPersonToRegion, securityContext);
 
@@ -132,7 +130,7 @@ public class SalesPersonToRegionService implements Plugin {
 		return update;
 	}
 
-	public SalesPersonToRegion updateSalesPersonToRegion(SalesPersonToRegionUpdate updateContainer, SecurityContextBase securityContext) {
+	public SalesPersonToRegion updateSalesPersonToRegion(SalesPersonToRegionUpdate updateContainer, SecurityContext securityContext) {
 		SalesPersonToRegion salesPersonToRegion = updateContainer.getSalesPersonToRegion();
 		if (updateSalesPersonToRegionNoMerge(salesPersonToRegion, updateContainer)) {
 			repository.merge(salesPersonToRegion);
@@ -141,11 +139,11 @@ public class SalesPersonToRegionService implements Plugin {
 	}
 
 
-	public void validate(SalesPersonToRegionCreate creationContainer, SecurityContextBase securityContext) {
+	public void validate(SalesPersonToRegionCreate creationContainer, SecurityContext securityContext) {
 		basicService.validate(creationContainer,securityContext);
 		String salesPersonId = creationContainer.getSalesPersonId();
 		SalesPerson salesPerson = salesPersonId == null ? null : getByIdOrNull(salesPersonId,
-				SalesPerson.class, SalesPerson_.security, securityContext);
+				SalesPerson.class,  securityContext);
 		if (salesPerson == null && salesPersonId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SalesPerson with id " + salesPersonId);
 		}
@@ -153,7 +151,7 @@ public class SalesPersonToRegionService implements Plugin {
 
 		String salesRegionId = creationContainer.getSalesRegionId();
 		SalesRegion salesRegion = salesRegionId == null ? null : getByIdOrNull(salesRegionId,
-				SalesRegion.class, SalesPerson_.security, securityContext);
+				SalesRegion.class,  securityContext);
 		if (salesRegion == null && salesRegionId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SalesRegion with id " + salesRegionId);
 		}

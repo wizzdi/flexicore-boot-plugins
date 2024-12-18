@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -34,7 +34,7 @@ public class MapGroupToMappedPOIService implements Plugin {
    * @return created MapGroupToMappedPOI
    */
   public MapGroupToMappedPOI createMapGroupToMappedPOI(
-      MapGroupToMappedPOICreate mapGroupToMappedPOICreate, SecurityContextBase securityContext) {
+      MapGroupToMappedPOICreate mapGroupToMappedPOICreate, SecurityContext securityContext) {
     MapGroupToMappedPOI mapGroupToMappedPOI =
         createMapGroupToMappedPOINoMerge(mapGroupToMappedPOICreate, securityContext);
     this.repository.merge(mapGroupToMappedPOI);
@@ -47,7 +47,7 @@ public class MapGroupToMappedPOIService implements Plugin {
    * @return created MapGroupToMappedPOI unmerged
    */
   public MapGroupToMappedPOI createMapGroupToMappedPOINoMerge(
-      MapGroupToMappedPOICreate mapGroupToMappedPOICreate, SecurityContextBase securityContext) {
+      MapGroupToMappedPOICreate mapGroupToMappedPOICreate, SecurityContext securityContext) {
     MapGroupToMappedPOI mapGroupToMappedPOI = new MapGroupToMappedPOI();
     mapGroupToMappedPOI.setId(UUID.randomUUID().toString());
     updateMapGroupToMappedPOINoMerge(mapGroupToMappedPOI, mapGroupToMappedPOICreate);
@@ -96,7 +96,7 @@ public class MapGroupToMappedPOIService implements Plugin {
    * @return mapGroupToMappedPOI
    */
   public MapGroupToMappedPOI updateMapGroupToMappedPOI(
-      MapGroupToMappedPOIUpdate mapGroupToMappedPOIUpdate, SecurityContextBase securityContext) {
+      MapGroupToMappedPOIUpdate mapGroupToMappedPOIUpdate, SecurityContext securityContext) {
     MapGroupToMappedPOI mapGroupToMappedPOI = mapGroupToMappedPOIUpdate.getMapGroupToMappedPOI();
     if (updateMapGroupToMappedPOINoMerge(mapGroupToMappedPOI, mapGroupToMappedPOIUpdate)) {
       this.repository.merge(mapGroupToMappedPOI);
@@ -110,7 +110,7 @@ public class MapGroupToMappedPOIService implements Plugin {
    * @return PaginationResponse containing paging information for MapGroupToMappedPOI
    */
   public PaginationResponse<MapGroupToMappedPOI> getAllMapGroupToMappedPOIs(
-      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContextBase securityContext) {
+      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContext securityContext) {
     List<MapGroupToMappedPOI> list =
         listAllMapGroupToMappedPOIs(mapGroupToMappedPOIFilter, securityContext);
     long count =
@@ -124,17 +124,17 @@ public class MapGroupToMappedPOIService implements Plugin {
    * @return List of MapGroupToMappedPOI
    */
   public List<MapGroupToMappedPOI> listAllMapGroupToMappedPOIs(
-      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContextBase securityContext) {
+      MapGroupToMappedPOIFilter mapGroupToMappedPOIFilter, SecurityContext securityContext) {
     return this.repository.listAllMapGroupToMappedPOIs(mapGroupToMappedPOIFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -142,7 +142,7 @@ public class MapGroupToMappedPOIService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -150,7 +150,7 @@ public class MapGroupToMappedPOIService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

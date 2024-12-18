@@ -2,7 +2,7 @@ package com.wizzdi.messaging.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BaseclassRepository;
 import com.wizzdi.flexicore.security.data.BasicRepository;
@@ -36,7 +36,7 @@ public class ChatToChatUserRepository implements Plugin {
     private BasicRepository basicRepository;
 
 
-    public List<ChatToChatUser> listAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContextBase securityContext) {
+    public List<ChatToChatUser> listAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<ChatToChatUser> q = cb.createQuery(ChatToChatUser.class);
         Root<ChatToChatUser> r = q.from(ChatToChatUser.class);
@@ -49,7 +49,7 @@ public class ChatToChatUserRepository implements Plugin {
 
     }
 
-    public <T extends ChatToChatUser> void addChatToChatUserPredicates(ChatToChatUserFilter chatToChatUserFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContextBase securityContext) {
+    public <T extends ChatToChatUser> void addChatToChatUserPredicates(ChatToChatUserFilter chatToChatUserFilter, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> predicates, SecurityContext securityContext) {
         if (chatToChatUserFilter.getBasicPropertiesFilter() == null) {
             chatToChatUserFilter.setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.NON_DELETED_ONLY));
         }
@@ -75,7 +75,7 @@ public class ChatToChatUserRepository implements Plugin {
 
     }
 
-    public long countAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContextBase securityContext) {
+    public long countAllChatToChatUsers(ChatToChatUserFilter ChatToChatUserFilter, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<ChatToChatUser> r = q.from(ChatToChatUser.class);
@@ -97,19 +97,19 @@ public class ChatToChatUserRepository implements Plugin {
         basicRepository.massMerge(toMerge);
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return baseclassRepository.listByIds(c, ids, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return baseclassRepository.getByIdOrNull(id, c, securityContext);
     }
 

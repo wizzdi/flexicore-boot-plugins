@@ -4,13 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class City extends SecuredBasic {
+public class City extends Baseclass {
 
 	public City() {
 	}

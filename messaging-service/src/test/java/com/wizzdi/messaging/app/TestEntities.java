@@ -1,6 +1,6 @@
 package com.wizzdi.messaging.app;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.messaging.model.Chat;
 import com.wizzdi.messaging.request.ChatCreate;
 import com.wizzdi.messaging.service.ChatService;
@@ -14,7 +14,7 @@ public class TestEntities {
     @Autowired
     private ChatService chatService;
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
     @Bean
     public Chat chat(){
         return chatService.createChat(new ChatCreate().setName("test"),adminSecurityContext);

@@ -1,8 +1,8 @@
 package com.flexicore.ui.dashboard.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.dashboard.model.GridLayoutCell;
 import com.flexicore.ui.dashboard.request.GridLayoutCellCreate;
 import com.flexicore.ui.dashboard.request.GridLayoutCellFilter;
@@ -45,7 +45,7 @@ public class GridLayoutCellController implements Plugin {
 	public PaginationResponse<GridLayoutCell> getAllGridLayoutCell(
 			@RequestBody
 			GridLayoutCellFilter gridLayoutCellFilter,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(gridLayoutCellFilter, securityContext);
 		return service.getAllGridLayoutCell(gridLayoutCellFilter, securityContext);
 
@@ -57,9 +57,9 @@ public class GridLayoutCellController implements Plugin {
 	@PutMapping("updateGridLayoutCell")
 	public GridLayoutCell updateGridLayoutCell(
 			@RequestBody
-			GridLayoutCellUpdate updateGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
+			GridLayoutCellUpdate updateGridLayoutCell, @RequestAttribute SecurityContext securityContext) {
 		GridLayoutCell gridLayoutCell = updateGridLayoutCell.getId() != null ? service.getByIdOrNull(
-				updateGridLayoutCell.getId(), GridLayoutCell.class, SecuredBasic_.security, securityContext) : null;
+				updateGridLayoutCell.getId(), GridLayoutCell.class,  securityContext) : null;
 		if (gridLayoutCell == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ updateGridLayoutCell.getId());
@@ -77,7 +77,7 @@ public class GridLayoutCellController implements Plugin {
 	@PostMapping("createGridLayoutCell")
 	public GridLayoutCell createGridLayoutCell(
 			@RequestBody
-			GridLayoutCellCreate createGridLayoutCell, @RequestAttribute SecurityContextBase securityContext) {
+			GridLayoutCellCreate createGridLayoutCell, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createGridLayoutCell, securityContext);
 		return service.createGridLayoutCell(createGridLayoutCell, securityContext);
 

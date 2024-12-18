@@ -5,7 +5,7 @@ import com.flexicore.organization.model.Organization;
 import com.flexicore.organization.request.OrganizationCreate;
 import com.flexicore.organization.request.OrganizationFiltering;
 import com.flexicore.organization.service.OrganizationService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +44,7 @@ public class OrganizationControllerTest {
     @Autowired
     private OrganizationService organizationService;
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
   private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
 

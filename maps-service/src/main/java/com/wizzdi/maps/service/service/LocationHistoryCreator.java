@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
@@ -32,8 +32,8 @@ public class LocationHistoryCreator implements Plugin {
 
     @Transactional(propagation = REQUIRES_NEW)
     public LocationHistory createLocationHistory(MappedPOI mappedPOI) {
-        SecurityContextBase securityContext = securityContextProvider.getSecurityContext(mappedPOI.getSecurity().getCreator());
-        securityContext.setTenantToCreateIn(mappedPOI.getSecurity().getTenant());
+        SecurityContext securityContext = securityContextProvider.getSecurityContext(mappedPOI.getCreator());
+        securityContext.setTenantToCreateIn(mappedPOI.getTenant());
         return locationHistoryService.createLocationHistory(new LocationHistoryCreate(mappedPOI),securityContext);
 
     }

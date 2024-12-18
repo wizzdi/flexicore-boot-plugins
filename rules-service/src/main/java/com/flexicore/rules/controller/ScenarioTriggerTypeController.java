@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioTriggerTypeCreate;
 import com.flexicore.rules.request.ScenarioTriggerTypeFilter;
 import com.flexicore.rules.request.ScenarioTriggerTypeUpdate;
 import com.flexicore.rules.service.ScenarioTriggerTypeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioTriggerTypeController implements Plugin {
   public ScenarioTriggerType createScenarioTriggerType(
       
       @RequestBody ScenarioTriggerTypeCreate scenarioTriggerTypeCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioTriggerTypeService.validate(scenarioTriggerTypeCreate, securityContext);
     return scenarioTriggerTypeService.createScenarioTriggerType(
@@ -44,7 +44,7 @@ public class ScenarioTriggerTypeController implements Plugin {
   public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerTypes(
       
       @RequestBody ScenarioTriggerTypeFilter scenarioTriggerTypeFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioTriggerTypeService.validate(scenarioTriggerTypeFilter, securityContext);
     return scenarioTriggerTypeService.getAllScenarioTriggerTypes(
@@ -56,14 +56,13 @@ public class ScenarioTriggerTypeController implements Plugin {
   public ScenarioTriggerType updateScenarioTriggerType(
       
       @RequestBody ScenarioTriggerTypeUpdate scenarioTriggerTypeUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioTriggerTypeId = scenarioTriggerTypeUpdate.getId();
     ScenarioTriggerType scenarioTriggerType =
         scenarioTriggerTypeService.getByIdOrNull(
             scenarioTriggerTypeId,
             ScenarioTriggerType.class,
-            ScenarioTriggerType_.security,
             securityContext);
     if (scenarioTriggerType == null) {
       throw new ResponseStatusException(

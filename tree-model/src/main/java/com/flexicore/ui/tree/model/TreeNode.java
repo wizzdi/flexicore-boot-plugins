@@ -3,7 +3,7 @@ package com.flexicore.ui.tree.model;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.flexicore.ui.model.Preset;
 
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class TreeNode extends SecuredBasic {
+public class TreeNode extends Baseclass {
 
     @ManyToOne(targetEntity = TreeNode.class)
     private TreeNode parent;

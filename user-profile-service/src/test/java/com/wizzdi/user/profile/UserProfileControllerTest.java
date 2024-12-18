@@ -1,7 +1,7 @@
 package com.wizzdi.user.profile;
 
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
@@ -65,7 +65,7 @@ public class UserProfileControllerTest {
     @Autowired
     @Lazy
     @Qualifier("adminSecurityContext")
-    private SecurityContextBase securityContextBase;
+    private SecurityContext SecurityContext;
 
     @Autowired
     private FileResource avatar;
@@ -93,7 +93,7 @@ public class UserProfileControllerTest {
         UserProfileCreate request = new UserProfileCreate()
                 .setAvatarId(avatar.getId())
                 .setGender(Gender.MALE)
-                .setUserId(securityContextBase.getUser().getId())
+                .setUserId(SecurityContext.getUser().getId())
                 .setName("test userProfile");
 
         ParameterizedTypeReference<UserProfile> t = new ParameterizedTypeReference<>() {};

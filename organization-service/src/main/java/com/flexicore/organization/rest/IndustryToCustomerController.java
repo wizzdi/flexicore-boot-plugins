@@ -12,7 +12,7 @@ import com.flexicore.organization.request.IndustryToCustomerCreate;
 import com.flexicore.organization.request.IndustryToCustomerFiltering;
 import com.flexicore.organization.request.IndustryToCustomerUpdate;
 import com.flexicore.organization.service.IndustryToCustomerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -44,7 +44,7 @@ public class IndustryToCustomerController implements Plugin {
 	@PostMapping("/getAllIndustryToCustomers")
 	public PaginationResponse<IndustryToCustomer> getAllIndustryToCustomers(
 
-			@RequestBody IndustryToCustomerFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody IndustryToCustomerFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllIndustryToCustomers(securityContext, filtering);
 	}
@@ -56,7 +56,7 @@ public class IndustryToCustomerController implements Plugin {
 	public IndustryToCustomer createIndustryToCustomer(
 
 			@RequestBody IndustryToCustomerCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createIndustryToCustomer(creationContainer, securityContext);
@@ -69,10 +69,10 @@ public class IndustryToCustomerController implements Plugin {
 	public IndustryToCustomer updateIndustryToCustomer(
 
 			@RequestBody IndustryToCustomerUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		IndustryToCustomer industryToCustomer = service.getByIdOrNull(updateContainer.getId(),
-				IndustryToCustomer.class, IndustryToCustomer_.security, securityContext);
+				IndustryToCustomer.class,  securityContext);
 		if (industryToCustomer == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no IndustryToCustomer with id "
 					+ updateContainer.getId());

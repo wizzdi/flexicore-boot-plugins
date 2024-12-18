@@ -4,7 +4,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
@@ -38,7 +38,7 @@ public class DeviceRepository implements Plugin {
     @Autowired
     private DeviceTypeRepository deviceTypeRepository;
 
-    public List<Device> getAllDevices(SecurityContextBase securityContext,
+    public List<Device> getAllDevices(SecurityContext securityContext,
                                            DeviceFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Device> q = cb.createQuery(Device.class);
@@ -51,7 +51,7 @@ public class DeviceRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllDevices(SecurityContextBase securityContext,
+    public long countAllDevices(SecurityContext securityContext,
                                    DeviceFilter filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -64,7 +64,7 @@ public class DeviceRepository implements Plugin {
     }
 
     public <T extends Device> void addDevicePredicates(DeviceFilter filtering,
-                                                           CriteriaBuilder cb, CriteriaQuery<?> q,From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CriteriaQuery<?> q,From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         remoteRepository.addRemotePredicates(filtering,cb,q,r,preds,securityContext);
         if(filtering.getGateways()!=null&&!filtering.getGateways().isEmpty()){
             Set<String> ids=filtering.getGateways().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -94,19 +94,19 @@ public class DeviceRepository implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return remoteRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return remoteRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return remoteRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return remoteRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

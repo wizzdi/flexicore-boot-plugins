@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 @Table(indexes = {
         @Index(name = "connectivity_change_idx",columnList = "remote_id,date,connectivity")
 })
-public class ConnectivityChange extends SecuredBasic {
+public class ConnectivityChange extends Baseclass {
 
     @ManyToOne(targetEntity = Remote.class)
     private Remote remote;

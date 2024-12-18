@@ -1,10 +1,10 @@
 package com.flexicore.rules.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Entity;
 
 @Entity
-public class ScenarioTriggerType extends SecuredBasic {
+public class ScenarioTriggerType extends Baseclass {
 
   private String eventCanonicalName;
 

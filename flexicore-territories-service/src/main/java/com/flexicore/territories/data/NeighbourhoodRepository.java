@@ -6,7 +6,7 @@ import com.flexicore.model.territories.City;
 import com.flexicore.model.territories.City_;
 import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.model.territories.Neighbourhood_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.NeighbourhoodFilter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -37,12 +37,12 @@ public class NeighbourhoodRepository implements Plugin {
 	private BaseclassRepository baseclassRepository;
 
 	public List<Neighbourhood> getAllNeighbourhoods(
-			SecurityContextBase securityContextBase, NeighbourhoodFilter filtering) {
+			SecurityContext SecurityContext, NeighbourhoodFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Neighbourhood> q = cb.createQuery(Neighbourhood.class);
 		Root<Neighbourhood> r = q.from(Neighbourhood.class);
 		List<Predicate> preds = new ArrayList<>();
-		addNeighbourhoodPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addNeighbourhoodPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(r).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Neighbourhood> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
@@ -50,13 +50,13 @@ public class NeighbourhoodRepository implements Plugin {
 
 	}
 
-	public long countAllNeighbourhoods(SecurityContextBase securityContextBase,
+	public long countAllNeighbourhoods(SecurityContext SecurityContext,
 			NeighbourhoodFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<Neighbourhood> r = q.from(Neighbourhood.class);
 		List<Predicate> preds = new ArrayList<>();
-		addNeighbourhoodPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addNeighbourhoodPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Long> query = em.createQuery(q);
 		return query.getSingleResult();
@@ -65,7 +65,7 @@ public class NeighbourhoodRepository implements Plugin {
 
 	private void addNeighbourhoodPredicate(NeighbourhoodFilter filtering,
 										   CommonAbstractCriteria q,
-										   CriteriaBuilder cb, Root<Neighbourhood> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+										   CriteriaBuilder cb, Root<Neighbourhood> r, List<Predicate> preds, SecurityContext SecurityContext) {
 
 		if (filtering.getExternalIds() != null && !filtering.getExternalIds().isEmpty()) {
 			preds.add(r.get(Neighbourhood_.externalId).in(filtering.getExternalIds()));
@@ -78,20 +78,20 @@ public class NeighbourhoodRepository implements Plugin {
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
-		if(securityContextBase!=null){
-			Join<Neighbourhood, Baseclass> join=r.join(Neighbourhood_.security);
-			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
+		if(SecurityContext!=null){
+			baseclassRepository.addBaseclassPredicates(cb,q,r,preds,SecurityContext);
 		}
 
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return baseclassRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
+
 
 	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
 		return baseclassRepository.findByIds(c, ids, idAttribute);

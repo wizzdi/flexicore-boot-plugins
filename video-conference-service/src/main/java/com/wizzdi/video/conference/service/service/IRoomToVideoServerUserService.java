@@ -2,7 +2,7 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.RoomToVideoServerUser;
 import com.wizzdi.video.conference.service.request.RoomToVideoServerUserCreate;
@@ -20,7 +20,7 @@ public interface IRoomToVideoServerUserService {
    * @return created RoomToVideoServerUser
    */
   RoomToVideoServerUser createRoomToVideoServerUser(
-      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContextBase securityContext);
+      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserCreate Object Used to Create RoomToVideoServerUser
@@ -28,7 +28,7 @@ public interface IRoomToVideoServerUserService {
    * @return created RoomToVideoServerUser unmerged
    */
   RoomToVideoServerUser createRoomToVideoServerUserNoMerge(
-      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContextBase securityContext);
+      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserCreate Object Used to Create RoomToVideoServerUser
@@ -45,7 +45,7 @@ public interface IRoomToVideoServerUserService {
    * @return roomToVideoServerUser
    */
   RoomToVideoServerUser updateRoomToVideoServerUser(
-      RoomToVideoServerUserUpdate roomToVideoServerUserUpdate, SecurityContextBase securityContext);
+      RoomToVideoServerUserUpdate roomToVideoServerUserUpdate, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserFilter Object Used to List RoomToVideoServerUser
@@ -53,7 +53,7 @@ public interface IRoomToVideoServerUserService {
    * @return PaginationResponse containing paging information for RoomToVideoServerUser
    */
   PaginationResponse<RoomToVideoServerUser> getAllRoomToVideoServerUsers(
-      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContextBase securityContext);
+      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserFilter Object Used to List RoomToVideoServerUser
@@ -61,7 +61,7 @@ public interface IRoomToVideoServerUserService {
    * @return List of RoomToVideoServerUser
    */
   List<RoomToVideoServerUser> listAllRoomToVideoServerUsers(
-      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContextBase securityContext);
+      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserFilter Object Used to List RoomToVideoServerUser
@@ -69,7 +69,7 @@ public interface IRoomToVideoServerUserService {
    * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserFilter is not valid
    */
   void validate(
-      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContextBase securityContext);
+      RoomToVideoServerUserFilter roomToVideoServerUserFilter, SecurityContext securityContext);
 
   /**
    * @param roomToVideoServerUserCreate Object Used to Create RoomToVideoServerUser
@@ -77,24 +77,24 @@ public interface IRoomToVideoServerUserService {
    * @throws org.springframework.web.server.ResponseStatusException  if roomToVideoServerUserCreate is not valid
    */
   void validate(
-      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContextBase securityContext);
+      RoomToVideoServerUserCreate roomToVideoServerUserCreate, SecurityContext securityContext);
 
   <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext);
+      Class<T> c, Set<String> ids, SecurityContext securityContext);
 
-  <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext);
+  <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext);
 
   <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext);
+      SecurityContext securityContext);
 
   <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext);
+      SecurityContext securityContext);
 
   <D extends Basic, T extends D> List<T> findByIds(
       Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute);

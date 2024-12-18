@@ -3,7 +3,7 @@ package com.flexicore.rules.model;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Entity
-public class ScenarioSavableEvent extends SecuredBasic {
+public class ScenarioSavableEvent extends Baseclass {
 
     @ManyToOne(targetEntity = ScenarioTrigger.class)
     private ScenarioTrigger scenarioTrigger;

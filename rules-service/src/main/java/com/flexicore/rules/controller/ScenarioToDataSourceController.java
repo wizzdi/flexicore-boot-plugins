@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioToDataSourceCreate;
 import com.flexicore.rules.request.ScenarioToDataSourceFilter;
 import com.flexicore.rules.request.ScenarioToDataSourceUpdate;
 import com.flexicore.rules.service.ScenarioToDataSourceService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioToDataSourceController implements Plugin {
   public ScenarioToDataSource createScenarioToDataSource(
       
       @RequestBody ScenarioToDataSourceCreate scenarioToDataSourceCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToDataSourceService.validate(scenarioToDataSourceCreate, securityContext);
     return scenarioToDataSourceService.createScenarioToDataSource(
@@ -44,14 +44,13 @@ public class ScenarioToDataSourceController implements Plugin {
   public ScenarioToDataSource updateScenarioToDataSource(
       
       @RequestBody ScenarioToDataSourceUpdate scenarioToDataSourceUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioToDataSourceId = scenarioToDataSourceUpdate.getId();
     ScenarioToDataSource scenarioToDataSource =
         scenarioToDataSourceService.getByIdOrNull(
             scenarioToDataSourceId,
             ScenarioToDataSource.class,
-            ScenarioToDataSource_.security,
             securityContext);
     if (scenarioToDataSource == null) {
       throw new ResponseStatusException(
@@ -68,7 +67,7 @@ public class ScenarioToDataSourceController implements Plugin {
   public PaginationResponse<ScenarioToDataSource> getAllScenarioToDataSources(
       
       @RequestBody ScenarioToDataSourceFilter scenarioToDataSourceFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToDataSourceService.validate(scenarioToDataSourceFilter, securityContext);
     return scenarioToDataSourceService.getAllScenarioToDataSources(

@@ -5,6 +5,7 @@ import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.model.Preset;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.Clazzes;
+import com.wizzdi.flexicore.security.service.ClazzService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,22 +17,19 @@ import org.springframework.context.annotation.Lazy;
 @Extension
 public class ClazzProvider implements Plugin {
 
-    @Autowired
-    @Lazy
-    private Clazzes clazzes;
 
     @Qualifier("gridPresetClazz")
     @Bean
     @Lazy
-    public Clazz gridPresetClazz(){
-        return clazzes.getClazzes().stream().filter(f->f.getName().equals(GridPreset.class.getCanonicalName())).findFirst().orElse(null);
+    public Clazz gridPresetClazz(ClazzService clazzService){
+        return clazzService.getClazz(GridPreset.class).orElseThrow(()->new RuntimeException("cannot find clazz gird preset"));
     }
 
 
     @Qualifier("presetClazz")
     @Bean
     @Lazy
-    public Clazz presetClazz(){
-        return clazzes.getClazzes().stream().filter(f->f.getName().equals(Preset.class.getCanonicalName())).findFirst().orElse(null);
+    public Clazz presetClazz(ClazzService clazzService){
+        return clazzService.getClazz(Preset.class).orElseThrow(()->new RuntimeException("cannot find clazz preset"));
     }
 }

@@ -15,7 +15,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.pf4j.Extension;
@@ -41,7 +41,7 @@ public class ContractItemController implements Plugin {
     public PaginationResponse<ContractItem> getAllContractItems(
 
             
-            @RequestBody ContractItemFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ContractItemFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllContractItems(securityContext, filtering);
     }
@@ -54,7 +54,7 @@ public class ContractItemController implements Plugin {
 
             
             @RequestBody ContractItemCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createContractItem(creationContainer, securityContext);
@@ -68,10 +68,10 @@ public class ContractItemController implements Plugin {
 
             
             @RequestBody ContractItemUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         ContractItem contractItem = service.getByIdOrNull(updateContainer.getId(),
-                ContractItem.class, ContractItem_.security, securityContext);
+                ContractItem.class,  securityContext);
         if (contractItem == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no ContractItem with id "
                     + updateContainer.getId());

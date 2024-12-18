@@ -2,13 +2,13 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.DataSourceRepository;
 import com.flexicore.rules.model.DataSource;
 import com.flexicore.rules.request.DataSourceCreate;
 import com.flexicore.rules.request.DataSourceFilter;
 import com.flexicore.rules.request.DataSourceUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -43,7 +43,7 @@ public class DataSourceService implements Plugin {
    * @return created DataSource
    */
   public DataSource createDataSource(
-      DataSourceCreate dataSourceCreate, SecurityContextBase securityContext) {
+      DataSourceCreate dataSourceCreate, SecurityContext securityContext) {
     DataSource dataSource = createDataSourceNoMerge(dataSourceCreate, securityContext);
     this.repository.merge(dataSource);
     return dataSource;
@@ -55,7 +55,7 @@ public class DataSourceService implements Plugin {
    * @return created DataSource unmerged
    */
   public DataSource createDataSourceNoMerge(
-      DataSourceCreate dataSourceCreate, SecurityContextBase securityContext) {
+      DataSourceCreate dataSourceCreate, SecurityContext securityContext) {
     DataSource dataSource = new DataSource();
     dataSource.setId(UUID.randomUUID().toString());
     updateDataSourceNoMerge(dataSource, dataSourceCreate);
@@ -91,7 +91,7 @@ public class DataSourceService implements Plugin {
    * @return dataSource
    */
   public DataSource updateDataSource(
-      DataSourceUpdate dataSourceUpdate, SecurityContextBase securityContext) {
+      DataSourceUpdate dataSourceUpdate, SecurityContext securityContext) {
     DataSource dataSource = dataSourceUpdate.getDataSource();
     if (updateDataSourceNoMerge(dataSource, dataSourceUpdate)) {
       this.repository.merge(dataSource);
@@ -105,7 +105,7 @@ public class DataSourceService implements Plugin {
    * @return PaginationResponse containing paging information for DataSource
    */
   public PaginationResponse<DataSource> getAllDataSources(
-      DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
+      DataSourceFilter dataSourceFilter, SecurityContext securityContext) {
     List<DataSource> list = listAllDataSources(dataSourceFilter, securityContext);
     long count = this.repository.countAllDataSources(dataSourceFilter, securityContext);
     return new PaginationResponse<>(list, dataSourceFilter, count);
@@ -117,7 +117,7 @@ public class DataSourceService implements Plugin {
    * @return List of DataSource
    */
   public List<DataSource> listAllDataSources(
-      DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
+      DataSourceFilter dataSourceFilter, SecurityContext securityContext) {
     return this.repository.listAllDataSources(dataSourceFilter, securityContext);
   }
 
@@ -126,7 +126,7 @@ public class DataSourceService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if dataSourceFilter is not valid
    */
-  public void validate(DataSourceFilter dataSourceFilter, SecurityContextBase securityContext) {
+  public void validate(DataSourceFilter dataSourceFilter, SecurityContext securityContext) {
     basicService.validate(dataSourceFilter, securityContext);
 
     Set<String> dynamicExecutionIds =
@@ -140,7 +140,6 @@ public class DataSourceService implements Plugin {
                 .listByIds(
                     DynamicExecution.class,
                     dynamicExecutionIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -157,7 +156,7 @@ public class DataSourceService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if dataSourceCreate is not valid
    */
-  public void validate(DataSourceCreate dataSourceCreate, SecurityContextBase securityContext) {
+  public void validate(DataSourceCreate dataSourceCreate, SecurityContext securityContext) {
     basicService.validate(dataSourceCreate, securityContext);
 
     String dynamicExecutionId = dataSourceCreate.getDynamicExecutionId();
@@ -167,7 +166,7 @@ public class DataSourceService implements Plugin {
             : this.repository.getByIdOrNull(
                 dynamicExecutionId,
                 DynamicExecution.class,
-                SecuredBasic_.security,
+                
                 securityContext);
     if (dynamicExecutionId != null && dynamicExecution == null) {
       throw new ResponseStatusException(
@@ -177,12 +176,12 @@ public class DataSourceService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -190,7 +189,7 @@ public class DataSourceService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -198,7 +197,7 @@ public class DataSourceService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

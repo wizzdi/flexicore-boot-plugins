@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioActionCreate;
 import com.flexicore.rules.request.ScenarioActionFilter;
 import com.flexicore.rules.request.ScenarioActionUpdate;
 import com.flexicore.rules.service.ScenarioActionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioActionController implements Plugin {
   public ScenarioAction createScenarioAction(
       
       @RequestBody ScenarioActionCreate scenarioActionCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioActionService.validate(scenarioActionCreate, securityContext);
     return scenarioActionService.createScenarioAction(scenarioActionCreate, securityContext);
@@ -43,12 +43,12 @@ public class ScenarioActionController implements Plugin {
   public ScenarioAction updateScenarioAction(
       
       @RequestBody ScenarioActionUpdate scenarioActionUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioActionId = scenarioActionUpdate.getId();
     ScenarioAction scenarioAction =
         scenarioActionService.getByIdOrNull(
-            scenarioActionId, ScenarioAction.class, ScenarioAction_.security, securityContext);
+            scenarioActionId, ScenarioAction.class,  securityContext);
     if (scenarioAction == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No ScenarioAction with id " + scenarioActionId);
@@ -63,7 +63,7 @@ public class ScenarioActionController implements Plugin {
   public PaginationResponse<ScenarioAction> getAllScenarioActions(
       
       @RequestBody ScenarioActionFilter scenarioActionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioActionService.validate(scenarioActionFilter, securityContext);
     return scenarioActionService.getAllScenarioActions(scenarioActionFilter, securityContext);

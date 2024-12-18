@@ -1,7 +1,7 @@
 package com.wizzdi.video.conference.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.video.conference.model.RoomToVideoServerUser;
@@ -32,7 +32,7 @@ public class RoomToVideoServerUserController implements Plugin {
   public RoomToVideoServerUser createRoomToVideoServerUser(
       
       @RequestBody RoomToVideoServerUserCreate roomToVideoServerUserCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     roomToVideoServerUserService.validate(roomToVideoServerUserCreate, securityContext);
     return roomToVideoServerUserService.createRoomToVideoServerUser(
         roomToVideoServerUserCreate, securityContext);
@@ -43,13 +43,12 @@ public class RoomToVideoServerUserController implements Plugin {
   public RoomToVideoServerUser updateRoomToVideoServerUser(
       
       @RequestBody RoomToVideoServerUserUpdate roomToVideoServerUserUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String roomToVideoServerUserId = roomToVideoServerUserUpdate.getId();
     RoomToVideoServerUser roomToVideoServerUser =
         roomToVideoServerUserService.getByIdOrNull(
             roomToVideoServerUserId,
             RoomToVideoServerUser.class,
-            RoomToVideoServerUser_.security,
             securityContext);
     if (roomToVideoServerUser == null) {
       throw new ResponseStatusException(
@@ -68,7 +67,7 @@ public class RoomToVideoServerUserController implements Plugin {
   public PaginationResponse<RoomToVideoServerUser> getAllRoomToVideoServerUsers(
       
       @RequestBody RoomToVideoServerUserFilter roomToVideoServerUserFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     roomToVideoServerUserService.validate(roomToVideoServerUserFilter, securityContext);
     return roomToVideoServerUserService.getAllRoomToVideoServerUsers(
         roomToVideoServerUserFilter, securityContext);

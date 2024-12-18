@@ -7,7 +7,7 @@ import com.flexicore.scheduling.request.ScheduleTimeslotCreate;
 import com.flexicore.scheduling.request.ScheduleTimeslotFilter;
 import com.flexicore.scheduling.request.ScheduleTimeslotUpdate;
 import com.flexicore.scheduling.service.ScheduleTimeslotService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScheduleTimeslotController implements Plugin {
   public ScheduleTimeslot createScheduleTimeslot(
       
       @RequestBody ScheduleTimeslotCreate scheduleTimeslotCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleTimeslotService.validate(scheduleTimeslotCreate, securityContext);
     return scheduleTimeslotService.createScheduleTimeslot(scheduleTimeslotCreate, securityContext);
   }
@@ -42,13 +42,12 @@ public class ScheduleTimeslotController implements Plugin {
   public ScheduleTimeslot updateScheduleTimeslot(
       
       @RequestBody ScheduleTimeslotUpdate scheduleTimeslotUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String scheduleTimeslotId = scheduleTimeslotUpdate.getId();
     ScheduleTimeslot scheduleTimeslot =
         scheduleTimeslotService.getByIdOrNull(
             scheduleTimeslotId,
             ScheduleTimeslot.class,
-            ScheduleTimeslot_.security,
             securityContext);
     if (scheduleTimeslot == null) {
       throw new ResponseStatusException(
@@ -66,7 +65,7 @@ public class ScheduleTimeslotController implements Plugin {
   public PaginationResponse<ScheduleTimeslot> getAllScheduleTimeslots(
       
       @RequestBody ScheduleTimeslotFilter scheduleTimeslotFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleTimeslotService.validate(scheduleTimeslotFilter, securityContext);
     return scheduleTimeslotService.getAllScheduleTimeslots(scheduleTimeslotFilter, securityContext);
   }

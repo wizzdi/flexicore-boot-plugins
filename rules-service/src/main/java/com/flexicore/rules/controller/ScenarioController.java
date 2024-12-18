@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioCreate;
 import com.flexicore.rules.request.ScenarioFilter;
 import com.flexicore.rules.request.ScenarioUpdate;
 import com.flexicore.rules.service.ScenarioService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioController implements Plugin {
   public Scenario createScenario(
       
       @RequestBody ScenarioCreate scenarioCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioService.validate(scenarioCreate, securityContext);
     return scenarioService.createScenario(scenarioCreate, securityContext);
@@ -43,12 +43,12 @@ public class ScenarioController implements Plugin {
   public Scenario updateScenario(
       
       @RequestBody ScenarioUpdate scenarioUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioId = scenarioUpdate.getId();
     Scenario scenario =
         scenarioService.getByIdOrNull(
-            scenarioId, Scenario.class, Scenario_.security, securityContext);
+            scenarioId, Scenario.class,  securityContext);
     if (scenario == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No Scenario with id " + scenarioId);
@@ -63,7 +63,7 @@ public class ScenarioController implements Plugin {
   public PaginationResponse<Scenario> getAllScenarios(
       
       @RequestBody ScenarioFilter scenarioFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioService.validate(scenarioFilter, securityContext);
     return scenarioService.getAllScenarios(scenarioFilter, securityContext);

@@ -3,7 +3,7 @@ package com.flexicore.ui.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.PresetToPresetRepository;
 import com.flexicore.ui.model.Preset;
 import com.flexicore.ui.model.PresetToPreset;
@@ -40,7 +40,7 @@ public class PresetToPresetService implements Plugin {
 
 
 	public PaginationResponse<PresetToPreset> getAllPresetToPresets(PresetToPresetFiltering presetToPresetFiltering,
-																	SecurityContextBase securityContext) {
+																	SecurityContext securityContext) {
 		List<PresetToPreset> list = listAllPresetToPresets(presetToPresetFiltering, securityContext);
 		long count = presetToPresetRepository.countAllPresetToPresets(presetToPresetFiltering,
 				securityContext);
@@ -48,7 +48,7 @@ public class PresetToPresetService implements Plugin {
 	}
 
 	public List<PresetToPreset> listAllPresetToPresets(PresetToPresetFiltering presetToPresetFiltering,
-													   SecurityContextBase securityContext) {
+													   SecurityContext securityContext) {
 		return presetToPresetRepository.listAllPresetToPresets(presetToPresetFiltering, securityContext);
 	}
 
@@ -83,7 +83,7 @@ public class PresetToPresetService implements Plugin {
 	}
 
 	public PresetToPreset updatePresetToPreset(PresetToPresetUpdate updatePreset,
-											   SecurityContextBase securityContext) {
+											   SecurityContext securityContext) {
 		if (updatePresetToPresetNoMerge(updatePreset, updatePreset.getPresetToPreset())) {
 			presetToPresetRepository.merge(updatePreset.getPresetToPreset());
 		}
@@ -92,7 +92,7 @@ public class PresetToPresetService implements Plugin {
 	}
 
 	public PresetToPreset createPresetToPreset(PresetToPresetCreate createPreset,
-											   SecurityContextBase securityContext) {
+											   SecurityContext securityContext) {
 		PresetToPreset preset = createPresetToPresetNoMerge(createPreset, securityContext);
 		presetToPresetRepository.merge(preset);
 		return preset;
@@ -100,7 +100,7 @@ public class PresetToPresetService implements Plugin {
 	}
 
 	public PresetToPreset createPresetToPresetNoMerge(PresetToPresetCreate createPreset,
-													  SecurityContextBase securityContext) {
+													  SecurityContext securityContext) {
 		PresetToPreset preset = new PresetToPreset();
 		preset.setId(UUID.randomUUID().toString());
 		updatePresetToPresetNoMerge(createPreset, preset);
@@ -109,9 +109,9 @@ public class PresetToPresetService implements Plugin {
 	}
 
 
-	public void validate(PresetToPresetFiltering presetToPresetFiltering, SecurityContextBase securityContext) {
+	public void validate(PresetToPresetFiltering presetToPresetFiltering, SecurityContext securityContext) {
 		Set<String> parentPresetIds=presetToPresetFiltering.getParentPrestIds();
-		Map<String,Preset> parentPresets=parentPresetIds.isEmpty()?new HashMap<>():presetToPresetRepository.listByIds(Preset.class,parentPresetIds,Preset_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String,Preset> parentPresets=parentPresetIds.isEmpty()?new HashMap<>():presetToPresetRepository.listByIds(Preset.class,parentPresetIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		parentPresetIds.removeAll(parentPresets.keySet());
 		if(!parentPresetIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Presets with ids "+parentPresetIds);
@@ -119,7 +119,7 @@ public class PresetToPresetService implements Plugin {
 		presetToPresetFiltering.setParentPresets(new ArrayList<>(parentPresets.values()));
 
 		Set<String> childPresetIds=presetToPresetFiltering.getChildPresetIds();
-		Map<String,Preset> childPresets=childPresetIds.isEmpty()?new HashMap<>():presetToPresetRepository.listByIds(Preset.class,childPresetIds,Preset_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+		Map<String,Preset> childPresets=childPresetIds.isEmpty()?new HashMap<>():presetToPresetRepository.listByIds(Preset.class,childPresetIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
 		childPresetIds.removeAll(childPresets.keySet());
 		if(!childPresetIds.isEmpty()){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Presets with ids "+childPresetIds);
@@ -128,35 +128,35 @@ public class PresetToPresetService implements Plugin {
 	}
 
 
-	public void validate(PresetToPresetCreate createPresetToPreset, SecurityContextBase securityContext) {
+	public void validate(PresetToPresetCreate createPresetToPreset, SecurityContext securityContext) {
 		String parentPresetId = createPresetToPreset.getParentPresetId();
-		Preset parentPreset = parentPresetId == null ? null : getByIdOrNull(parentPresetId, Preset.class, Preset_.security, securityContext);
+		Preset parentPreset = parentPresetId == null ? null : getByIdOrNull(parentPresetId, Preset.class,securityContext);
 		if (parentPreset == null && parentPresetId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Preset with id " + parentPresetId);
 		}
 		createPresetToPreset.setParentPreset(parentPreset);
 
 		String childPresetId = createPresetToPreset.getChildPresetId();
-		Preset childPreset = childPresetId == null ? null : getByIdOrNull(childPresetId, Preset.class, Preset_.security, securityContext);
+		Preset childPreset = childPresetId == null ? null : getByIdOrNull(childPresetId, Preset.class,securityContext);
 		if (childPreset == null && childPresetId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Preset with id " + childPresetId);
 		}
 		createPresetToPreset.setChildPreset(childPreset);
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return presetToPresetRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return presetToPresetRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return presetToPresetRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return presetToPresetRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

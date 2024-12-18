@@ -3,7 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Gateway;
 import com.wizzdi.basic.iot.model.PendingGateway;
 import com.wizzdi.basic.iot.model.Remote_;
@@ -38,21 +38,21 @@ public class PendingGatewayService implements Plugin {
     @Autowired
     private BasicService basicService;
     @Autowired
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -79,30 +79,30 @@ public class PendingGatewayService implements Plugin {
     }
 
     public void validateFiltering(PendingGatewayFilter pendingGatewayFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(pendingGatewayFilter, securityContext);
     }
 
     public PaginationResponse<PendingGateway> getAllPendingGateways(
-            SecurityContextBase securityContext, PendingGatewayFilter filtering) {
+            SecurityContext securityContext, PendingGatewayFilter filtering) {
         List<PendingGateway> list = listAllPendingGateways(securityContext, filtering);
         long count = repository.countAllPendingGateways(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<PendingGateway> listAllPendingGateways(SecurityContextBase securityContext, PendingGatewayFilter pendingGatewayFilter) {
+    public List<PendingGateway> listAllPendingGateways(SecurityContext securityContext, PendingGatewayFilter pendingGatewayFilter) {
         return repository.getAllPendingGateways(securityContext, pendingGatewayFilter);
     }
 
     public PendingGateway createPendingGateway(PendingGatewayCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         PendingGateway pendingGateway = createPendingGatewayNoMerge(creationContainer, securityContext);
         repository.merge(pendingGateway);
         return pendingGateway;
     }
 
     public PendingGateway createPendingGatewayNoMerge(PendingGatewayCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         PendingGateway pendingGateway = new PendingGateway();
         pendingGateway.setId(UUID.randomUUID().toString());
 
@@ -134,7 +134,7 @@ public class PendingGatewayService implements Plugin {
     }
 
     public PendingGateway updatePendingGateway(PendingGatewayUpdate pendingGatewayUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         PendingGateway pendingGateway = pendingGatewayUpdate.getPendingGateway();
         if (updatePendingGatewayNoMerge(pendingGateway, pendingGatewayUpdate)) {
             repository.merge(pendingGateway);
@@ -143,11 +143,11 @@ public class PendingGatewayService implements Plugin {
     }
 
     public void validate(PendingGatewayCreate pendingGatewayCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(pendingGatewayCreate, securityContext);
 
         String registeredGatewayId=pendingGatewayCreate.getRegisteredGatewayId();
-        Gateway gateway=registeredGatewayId==null?null:getByIdOrNull(registeredGatewayId,Gateway.class, Remote_.security,securityContext);
+        Gateway gateway=registeredGatewayId==null?null:getByIdOrNull(registeredGatewayId,Gateway.class, securityContext);
         if(registeredGatewayId!=null&&gateway==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Gateway with id "+registeredGatewayId);
         }

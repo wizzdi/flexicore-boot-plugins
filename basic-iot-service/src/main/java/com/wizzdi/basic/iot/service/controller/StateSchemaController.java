@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.basic.iot.model.StateSchema_;
 import com.wizzdi.basic.iot.service.request.StateSchemaCreate;
@@ -38,7 +38,7 @@ public class StateSchemaController implements Plugin {
     public PaginationResponse<StateSchema> getAllStateSchemas(
 
             
-            @RequestBody StateSchemaFilter stateSchemaFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody StateSchemaFilter stateSchemaFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(stateSchemaFilter, securityContext);
         return service.getAllStateSchemas(securityContext, stateSchemaFilter);
     }
@@ -50,7 +50,7 @@ public class StateSchemaController implements Plugin {
     public StateSchema createStateSchema(
             
             @RequestBody StateSchemaCreate stateSchemaCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(stateSchemaCreate, securityContext);
 
         return service.createStateSchema(stateSchemaCreate, securityContext);
@@ -64,10 +64,10 @@ public class StateSchemaController implements Plugin {
 
             
             @RequestBody StateSchemaUpdate stateSchemaUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(stateSchemaUpdate, securityContext);
         StateSchema stateSchema = service.getByIdOrNull(stateSchemaUpdate.getId(),
-                StateSchema.class, StateSchema_.security, securityContext);
+                StateSchema.class,  securityContext);
         if (stateSchema == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no StateSchema with id "
                     + stateSchemaUpdate.getId());

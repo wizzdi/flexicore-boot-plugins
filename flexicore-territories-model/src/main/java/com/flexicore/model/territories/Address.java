@@ -1,12 +1,12 @@
 package com.flexicore.model.territories;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Address extends SecuredBasic {
+public class Address extends Baseclass {
 
 
 

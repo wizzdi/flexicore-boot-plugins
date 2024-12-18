@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.Money;
 import com.wizzdi.flexicore.pricing.model.price.Money_;
@@ -39,7 +39,7 @@ public class MoneyController implements Plugin {
     public PaginationResponse<Money> getAllMoney(
 
             
-            @RequestBody MoneyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody MoneyFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllMoney(securityContext, filtering);
     }
@@ -51,7 +51,7 @@ public class MoneyController implements Plugin {
     public Money createMoney(
             
             @RequestBody MoneyCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createMoney(creationContainer, securityContext);
@@ -65,10 +65,10 @@ public class MoneyController implements Plugin {
 
             
             @RequestBody MoneyUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Money money = service.getByIdOrNull(updateContainer.getId(),
-                Money.class, Money_.security, securityContext);
+                Money.class,  securityContext);
         if (money == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Money with id "
                     + updateContainer.getId());

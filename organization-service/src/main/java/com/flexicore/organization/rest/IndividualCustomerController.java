@@ -8,7 +8,7 @@ import com.flexicore.organization.request.IndividualCustomerCreate;
 import com.flexicore.organization.request.IndividualCustomerFiltering;
 import com.flexicore.organization.request.IndividualCustomerUpdate;
 import com.flexicore.organization.service.IndividualCustomerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +38,7 @@ public class IndividualCustomerController implements Plugin {
 	@PostMapping("/getAllIndividualCustomers")
 	public PaginationResponse<IndividualCustomer> getAllIndividualCustomers(
 
-			@RequestBody IndividualCustomerFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody IndividualCustomerFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllIndividualCustomers(securityContext, filtering);
 	}
@@ -50,7 +50,7 @@ public class IndividualCustomerController implements Plugin {
 	public IndividualCustomer createIndividualCustomer(
 
 			@RequestBody IndividualCustomerCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createIndividualCustomer(creationContainer, securityContext);
@@ -63,10 +63,10 @@ public class IndividualCustomerController implements Plugin {
 	public IndividualCustomer updateIndividualCustomer(
 
 			@RequestBody IndividualCustomerUpdate updateContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
 		IndividualCustomer individualCustomer = service.getByIdOrNull(updateContainer.getId(),
-				IndividualCustomer.class, IndividualCustomer_.security, securityContext);
+				IndividualCustomer.class,  securityContext);
 		if (individualCustomer == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no IndividualCustomer with id "
 					+ updateContainer.getId());

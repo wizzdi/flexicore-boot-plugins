@@ -3,8 +3,8 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.basic.iot.service.data.StateSchemaRepository;
@@ -41,19 +41,19 @@ public class StateSchemaService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -80,10 +80,10 @@ public class StateSchemaService implements Plugin {
     }
 
     public void validateFiltering(StateSchemaFilter stateSchemaFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(stateSchemaFilter, securityContext);
         Set<String> deviceTypeIds = stateSchemaFilter.getDeviceTypeIds();
-        Map<String, DeviceType> deviceTypeMap=deviceTypeIds.isEmpty()?new HashMap<>():listByIds(DeviceType.class,deviceTypeIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+        Map<String, DeviceType> deviceTypeMap=deviceTypeIds.isEmpty()?new HashMap<>():listByIds(DeviceType.class,deviceTypeIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
         deviceTypeIds.removeAll(deviceTypeMap.keySet());
         if(!deviceTypeIds.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no device ids "+deviceTypeIds);
@@ -92,25 +92,25 @@ public class StateSchemaService implements Plugin {
     }
 
     public PaginationResponse<StateSchema> getAllStateSchemas(
-            SecurityContextBase securityContext, StateSchemaFilter filtering) {
+            SecurityContext securityContext, StateSchemaFilter filtering) {
         List<StateSchema> list = listAllStateSchemas(securityContext, filtering);
         long count = repository.countAllStateSchemas(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<StateSchema> listAllStateSchemas(SecurityContextBase securityContext, StateSchemaFilter stateSchemaFilter) {
+    public List<StateSchema> listAllStateSchemas(SecurityContext securityContext, StateSchemaFilter stateSchemaFilter) {
         return repository.getAllStateSchemas(securityContext, stateSchemaFilter);
     }
 
     public StateSchema createStateSchema(StateSchemaCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         StateSchema stateSchema = createStateSchemaNoMerge(creationContainer, securityContext);
         repository.merge(stateSchema);
         return stateSchema;
     }
 
     public StateSchema createStateSchemaNoMerge(StateSchemaCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         StateSchema stateSchema = new StateSchema();
         stateSchema.setId(UUID.randomUUID().toString());
 
@@ -144,7 +144,7 @@ public class StateSchemaService implements Plugin {
     }
 
     public StateSchema updateStateSchema(StateSchemaUpdate stateSchemaUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         StateSchema stateSchema = stateSchemaUpdate.getStateSchema();
         if (updateStateSchemaNoMerge(stateSchema, stateSchemaUpdate)) {
             repository.merge(stateSchema);
@@ -153,10 +153,10 @@ public class StateSchemaService implements Plugin {
     }
 
     public void validate(StateSchemaCreate stateSchemaCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(stateSchemaCreate, securityContext);
         String deviceTypeId = stateSchemaCreate.getDeviceTypeId();
-        DeviceType deviceType = deviceTypeId == null ? null : getByIdOrNull(deviceTypeId, DeviceType.class, SecuredBasic_.security, securityContext);
+        DeviceType deviceType = deviceTypeId == null ? null : getByIdOrNull(deviceTypeId, DeviceType.class,securityContext);
         if (deviceTypeId != null && deviceType == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No DeviceType with id " + deviceTypeId);
         }

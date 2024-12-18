@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice_;
@@ -39,7 +39,7 @@ public class RecurringPriceController implements Plugin {
     public PaginationResponse<RecurringPrice> getAllRecurringPrice(
 
             
-            @RequestBody RecurringPriceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody RecurringPriceFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllRecurringPrice(securityContext, filtering);
     }
@@ -51,7 +51,7 @@ public class RecurringPriceController implements Plugin {
     public RecurringPrice createRecurringPrice(
             
             @RequestBody RecurringPriceCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createRecurringPrice(creationContainer, securityContext);
@@ -65,10 +65,10 @@ public class RecurringPriceController implements Plugin {
 
             
             @RequestBody RecurringPriceUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         RecurringPrice recurringPrice = service.getByIdOrNull(updateContainer.getId(),
-                RecurringPrice.class, RecurringPrice_.security, securityContext);
+                RecurringPrice.class,  securityContext);
         if (recurringPrice == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no RecurringPrice with id "
                     + updateContainer.getId());

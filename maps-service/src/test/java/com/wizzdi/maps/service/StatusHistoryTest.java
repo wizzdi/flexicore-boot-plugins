@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
@@ -61,7 +61,7 @@ public class StatusHistoryTest {
     @Qualifier("historyIcons")
     private Map<String, MapIcon> historyIcons;
     @Autowired
-    private SecurityContextBase securityContext;
+    private SecurityContext securityContext;
     @Autowired
     private StatusHistoryService statusHistoryService;
     @Autowired

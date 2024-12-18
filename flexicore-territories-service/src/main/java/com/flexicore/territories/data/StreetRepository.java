@@ -3,7 +3,7 @@ package com.flexicore.territories.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.StreetFilter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -33,13 +33,13 @@ public class StreetRepository implements Plugin {
 	@Autowired
 	private BaseclassRepository baseclassRepository;
 
-	public List<Street> listAllStreets(SecurityContextBase securityContextBase,
+	public List<Street> listAllStreets(SecurityContext SecurityContext,
 			StreetFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Street> q = cb.createQuery(Street.class);
 		Root<Street> r = q.from(Street.class);
 		List<Predicate> preds = new ArrayList<>();
-		addStreetPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addStreetPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(r).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Street> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
@@ -47,13 +47,13 @@ public class StreetRepository implements Plugin {
 
 	}
 
-	public long countAllStreets(SecurityContextBase securityContextBase,
+	public long countAllStreets(SecurityContext SecurityContext,
 			StreetFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<Street> r = q.from(Street.class);
 		List<Predicate> preds = new ArrayList<>();
-		addStreetPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addStreetPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Long> query = em.createQuery(q);
 		return query.getSingleResult();
@@ -62,7 +62,7 @@ public class StreetRepository implements Plugin {
 
 	private void addStreetPredicate(StreetFilter filtering,
 									CommonAbstractCriteria q,
-									CriteriaBuilder cb, Root<Street> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+									CriteriaBuilder cb, Root<Street> r, List<Predicate> preds, SecurityContext SecurityContext) {
 		Join<Street, City> cityJoin=null;
 		if (filtering.getCities() != null && !filtering.getCities().isEmpty()) {
 			Set<String> ids=filtering.getCities().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -89,20 +89,20 @@ public class StreetRepository implements Plugin {
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
-		if(securityContextBase!=null){
-			Join<Street, Baseclass> join=r.join(Street_.security);
-			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
+		if(SecurityContext!=null){
+			baseclassRepository.addBaseclassPredicates(cb,q,r,preds,SecurityContext);
 		}
 
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return baseclassRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
+
 
 	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
 		return baseclassRepository.findByIds(c, ids, idAttribute);
@@ -139,4 +139,6 @@ public class StreetRepository implements Plugin {
 	public void remove(Object o) {
 		em.remove(o);
 	}
+
+
 }

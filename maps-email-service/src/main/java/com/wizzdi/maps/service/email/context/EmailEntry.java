@@ -28,7 +28,7 @@ public class EmailEntry {
         this.time=dateAtStatus.format(TIME_FORMATTER);
         MappedPOI mappedPOI = statusHistory.getMappedPOI();
         if(mappedPOI!=null){
-            this.tenant= Optional.ofNullable(mappedPOI.getSecurity()).map(f->f.getTenant()).map(f->f.getName()).orElse(null);
+            this.tenant= Optional.ofNullable(mappedPOI.getTenant()).map(f->f.getName()).orElse(null);
             this.externalId=mappedPOI.getExternalId();
             this.name=mappedPOI.getName();
         }

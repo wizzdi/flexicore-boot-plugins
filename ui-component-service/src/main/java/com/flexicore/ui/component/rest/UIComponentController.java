@@ -7,7 +7,7 @@
 package com.flexicore.ui.component.rest;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.component.model.UIComponent;
 import com.flexicore.ui.component.request.UIComponentsRegistrationContainer;
 import com.flexicore.ui.component.service.UIComponentService;
@@ -40,7 +40,7 @@ public class UIComponentController implements Plugin {
 
     public List<UIComponent> registerAndGetAllowedUIComponents(
                                          @RequestBody UIComponentsRegistrationContainer uiComponentsRegistrationContainer,
-                                                               @RequestAttribute SecurityContextBase securityContext) {
+                                                               @RequestAttribute SecurityContext securityContext) {
         uiPluginService.validate(uiComponentsRegistrationContainer);
         return uiPluginService.registerAndGetAllowedUIComponents(uiComponentsRegistrationContainer.getComponentsToRegister(),securityContext);
     }

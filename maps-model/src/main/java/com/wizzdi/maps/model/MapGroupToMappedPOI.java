@@ -1,6 +1,6 @@
 package com.wizzdi.maps.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 @Table(indexes = {
         @Index(name = "mapgroup_to_mappedpoi_idx",columnList = "mappedPOI_id,mapGroup_id")
 })
-public class MapGroupToMappedPOI extends SecuredBasic {
+public class MapGroupToMappedPOI extends Baseclass {
 
   @ManyToOne(targetEntity = MappedPOI.class)
   private MappedPOI mappedPOI;

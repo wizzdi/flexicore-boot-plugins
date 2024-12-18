@@ -1,7 +1,7 @@
 package com.wizzdi.messaging.firebase;
 
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.messaging.connectors.firebase.model.FirebaseEnabledDevice;
 import com.wizzdi.messaging.firebase.app.App;
@@ -69,7 +69,7 @@ public class FirebaseEnabledDeviceControllerTest {
     @Autowired
     @Lazy
     @Qualifier("adminSecurityContext")
-    private SecurityContextBase securityContextBase;
+    private SecurityContext SecurityContext;
     @Autowired
     private SecurityServiceTest securityServiceTest;
 
@@ -87,7 +87,7 @@ public class FirebaseEnabledDeviceControllerTest {
                             .add("authenticationKey", reference.get());
                     return execution.execute(request, body);
                 }));
-        chatUser = chatUserService.createChatUser(new ChatUserCreate(), securityContextBase);
+        chatUser = chatUserService.createChatUser(new ChatUserCreate(), SecurityContext);
         SecurityInterceptor.setChatUser(chatUser);
     }
 

@@ -2,7 +2,7 @@ package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Device_;
 import com.wizzdi.basic.iot.service.request.ChangeStateRequest;
@@ -40,7 +40,7 @@ public class DeviceController implements Plugin {
     public PaginationResponse<Device> getAllDevices(
 
             
-            @RequestBody DeviceFilter deviceFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody DeviceFilter deviceFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(deviceFilter, securityContext);
         return service.getAllDevices(securityContext, deviceFilter);
     }
@@ -53,7 +53,7 @@ public class DeviceController implements Plugin {
     public Device createDevice(
             
             @RequestBody DeviceCreate deviceCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(deviceCreate, securityContext);
 
         return service.createDevice(deviceCreate, securityContext);
@@ -67,10 +67,10 @@ public class DeviceController implements Plugin {
 
             
             @RequestBody DeviceUpdate deviceUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(deviceUpdate, securityContext);
         Device device = service.getByIdOrNull(deviceUpdate.getId(),
-                Device.class, Device_.security, securityContext);
+                Device.class,  securityContext);
         if (device == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Device with id "
                     + deviceUpdate.getId());

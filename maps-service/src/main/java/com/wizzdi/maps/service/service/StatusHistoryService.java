@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -36,7 +36,7 @@ public class StatusHistoryService implements Plugin {
    * @return created StatusHistory
    */
   public StatusHistory createStatusHistory(
-      StatusHistoryCreate statusHistoryCreate, SecurityContextBase securityContext) {
+      StatusHistoryCreate statusHistoryCreate, SecurityContext securityContext) {
     StatusHistory statusHistory = createStatusHistoryNoMerge(statusHistoryCreate, securityContext);
     this.repository.merge(statusHistory);
     return statusHistory;
@@ -48,13 +48,13 @@ public class StatusHistoryService implements Plugin {
    * @return created StatusHistory unmerged
    */
   public StatusHistory createStatusHistoryNoMerge(
-      StatusHistoryCreate statusHistoryCreate, SecurityContextBase securityContext) {
+      StatusHistoryCreate statusHistoryCreate, SecurityContext securityContext) {
     StatusHistory statusHistory = new StatusHistory();
     statusHistory.setId(UUID.randomUUID().toString());
     updateStatusHistoryNoMerge(statusHistory, statusHistoryCreate);
 
     if(statusHistory.getMappedPOI()!=null){
-      statusHistory.setSecurity(statusHistory.getMappedPOI().getSecurity());
+      statusHistory.setSecurityId(statusHistory.getMappedPOI().getSecurityId());
     }
     else{
       throw new RuntimeException("cannot create status history without MappedPOI");
@@ -105,7 +105,7 @@ public class StatusHistoryService implements Plugin {
    * @return statusHistory
    */
   public StatusHistory updateStatusHistory(
-      StatusHistoryUpdate statusHistoryUpdate, SecurityContextBase securityContext) {
+      StatusHistoryUpdate statusHistoryUpdate, SecurityContext securityContext) {
     StatusHistory statusHistory = statusHistoryUpdate.getStatusHistory();
     if (updateStatusHistoryNoMerge(statusHistory, statusHistoryUpdate)) {
       this.repository.merge(statusHistory);
@@ -119,7 +119,7 @@ public class StatusHistoryService implements Plugin {
    * @return PaginationResponse containing paging information for StatusHistory
    */
   public PaginationResponse<StatusHistory> getAllStatusHistories(
-      StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+      StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     List<StatusHistory> list = listAllStatusHistories(statusHistoryFilter, securityContext);
     return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), 0)
             .setTotalRecords(null)
@@ -133,17 +133,17 @@ public class StatusHistoryService implements Plugin {
    * @return List of StatusHistory
    */
   public List<StatusHistory> listAllStatusHistories(
-      StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+      StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     return this.repository.listAllStatusHistories(statusHistoryFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -151,7 +151,7 @@ public class StatusHistoryService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -159,7 +159,7 @@ public class StatusHistoryService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
@@ -184,7 +184,7 @@ public class StatusHistoryService implements Plugin {
     this.repository.massMerge(toMerge);
   }
 
-  public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+  public PaginationResponse<StatusHistoryContainer> getAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     List<StatusHistoryContainer> list = listAllStatusHistoryContainers(statusHistoryFilter, securityContext);
     //long count = this.repository.countAllStatusHistories(statusHistoryFilter, securityContext);
     return new PaginationResponse<>(list, statusHistoryFilter.getPageSize(), 0)
@@ -193,7 +193,7 @@ public class StatusHistoryService implements Plugin {
             .setTotalPages(null);
   }
 
-  private List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContextBase securityContext) {
+  private List<StatusHistoryContainer> listAllStatusHistoryContainers(StatusHistoryFilter statusHistoryFilter, SecurityContext securityContext) {
     return repository.listAllStatusHistoryContainers(statusHistoryFilter, securityContext);
   }
 }

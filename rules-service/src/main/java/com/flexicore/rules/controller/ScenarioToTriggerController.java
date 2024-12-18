@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioToTriggerCreate;
 import com.flexicore.rules.request.ScenarioToTriggerFilter;
 import com.flexicore.rules.request.ScenarioToTriggerUpdate;
 import com.flexicore.rules.service.ScenarioToTriggerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioToTriggerController implements Plugin {
   public PaginationResponse<ScenarioToTrigger> getAllScenarioToTriggers(
       
       @RequestBody ScenarioToTriggerFilter scenarioToTriggerFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToTriggerService.validate(scenarioToTriggerFilter, securityContext);
     return scenarioToTriggerService.getAllScenarioToTriggers(
@@ -44,7 +44,7 @@ public class ScenarioToTriggerController implements Plugin {
   public ScenarioToTrigger createScenarioToTrigger(
       
       @RequestBody ScenarioToTriggerCreate scenarioToTriggerCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioToTriggerService.validate(scenarioToTriggerCreate, securityContext);
     return scenarioToTriggerService.createScenarioToTrigger(
@@ -56,14 +56,13 @@ public class ScenarioToTriggerController implements Plugin {
   public ScenarioToTrigger updateScenarioToTrigger(
       
       @RequestBody ScenarioToTriggerUpdate scenarioToTriggerUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioToTriggerId = scenarioToTriggerUpdate.getId();
     ScenarioToTrigger scenarioToTrigger =
         scenarioToTriggerService.getByIdOrNull(
             scenarioToTriggerId,
             ScenarioToTrigger.class,
-            ScenarioToTrigger_.security,
             securityContext);
     if (scenarioToTrigger == null) {
       throw new ResponseStatusException(

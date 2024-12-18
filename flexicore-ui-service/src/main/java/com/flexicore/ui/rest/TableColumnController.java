@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.model.TableColumn;
 import com.flexicore.ui.request.TableColumnCreate;
@@ -54,7 +54,7 @@ public class TableColumnController implements Plugin {
 	public PaginationResponse<TableColumn> getAllTableColumns(
 			 @RequestBody
 			TableColumnFiltering tableColumnFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(tableColumnFiltering, securityContext);
 		return service
 				.getAllTableColumns(tableColumnFiltering, securityContext);
@@ -68,10 +68,10 @@ public class TableColumnController implements Plugin {
 	public TableColumn updateTableColumn(
 			 @RequestBody
 			TableColumnUpdate tableColumnUpdate,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		TableColumn tableColumn = tableColumnUpdate.getId() != null ? service
 				.getByIdOrNull(tableColumnUpdate.getId(), TableColumn.class,
-						TableColumn_.security, securityContext) : null;
+						 securityContext) : null;
 		if (tableColumn == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id  "
 					+ tableColumnUpdate.getId());
@@ -89,7 +89,7 @@ public class TableColumnController implements Plugin {
 	public TableColumn createTableColumn(
 			 @RequestBody
 			TableColumnCreate createTableColumn,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validateCreate(createTableColumn, securityContext);
 		return service.createTableColumn(createTableColumn, securityContext);
 

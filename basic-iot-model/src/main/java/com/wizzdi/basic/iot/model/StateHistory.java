@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.dynamic.properties.converter.JsonConverter;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Table(indexes = {
         @Index(name = "remote_idx",columnList = "remote_id,timeAtState")
 })
-public class StateHistory extends SecuredBasic {
+public class StateHistory extends Baseclass {
 
    @ManyToOne(targetEntity = Remote.class)
    private Remote remote;

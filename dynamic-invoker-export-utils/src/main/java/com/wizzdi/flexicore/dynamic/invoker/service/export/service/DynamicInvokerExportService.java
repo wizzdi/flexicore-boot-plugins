@@ -12,7 +12,7 @@ import com.wizzdi.flexicore.dynamic.invoker.service.export.request.ExportDynamic
 import com.wizzdi.flexicore.dynamic.invoker.service.export.request.ExportDynamicInvoker;
 import com.wizzdi.flexicore.dynamic.invoker.service.export.request.FieldProperties;
 import com.wizzdi.flexicore.file.model.FileResource;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.*;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicInvokerService;
@@ -65,28 +65,28 @@ public class DynamicInvokerExportService implements Plugin {
 
 
 
-    public FileResource exportDynamicExecutionResultToCSV(ExportDynamicExecution exportDynamicExecution, SecurityContextBase securityContextBase) {
-        ExecuteInvokersResponse executeInvokersResponse = dynamicExecutionService.executeDynamicExecution(exportDynamicExecution, securityContextBase);
+    public FileResource exportDynamicExecutionResultToCSV(ExportDynamicExecution exportDynamicExecution, SecurityContext SecurityContext) {
+        ExecuteInvokersResponse executeInvokersResponse = dynamicExecutionService.executeDynamicExecution(exportDynamicExecution, SecurityContext);
         Map<String, FieldProperties> fieldToName = exportDynamicExecution.getFieldToName();
         CSVFormat csvFormat = exportDynamicExecution.getCsvFormat();
 
-        return invokerResponseToCSV(securityContextBase, executeInvokersResponse, fieldToName, csvFormat);
+        return invokerResponseToCSV(SecurityContext, executeInvokersResponse, fieldToName, csvFormat);
 
 
     }
 
-    public FileResource exportDynamicInvokerToCSV(ExportDynamicInvoker exportDynamicExecution, SecurityContextBase securityContextBase) {
-        ExecuteInvokersResponse executeInvokersResponse = dynamicInvokerService.executeInvoker(exportDynamicExecution, securityContextBase);
+    public FileResource exportDynamicInvokerToCSV(ExportDynamicInvoker exportDynamicExecution, SecurityContext SecurityContext) {
+        ExecuteInvokersResponse executeInvokersResponse = dynamicInvokerService.executeInvoker(exportDynamicExecution, SecurityContext);
         Map<String, FieldProperties> fieldToName = exportDynamicExecution.getFieldProperties();
         CSVFormat csvFormat = exportDynamicExecution.getCsvFormat();
 
-        return invokerResponseToCSV(securityContextBase, executeInvokersResponse, fieldToName, csvFormat);
+        return invokerResponseToCSV(SecurityContext, executeInvokersResponse, fieldToName, csvFormat);
 
 
     }
 
-    private FileResource invokerResponseToCSV(SecurityContextBase securityContextBase, ExecuteInvokersResponse executeInvokersResponse, Map<String, FieldProperties> fieldToName, CSVFormat csvFormat) {
-        File file = new File(fileResourceService.generateNewPathForFileResource("dynamic-execution-csv", securityContextBase.getUser()) + ".csv");
+    private FileResource invokerResponseToCSV(SecurityContext SecurityContext, ExecuteInvokersResponse executeInvokersResponse, Map<String, FieldProperties> fieldToName, CSVFormat csvFormat) {
+        File file = new File(fileResourceService.generateNewPathForFileResource("dynamic-execution-csv", SecurityContext.getUser()) + ".csv");
         String[] headersArr = fieldToName.values().stream().sorted(Comparator.comparing(FieldProperties::getOrdinal)).map(FieldProperties::getName).toArray(String[]::new);
 
         boolean writeBom = CSVFormat.EXCEL.equals(csvFormat);
@@ -126,7 +126,7 @@ public class DynamicInvokerExportService implements Plugin {
                 .setFullPath(file.getAbsolutePath())
                 .setMd5(md5Service.generateMD5(file))
                 .setName(file.getName());
-        FileResource fileResource = fileResourceService.createFileResourceNoMerge(fileResourceCreate, securityContextBase);
+        FileResource fileResource = fileResourceService.createFileResourceNoMerge(fileResourceCreate, SecurityContext);
         fileResource.setKeepUntil(OffsetDateTime.now().plusMinutes(30));
         fileResourceService.merge(fileResource);
         return fileResource;
@@ -234,8 +234,8 @@ public class DynamicInvokerExportService implements Plugin {
     }
 
 
-    public void validateExportDynamicExecution(ExportDynamicExecution exportDynamicExecution, SecurityContextBase securityContextBase) {
-        dynamicExecutionService.validate(exportDynamicExecution, securityContextBase);
+    public void validateExportDynamicExecution(ExportDynamicExecution exportDynamicExecution, SecurityContext SecurityContext) {
+        dynamicExecutionService.validate(exportDynamicExecution, SecurityContext);
         if (exportDynamicExecution.getFieldToName() == null || exportDynamicExecution.getFieldToName().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Field to name map must be non null and not empty");
         }
@@ -244,7 +244,7 @@ public class DynamicInvokerExportService implements Plugin {
         }
     }
 
-    public void validateExportDynamicInvoker(ExportDynamicInvoker exportDynamicInvoker, SecurityContextBase securityContextBase) {
+    public void validateExportDynamicInvoker(ExportDynamicInvoker exportDynamicInvoker, SecurityContext SecurityContext) {
         if (exportDynamicInvoker.getFieldProperties() == null || exportDynamicInvoker.getFieldProperties().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"fieldProperties map must be non null and not empty");
         }
@@ -254,8 +254,8 @@ public class DynamicInvokerExportService implements Plugin {
     }
 
 
-    public void validate(DynamicExecutionExampleRequest dynamicExecutionExampleRequest, SecurityContextBase securityContextBase) {
-        dynamicExecutionService.validate(dynamicExecutionExampleRequest, securityContextBase);
+    public void validate(DynamicExecutionExampleRequest dynamicExecutionExampleRequest, SecurityContext SecurityContext) {
+        dynamicExecutionService.validate(dynamicExecutionExampleRequest, SecurityContext);
 
     }
 }

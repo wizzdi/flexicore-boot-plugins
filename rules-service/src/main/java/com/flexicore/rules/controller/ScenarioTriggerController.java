@@ -7,7 +7,7 @@ import com.flexicore.rules.request.ScenarioTriggerCreate;
 import com.flexicore.rules.request.ScenarioTriggerFilter;
 import com.flexicore.rules.request.ScenarioTriggerUpdate;
 import com.flexicore.rules.service.ScenarioTriggerService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScenarioTriggerController implements Plugin {
   public ScenarioTrigger createScenarioTrigger(
       
       @RequestBody ScenarioTriggerCreate scenarioTriggerCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioTriggerService.validate(scenarioTriggerCreate, securityContext);
     return scenarioTriggerService.createScenarioTrigger(scenarioTriggerCreate, securityContext);
@@ -43,7 +43,7 @@ public class ScenarioTriggerController implements Plugin {
   public PaginationResponse<ScenarioTrigger> getAllScenarioTriggers(
       
       @RequestBody ScenarioTriggerFilter scenarioTriggerFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     scenarioTriggerService.validate(scenarioTriggerFilter, securityContext);
     return scenarioTriggerService.getAllScenarioTriggers(scenarioTriggerFilter, securityContext);
@@ -54,12 +54,12 @@ public class ScenarioTriggerController implements Plugin {
   public ScenarioTrigger updateScenarioTrigger(
       
       @RequestBody ScenarioTriggerUpdate scenarioTriggerUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     String scenarioTriggerId = scenarioTriggerUpdate.getId();
     ScenarioTrigger scenarioTrigger =
         scenarioTriggerService.getByIdOrNull(
-            scenarioTriggerId, ScenarioTrigger.class, ScenarioTrigger_.security, securityContext);
+            scenarioTriggerId, ScenarioTrigger.class,  securityContext);
     if (scenarioTrigger == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No ScenarioTrigger with id " + scenarioTriggerId);

@@ -6,7 +6,7 @@ import com.wizzdi.alerts.request.AlertFilter;
 import com.wizzdi.alerts.request.AlertUpdate;
 import com.wizzdi.alerts.service.AlertService;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class AlertController implements Plugin {
   @Operation(summary = "createAlert", description = "Creates Alert")
   public Alert createAlert(
       @Validated(Create.class) @RequestBody AlertCreate alertCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return alertService.createAlert(alertCreate, securityContext);
   }
@@ -41,7 +41,7 @@ public class AlertController implements Plugin {
   @Operation(summary = "getAllAlerts", description = "lists Alerts")
   public PaginationResponse<Alert> getAllAlerts(
       @Valid @RequestBody AlertFilter alertFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return alertService.getAllAlerts(alertFilter, securityContext);
   }
@@ -50,7 +50,7 @@ public class AlertController implements Plugin {
   @Operation(summary = "updateAlert", description = "Updates Alert")
   public Alert updateAlert(
       @Validated(Update.class) @RequestBody AlertUpdate alertUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return alertService.updateAlert(alertUpdate, securityContext);
   }

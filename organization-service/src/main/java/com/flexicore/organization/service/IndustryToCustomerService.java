@@ -13,7 +13,7 @@ import com.flexicore.organization.model.IndustryToCustomer;
 import com.flexicore.organization.request.IndustryToCustomerCreate;
 import com.flexicore.organization.request.IndustryToCustomerFiltering;
 import com.flexicore.organization.request.IndustryToCustomerUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -43,19 +43,18 @@ public class IndustryToCustomerService implements Plugin {
 
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
-		return repository.listByIds(c, ids, securityContext);
-	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return repository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return repository.listByIds(c, ids, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return repository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -82,33 +81,33 @@ public class IndustryToCustomerService implements Plugin {
 	}
 
 	public void validateFiltering(IndustryToCustomerFiltering filtering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(filtering, securityContext);
 		Set<String> customerIds = filtering.getCustomerIds();
-		Map<String, Customer> customers = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds, Customer_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+		Map<String, Customer> customers = customerIds.isEmpty() ? new HashMap<>() : listByIds(Customer.class, customerIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
 		customerIds.removeAll(customers.keySet());
 		if (!customerIds.isEmpty()) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Organization with ids " + customerIds);
 		}
 		filtering.setCustomers(new ArrayList<>(customers.values()));
 	}
 
-	public PaginationResponse<IndustryToCustomer> getAllIndustryToCustomers(SecurityContextBase securityContext, IndustryToCustomerFiltering filtering) {
+	public PaginationResponse<IndustryToCustomer> getAllIndustryToCustomers(SecurityContext securityContext, IndustryToCustomerFiltering filtering) {
 		List<IndustryToCustomer> list = repository.getAllIndustryToCustomers(securityContext, filtering);
 		long count = repository.countAllIndustryToCustomers(securityContext, filtering);
 		return new PaginationResponse<>(list, filtering, count);
 	}
 
 	public IndustryToCustomer createIndustryToCustomer(IndustryToCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndustryToCustomer industryToCustomer = createIndustryToCustomerNoMerge(creationContainer, securityContext);
 		repository.merge(industryToCustomer);
 		return industryToCustomer;
 	}
 
 	public IndustryToCustomer createIndustryToCustomerNoMerge(IndustryToCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndustryToCustomer industryToCustomer = new IndustryToCustomer();
-		industryToCustomer.setId(Baseclass.getBase64ID());
+		industryToCustomer.setId(UUID.randomUUID().toString());
 		updateIndustryToCustomerNoMerge(industryToCustomer, creationContainer);
 		BaseclassService.createSecurityObjectNoMerge(industryToCustomer, securityContext);
 
@@ -132,7 +131,7 @@ public class IndustryToCustomerService implements Plugin {
 	}
 
 	public IndustryToCustomer updateIndustryToCustomer(IndustryToCustomerUpdate updateContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		IndustryToCustomer industryToCustomer = updateContainer.getIndustryToCustomer();
 		if (updateIndustryToCustomerNoMerge(industryToCustomer, updateContainer)) {
 			repository.merge(industryToCustomer);
@@ -141,17 +140,17 @@ public class IndustryToCustomerService implements Plugin {
 	}
 
 	public void validate(IndustryToCustomerCreate creationContainer,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		basicService.validate(creationContainer, securityContext);
 		String customerId = creationContainer.getCustomerId();
-		Customer customer = customerId == null ? null : getByIdOrNull(customerId, Customer.class, null, securityContext);
+		Customer customer = customerId == null ? null : getByIdOrNull(customerId, Customer.class,  securityContext);
 		if (customer == null && customerId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Customer with id " + customerId);
 		}
 		creationContainer.setCustomer(customer);
 
 		String industryId = creationContainer.getIndustryId();
-		Industry industry = industryId == null ? null : getByIdOrNull(industryId, Industry.class, null, securityContext);
+		Industry industry = industryId == null ? null : getByIdOrNull(industryId, Industry.class,  securityContext);
 		if (industry == null && industryId != null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No Industry with id " + industryId);
 		}

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.Form;
 import com.flexicore.ui.request.FormCopy;
 import com.flexicore.ui.request.FormCreate;
@@ -52,7 +52,7 @@ public class FormController implements Plugin {
 	public PaginationResponse<Form> getAllForms(
 			 @RequestBody
 			FormFiltering formFiltering,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		return service.getAllForms(formFiltering, securityContext);
 
 	}
@@ -63,8 +63,8 @@ public class FormController implements Plugin {
 	@PutMapping("updateForm")
 	public Form updateForm(
 			
-			@RequestBody FormUpdate updateForm, @RequestAttribute SecurityContextBase securityContext) {
-		Form form = updateForm.getId() != null ? service.getByIdOrNull(updateForm.getId(), Form.class, Form_.security, securityContext) : null;
+			@RequestBody FormUpdate updateForm, @RequestAttribute SecurityContext securityContext) {
+		Form form = updateForm.getId() != null ? service.getByIdOrNull(updateForm.getId(), Form.class,securityContext) : null;
 		if (form == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Form with id  " + updateForm.getId());
 		}
@@ -81,7 +81,7 @@ public class FormController implements Plugin {
 	@PostMapping("createForm")
 	public Form createForm(
 			 @RequestBody
-			FormCreate createForm, @RequestAttribute SecurityContextBase securityContext) {
+			FormCreate createForm, @RequestAttribute SecurityContext securityContext) {
 		service.validate(createForm, securityContext);
 		return service.createForm(createForm, securityContext);
 
@@ -93,7 +93,7 @@ public class FormController implements Plugin {
 	@PostMapping("copyForm")
 	public Form copyForm(
 			 @RequestBody
-			FormCopy formCopy, @RequestAttribute SecurityContextBase securityContext) {
+			FormCopy formCopy, @RequestAttribute SecurityContext securityContext) {
 		service.validate(formCopy, securityContext);
 		return service.copyForm(formCopy, securityContext);
 

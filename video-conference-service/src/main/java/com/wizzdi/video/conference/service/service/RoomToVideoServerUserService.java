@@ -2,8 +2,8 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -46,7 +46,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public RoomToVideoServerUser createRoomToVideoServerUser(
       RoomToVideoServerUserCreate roomToVideoServerUserCreate,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     RoomToVideoServerUser roomToVideoServerUser =
         createRoomToVideoServerUserNoMerge(roomToVideoServerUserCreate, securityContext);
     repository.merge(roomToVideoServerUser);
@@ -61,7 +61,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public RoomToVideoServerUser createRoomToVideoServerUserNoMerge(
       RoomToVideoServerUserCreate roomToVideoServerUserCreate,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     RoomToVideoServerUser roomToVideoServerUser = new RoomToVideoServerUser();
     roomToVideoServerUser.setId(UUID.randomUUID().toString());
     updateRoomToVideoServerUserNoMerge(roomToVideoServerUserCreate, roomToVideoServerUser);
@@ -119,7 +119,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public RoomToVideoServerUser updateRoomToVideoServerUser(
       RoomToVideoServerUserUpdate roomToVideoServerUserUpdate,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     RoomToVideoServerUser roomToVideoServerUser =
         roomToVideoServerUserUpdate.getRoomToVideoServerUser();
     if (updateRoomToVideoServerUserNoMerge(roomToVideoServerUserUpdate, roomToVideoServerUser)) {
@@ -136,7 +136,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public PaginationResponse<RoomToVideoServerUser> getAllRoomToVideoServerUsers(
       RoomToVideoServerUserFilter roomToVideoServerUserFilter,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     List<RoomToVideoServerUser> list =
         listAllRoomToVideoServerUsers(roomToVideoServerUserFilter, securityContext);
     long count =
@@ -152,7 +152,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public List<RoomToVideoServerUser> listAllRoomToVideoServerUsers(
       RoomToVideoServerUserFilter roomToVideoServerUserFilter,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listAllRoomToVideoServerUsers(roomToVideoServerUserFilter, securityContext);
   }
 
@@ -164,7 +164,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public void validate(
       RoomToVideoServerUserFilter roomToVideoServerUserFilter,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     basicService.validate(roomToVideoServerUserFilter, securityContext);
 
     Set<String> videoServerUserIds =
@@ -178,7 +178,6 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
                 .listByIds(
                     VideoServerUser.class,
                     videoServerUserIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -196,7 +195,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
         roomIds.isEmpty()
             ? new HashMap<>()
             : repository
-                .listByIds(Room.class, roomIds, SecuredBasic_.security, securityContext)
+                .listByIds(Room.class, roomIds,securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     roomIds.removeAll(room.keySet());
@@ -214,7 +213,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
   @Override
   public void validate(
       RoomToVideoServerUserCreate roomToVideoServerUserCreate,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     basicService.validate(roomToVideoServerUserCreate, securityContext);
 
     String videoServerUserId = roomToVideoServerUserCreate.getVideoServerUserId();
@@ -222,7 +221,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
         videoServerUserId == null
             ? null
             : repository.getByIdOrNull(
-                videoServerUserId, VideoServerUser.class, SecuredBasic_.security, securityContext);
+                videoServerUserId, VideoServerUser.class,  securityContext);
     if (videoServerUserId != null && videoServerUser == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No VideoServerUser with id " + videoServerUserId);
@@ -233,7 +232,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
     Room room =
         roomId == null
             ? null
-            : repository.getByIdOrNull(roomId, Room.class, SecuredBasic_.security, securityContext);
+            : repository.getByIdOrNull(roomId, Room.class,securityContext);
     if (roomId != null && room == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with id " + roomId);
     }
@@ -242,13 +241,13 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
 
   @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
   @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -257,7 +256,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -266,7 +265,7 @@ public class RoomToVideoServerUserService implements Plugin, IRoomToVideoServerU
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

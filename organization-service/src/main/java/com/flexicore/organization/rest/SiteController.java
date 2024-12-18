@@ -13,7 +13,7 @@ import com.flexicore.organization.request.SiteCreate;
 import com.flexicore.organization.request.SiteFiltering;
 import com.flexicore.organization.request.SiteUpdate;
 import com.flexicore.organization.service.SiteService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -43,7 +43,7 @@ public class SiteController implements Plugin {
 	@PostMapping("/getAllSites")
 	public PaginationResponse<Site> getAllSites(
 
-			@RequestBody SiteFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody SiteFiltering filtering, @RequestAttribute SecurityContext securityContext) {
 		service.validateFiltering(filtering, securityContext);
 		return service.getAllSites(securityContext, filtering);
 	}
@@ -55,7 +55,7 @@ public class SiteController implements Plugin {
 	public Site createSite(
 
 			@RequestBody SiteCreate creationContainer,
-			@RequestAttribute SecurityContextBase securityContext) {
+			@RequestAttribute SecurityContext securityContext) {
 		service.validate(creationContainer, securityContext);
 
 		return service.createSite(creationContainer, securityContext);
@@ -67,9 +67,9 @@ public class SiteController implements Plugin {
 	@IOperation(Name = "updateSite", Description = "Updates Site")
 	public Site updateSite(
 
-			@RequestBody SiteUpdate updateContainer, @RequestAttribute SecurityContextBase securityContext) {
+			@RequestBody SiteUpdate updateContainer, @RequestAttribute SecurityContext securityContext) {
 		service.validate(updateContainer, securityContext);
-		Site site = service.getByIdOrNull(updateContainer.getId(), Site.class, Site_.security, securityContext);
+		Site site = service.getByIdOrNull(updateContainer.getId(), Site.class,securityContext);
 		if (site == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Site with id "
 					+ updateContainer.getId());

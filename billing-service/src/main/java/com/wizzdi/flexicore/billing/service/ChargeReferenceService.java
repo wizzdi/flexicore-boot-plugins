@@ -7,7 +7,7 @@ import com.wizzdi.flexicore.billing.request.ChargeReferenceFiltering;
 import com.wizzdi.flexicore.billing.request.ChargeReferenceUpdate;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.billing.ChargeReference;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -33,19 +34,19 @@ public class ChargeReferenceService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -72,34 +73,34 @@ public class ChargeReferenceService implements Plugin {
     }
 
     public void validateFiltering(ChargeReferenceFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
 
 
     }
 
     public PaginationResponse<ChargeReference> getAllChargeReferences(
-            SecurityContextBase securityContext, ChargeReferenceFiltering filtering) {
+            SecurityContext securityContext, ChargeReferenceFiltering filtering) {
         List<ChargeReference> list = listAllChargeReferences(securityContext, filtering);
         long count = repository.countAllChargeReferences(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<ChargeReference> listAllChargeReferences(SecurityContextBase securityContext, ChargeReferenceFiltering filtering) {
+    public List<ChargeReference> listAllChargeReferences(SecurityContext securityContext, ChargeReferenceFiltering filtering) {
         return repository.getAllChargeReferences(securityContext, filtering);
     }
 
     public ChargeReference createChargeReference(ChargeReferenceCreate chargeReferenceCreate,
-                               SecurityContextBase securityContext) {
+                               SecurityContext securityContext) {
         ChargeReference chargeReference = createChargeReferenceNoMerge(chargeReferenceCreate, securityContext);
         repository.merge(chargeReference);
         return chargeReference;
     }
 
     public ChargeReference createChargeReferenceNoMerge(ChargeReferenceCreate chargeReferenceCreate,
-                                      SecurityContextBase securityContext) {
+                                      SecurityContext securityContext) {
         ChargeReference chargeReference = new ChargeReference();
-        chargeReference.setId(Baseclass.getBase64ID());
+        chargeReference.setId(UUID.randomUUID().toString());
 
         updateChargeReferenceNoMerge(chargeReference, chargeReferenceCreate);
         BaseclassService.createSecurityObjectNoMerge(chargeReference, securityContext);
@@ -120,7 +121,7 @@ public class ChargeReferenceService implements Plugin {
     }
 
     public ChargeReference updateChargeReference(ChargeReferenceUpdate chargeReferenceUpdate,
-                                                 SecurityContextBase securityContext) {
+                                                 SecurityContext securityContext) {
         ChargeReference chargeReference = chargeReferenceUpdate.getChargeReferenceObject();
         if (updateChargeReferenceNoMerge(chargeReference, chargeReferenceUpdate)) {
             repository.merge(chargeReference);
@@ -128,7 +129,7 @@ public class ChargeReferenceService implements Plugin {
         return chargeReference;
     }
 
-    public void validate(ChargeReferenceCreate chargeReferenceCreate, SecurityContextBase securityContext) {
+    public void validate(ChargeReferenceCreate chargeReferenceCreate, SecurityContext securityContext) {
         basicService.validate(chargeReferenceCreate, securityContext);
 
 

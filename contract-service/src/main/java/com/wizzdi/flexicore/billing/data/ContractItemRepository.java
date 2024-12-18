@@ -12,7 +12,7 @@ import com.wizzdi.flexicore.security.data.BasicRepository;
 
 import jakarta.persistence.TypedQuery;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +39,7 @@ public class ContractItemRepository implements Plugin {
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
 
-    public List<ContractItem> getAllContractItems(SecurityContextBase securityContext,
+    public List<ContractItem> getAllContractItems(SecurityContext securityContext,
                                                   ContractItemFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<ContractItem> q = cb.createQuery(ContractItem.class);
@@ -52,7 +52,7 @@ public class ContractItemRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllContractItems(SecurityContextBase securityContext,
+    public long countAllContractItems(SecurityContext securityContext,
                                      ContractItemFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -65,7 +65,7 @@ public class ContractItemRepository implements Plugin {
     }
 
     public <T extends ContractItem> void addContractItemPredicates(ContractItemFiltering filtering,
-                                                                 CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                                 CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
 
@@ -84,19 +84,19 @@ public class ContractItemRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

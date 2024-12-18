@@ -1,6 +1,6 @@
 package com.wizzdi.maps.service.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
@@ -37,8 +37,8 @@ public class StatusHistoryCreator implements Plugin {
 
     @Transactional(propagation = REQUIRES_NEW)
     public StatusHistory createStatusHistory(MappedPOI mappedPOI) {
-        SecurityContextBase securityContext = securityContextProvider.getSecurityContext(mappedPOI.getSecurity().getCreator());
-        securityContext.setTenantToCreateIn(mappedPOI.getSecurity().getTenant());
+        SecurityContext securityContext = securityContextProvider.getSecurityContext(mappedPOI.getCreator());
+        securityContext.setTenantToCreateIn(mappedPOI.getTenant());
         OffsetDateTime now = OffsetDateTime.now();
         String name = mappedPOI.getName() + " status change to " + (mappedPOI.getMapIcon()!=null?mappedPOI.getMapIcon().getName():"null") + " at " + now;
         StatusHistoryCreate statusHistoryCreate = new StatusHistoryCreate()

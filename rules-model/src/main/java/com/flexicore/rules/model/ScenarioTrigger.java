@@ -1,7 +1,7 @@
 package com.flexicore.rules.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.file.model.FileResource;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class ScenarioTrigger extends SecuredBasic {
+public class ScenarioTrigger extends Baseclass {
 
   private String lastEventId;
 

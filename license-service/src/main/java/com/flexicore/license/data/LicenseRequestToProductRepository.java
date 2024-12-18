@@ -4,7 +4,7 @@ import com.flexicore.license.model.LicenseRequestToProduct;
 import com.flexicore.license.request.LicenseRequestToProductFiltering;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class LicenseRequestToProductRepository implements Plugin {
 	private LicenseRequestToEntityRepository licenseRequestToEntityRepository;
 
 
-	public List<LicenseRequestToProduct> listAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContextBase securityContext) {
+	public List<LicenseRequestToProduct> listAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<LicenseRequestToProduct> q = cb.createQuery(LicenseRequestToProduct.class);
 		Root<LicenseRequestToProduct> r = q.from(LicenseRequestToProduct.class);
@@ -44,11 +44,11 @@ public class LicenseRequestToProductRepository implements Plugin {
 		return query.getResultList();
 	}
 
-	public <T extends LicenseRequestToProduct> void addLicenseRequestToProductsPredicates(LicenseRequestToProductFiltering licenseRequestToProductFiltering, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+	public <T extends LicenseRequestToProduct> void addLicenseRequestToProductsPredicates(LicenseRequestToProductFiltering licenseRequestToProductFiltering, CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
 		licenseRequestToEntityRepository.addLicenseRequestToEntitiesPredicates(licenseRequestToProductFiltering, cb, q, r, preds, securityContext);
 	}
 
-	public long countAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContextBase securityContext) {
+	public long countAllLicenseRequestToProducts(LicenseRequestToProductFiltering licenseRequestToProductFiltering, SecurityContext securityContext) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<LicenseRequestToProduct> r = q.from(LicenseRequestToProduct.class);
@@ -59,19 +59,19 @@ public class LicenseRequestToProductRepository implements Plugin {
 		return query.getSingleResult();
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return licenseRequestToEntityRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return licenseRequestToEntityRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return licenseRequestToEntityRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return licenseRequestToEntityRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

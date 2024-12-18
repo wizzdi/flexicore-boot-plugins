@@ -2,7 +2,7 @@ package com.wizzdi.video.conference.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -49,7 +49,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
   @Value("${video.jitsi.jwt.emailDomain:jitsi.com}")
   private String domain;
 
-  public VideoServerUser getVideoServerUser(SecurityContextBase securityContext) {
+  public VideoServerUser getVideoServerUser(SecurityContext securityContext) {
     return videoUserProviders.stream().filter(f -> f.getType().isAssignableFrom(securityContext.getUser().getClass())).findFirst().map(f -> f.getVideoServerUser(securityContext)).orElse(null);
   }
 
@@ -60,7 +60,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public VideoServerUser createVideoServerUser(
-      VideoServerUserCreate videoServerUserCreate, SecurityContextBase securityContext) {
+      VideoServerUserCreate videoServerUserCreate, SecurityContext securityContext) {
     VideoServerUser videoServerUser =
         createVideoServerUserNoMerge(videoServerUserCreate, securityContext);
     repository.merge(videoServerUser);
@@ -74,7 +74,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public VideoServerUser createVideoServerUserNoMerge(
-      VideoServerUserCreate videoServerUserCreate, SecurityContextBase securityContext) {
+      VideoServerUserCreate videoServerUserCreate, SecurityContext securityContext) {
     VideoServerUser videoServerUser = new VideoServerUser();
     videoServerUser.setId(UUID.randomUUID().toString());
     updateVideoServerUserNoMerge(videoServerUserCreate, videoServerUser);
@@ -103,7 +103,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public VideoServerUser updateVideoServerUser(
-      VideoServerUserUpdate videoServerUserUpdate, SecurityContextBase securityContext) {
+      VideoServerUserUpdate videoServerUserUpdate, SecurityContext securityContext) {
     VideoServerUser videoServerUser = videoServerUserUpdate.getVideoServerUser();
     if (updateVideoServerUserNoMerge(videoServerUserUpdate, videoServerUser)) {
       repository.merge(videoServerUser);
@@ -118,7 +118,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public PaginationResponse<VideoServerUser> getAllVideoServerUsers(
-      VideoServerUserFilter videoServerUserFilter, SecurityContextBase securityContext) {
+      VideoServerUserFilter videoServerUserFilter, SecurityContext securityContext) {
     List<VideoServerUser> list = listAllVideoServerUsers(videoServerUserFilter, securityContext);
     long count = repository.countAllVideoServerUsers(videoServerUserFilter, securityContext);
     return new PaginationResponse<>(list, videoServerUserFilter, count);
@@ -131,7 +131,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public List<VideoServerUser> listAllVideoServerUsers(
-      VideoServerUserFilter videoServerUserFilter, SecurityContextBase securityContext) {
+      VideoServerUserFilter videoServerUserFilter, SecurityContext securityContext) {
     return repository.listAllVideoServerUsers(videoServerUserFilter, securityContext);
   }
 
@@ -142,7 +142,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public void validate(
-      VideoServerUserFilter videoServerUserFilter, SecurityContextBase securityContext) {
+      VideoServerUserFilter videoServerUserFilter, SecurityContext securityContext) {
     basicService.validate(videoServerUserFilter, securityContext);
   }
 
@@ -153,19 +153,19 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
    */
   @Override
   public void validate(
-      VideoServerUserCreate videoServerUserCreate, SecurityContextBase securityContext) {
+      VideoServerUserCreate videoServerUserCreate, SecurityContext securityContext) {
     basicService.validate(videoServerUserCreate, securityContext);
   }
 
   @Override
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return repository.listByIds(c, ids, securityContext);
   }
 
   @Override
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -174,7 +174,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -183,7 +183,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
@@ -213,7 +213,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
     repository.massMerge(toMerge);
   }
 
-  public JitsiTokenResponse getJitsiToken(JitsiTokenRequest jitsiTokenRequest,SecurityContextBase securityContext) {
+  public JitsiTokenResponse getJitsiToken(JitsiTokenRequest jitsiTokenRequest,SecurityContext securityContext) {
     String roomId = jitsiTokenRequest.getRoom().getId();
     OffsetDateTime expirationDate=OffsetDateTime.now().plusMinutes(expMin);
     String token = Jwts.builder()
@@ -235,7 +235,7 @@ public class VideoServerUserService implements Plugin, IVideoServerUserService {
             .setName(videoServerUser.getName());
   }
 
-  public void validate(JitsiTokenRequest jitsiTokenRequest, SecurityContextBase securityContext) {
+  public void validate(JitsiTokenRequest jitsiTokenRequest, SecurityContext securityContext) {
 
     VideoServerUser videoServerUser = getVideoServerUser(securityContext);
     if(videoServerUser==null){

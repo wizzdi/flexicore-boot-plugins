@@ -5,7 +5,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.TableColumnRepository;
 import com.flexicore.ui.model.TableColumn;
 import com.flexicore.ui.request.TableColumnCreate;
@@ -42,7 +42,7 @@ public class TableColumnService implements Plugin {
 	private UiFieldService uiFieldService;
 
 	public TableColumn TableColumnUpdate(TableColumnUpdate TableColumnUpdate,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		if (TableColumnUpdateNoMerge(TableColumnUpdate, TableColumnUpdate.getTableColumn())) {
 			tableColumnRepository.merge(TableColumnUpdate.getTableColumn());
 		}
@@ -73,13 +73,13 @@ public class TableColumnService implements Plugin {
 
 	public List<TableColumn> listAllTableColumns(
 			TableColumnFiltering tableColumnFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		return tableColumnRepository.listAllTableColumns(tableColumnFiltering,
 				securityContext);
 	}
 
 	public TableColumn createTableColumn(TableColumnCreate createTableColumn,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		TableColumn tableColumn = createTableColumnNoMerge(createTableColumn,
 				securityContext);
 		tableColumnRepository.merge(tableColumn);
@@ -88,7 +88,7 @@ public class TableColumnService implements Plugin {
 	}
 
 	public TableColumn createTableColumnNoMerge(
-			TableColumnCreate createTableColumn, SecurityContextBase securityContext) {
+			TableColumnCreate createTableColumn, SecurityContext securityContext) {
 		TableColumn tableColumn = new TableColumn();
 		tableColumn.setId(UUID.randomUUID().toString());
 		TableColumnUpdateNoMerge(createTableColumn, tableColumn);
@@ -98,17 +98,17 @@ public class TableColumnService implements Plugin {
 
 	public PaginationResponse<TableColumn> getAllTableColumns(
 			TableColumnFiltering tableColumnFiltering,
-			SecurityContextBase securityContext) {
+			SecurityContext securityContext) {
 		List<TableColumn> list = listAllTableColumns(tableColumnFiltering, securityContext);
 		long count = tableColumnRepository.countAllTableColumns(tableColumnFiltering, securityContext);
 		return new PaginationResponse<>(list, tableColumnFiltering, count);
 	}
 
-	public void validate(TableColumnCreate createTableColumn, SecurityContextBase securityContext) {
+	public void validate(TableColumnCreate createTableColumn, SecurityContext securityContext) {
 		uiFieldService.validate(createTableColumn, securityContext);
 	}
 
-	public void validate(TableColumnFiltering tableColumnFiltering, SecurityContextBase securityContext) {
+	public void validate(TableColumnFiltering tableColumnFiltering, SecurityContext securityContext) {
 		uiFieldService.validate(tableColumnFiltering, securityContext);
 	}
 
@@ -127,19 +127,19 @@ public class TableColumnService implements Plugin {
 	}
 
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return tableColumnRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return tableColumnRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return tableColumnRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return tableColumnRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 
@@ -165,7 +165,7 @@ public class TableColumnService implements Plugin {
 		tableColumnRepository.massMerge(toMerge);
 	}
 
-	public void validateCreate(TableColumnCreate createTableColumn, SecurityContextBase securityContext) {
+	public void validateCreate(TableColumnCreate createTableColumn, SecurityContext securityContext) {
 		uiFieldService.validateCreate(createTableColumn,securityContext);
 	}
 }

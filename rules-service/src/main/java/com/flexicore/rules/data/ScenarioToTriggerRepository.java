@@ -5,7 +5,7 @@ import com.flexicore.model.Basic;
 import com.flexicore.model.Basic_;
 import com.flexicore.rules.model.*;
 import com.flexicore.rules.request.ScenarioToTriggerFilter;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
@@ -35,7 +35,7 @@ public class ScenarioToTriggerRepository implements Plugin {
    * @return List of ScenarioToTrigger
    */
   public List<ScenarioToTrigger> listAllScenarioToTriggers(
-          ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioToTriggerFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<ScenarioToTrigger> q = cb.createQuery(ScenarioToTrigger.class);
     Root<ScenarioToTrigger> r = q.from(ScenarioToTrigger.class);
@@ -53,7 +53,7 @@ public class ScenarioToTriggerRepository implements Plugin {
           CommonAbstractCriteria q,
           From<?, T> r,
           List<Predicate> preds,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
 
     this.securedBasicRepository.addSecuredBasicPredicates(null, cb, q, r, preds, securityContext);
 
@@ -99,7 +99,7 @@ public class ScenarioToTriggerRepository implements Plugin {
    * @return count of ScenarioToTrigger
    */
   public Long countAllScenarioToTriggers(
-          ScenarioToTriggerFilter filtering, SecurityContextBase securityContext) {
+          ScenarioToTriggerFilter filtering, SecurityContext securityContext) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
     CriteriaQuery<Long> q = cb.createQuery(Long.class);
     Root<ScenarioToTrigger> r = q.from(ScenarioToTrigger.class);
@@ -111,12 +111,12 @@ public class ScenarioToTriggerRepository implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-          Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+          Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-          String id, Class<T> c, SecurityContextBase securityContext) {
+          String id, Class<T> c, SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -124,7 +124,7 @@ public class ScenarioToTriggerRepository implements Plugin {
           String id,
           Class<T> c,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -132,7 +132,7 @@ public class ScenarioToTriggerRepository implements Plugin {
           Class<T> c,
           Set<String> ids,
           SingularAttribute<D, E> baseclassAttribute,
-          SecurityContextBase securityContext) {
+          SecurityContext securityContext) {
     return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

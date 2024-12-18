@@ -1,6 +1,6 @@
 package com.wizzdi.user.profile.app;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.file.request.FileResourceCreate;
 import com.wizzdi.flexicore.file.service.FileResourceService;
@@ -26,7 +26,7 @@ public class TestEntities {
     private MD5Service md5Service;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
     @Bean
     public FileResource avatar() throws IOException {

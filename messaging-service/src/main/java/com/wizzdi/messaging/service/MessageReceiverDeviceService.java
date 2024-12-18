@@ -2,7 +2,7 @@ package com.wizzdi.messaging.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.SoftDeleteOption;
@@ -28,6 +28,7 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -43,13 +44,13 @@ public class MessageReceiverDeviceService implements Plugin {
 	private ChatUserService chatUserService;
 
 
-	public MessageReceiverDevice createMessageReceiverDevice(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContextBase securityContext) {
+	public MessageReceiverDevice createMessageReceiverDevice(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContext securityContext) {
 		MessageReceiverDevice messageReceiverDevice = createMessageReceiverDeviceNoMerge(messageReceiverDeviceCreate, securityContext);
 		messageReceiverDeviceRepository.merge(messageReceiverDevice);
 		return messageReceiverDevice;
 	}
 
-	public MessageReceiverDevice getOrCreateMessageReceiverDevice(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContextBase securityContext){
+	public MessageReceiverDevice getOrCreateMessageReceiverDevice(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContext securityContext){
 		MessageReceiverDevice messageReceiverDevice = listAllMessageReceiverDevices(new MessageReceiverDeviceFilter().setChatUsers(Collections.singletonList(messageReceiverDeviceCreate.getOwner())).setBasicPropertiesFilter(new BasicPropertiesFilter().setSoftDelete(SoftDeleteOption.BOTH)).setExternalIds(Collections.singleton(messageReceiverDeviceCreate.getExternalId())), securityContext).stream().findFirst().orElse(null);
 		if(messageReceiverDevice==null){
 			messageReceiverDevice=createMessageReceiverDevice(messageReceiverDeviceCreate, securityContext);
@@ -64,9 +65,9 @@ public class MessageReceiverDeviceService implements Plugin {
 	}
 
 
-	public MessageReceiverDevice createMessageReceiverDeviceNoMerge(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContextBase securityContext) {
+	public MessageReceiverDevice createMessageReceiverDeviceNoMerge(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContext securityContext) {
 		MessageReceiverDevice messageReceiverDevice = new MessageReceiverDevice();
-		messageReceiverDevice.setId(Baseclass.getBase64ID());
+		messageReceiverDevice.setId(UUID.randomUUID().toString());
 		updateMessageReceiverDeviceNoMerge(messageReceiverDeviceCreate, messageReceiverDevice);
 		BaseclassService.createSecurityObjectNoMerge(messageReceiverDevice,securityContext);
 		return messageReceiverDevice;
@@ -85,7 +86,7 @@ public class MessageReceiverDeviceService implements Plugin {
 		return update;
 	}
 
-	public MessageReceiverDevice updateMessageReceiverDevice(MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, SecurityContextBase securityContext) {
+	public MessageReceiverDevice updateMessageReceiverDevice(MessageReceiverDeviceUpdate messageReceiverDeviceUpdate, SecurityContext securityContext) {
 		MessageReceiverDevice MessageReceiverDevice = messageReceiverDeviceUpdate.getMessageReceiverDevice();
 		if (updateMessageReceiverDeviceNoMerge(messageReceiverDeviceUpdate, MessageReceiverDevice)) {
 			messageReceiverDeviceRepository.merge(MessageReceiverDevice);
@@ -93,9 +94,9 @@ public class MessageReceiverDeviceService implements Plugin {
 		return MessageReceiverDevice;
 	}
 
-	public void validate(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContextBase securityContext) {
+	public void validate(MessageReceiverDeviceCreate messageReceiverDeviceCreate, SecurityContext securityContext) {
 		String ownerId=messageReceiverDeviceCreate.getOwnerId();
-		ChatUser owner=ownerId!=null?getByIdOrNull(ownerId,ChatUser.class, ChatUser_.security,securityContext):null;
+		ChatUser owner=ownerId!=null?getByIdOrNull(ownerId,ChatUser.class, securityContext):null;
 		if(ownerId!=null&&owner==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no owner with id "+ownerId);
 		}
@@ -110,7 +111,7 @@ public class MessageReceiverDeviceService implements Plugin {
 		}
 	}
 
-	public void validate(MessageReceiverDeviceFilter messageReceiverDeviceFilter, SecurityContextBase securityContext) {
+	public void validate(MessageReceiverDeviceFilter messageReceiverDeviceFilter, SecurityContext securityContext) {
 		basicService.validate(messageReceiverDeviceFilter, securityContext);
 
 
@@ -118,29 +119,29 @@ public class MessageReceiverDeviceService implements Plugin {
 
 
 
-	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices(MessageReceiverDeviceFilter MessageReceiverDeviceFilter, SecurityContextBase securityContext) {
+	public PaginationResponse<MessageReceiverDevice> getAllMessageReceiverDevices(MessageReceiverDeviceFilter MessageReceiverDeviceFilter, SecurityContext securityContext) {
 		List<MessageReceiverDevice> list = listAllMessageReceiverDevices(MessageReceiverDeviceFilter, securityContext);
 		long count = messageReceiverDeviceRepository.countAllMessageReceiverDevices(MessageReceiverDeviceFilter, securityContext);
 		return new PaginationResponse<>(list, MessageReceiverDeviceFilter, count);
 	}
 
-	public List<MessageReceiverDevice> listAllMessageReceiverDevices(MessageReceiverDeviceFilter MessageReceiverDeviceFilter, SecurityContextBase securityContext) {
+	public List<MessageReceiverDevice> listAllMessageReceiverDevices(MessageReceiverDeviceFilter MessageReceiverDeviceFilter, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.listAllMessageReceiverDevices(MessageReceiverDeviceFilter, securityContext);
 	}
 
-	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.listByIds(c, ids, securityContext);
 	}
 
-	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
 		return messageReceiverDeviceRepository.listByIds(c, ids, baseclassAttribute, securityContext);
 	}
 

@@ -3,7 +3,7 @@ package com.flexicore.territories.rest;
 import com.flexicore.annotations.OperationsInside;
 import com.flexicore.model.territories.Neighbourhood;
 import com.flexicore.model.territories.Neighbourhood_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.NeighbourhoodCreate;
 import com.flexicore.territories.request.NeighbourhoodFilter;
 import com.flexicore.territories.request.NeighbourhoodUpdate;
@@ -35,14 +35,14 @@ public class NeighbourhoodRESTService implements Plugin {
 	public Neighbourhood updateNeighbourhood(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody NeighbourhoodUpdate updateContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		Neighbourhood neighbourhood = service.getByIdOrNull(updateContainer.getId(), Neighbourhood.class, Neighbourhood_.security, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		Neighbourhood neighbourhood = service.getByIdOrNull(updateContainer.getId(), Neighbourhood.class,SecurityContext);
 		if (neighbourhood == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Neighbourhood with id " + updateContainer.getId());
 		}
 		updateContainer.setNeighbourhood(neighbourhood);
-		service.validate(updateContainer, securityContextBase);
-		return service.updateNeighbourhood(updateContainer, securityContextBase);
+		service.validate(updateContainer, SecurityContext);
+		return service.updateNeighbourhood(updateContainer, SecurityContext);
 	}
 
 	@Operation(description = "get all neighbourhoods",summary = "get all neighbourhoods")
@@ -51,9 +51,9 @@ public class NeighbourhoodRESTService implements Plugin {
 	public PaginationResponse<Neighbourhood> getAllNeighbourhoods(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody NeighbourhoodFilter filtering,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(filtering,securityContextBase);
-		return service.getAllNeighbourhoods(securityContextBase, filtering);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(filtering,SecurityContext);
+		return service.getAllNeighbourhoods(SecurityContext, filtering);
 	}
 
 	@Operation(description = "create neighbourhood",summary = "create neighbourhood")
@@ -62,10 +62,10 @@ public class NeighbourhoodRESTService implements Plugin {
 	public Neighbourhood createNeighbourhood(
 			
 			@RequestHeader(value = "authenticationKey",required = false) String key,@RequestBody NeighbourhoodCreate creationContainer,
-			@RequestAttribute("securityContext") SecurityContextBase securityContextBase) {
-		service.validate(creationContainer, securityContextBase);
+			@RequestAttribute("securityContext") SecurityContext SecurityContext) {
+		service.validate(creationContainer, SecurityContext);
 
-		return service.createNeighbourhood(creationContainer, securityContextBase);
+		return service.createNeighbourhood(creationContainer, SecurityContext);
 	}
 
 }

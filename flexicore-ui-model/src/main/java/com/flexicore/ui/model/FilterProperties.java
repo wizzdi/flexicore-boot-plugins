@@ -1,12 +1,12 @@
 package com.flexicore.ui.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class FilterProperties extends SecuredBasic {
+public class FilterProperties extends Baseclass {
 
     private String filterPath;
     private boolean externalize;

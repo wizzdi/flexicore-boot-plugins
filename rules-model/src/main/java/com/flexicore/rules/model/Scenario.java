@@ -1,7 +1,7 @@
 package com.flexicore.rules.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Scenario extends SecuredBasic {
+public class Scenario extends Baseclass {
 
     @ManyToOne(targetEntity = FileResource.class)
     private FileResource evaluatingJSCode;

@@ -4,7 +4,7 @@ import com.flexicore.annotations.OperationsInside;
 import com.flexicore.rules.request.ClearLogRequest;
 import com.flexicore.rules.response.FixMissingLogsResponse;
 import com.flexicore.rules.service.ScenarioLogService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +27,7 @@ public class ScenarioLogController implements Plugin {
     public void clearLog(
             
             @RequestBody ClearLogRequest scenarioCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         scenarioLogService.validate(scenarioCreate, securityContext);
         scenarioLogService.clearLog(scenarioCreate, securityContext);
     }
@@ -35,7 +35,7 @@ public class ScenarioLogController implements Plugin {
     @PostMapping("fixMissingLogFiles")
     @Operation(summary = "fixMissingLogFiles", description = "fixesMissingLogFiles")
     public FixMissingLogsResponse fixMissingLogFiles(
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         return scenarioLogService.fixMissingLogFiles(securityContext);
     }
 

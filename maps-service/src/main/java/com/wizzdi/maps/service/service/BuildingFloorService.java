@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -38,7 +38,7 @@ public class BuildingFloorService implements Plugin {
    * @return created BuildingFloor
    */
   public BuildingFloor createBuildingFloor(
-          BuildingFloorCreate buildingFloorCreate, SecurityContextBase securityContext) {
+          BuildingFloorCreate buildingFloorCreate, SecurityContext securityContext) {
     BuildingFloor buildingFloor = createBuildingFloorNoMerge(buildingFloorCreate, securityContext);
     this.repository.merge(buildingFloor);
     return buildingFloor;
@@ -50,7 +50,7 @@ public class BuildingFloorService implements Plugin {
    * @return created BuildingFloor unmerged
    */
   public BuildingFloor createBuildingFloorNoMerge(
-      BuildingFloorCreate buildingCreate, SecurityContextBase securityContext) {
+      BuildingFloorCreate buildingCreate, SecurityContext securityContext) {
     BuildingFloor building = new BuildingFloor();
     building.setId(UUID.randomUUID().toString());
     updateBuildingFloorNoMerge(building, buildingCreate);
@@ -89,7 +89,7 @@ public class BuildingFloorService implements Plugin {
    * @return building
    */
   public BuildingFloor updateBuildingFloor(
-          BuildingFloorUpdate buildingFloorUpdate, SecurityContextBase securityContext) {
+          BuildingFloorUpdate buildingFloorUpdate, SecurityContext securityContext) {
     BuildingFloor buildingFloor = buildingFloorUpdate.getBuildingFloor();
     if (updateBuildingFloorNoMerge(buildingFloor, buildingFloorUpdate)) {
       this.repository.merge(buildingFloor);
@@ -103,7 +103,7 @@ public class BuildingFloorService implements Plugin {
    * @return PaginationResponse containing paging information for BuildingFloor
    */
   public PaginationResponse<BuildingFloor> getAllBuildingFloors(
-          BuildingFloorFilter buildingFilter, SecurityContextBase securityContext) {
+          BuildingFloorFilter buildingFilter, SecurityContext securityContext) {
     List<BuildingFloor> list = listAllBuildingFloors(buildingFilter, securityContext);
     long count = this.repository.countAllBuildingFloors(buildingFilter, securityContext);
     return new PaginationResponse<>(list, buildingFilter.getPageSize(), count);
@@ -115,17 +115,17 @@ public class BuildingFloorService implements Plugin {
    * @return List of BuildingFloor
    */
   public List<BuildingFloor> listAllBuildingFloors(
-      BuildingFloorFilter buildingFloorFilter, SecurityContextBase securityContext) {
+      BuildingFloorFilter buildingFloorFilter, SecurityContext securityContext) {
     return this.repository.listAllBuildingFloors(buildingFloorFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -133,7 +133,7 @@ public class BuildingFloorService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -141,7 +141,7 @@ public class BuildingFloorService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
@@ -166,7 +166,7 @@ public class BuildingFloorService implements Plugin {
     this.repository.massMerge(toMerge);
   }
 
-  public BuildingFloor getOrCreateByExternalId(Building building, String floorId, SecurityContextBase gatewaySecurityContext) {
+  public BuildingFloor getOrCreateByExternalId(Building building, String floorId, SecurityContext gatewaySecurityContext) {
     String externalId= "%s_%s".formatted(gatewaySecurityContext.getTenantToCreateIn().getId(), floorId);
     return listAllBuildingFloors(new BuildingFloorFilter().setExternalIds(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createBuildingFloor(new BuildingFloorCreate().setBuilding(building).setExternalId(externalId).setName(floorId),gatewaySecurityContext));
   }

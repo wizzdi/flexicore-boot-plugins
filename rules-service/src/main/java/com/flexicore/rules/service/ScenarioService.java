@@ -2,13 +2,13 @@ package com.flexicore.rules.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.rules.data.ScenarioRepository;
 import com.flexicore.rules.model.Scenario;
 import com.flexicore.rules.request.ScenarioCreate;
 import com.flexicore.rules.request.ScenarioFilter;
 import com.flexicore.rules.request.ScenarioUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.file.model.FileResource;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -43,7 +43,7 @@ public class ScenarioService implements Plugin {
    * @return created Scenario
    */
   public Scenario createScenario(
-      ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
+      ScenarioCreate scenarioCreate, SecurityContext securityContext) {
     Scenario scenario = createScenarioNoMerge(scenarioCreate, securityContext);
     this.repository.merge(scenario);
     return scenario;
@@ -55,7 +55,7 @@ public class ScenarioService implements Plugin {
    * @return created Scenario unmerged
    */
   public Scenario createScenarioNoMerge(
-      ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
+      ScenarioCreate scenarioCreate, SecurityContext securityContext) {
     Scenario scenario = new Scenario();
     scenario.setId(UUID.randomUUID().toString());
     updateScenarioNoMerge(scenario, scenarioCreate);
@@ -107,7 +107,7 @@ public class ScenarioService implements Plugin {
    * @return scenario
    */
   public Scenario updateScenario(
-      ScenarioUpdate scenarioUpdate, SecurityContextBase securityContext) {
+      ScenarioUpdate scenarioUpdate, SecurityContext securityContext) {
     Scenario scenario = scenarioUpdate.getScenario();
     if (updateScenarioNoMerge(scenario, scenarioUpdate)) {
       this.repository.merge(scenario);
@@ -121,7 +121,7 @@ public class ScenarioService implements Plugin {
    * @return PaginationResponse containing paging information for Scenario
    */
   public PaginationResponse<Scenario> getAllScenarios(
-      ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
+      ScenarioFilter scenarioFilter, SecurityContext securityContext) {
     List<Scenario> list = listAllScenarios(scenarioFilter, securityContext);
     long count = this.repository.countAllScenarios(scenarioFilter, securityContext);
     return new PaginationResponse<>(list, scenarioFilter, count);
@@ -133,7 +133,7 @@ public class ScenarioService implements Plugin {
    * @return List of Scenario
    */
   public List<Scenario> listAllScenarios(
-      ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
+      ScenarioFilter scenarioFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarios(scenarioFilter, securityContext);
   }
 
@@ -142,7 +142,7 @@ public class ScenarioService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioFilter is not valid
    */
-  public void validate(ScenarioFilter scenarioFilter, SecurityContextBase securityContext) {
+  public void validate(ScenarioFilter scenarioFilter, SecurityContext securityContext) {
     basicService.validate(scenarioFilter, securityContext);
 
     Set<String> evaluatingJSCodeIds =
@@ -156,7 +156,6 @@ public class ScenarioService implements Plugin {
                 .listByIds(
                     FileResource.class,
                     evaluatingJSCodeIds,
-                    SecuredBasic_.security,
                     securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
@@ -175,7 +174,7 @@ public class ScenarioService implements Plugin {
             ? new HashMap<>()
             : this.repository
                 .listByIds(
-                    FileResource.class, logFileResourceIds, SecuredBasic_.security, securityContext)
+                    FileResource.class, logFileResourceIds,  securityContext)
                 .parallelStream()
                 .collect(Collectors.toMap(f -> f.getId(), f -> f));
     logFileResourceIds.removeAll(logFileResource.keySet());
@@ -191,7 +190,7 @@ public class ScenarioService implements Plugin {
    * @param securityContext
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioCreate is not valid
    */
-  public void validate(ScenarioCreate scenarioCreate, SecurityContextBase securityContext) {
+  public void validate(ScenarioCreate scenarioCreate, SecurityContext securityContext) {
     basicService.validate(scenarioCreate, securityContext);
 
     String evaluatingJSCodeId = scenarioCreate.getEvaluatingJSCodeId();
@@ -199,7 +198,7 @@ public class ScenarioService implements Plugin {
         evaluatingJSCodeId == null
             ? null
             : this.repository.getByIdOrNull(
-                evaluatingJSCodeId, FileResource.class, SecuredBasic_.security, securityContext);
+                evaluatingJSCodeId, FileResource.class,  securityContext);
     if (evaluatingJSCodeId != null && evaluatingJSCode == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No FileResource with id " + evaluatingJSCodeId);
@@ -211,7 +210,7 @@ public class ScenarioService implements Plugin {
         logFileResourceId == null
             ? null
             : this.repository.getByIdOrNull(
-                logFileResourceId, FileResource.class, SecuredBasic_.security, securityContext);
+                logFileResourceId, FileResource.class,  securityContext);
     if (logFileResourceId != null && logFileResource == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No FileResource with id " + logFileResourceId);
@@ -220,12 +219,12 @@ public class ScenarioService implements Plugin {
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -233,7 +232,7 @@ public class ScenarioService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -241,7 +240,7 @@ public class ScenarioService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

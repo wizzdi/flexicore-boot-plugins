@@ -1,7 +1,7 @@
 package com.wizzdi.maps.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.file.model.FileResource;
 
 import jakarta.persistence.*;
@@ -12,7 +12,7 @@ import java.util.List;
 @Table(indexes = {
         @Index(name = "buildingFloor_idx",columnList = "building_id")
 })
-public class BuildingFloor extends SecuredBasic {
+public class BuildingFloor extends Baseclass {
 
     private String externalId;
     @JoinColumn(nullable = false)

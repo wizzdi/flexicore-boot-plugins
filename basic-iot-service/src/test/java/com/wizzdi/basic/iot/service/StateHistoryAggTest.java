@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.*;
@@ -90,7 +90,7 @@ public class StateHistoryAggTest {
     private StateHistoryAggService stateHistoryAggService;
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
 
     @BeforeAll

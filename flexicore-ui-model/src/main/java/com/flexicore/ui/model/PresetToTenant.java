@@ -12,7 +12,7 @@ public class PresetToTenant extends PresetToEntity {
 
 	@ManyToOne(targetEntity = SecurityTenant.class, cascade = { CascadeType.MERGE,
 			CascadeType.PERSIST })
-	private SecurityTenant tenant;
+	private SecurityTenant targetTenant;
 
 	public PresetToTenant() {
 	}
@@ -20,19 +20,19 @@ public class PresetToTenant extends PresetToEntity {
 
 	@ManyToOne(targetEntity = SecurityTenant.class, cascade = { CascadeType.MERGE,
 			CascadeType.PERSIST })
-	public SecurityTenant getTenant() {
-		return tenant;
+	public SecurityTenant getTargetTenant() {
+		return targetTenant;
 	}
 
-	public <T extends PresetToTenant> T setTenant(SecurityTenant tenant) {
-		this.tenant = tenant;
+	public <T extends PresetToTenant> T setTargetTenant(SecurityTenant tenant) {
+		this.targetTenant = tenant;
 		return (T) this;
 	}
 
 	@Override
 	@Transient
 	public SecurityTenant getEntity() {
-		return tenant;
+		return targetTenant;
 	}
 
 }

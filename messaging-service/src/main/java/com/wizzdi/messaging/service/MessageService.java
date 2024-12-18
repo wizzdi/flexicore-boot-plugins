@@ -2,8 +2,8 @@ package com.wizzdi.messaging.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.dynamic.properties.converter.DynamicPropertiesUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -50,7 +50,7 @@ public class MessageService implements Plugin {
     @Autowired
     private ChatUserService chatUserService;
 
-    public Message createMessage(MessageCreate messageCreate, SecurityContextBase securityContext) {
+    public Message createMessage(MessageCreate messageCreate, SecurityContext securityContext) {
         Message message = createMessageNoMerge(messageCreate, securityContext);
         messageRepository.merge(message);
         applicationEventPublisher.publishEvent(new BeforeMessageEvent(message, securityContext));
@@ -67,17 +67,17 @@ public class MessageService implements Plugin {
         messageRepository.massMerge(list);
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return messageRepository.listByIds(c, ids, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return messageRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
-    public Message createMessageNoMerge(MessageCreate messageCreate, SecurityContextBase securityContext) {
+    public Message createMessageNoMerge(MessageCreate messageCreate, SecurityContext securityContext) {
         Message message = new Message();
-        message.setId(Baseclass.getBase64ID());
+        message.setId(UUID.randomUUID().toString());
         updateMessageNoMerge(messageCreate, message);
         return message;
     }
@@ -113,7 +113,7 @@ public class MessageService implements Plugin {
         return update;
     }
 
-    public Message updateMessage(MessageUpdate messageUpdate, SecurityContextBase securityContext) {
+    public Message updateMessage(MessageUpdate messageUpdate, SecurityContext securityContext) {
         Message message = messageUpdate.getMessage();
         if (updateMessageNoMerge(messageUpdate, message)) {
             messageRepository.merge(message);
@@ -123,7 +123,7 @@ public class MessageService implements Plugin {
         return message;
     }
 
-    public void validate(MessageCreate messageCreate, SecurityContextBase securityContext) {
+    public void validate(MessageCreate messageCreate, SecurityContext securityContext) {
         basicService.validate(messageCreate, securityContext);
         if (messageCreate.getSender() == null) {
             ChatUser chatUser = chatUserService.getChatUser(securityContext);
@@ -134,7 +134,7 @@ public class MessageService implements Plugin {
 
         }
         String chatId = messageCreate.getChatId();
-        Chat chat = chatId != null ? getByIdOrNull(chatId, Chat.class, Chat_.security, securityContext) : null;
+        Chat chat = chatId != null ? getByIdOrNull(chatId, Chat.class,securityContext) : null;
         if (chatId != null && (chat == null || chat.isSoftDelete())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chat with id " + chatId);
         }
@@ -142,8 +142,8 @@ public class MessageService implements Plugin {
 
     }
 
-    private ChatUser getChatUserById(String chatUserId, SecurityContextBase securityContextBase) {
-        ChatUser thisChatUser = chatUserService.getChatUser(securityContextBase);
+    private ChatUser getChatUserById(String chatUserId, SecurityContext SecurityContext) {
+        ChatUser thisChatUser = chatUserService.getChatUser(SecurityContext);
         if (chatUserId == null) {
             return thisChatUser;
         }
@@ -151,10 +151,10 @@ public class MessageService implements Plugin {
             return thisChatUser;
         }
 
-        return getByIdOrNull(chatUserId, ChatUser.class, SecuredBasic_.security, securityContextBase);
+        return getByIdOrNull(chatUserId, ChatUser.class,SecurityContext);
     }
 
-    public void validate(MarkMessagesRequest markMessagesRequest, SecurityContextBase securityContext) {
+    public void validate(MarkMessagesRequest markMessagesRequest, SecurityContext securityContext) {
         MessageFilter messageFilter = markMessagesRequest.getMessageFilter();
         if (messageFilter == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Message Filter must be send");
@@ -173,11 +173,11 @@ public class MessageService implements Plugin {
     }
 
 
-    public void validate(MessageFilter messageFilter, SecurityContextBase securityContext) {
+    public void validate(MessageFilter messageFilter, SecurityContext securityContext) {
         basicService.validate(messageFilter, securityContext);
         ChatUser thisChatUser = chatUserService.getChatUser(securityContext);
         Set<String> chatIds = messageFilter.getChatsIds();
-        Map<String, Chat> chatMap = chatIds.isEmpty() ? new HashMap<>() : messageRepository.listByIds(Chat.class, chatIds, Chat_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Chat> chatMap = chatIds.isEmpty() ? new HashMap<>() : messageRepository.listByIds(Chat.class, chatIds,securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         chatIds.removeAll(chatMap.keySet());
         if (!chatIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no chats with ids " + chatIds);
@@ -185,7 +185,7 @@ public class MessageService implements Plugin {
         messageFilter.setChats(new ArrayList<>(chatMap.values()));
 
         Set<String> senderIds = messageFilter.getSenderIds();
-        Map<String, ChatUser> sendersMap = senderIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, senderIds, ChatUser_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, ChatUser> sendersMap = senderIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, senderIds,securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         if (thisChatUser != null && senderIds.contains(thisChatUser.getId())) {
             sendersMap.put(thisChatUser.getId(), thisChatUser);
         }
@@ -196,7 +196,7 @@ public class MessageService implements Plugin {
         messageFilter.setSenders(new ArrayList<>(sendersMap.values()));
 
         Set<String> addressedToIds = messageFilter.getAddressedToIds();
-        Map<String, ChatUser> addressedToMap = addressedToIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, addressedToIds, ChatUser_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, ChatUser> addressedToMap = addressedToIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, addressedToIds,securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         if (thisChatUser != null && addressedToIds.contains(thisChatUser.getId())) {
             addressedToMap.put(thisChatUser.getId(), thisChatUser);
         }
@@ -212,7 +212,7 @@ public class MessageService implements Plugin {
 
 
         Set<String> unreadByIds = messageFilter.getUnreadByIds();
-        Map<String, ChatUser> unreadByMap = unreadByIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, unreadByIds, ChatUser_.security, securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, ChatUser> unreadByMap = unreadByIds.isEmpty() ? new HashMap<>() : listByIds(ChatUser.class, unreadByIds,securityContext).stream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         if (thisChatUser != null && unreadByIds.contains(thisChatUser.getId())) {
             unreadByMap.put(thisChatUser.getId(), thisChatUser);
         }
@@ -225,11 +225,11 @@ public class MessageService implements Plugin {
 
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return messageRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return messageRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
@@ -237,7 +237,7 @@ public class MessageService implements Plugin {
         return messageRepository.findByIdOrNull(type, id);
     }
 
-    public PaginationResponse<Message> getAllMessages(MessageFilter MessageFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<Message> getAllMessages(MessageFilter MessageFilter, SecurityContext securityContext) {
         long count = messageRepository.countAllMessages(MessageFilter, securityContext);
         PaginationResponse<Message> messagePaginationResponse = new PaginationResponse<>(new ArrayList<>(), MessageFilter, count);
         if (MessageFilter.isLastPage()) {
@@ -248,7 +248,7 @@ public class MessageService implements Plugin {
         return messagePaginationResponse;
     }
 
-    public List<Message> listAllMessages(MessageFilter MessageFilter, SecurityContextBase securityContext) {
+    public List<Message> listAllMessages(MessageFilter MessageFilter, SecurityContext securityContext) {
         return messageRepository.listAllMessages(MessageFilter, securityContext);
     }
 
@@ -256,7 +256,7 @@ public class MessageService implements Plugin {
         return messageRepository.findByIds(c, requested);
     }
 
-    public PaginationResponse<Message> markRead(MarkMessagesRequest markMessagesRequest, SecurityContextBase securityContext) {
+    public PaginationResponse<Message> markRead(MarkMessagesRequest markMessagesRequest, SecurityContext securityContext) {
         PaginationResponse<Message> messagePaginationResponse = getAllMessages(markMessagesRequest.getMessageFilter(), securityContext);
         List<Message> messages = messagePaginationResponse.getList();
         Map<String, OffsetDateTime> chatUsersMap = new HashMap<>();
@@ -273,10 +273,10 @@ public class MessageService implements Plugin {
         return messagePaginationResponse;
     }
 
-    public UnreadMessagesSummary getMessageSummary(MessageFilter messageFilter, SecurityContextBase securityContext) {
+    public UnreadMessagesSummary getMessageSummary(MessageFilter messageFilter, SecurityContext securityContext) {
         List<UnreadMessagesSummaryItem> messagesSummaryItems=messageRepository.getMessageSummary(messageFilter,securityContext);
         Set<String> chatIds=messagesSummaryItems.stream().map(f->f.getChatId()).filter(f->f!=null).collect(Collectors.toSet());
-        Map<String,Chat> chats=chatIds.isEmpty()?new HashMap<>():listByIds(Chat.class,chatIds,SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+        Map<String,Chat> chats=chatIds.isEmpty()?new HashMap<>():listByIds(Chat.class,chatIds,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
         for (UnreadMessagesSummaryItem messagesSummaryItem : messagesSummaryItems) {
 
             Chat chat=chats.get(messagesSummaryItem.getChatId());

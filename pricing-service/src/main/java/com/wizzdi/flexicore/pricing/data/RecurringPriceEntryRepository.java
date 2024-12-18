@@ -3,7 +3,7 @@ package com.wizzdi.flexicore.pricing.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPriceEntry;
@@ -34,7 +34,7 @@ public class RecurringPriceEntryRepository implements Plugin {
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
 
-    public List<RecurringPriceEntry> getAllRecurringPriceEntry(SecurityContextBase securityContext,
+    public List<RecurringPriceEntry> getAllRecurringPriceEntry(SecurityContext securityContext,
                                            RecurringPriceEntryFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<RecurringPriceEntry> q = cb.createQuery(RecurringPriceEntry.class);
@@ -47,7 +47,7 @@ public class RecurringPriceEntryRepository implements Plugin {
         return query.getResultList();
     }
 
-    public long countAllRecurringPriceEntry(SecurityContextBase securityContext,
+    public long countAllRecurringPriceEntry(SecurityContext securityContext,
                                    RecurringPriceEntryFiltering filtering) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
@@ -60,7 +60,7 @@ public class RecurringPriceEntryRepository implements Plugin {
     }
 
     public <T extends RecurringPriceEntry> void addRecurringPriceEntryPredicates(RecurringPriceEntryFiltering filtering,
-                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContextBase securityContext) {
+                                                           CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
         if(filtering.getRecurringPrices()!=null&&!filtering.getRecurringPrices().isEmpty()){
             Set<String> ids=filtering.getRecurringPrices().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -72,19 +72,19 @@ public class RecurringPriceEntryRepository implements Plugin {
 
     }
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return securedBasicRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

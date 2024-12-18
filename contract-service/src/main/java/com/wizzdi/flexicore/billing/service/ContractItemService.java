@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.billing.service;
 
 
 import com.wizzdi.flexicore.billing.data.ContractItemRepository;
-import com.flexicore.model.SecuredBasic_;
+
 import com.wizzdi.flexicore.billing.model.billing.Charge_;
 import com.wizzdi.flexicore.contract.model.*;
 import com.wizzdi.flexicore.billing.request.ContractItemCreate;
@@ -14,7 +14,7 @@ import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
@@ -41,19 +41,19 @@ public class ContractItemService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -80,10 +80,10 @@ public class ContractItemService implements Plugin {
     }
 
     public void validateFiltering(ContractItemFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(filtering, securityContext);
         Set<String> contractIds = filtering.getContractIds();
-        Map<String, Contract> contractMap = contractIds.isEmpty() ? new HashMap<>() : listByIds(Contract.class, contractIds, Contract_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Contract> contractMap = contractIds.isEmpty() ? new HashMap<>() : listByIds(Contract.class, contractIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         contractIds.removeAll(contractMap.keySet());
         if (!contractIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Contract with ids " + contractIds);
@@ -91,7 +91,7 @@ public class ContractItemService implements Plugin {
         filtering.setContracts(new ArrayList<>(contractMap.values()));
 
         Set<String> priceListsItemsIds = filtering.getPriceListsItemsIds();
-        Map<String, PriceListItem> chargeMap = priceListsItemsIds.isEmpty() ? new HashMap<>() : listByIds(PriceListItem.class, priceListsItemsIds, Charge_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, PriceListItem> chargeMap = priceListsItemsIds.isEmpty() ? new HashMap<>() : listByIds(PriceListItem.class, priceListsItemsIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         priceListsItemsIds.removeAll(chargeMap.keySet());
         if (!priceListsItemsIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PriceListItem with ids " + priceListsItemsIds);
@@ -101,27 +101,27 @@ public class ContractItemService implements Plugin {
     }
 
     public PaginationResponse<ContractItem> getAllContractItems(
-            SecurityContextBase securityContext, ContractItemFiltering filtering) {
+            SecurityContext securityContext, ContractItemFiltering filtering) {
         List<ContractItem> list = listAllContractItems(securityContext, filtering);
         long count = repository.countAllContractItems(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<ContractItem> listAllContractItems(SecurityContextBase securityContext, ContractItemFiltering filtering) {
+    public List<ContractItem> listAllContractItems(SecurityContext securityContext, ContractItemFiltering filtering) {
         return repository.getAllContractItems(securityContext, filtering);
     }
 
     public ContractItem createContractItem(ContractItemCreate contractItemCreate,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         ContractItem contractItem = createContractItemNoMerge(contractItemCreate, securityContext);
         repository.merge(contractItem);
         return contractItem;
     }
 
     public ContractItem createContractItemNoMerge(ContractItemCreate contractItemCreate,
-                                                SecurityContextBase securityContext) {
+                                                SecurityContext securityContext) {
         ContractItem contractItem = new ContractItem();
-        contractItem.setId(Baseclass.getBase64ID());
+        contractItem.setId(UUID.randomUUID().toString());
 
         updateContractItemNoMerge(contractItem, contractItemCreate);
         BaseclassService.createSecurityObjectNoMerge(contractItem, securityContext);
@@ -160,7 +160,7 @@ public class ContractItemService implements Plugin {
     }
 
     public ContractItem updateContractItem(ContractItemUpdate contractItemUpdate,
-                                         SecurityContextBase securityContext) {
+                                         SecurityContext securityContext) {
         ContractItem contractItem = contractItemUpdate.getContractItem();
         if (updateContractItemNoMerge(contractItem, contractItemUpdate)) {
             repository.merge(contractItem);
@@ -168,11 +168,11 @@ public class ContractItemService implements Plugin {
         return contractItem;
     }
 
-    public void validate(ContractItemCreate contractItemCreate, SecurityContextBase securityContext) {
+    public void validate(ContractItemCreate contractItemCreate, SecurityContext securityContext) {
         basicService.validate(contractItemCreate, securityContext);
 
         String contractId = contractItemCreate.getContractId();
-        Contract contract = contractId == null ? null : getByIdOrNull(contractId, Contract.class, SecuredBasic_.security, securityContext);
+        Contract contract = contractId == null ? null : getByIdOrNull(contractId, Contract.class,securityContext);
 
         if (contract == null && contractId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Contract with id " + contractId);
@@ -180,14 +180,14 @@ public class ContractItemService implements Plugin {
         contractItemCreate.setContract(contract);
 
         String recurringPriceId = contractItemCreate.getRecurringPriceId();
-        RecurringPrice recurringPrice = recurringPriceId == null ? null : getByIdOrNull(recurringPriceId, RecurringPrice.class, SecuredBasic_.security, securityContext);
+        RecurringPrice recurringPrice = recurringPriceId == null ? null : getByIdOrNull(recurringPriceId, RecurringPrice.class,securityContext);
         if (recurringPrice == null && recurringPriceId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No RecurringPrice with id " + recurringPriceId);
         }
         contractItemCreate.setRecurringPrice(recurringPrice);
 
         String priceListItemId = contractItemCreate.getPriceListItemId();
-        PriceListItem priceListItem = priceListItemId == null ? null : getByIdOrNull(priceListItemId, PriceListItem.class, SecuredBasic_.security, securityContext);
+        PriceListItem priceListItem = priceListItemId == null ? null : getByIdOrNull(priceListItemId, PriceListItem.class,securityContext);
         if (priceListItem == null && priceListItemId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No PriceListItem with id " + priceListItemId);
         }

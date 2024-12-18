@@ -3,7 +3,7 @@ package com.flexicore.territories.data;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.CityFilter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -32,13 +32,13 @@ public class CityRepository implements Plugin {
 	private EntityManager em;
 	@Autowired
 	private BaseclassRepository baseclassRepository;
-	public List<City> listAllCities(SecurityContextBase securityContextBase,
+	public List<City> listAllCities(SecurityContext SecurityContext,
 			CityFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<City> q = cb.createQuery(City.class);
 		Root<City> r = q.from(City.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCityPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addCityPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(City_.name)));
 		TypedQuery<City> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
@@ -46,13 +46,13 @@ public class CityRepository implements Plugin {
 
 	}
 
-	public long countAllCities(SecurityContextBase securityContextBase,
+	public long countAllCities(SecurityContext SecurityContext,
 			CityFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<City> r = q.from(City.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCityPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addCityPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Long> query = em.createQuery(q);
 		return query.getSingleResult();
@@ -60,7 +60,7 @@ public class CityRepository implements Plugin {
 	}
 
 	private void addCityPredicate(CityFilter filtering, CommonAbstractCriteria q, CriteriaBuilder cb,
-								  Root<City> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+								  Root<City> r, List<Predicate> preds, SecurityContext SecurityContext) {
 
 		if (filtering.getCountries() != null && !filtering.getCountries().isEmpty()) {
 			Set<String> ids=filtering.getCountries().stream().map(f->f.getId()).collect(Collectors.toSet());
@@ -79,22 +79,16 @@ public class CityRepository implements Plugin {
 		if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
 			preds.add(r.get(City_.externalId).in(filtering.getExternalIds()));
 		}
-		if(securityContextBase!=null){
-			Join<City, Baseclass> join=r.join(City_.security);
-			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
+		if(SecurityContext!=null){
+			baseclassRepository.addBaseclassPredicates(cb,q,r,preds,SecurityContext);
 		}
 
 	}
 
 
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
-	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
-	}
+
 
 	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
 		return baseclassRepository.findByIds(c, ids, idAttribute);
@@ -130,5 +124,13 @@ public class CityRepository implements Plugin {
 	@Transactional
 	public void massMerge(List<?> toMerge, boolean updatedate) {
 		baseclassRepository.massMerge(toMerge, updatedate);
+	}
+
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return baseclassRepository.getByIdOrNull(id, c, securityContext);
+	}
+
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
 }

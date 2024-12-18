@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.*;
 import com.flexicore.ui.request.*;
 import com.flexicore.ui.response.PresetToRoleContainer;
@@ -49,8 +49,8 @@ public class UiFieldController implements Plugin {
     public UiField deleteUIField(
             
             @PathVariable("id") String id,
-            @RequestAttribute SecurityContextBase securityContext) {
-        UiField uiField=id!=null?service.getByIdOrNull(id,UiField.class,UiField_.security,securityContext):null;
+            @RequestAttribute SecurityContext securityContext) {
+        UiField uiField=id!=null?service.getByIdOrNull(id,UiField.class,securityContext):null;
         if(uiField==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ui field with id "+id);
         }
@@ -63,7 +63,7 @@ public class UiFieldController implements Plugin {
     public PaginationResponse<UiField> getAllUiFields(
             
             @RequestBody UiFieldFiltering uiFieldFiltering,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(uiFieldFiltering, securityContext);
         return service.getAllUiFields(uiFieldFiltering, securityContext);
 
@@ -75,7 +75,7 @@ public class UiFieldController implements Plugin {
     public PresetToUser linkPresetToUser(
             
             @RequestBody PresetToUserCreate linkPresetToUser,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(linkPresetToUser, securityContext);
         return service.createPresetToUser(linkPresetToUser, securityContext);
 
@@ -87,7 +87,7 @@ public class UiFieldController implements Plugin {
     public PaginationResponse<PresetToRoleContainer> getAllPresetToRole(
             
             @RequestBody PresetToRoleFilter presetToRoleFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(presetToRoleFilter, securityContext);
         return service.getAllPresetToRole(presetToRoleFilter, securityContext);
 
@@ -99,7 +99,7 @@ public class UiFieldController implements Plugin {
     public PaginationResponse<PresetToUserContainer> getAllPresetToUser(
              @RequestBody
             PresetToUserFilter presetToUserFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(presetToUserFilter, securityContext);
         return service.getAllPresetToUser(presetToUserFilter, securityContext);
 
@@ -111,7 +111,7 @@ public class UiFieldController implements Plugin {
     public PaginationResponse<PresetToTenantContainer> getAllPresetToTenant(
              @RequestBody
             PresetToTenantFilter presetToTenantFilter,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(presetToTenantFilter, securityContext);
         return service.getAllPresetToTenant(presetToTenantFilter,
                 securityContext);
@@ -124,7 +124,7 @@ public class UiFieldController implements Plugin {
     public List<Preset> getPreferredPresets(
              @RequestBody
             PreferedPresetRequest linkPresetToRole,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(linkPresetToRole, securityContext);
         return service.getPreferredPresets(linkPresetToRole, securityContext);
 
@@ -136,7 +136,7 @@ public class UiFieldController implements Plugin {
     public PresetToRole linkPresetToRole(
              @RequestBody
             PresetToRoleCreate linkPresetToRole,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(linkPresetToRole, securityContext);
         return service.createPresetToRole(linkPresetToRole, securityContext);
 
@@ -148,7 +148,7 @@ public class UiFieldController implements Plugin {
     public PresetToTenant linkPresetToTenant(
              @RequestBody
             PresetToTenantCreate linkPresetToRole,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(linkPresetToRole, securityContext);
         return service.createPresetToTenant(linkPresetToRole, securityContext);
 
@@ -160,10 +160,10 @@ public class UiFieldController implements Plugin {
     public PresetToTenant updatePresetToTenant(
              @RequestBody
             PresetToTenantUpdate updateLinkPresetToTenant,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         PresetToTenant preset = updateLinkPresetToTenant.getLinkId() != null
                 ? service.getByIdOrNull(updateLinkPresetToTenant.getLinkId(),
-                PresetToTenant.class, PresetToTenant_.security, securityContext) : null;
+                PresetToTenant.class,  securityContext) : null;
         if (preset == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no link with id "
                     + updateLinkPresetToTenant.getLinkId());
@@ -180,10 +180,10 @@ public class UiFieldController implements Plugin {
     public PresetToUser updatePresetToUser(
              @RequestBody
             PresetToUserUpdate updateLinkPresetToUser,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         PresetToUser preset = updateLinkPresetToUser.getLinkId() != null
                 ? service.getByIdOrNull(updateLinkPresetToUser.getLinkId(),
-                PresetToUser.class, PresetToUser_.security, securityContext) : null;
+                PresetToUser.class,  securityContext) : null;
         if (preset == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no link with id "
                     + updateLinkPresetToUser.getLinkId());
@@ -200,10 +200,10 @@ public class UiFieldController implements Plugin {
     public PresetToRole updatePresetToRole(
              @RequestBody
             PresetToRoleUpdate updateLinkPresetToTenant,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         PresetToRole preset = updateLinkPresetToTenant.getLinkId() != null
                 ? service.getByIdOrNull(updateLinkPresetToTenant.getLinkId(),
-                PresetToRole.class, PresetToRole_.security, securityContext) : null;
+                PresetToRole.class,  securityContext) : null;
         if (preset == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no link with id "
                     + updateLinkPresetToTenant.getLinkId());

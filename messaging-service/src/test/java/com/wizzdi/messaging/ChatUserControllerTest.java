@@ -1,7 +1,7 @@
 package com.wizzdi.messaging;
 
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.messaging.app.App;
 import com.wizzdi.messaging.model.ChatUser;
@@ -62,7 +62,7 @@ public class ChatUserControllerTest {
     @Autowired
     @Lazy
     @Qualifier("adminSecurityContext")
-    private SecurityContextBase securityContextBase;
+    private SecurityContext SecurityContext;
 
 
 

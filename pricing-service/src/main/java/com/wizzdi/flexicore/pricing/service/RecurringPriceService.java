@@ -3,7 +3,7 @@ package com.wizzdi.flexicore.pricing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.data.RecurringPriceRepository;
 import com.wizzdi.flexicore.pricing.model.price.RecurringPrice;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Extension
 @Component
@@ -32,19 +33,19 @@ public class RecurringPriceService implements Plugin {
     @Autowired
     private PriceService priceService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -71,32 +72,32 @@ public class RecurringPriceService implements Plugin {
     }
 
     public void validateFiltering(RecurringPriceFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         priceService.validateFiltering(filtering, securityContext);
     }
 
     public PaginationResponse<RecurringPrice> getAllRecurringPrice(
-            SecurityContextBase securityContext, RecurringPriceFiltering filtering) {
+            SecurityContext securityContext, RecurringPriceFiltering filtering) {
         List<RecurringPrice> list = listAllRecurringPrice(securityContext, filtering);
         long count = repository.countAllRecurringPrice(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<RecurringPrice> listAllRecurringPrice(SecurityContextBase securityContext, RecurringPriceFiltering filtering) {
+    public List<RecurringPrice> listAllRecurringPrice(SecurityContext securityContext, RecurringPriceFiltering filtering) {
         return repository.getAllRecurringPrice(securityContext, filtering);
     }
 
     public RecurringPrice createRecurringPrice(RecurringPriceCreate creationContainer,
-                                               SecurityContextBase securityContext) {
+                                               SecurityContext securityContext) {
         RecurringPrice recurringPrice = createRecurringPriceNoMerge(creationContainer, securityContext);
         repository.merge(recurringPrice);
         return recurringPrice;
     }
 
     private RecurringPrice createRecurringPriceNoMerge(RecurringPriceCreate creationContainer,
-                                                       SecurityContextBase securityContext) {
+                                                       SecurityContext securityContext) {
         RecurringPrice recurringPrice = new RecurringPrice();
-        recurringPrice.setId(Baseclass.getBase64ID());
+        recurringPrice.setId(UUID.randomUUID().toString());
 
         updateRecurringPriceNoMerge(recurringPrice, creationContainer);
         BaseclassService.createSecurityObjectNoMerge(recurringPrice, securityContext);
@@ -111,7 +112,7 @@ public class RecurringPriceService implements Plugin {
     }
 
     public RecurringPrice updateRecurringPrice(RecurringPriceUpdate updateContainer,
-                                               SecurityContextBase securityContext) {
+                                               SecurityContext securityContext) {
         RecurringPrice recurringPrice = updateContainer.getRecurringPrice();
         if (updateRecurringPriceNoMerge(recurringPrice, updateContainer)) {
             repository.merge(recurringPrice);
@@ -120,7 +121,7 @@ public class RecurringPriceService implements Plugin {
     }
 
     public void validate(RecurringPriceCreate creationContainer,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         priceService.validate(creationContainer, securityContext);
     }
 }

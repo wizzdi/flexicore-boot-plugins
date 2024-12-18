@@ -1,12 +1,12 @@
 package com.wizzdi.messaging.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class MessageReceiverDevice extends SecuredBasic {
+public class MessageReceiverDevice extends Baseclass {
 
 	@ManyToOne(targetEntity = ChatUser.class)
 	private ChatUser owner;

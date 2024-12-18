@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.pricing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.pricing.model.price.Frequency;
 import com.wizzdi.flexicore.pricing.model.price.Frequency_;
@@ -39,7 +39,7 @@ public class FrequencyController implements Plugin {
     public PaginationResponse<Frequency> getAllFrequencies(
 
             
-            @RequestBody FrequencyFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody FrequencyFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllFrequencies(securityContext, filtering);
     }
@@ -51,7 +51,7 @@ public class FrequencyController implements Plugin {
     public Frequency createFrequency(
             
             @RequestBody FrequencyCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createFrequency(creationContainer, securityContext);
@@ -65,10 +65,10 @@ public class FrequencyController implements Plugin {
 
             
             @RequestBody FrequencyUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Frequency frequency = service.getByIdOrNull(updateContainer.getId(),
-                Frequency.class, Frequency_.security, securityContext);
+                Frequency.class,  securityContext);
         if (frequency == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Frequency with id "
                     + updateContainer.getId());

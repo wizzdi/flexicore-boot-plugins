@@ -3,8 +3,8 @@ package com.wizzdi.flexicore.billing.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.data.ContractItemChargeReferenceRepository;
 import com.wizzdi.flexicore.billing.model.billing.Charge_;
 import com.wizzdi.flexicore.billing.request.ContractItemChargeReferenceCreate;
@@ -37,19 +37,19 @@ public class ContractItemChargeReferenceService implements Plugin {
     @Autowired
     private ChargeReferenceService chargeReferenceService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -76,10 +76,10 @@ public class ContractItemChargeReferenceService implements Plugin {
     }
 
     public void validateFiltering(ContractItemChargeReferenceFiltering filtering,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         chargeReferenceService.validateFiltering(filtering, securityContext);
         Set<String> contractItemsIds = filtering.getContractItemsIds();
-        Map<String, ContractItem> contractItemMap = contractItemsIds.isEmpty() ? new HashMap<>() : listByIds(ContractItem.class, contractItemsIds, Charge_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, ContractItem> contractItemMap = contractItemsIds.isEmpty() ? new HashMap<>() : listByIds(ContractItem.class, contractItemsIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         contractItemsIds.removeAll(contractItemMap.keySet());
         if (!contractItemsIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ContractItem with ids " + contractItemsIds);
@@ -90,27 +90,27 @@ public class ContractItemChargeReferenceService implements Plugin {
     }
 
     public PaginationResponse<ContractItemChargeReference> getAllContractItemChargeReferences(
-            SecurityContextBase securityContext, ContractItemChargeReferenceFiltering filtering) {
+            SecurityContext securityContext, ContractItemChargeReferenceFiltering filtering) {
         List<ContractItemChargeReference> list = listAllContractItemChargeReferences(securityContext, filtering);
         long count = repository.countAllContractItemChargeReferences(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-	public List<ContractItemChargeReference> listAllContractItemChargeReferences(SecurityContextBase securityContext, ContractItemChargeReferenceFiltering filtering) {
+	public List<ContractItemChargeReference> listAllContractItemChargeReferences(SecurityContext securityContext, ContractItemChargeReferenceFiltering filtering) {
 		return repository.getAllContractItemChargeReferences(securityContext, filtering);
 	}
 
 	public ContractItemChargeReference createContractItemChargeReference(ContractItemChargeReferenceCreate contractItemChargeReferenceCreate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         ContractItemChargeReference contractItemChargeReference = createContractItemChargeReferenceNoMerge(contractItemChargeReferenceCreate, securityContext);
         repository.merge(contractItemChargeReference);
         return contractItemChargeReference;
     }
 
     public ContractItemChargeReference createContractItemChargeReferenceNoMerge(ContractItemChargeReferenceCreate contractItemChargeReferenceCreate,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         ContractItemChargeReference contractItemChargeReference = new ContractItemChargeReference();
-        contractItemChargeReference.setId(Baseclass.getBase64ID());
+        contractItemChargeReference.setId(UUID.randomUUID().toString());
 
         updateContractItemChargeReferenceNoMerge(contractItemChargeReference, contractItemChargeReferenceCreate);
         BaseclassService.createSecurityObjectNoMerge(contractItemChargeReference, securityContext);
@@ -133,7 +133,7 @@ public class ContractItemChargeReferenceService implements Plugin {
     }
 
     public ContractItemChargeReference updateContractItemChargeReference(ContractItemChargeReferenceUpdate contractItemChargeReferenceUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         ContractItemChargeReference contractItemChargeReference = contractItemChargeReferenceUpdate.getContractItemChargeReference();
         if (updateContractItemChargeReferenceNoMerge(contractItemChargeReference, contractItemChargeReferenceUpdate)) {
             repository.merge(contractItemChargeReference);
@@ -142,10 +142,10 @@ public class ContractItemChargeReferenceService implements Plugin {
     }
 
     public void validate(ContractItemChargeReferenceCreate contractItemChargeReferenceCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         chargeReferenceService.validate(contractItemChargeReferenceCreate, securityContext);
         String contractItemId = contractItemChargeReferenceCreate.getContractItemId();
-        ContractItem contractItem = contractItemId == null ? null : getByIdOrNull(contractItemId, ContractItem.class, SecuredBasic_.security, securityContext);
+        ContractItem contractItem = contractItemId == null ? null : getByIdOrNull(contractItemId, ContractItem.class,securityContext);
         if (contractItem == null && contractItemId != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No ContractItem with id " + contractItemId);
         }

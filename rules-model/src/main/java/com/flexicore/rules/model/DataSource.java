@@ -1,7 +1,7 @@
 package com.flexicore.rules.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class DataSource extends SecuredBasic {
+public class DataSource extends Baseclass {
 
   @ManyToOne(targetEntity = DynamicExecution.class)
   private DynamicExecution dynamicExecution;

@@ -7,7 +7,7 @@ import com.flexicore.rules.model.ScenarioTriggerType;
 import com.flexicore.rules.request.ScenarioTriggerTypeCreate;
 import com.flexicore.rules.request.ScenarioTriggerTypeFilter;
 import com.flexicore.rules.request.ScenarioTriggerTypeUpdate;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -35,7 +35,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @return created ScenarioTriggerType
    */
   public ScenarioTriggerType createScenarioTriggerType(
-      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContext securityContext) {
     ScenarioTriggerType scenarioTriggerType =
         createScenarioTriggerTypeNoMerge(scenarioTriggerTypeCreate, securityContext);
     this.repository.merge(scenarioTriggerType);
@@ -48,7 +48,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @return created ScenarioTriggerType unmerged
    */
   public ScenarioTriggerType createScenarioTriggerTypeNoMerge(
-      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContext securityContext) {
     ScenarioTriggerType scenarioTriggerType = new ScenarioTriggerType();
     scenarioTriggerType.setId(UUID.randomUUID().toString());
     updateScenarioTriggerTypeNoMerge(scenarioTriggerType, scenarioTriggerTypeCreate);
@@ -85,7 +85,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @return scenarioTriggerType
    */
   public ScenarioTriggerType updateScenarioTriggerType(
-      ScenarioTriggerTypeUpdate scenarioTriggerTypeUpdate, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeUpdate scenarioTriggerTypeUpdate, SecurityContext securityContext) {
     return updateScenarioTriggerType(scenarioTriggerTypeUpdate, scenarioTriggerTypeUpdate.getScenarioTriggerType());
   }
 
@@ -103,7 +103,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @return PaginationResponse containing paging information for ScenarioTriggerType
    */
   public PaginationResponse<ScenarioTriggerType> getAllScenarioTriggerTypes(
-      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContext securityContext) {
     List<ScenarioTriggerType> list =
         listAllScenarioTriggerTypes(scenarioTriggerTypeFilter, securityContext);
     long count =
@@ -117,7 +117,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @return List of ScenarioTriggerType
    */
   public List<ScenarioTriggerType> listAllScenarioTriggerTypes(
-      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContext securityContext) {
     return this.repository.listAllScenarioTriggerTypes(scenarioTriggerTypeFilter, securityContext);
   }
 
@@ -127,7 +127,7 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioTriggerTypeFilter is not valid
    */
   public void validate(
-      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeFilter scenarioTriggerTypeFilter, SecurityContext securityContext) {
     basicService.validate(scenarioTriggerTypeFilter, securityContext);
   }
 
@@ -137,17 +137,17 @@ public class ScenarioTriggerTypeService implements Plugin {
    * @throws org.springframework.web.server.ResponseStatusException  if scenarioTriggerTypeCreate is not valid
    */
   public void validate(
-      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContextBase securityContext) {
+      ScenarioTriggerTypeCreate scenarioTriggerTypeCreate, SecurityContext securityContext) {
     basicService.validate(scenarioTriggerTypeCreate, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -155,7 +155,7 @@ public class ScenarioTriggerTypeService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -163,7 +163,7 @@ public class ScenarioTriggerTypeService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 

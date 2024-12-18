@@ -1,7 +1,7 @@
 package com.flexicore.model.territories;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Country extends SecuredBasic {
+public class Country extends Baseclass {
 
 	public Country() {
 	}

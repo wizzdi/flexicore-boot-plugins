@@ -3,10 +3,10 @@ package com.wizzdi.maps.service.service;
 import ch.hsr.geohash.GeoHash;
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
+
 import com.flexicore.model.SecurityTenant;
 import com.flexicore.model.territories.Address;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.service.AddressService;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -60,7 +60,7 @@ public class MappedPOIService implements Plugin {
 
     @Autowired
     @Lazy
-    private SecurityContextBase adminSecurityContext;
+    private SecurityContext adminSecurityContext;
 
 
     /**
@@ -70,7 +70,7 @@ public class MappedPOIService implements Plugin {
      */
 
     public MappedPOI createMappedPOI(
-            MappedPOICreate mappedPOICreate, SecurityContextBase securityContext) {
+            MappedPOICreate mappedPOICreate, SecurityContext securityContext) {
         MappedPOI mappedPOI = createMappedPOINoMerge(mappedPOICreate, securityContext);
         this.repository.merge(mappedPOI);
         return mappedPOI;
@@ -83,7 +83,7 @@ public class MappedPOIService implements Plugin {
      */
 
     public MappedPOI createMappedPOINoMerge(
-            MappedPOICreate mappedPOICreate, SecurityContextBase securityContext) {
+            MappedPOICreate mappedPOICreate, SecurityContext securityContext) {
         MappedPOI mappedPOI = new MappedPOI();
         mappedPOI.setId(UUID.randomUUID().toString());
         if (mappedPOICreate.getKeepLocationHistory() == null) {
@@ -266,7 +266,7 @@ public class MappedPOIService implements Plugin {
      */
 
     public MappedPOI updateMappedPOI(
-            MappedPOIUpdate mappedPOIUpdate, SecurityContextBase securityContext) {
+            MappedPOIUpdate mappedPOIUpdate, SecurityContext securityContext) {
         MappedPOI mappedPOI = mappedPOIUpdate.getMappedPOI();
         if (updateMappedPOINoMerge(mappedPOIUpdate, mappedPOI)) {
             repository.merge(mappedPOI);
@@ -281,7 +281,7 @@ public class MappedPOIService implements Plugin {
      */
 
     public PaginationResponse<MappedPOI> getAllMappedPOIs(
-            MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+            MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         List<MappedPOI> list = listAllMappedPOIs(mappedPOIFilter, securityContext);
         long count = this.repository.countAllMappedPOIs(mappedPOIFilter, securityContext);
         return new PaginationResponse<>(list, mappedPOIFilter, count);
@@ -294,7 +294,7 @@ public class MappedPOIService implements Plugin {
      */
 
     public List<MappedPOI> listAllMappedPOIs(
-            MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+            MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         return repository.listAllMappedPOIs(mappedPOIFilter, securityContext);
     }
 
@@ -304,10 +304,10 @@ public class MappedPOIService implements Plugin {
      * @throws org.springframework.web.server.ResponseStatusException if mappedPOIFilter is not valid
      */
 
-    public void validate(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public void validate(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         basicService.validate(mappedPOIFilter, securityContext);
         Set<String> addressIds = mappedPOIFilter.getAddressIds();
-        Map<String, Address> address = addressIds.isEmpty() ? new HashMap<>() : repository.listByIds(Address.class, addressIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Address> address = addressIds.isEmpty() ? new HashMap<>() : repository.listByIds(Address.class, addressIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         addressIds.removeAll(address.keySet());
         if (!addressIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Address with ids " + addressIds);
@@ -315,7 +315,7 @@ public class MappedPOIService implements Plugin {
         mappedPOIFilter.setAddress(new ArrayList<>(address.values()));
 
         Set<String> layerIds = mappedPOIFilter.getLayerIds();
-        Map<String, Layer> layerMap = layerIds.isEmpty() ? new HashMap<>() : repository.listByIds(Layer.class, layerIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Layer> layerMap = layerIds.isEmpty() ? new HashMap<>() : repository.listByIds(Layer.class, layerIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         layerIds.removeAll(layerMap.keySet());
         if (!layerIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Layers with ids " + layerIds);
@@ -323,7 +323,7 @@ public class MappedPOIService implements Plugin {
         mappedPOIFilter.setLayers(new ArrayList<>(layerMap.values()));
 
         Set<String> roomIds = mappedPOIFilter.getRoomIds();
-        Map<String, Room> room = roomIds.isEmpty() ? new HashMap<>() : repository.listByIds(Room.class, roomIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, Room> room = roomIds.isEmpty() ? new HashMap<>() : repository.listByIds(Room.class, roomIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         roomIds.removeAll(room.keySet());
         if (!roomIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with ids " + roomIds);
@@ -331,7 +331,7 @@ public class MappedPOIService implements Plugin {
         mappedPOIFilter.setRoom(new ArrayList<>(room.values()));
 
         Set<String> buildingFloorIds = mappedPOIFilter.getBuildingFloorIds();
-        Map<String, BuildingFloor> buildingFloorMap = buildingFloorIds.isEmpty() ? new HashMap<>() : repository.listByIds(BuildingFloor.class, buildingFloorIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, BuildingFloor> buildingFloorMap = buildingFloorIds.isEmpty() ? new HashMap<>() : repository.listByIds(BuildingFloor.class, buildingFloorIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         buildingFloorIds.removeAll(buildingFloorMap.keySet());
         if (!buildingFloorIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No BuildingFloor with ids " + buildingFloorIds);
@@ -339,7 +339,7 @@ public class MappedPOIService implements Plugin {
         mappedPOIFilter.setBuildingFloors(new ArrayList<>(buildingFloorMap.values()));
 
         Set<String> mapGroupIds = mappedPOIFilter.getMapGroupIds();
-        Map<String, MapGroup> mapGroups = mapGroupIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapGroup.class, mapGroupIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, MapGroup> mapGroups = mapGroupIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapGroup.class, mapGroupIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         mapGroupIds.removeAll(mapGroups.keySet());
         if (!mapGroupIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapGroup with ids " + mapGroupIds);
@@ -347,7 +347,7 @@ public class MappedPOIService implements Plugin {
         mappedPOIFilter.setMapGroups(new ArrayList<>(mapGroups.values()));
 
         Set<String> mapIconIds = mappedPOIFilter.getMapIconsIds();
-        Map<String, MapIcon> mapIconMap = mapIconIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapIcon.class, mapIconIds, SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, MapIcon> mapIconMap = mapIconIds.isEmpty() ? new HashMap<>() : repository.listByIds(MapIcon.class, mapIconIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         mapIconIds.removeAll(mapIconMap.keySet());
         if (!mapIconIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapIcon with ids " + mapIconIds);
@@ -359,7 +359,7 @@ public class MappedPOIService implements Plugin {
             addressService.validate(mappedPOIFilter.getAddressFilter(), securityContext);
         }
         Set<String> tenantIds = mappedPOIFilter.getTenantIds();
-        Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds,SecuredBasic_.security, securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        Map<String, SecurityTenant> securityTenantMap = tenantIds.isEmpty() ? new HashMap<>() : this.repository.listByIds(SecurityTenant.class, tenantIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         tenantIds.removeAll(securityTenantMap.keySet());
         if (!tenantIds.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No SecurityTenant with ids " + tenantIds);
@@ -375,18 +375,18 @@ public class MappedPOIService implements Plugin {
      * @throws org.springframework.web.server.ResponseStatusException if mappedPOICreate is not valid
      */
 
-    public void validate(MappedPOICreate mappedPOICreate, SecurityContextBase securityContext) {
+    public void validate(MappedPOICreate mappedPOICreate, SecurityContext securityContext) {
         basicService.validate(mappedPOICreate, securityContext);
 
         String mapIconId = mappedPOICreate.getMapIconId();
-        MapIcon mapIcon = mapIconId == null ? null : this.repository.getByIdOrNull(mapIconId, MapIcon.class, SecuredBasic_.security, securityContext);
+        MapIcon mapIcon = mapIconId == null ? null : this.repository.getByIdOrNull(mapIconId, MapIcon.class,securityContext);
         if (mapIconId != null && mapIcon == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No MapIcon with id " + mapIconId);
         }
         mappedPOICreate.setMapIcon(mapIcon);
 
         String layerId = mappedPOICreate.getLayerId();
-        Layer layer = layerId == null ? null : this.repository.getByIdOrNull(layerId, Layer.class, SecuredBasic_.security, securityContext);
+        Layer layer = layerId == null ? null : this.repository.getByIdOrNull(layerId, Layer.class,securityContext);
         if (layerId != null && layer == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Layer with id " + layerId);
         }
@@ -394,7 +394,7 @@ public class MappedPOIService implements Plugin {
 
 
         String addressId = mappedPOICreate.getAddressId();
-        Address address = addressId == null ? null : repository.getByIdOrNull(addressId, Address.class, SecuredBasic_.security, securityContext);
+        Address address = addressId == null ? null : repository.getByIdOrNull(addressId, Address.class,securityContext);
         if (addressId != null && address == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Address with id " + addressId);
             }
@@ -402,7 +402,7 @@ public class MappedPOIService implements Plugin {
 
 
         String roomId = mappedPOICreate.getRoomId();
-        Room room = roomId == null ? null : this.repository.getByIdOrNull(roomId, Room.class, SecuredBasic_.security, securityContext);
+        Room room = roomId == null ? null : this.repository.getByIdOrNull(roomId, Room.class,securityContext);
         if (roomId != null && room == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Room with id " + roomId);
             }
@@ -421,13 +421,13 @@ public class MappedPOIService implements Plugin {
 
 
     public <T extends Baseclass> List<T> listByIds(
-            Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+            Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
 
     public <T extends Baseclass> T getByIdOrNull(
-            String id, Class<T> c, SecurityContextBase securityContext) {
+            String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
@@ -436,7 +436,7 @@ public class MappedPOIService implements Plugin {
             String id,
             Class<T> c,
             SingularAttribute<D, E> baseclassAttribute,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
@@ -445,7 +445,7 @@ public class MappedPOIService implements Plugin {
             Class<T> c,
             Set<String> ids,
             SingularAttribute<D, E> baseclassAttribute,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -476,7 +476,7 @@ public class MappedPOIService implements Plugin {
     }
 
 
-    public PaginationResponse<MappedPoiDTO> getAllMappedPOIDTOs(MappedPOIFilter mappedPOIFilter, SecurityContextBase securityContext) {
+    public PaginationResponse<MappedPoiDTO> getAllMappedPOIDTOs(MappedPOIFilter mappedPOIFilter, SecurityContext securityContext) {
         List<MappedPoiDTO> mappedPoiDTOS = repository.listAllMappedPOIDTOs(mappedPOIFilter, securityContext);
         long count = repository.countAllMappedPOIs(mappedPOIFilter, securityContext);
         return new PaginationResponse<>(mappedPoiDTOS, mappedPOIFilter, count);

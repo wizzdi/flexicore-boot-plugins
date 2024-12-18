@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.Remote_;
 import com.wizzdi.basic.iot.service.request.RemoteCreate;
@@ -39,7 +39,7 @@ public class RemoteController implements Plugin {
     public PaginationResponse<Remote> getAllRemotes(
 
             
-            @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(remoteFilter, securityContext);
         return service.getAllRemotes(securityContext, remoteFilter);
     }
@@ -49,7 +49,7 @@ public class RemoteController implements Plugin {
     public FixRemotesResponse fixRemoteMapIcons(
 
 
-            @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody RemoteFilter remoteFilter, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(remoteFilter, securityContext);
         return service.fixRemoteMapIcons(securityContext, remoteFilter);
     }
@@ -61,7 +61,7 @@ public class RemoteController implements Plugin {
     public Remote createRemote(
             
             @RequestBody RemoteCreate remoteCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(remoteCreate, securityContext);
 
         return service.createRemote(remoteCreate, securityContext);
@@ -75,10 +75,10 @@ public class RemoteController implements Plugin {
 
             
             @RequestBody RemoteUpdate remoteUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(remoteUpdate, securityContext);
         Remote remote = service.getByIdOrNull(remoteUpdate.getId(),
-                Remote.class, Remote_.security, securityContext);
+                Remote.class,  securityContext);
         if (remote == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Remote with id "
                     + remoteUpdate.getId());

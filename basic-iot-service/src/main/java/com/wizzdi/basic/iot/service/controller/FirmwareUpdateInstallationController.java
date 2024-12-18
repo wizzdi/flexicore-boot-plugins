@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.FirmwareUpdateInstallation;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationCreate;
 import com.wizzdi.basic.iot.service.request.FirmwareUpdateInstallationFilter;
@@ -41,7 +41,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     public PaginationResponse<FirmwareUpdateInstallation> getAllFirmwareUpdateInstallations(
 
             
-            @RequestBody @Valid FirmwareUpdateInstallationFilter firmwareUpdateInstallationFilter, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody @Valid FirmwareUpdateInstallationFilter firmwareUpdateInstallationFilter, @RequestAttribute SecurityContext securityContext) {
         return service.getAllFirmwareUpdateInstallations(securityContext, firmwareUpdateInstallationFilter);
     }
 
@@ -53,7 +53,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     public FirmwareUpdateInstallation createFirmwareUpdateInstallation(
             
             @RequestBody @Validated(Create.class) FirmwareUpdateInstallationCreate firmwareUpdateInstallationCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return service.createFirmwareUpdateInstallation(firmwareUpdateInstallationCreate, securityContext);
     }
@@ -64,7 +64,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
     public List<FirmwareUpdateInstallation> massCreateFirmwareUpdateInstallation(
             
             @RequestBody @Valid FirmwareUpdateInstallationMassCreate firmwareUpdateInstallationMassCreate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return service.massCreateFirmwareUpdateInstallation(firmwareUpdateInstallationMassCreate, securityContext);
     }
@@ -77,7 +77,7 @@ public class FirmwareUpdateInstallationController implements Plugin {
 
             
             @RequestBody @Validated(Update.class) FirmwareUpdateInstallationUpdate firmwareUpdateInstallationUpdate,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
 
         return service.updateFirmwareUpdateInstallation(firmwareUpdateInstallationUpdate, securityContext);
     }

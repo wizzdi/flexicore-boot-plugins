@@ -2,7 +2,7 @@ package com.wizzdi.flexicore.billing.rest;
 
 import com.flexicore.annotations.IOperation;
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.request.ContractItemChargeReferenceCreate;
 import com.wizzdi.flexicore.billing.request.ContractItemChargeReferenceFiltering;
 import com.wizzdi.flexicore.billing.request.ContractItemChargeReferenceUpdate;
@@ -39,7 +39,7 @@ public class ContractItemChargeReferenceController implements Plugin {
     public PaginationResponse<ContractItemChargeReference> getAllContractItemChargeReferences(
 
             
-            @RequestBody ContractItemChargeReferenceFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ContractItemChargeReferenceFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllContractItemChargeReferences(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class ContractItemChargeReferenceController implements Plugin {
 
             
             @RequestBody ContractItemChargeReferenceCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createContractItemChargeReference(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class ContractItemChargeReferenceController implements Plugin {
 
             
             @RequestBody ContractItemChargeReferenceUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         ContractItemChargeReference contractItemChargeReference = service.getByIdOrNull(updateContainer.getId(),
-                ContractItemChargeReference.class, ContractItemChargeReference_.security, securityContext);
+                ContractItemChargeReference.class,  securityContext);
         if (contractItemChargeReference == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no ContractItemChargeReference with id "
                     + updateContainer.getId());

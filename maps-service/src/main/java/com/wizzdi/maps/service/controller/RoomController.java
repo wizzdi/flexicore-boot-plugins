@@ -1,7 +1,7 @@
 package com.wizzdi.maps.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.validation.Create;
@@ -32,7 +32,7 @@ public class RoomController implements Plugin {
   @Operation(summary = "createRoom", description = "Creates Room")
   public Room createRoom(
       @Validated(Create.class) @RequestBody RoomCreate roomCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return roomService.createRoom(roomCreate, securityContext);
   }
@@ -41,7 +41,7 @@ public class RoomController implements Plugin {
   @Operation(summary = "updateRoom", description = "Updates Room")
   public Room updateRoom(
       @Validated(Update.class) @RequestBody RoomUpdate roomUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return roomService.updateRoom(roomUpdate, securityContext);
   }
@@ -50,7 +50,7 @@ public class RoomController implements Plugin {
   @Operation(summary = "getAllRooms", description = "lists Rooms")
   public PaginationResponse<Room> getAllRooms(
       @Valid @RequestBody RoomFilter roomFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
 
     return roomService.getAllRooms(roomFilter, securityContext);
   }

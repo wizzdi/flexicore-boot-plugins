@@ -6,7 +6,7 @@ import com.wizzdi.flexicore.billing.request.ChargeCreate;
 import com.wizzdi.flexicore.billing.request.ChargeFiltering;
 import com.wizzdi.flexicore.billing.request.ChargeUpdate;
 import com.wizzdi.flexicore.billing.service.ChargeService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.billing.model.billing.Charge;
 import com.wizzdi.flexicore.billing.model.billing.Charge_;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -39,7 +39,7 @@ public class ChargeController implements Plugin {
     public PaginationResponse<Charge> getAllCharges(
 
             
-            @RequestBody ChargeFiltering filtering, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ChargeFiltering filtering, @RequestAttribute SecurityContext securityContext) {
         service.validateFiltering(filtering, securityContext);
         return service.getAllCharges(securityContext, filtering);
     }
@@ -52,7 +52,7 @@ public class ChargeController implements Plugin {
 
             
             @RequestBody ChargeCreate creationContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(creationContainer, securityContext);
 
         return service.createCharge(creationContainer, securityContext);
@@ -66,10 +66,10 @@ public class ChargeController implements Plugin {
 
             
             @RequestBody ChargeUpdate updateContainer,
-            @RequestAttribute SecurityContextBase securityContext) {
+            @RequestAttribute SecurityContext securityContext) {
         service.validate(updateContainer, securityContext);
         Charge charge = service.getByIdOrNull(updateContainer.getId(),
-                Charge.class, Charge_.security, securityContext);
+                Charge.class,  securityContext);
         if (charge == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "no Charge with id "
                     + updateContainer.getId());

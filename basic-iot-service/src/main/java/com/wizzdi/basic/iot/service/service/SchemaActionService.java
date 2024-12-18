@@ -3,8 +3,8 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.model.SecuredBasic_;
-import com.flexicore.security.SecurityContextBase;
+
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.SchemaAction;
 import com.wizzdi.basic.iot.model.StateSchema;
@@ -42,19 +42,19 @@ public class SchemaActionService implements Plugin {
     @Autowired
     private BasicService basicService;
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return repository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 
@@ -81,10 +81,10 @@ public class SchemaActionService implements Plugin {
     }
 
     public void validateFiltering(SchemaActionFilter schemaActionFilter,
-                                  SecurityContextBase securityContext) {
+                                  SecurityContext securityContext) {
         basicService.validate(schemaActionFilter, securityContext);
         Set<String> deviceTypeIds = schemaActionFilter.getDeviceTypeIds();
-        Map<String, DeviceType> deviceTypeMap=deviceTypeIds.isEmpty()?new HashMap<>():listByIds(DeviceType.class,deviceTypeIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
+        Map<String, DeviceType> deviceTypeMap=deviceTypeIds.isEmpty()?new HashMap<>():listByIds(DeviceType.class,deviceTypeIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(),f->f));
         deviceTypeIds.removeAll(deviceTypeMap.keySet());
         if(!deviceTypeIds.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no device ids "+deviceTypeIds);
@@ -93,7 +93,7 @@ public class SchemaActionService implements Plugin {
 
 
         Set<String> stateSchemaIds = schemaActionFilter.getStateSchemaIds();
-        Map<String, StateSchema> stateSchemaMap=stateSchemaIds.isEmpty()?new HashMap<>():listByIds(StateSchema.class,stateSchemaIds, SecuredBasic_.security,securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
+        Map<String, StateSchema> stateSchemaMap=stateSchemaIds.isEmpty()?new HashMap<>():listByIds(StateSchema.class,stateSchemaIds, securityContext).stream().collect(Collectors.toMap(f->f.getId(), f->f));
         stateSchemaIds.removeAll(stateSchemaMap.keySet());
         if(!stateSchemaIds.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no StateSchema ids "+stateSchemaIds);
@@ -102,25 +102,25 @@ public class SchemaActionService implements Plugin {
     }
 
     public PaginationResponse<SchemaAction> getAllSchemaActions(
-            SecurityContextBase securityContext, SchemaActionFilter filtering) {
+            SecurityContext securityContext, SchemaActionFilter filtering) {
         List<SchemaAction> list = listAllSchemaActions(securityContext, filtering);
         long count = repository.countAllSchemaActions(securityContext, filtering);
         return new PaginationResponse<>(list, filtering, count);
     }
 
-    public List<SchemaAction> listAllSchemaActions(SecurityContextBase securityContext, SchemaActionFilter schemaActionFilter) {
+    public List<SchemaAction> listAllSchemaActions(SecurityContext securityContext, SchemaActionFilter schemaActionFilter) {
         return repository.getAllSchemaActions(securityContext, schemaActionFilter);
     }
 
     public SchemaAction createSchemaAction(SchemaActionCreate creationContainer,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         SchemaAction schemaAction = createSchemaActionNoMerge(creationContainer, securityContext);
         repository.merge(schemaAction);
         return schemaAction;
     }
 
     public SchemaAction createSchemaActionNoMerge(SchemaActionCreate creationContainer,
-                                        SecurityContextBase securityContext) {
+                                        SecurityContext securityContext) {
         SchemaAction schemaAction = new SchemaAction();
         schemaAction.setId(UUID.randomUUID().toString());
 
@@ -151,7 +151,7 @@ public class SchemaActionService implements Plugin {
     }
 
     public SchemaAction updateSchemaAction(SchemaActionUpdate schemaActionUpdate,
-                                 SecurityContextBase securityContext) {
+                                 SecurityContext securityContext) {
         SchemaAction schemaAction = schemaActionUpdate.getSchemaAction();
         if (updateSchemaActionNoMerge(schemaAction, schemaActionUpdate)) {
             repository.merge(schemaAction);
@@ -160,10 +160,10 @@ public class SchemaActionService implements Plugin {
     }
 
     public void validate(SchemaActionCreate schemaActionCreate,
-                         SecurityContextBase securityContext) {
+                         SecurityContext securityContext) {
         basicService.validate(schemaActionCreate, securityContext);
         String stateSchemaId= schemaActionCreate.getStateSchemaId();
-        StateSchema stateSchema=stateSchemaId!=null?getByIdOrNull(stateSchemaId,StateSchema.class,SecuredBasic_.security,securityContext):null;
+        StateSchema stateSchema=stateSchemaId!=null?getByIdOrNull(stateSchemaId,StateSchema.class,securityContext):null;
         if(stateSchema==null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no stateSchema with id "+stateSchemaId);
         }

@@ -8,7 +8,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.flexicore.model.*;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.*;
 import com.flexicore.ui.request.*;
 
@@ -35,7 +35,7 @@ public class TableColumnRepository implements Plugin {
 
     public List<TableColumn> listAllTableColumns(
             TableColumnFiltering tableColumnFiltering,
-            SecurityContextBase securityContext) {
+            SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<TableColumn> q = cb.createQuery(TableColumn.class);
         Root<TableColumn> r = q.from(TableColumn.class);
@@ -49,13 +49,13 @@ public class TableColumnRepository implements Plugin {
 
     public <T extends TableColumn> void addTableColumnPredicates(List<Predicate> preds,
                                                                  CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r,
-                                                                 TableColumnFiltering tableColumnFiltering, SecurityContextBase securityContextBase) {
-		uiFieldRepository.addUiFieldPredicates(preds,cb,q,r,tableColumnFiltering,securityContextBase);
+                                                                 TableColumnFiltering tableColumnFiltering, SecurityContext SecurityContext) {
+		uiFieldRepository.addUiFieldPredicates(preds,cb,q,r,tableColumnFiltering,SecurityContext);
 
     }
 
     public long countAllTableColumns(TableColumnFiltering tableColumnFiltering,
-                                     SecurityContextBase securityContext) {
+                                     SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Long> q = cb.createQuery(Long.class);
         Root<TableColumn> r = q.from(TableColumn.class);
@@ -67,19 +67,19 @@ public class TableColumnRepository implements Plugin {
     }
 
 
-    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+    public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return uiFieldRepository.listByIds(c, ids, securityContext);
     }
 
-    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContextBase securityContext) {
+    public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
         return uiFieldRepository.getByIdOrNull(id, c, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return uiFieldRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
     }
 
-    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
+    public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContext securityContext) {
         return uiFieldRepository.listByIds(c, ids, baseclassAttribute, securityContext);
     }
 

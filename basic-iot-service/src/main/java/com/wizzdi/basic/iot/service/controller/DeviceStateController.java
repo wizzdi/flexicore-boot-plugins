@@ -1,7 +1,7 @@
 package com.wizzdi.basic.iot.service.controller;
 
 import com.flexicore.annotations.OperationsInside;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.Device_;
 import com.wizzdi.basic.iot.service.request.ChangeStateRequest;
@@ -41,7 +41,7 @@ public class DeviceStateController implements Plugin {
     public ChangeStateResponse changeState(
 
             
-            @RequestBody ChangeStateRequest changeStateRequest, @RequestAttribute SecurityContextBase securityContext) {
+            @RequestBody ChangeStateRequest changeStateRequest, @RequestAttribute SecurityContext securityContext) {
         service.validate(changeStateRequest, securityContext);
         return service.changeState(securityContext, changeStateRequest);
     }

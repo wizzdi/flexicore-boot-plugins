@@ -1,6 +1,6 @@
 package com.wizzdi.basic.iot.service.data;
 
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.StateHistory;
 import com.wizzdi.basic.iot.model.StateHistory_;
@@ -43,7 +43,7 @@ public class StateHistoryAggRepository implements Plugin, InitializingBean {
     @Autowired
     private DataSource dataSource;
 
-    public List<StateHistoryAggEntry> listAllStateHistoriesAgg(StateHistoryAggRequest stateHistoryAggRequest, SecurityContextBase securityContext) {
+    public List<StateHistoryAggEntry> listAllStateHistoriesAgg(StateHistoryAggRequest stateHistoryAggRequest, SecurityContext securityContext) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Tuple> q = cb.createQuery(Tuple.class);
         Root<StateHistory> r = q.from(StateHistory.class);

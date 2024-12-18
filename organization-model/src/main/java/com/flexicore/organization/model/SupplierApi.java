@@ -1,11 +1,11 @@
 package com.flexicore.organization.model;
 
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 
 @Entity
-public class SupplierApi extends SecuredBasic {
+public class SupplierApi extends Baseclass {
 
 	private String implementorCanonicalName;
 

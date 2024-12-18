@@ -7,7 +7,7 @@ import com.flexicore.scheduling.request.ScheduleActionCreate;
 import com.flexicore.scheduling.request.ScheduleActionFilter;
 import com.flexicore.scheduling.request.ScheduleActionUpdate;
 import com.flexicore.scheduling.service.ScheduleActionService;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +32,7 @@ public class ScheduleActionController implements Plugin {
   public ScheduleAction createScheduleAction(
       
       @RequestBody ScheduleActionCreate scheduleActionCreate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleActionService.validate(scheduleActionCreate, securityContext);
     return scheduleActionService.createScheduleAction(scheduleActionCreate, securityContext);
   }
@@ -42,11 +42,11 @@ public class ScheduleActionController implements Plugin {
   public ScheduleAction updateScheduleAction(
       
       @RequestBody ScheduleActionUpdate scheduleActionUpdate,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     String scheduleActionId = scheduleActionUpdate.getId();
     ScheduleAction scheduleAction =
         scheduleActionService.getByIdOrNull(
-            scheduleActionId, ScheduleAction.class, ScheduleAction_.security, securityContext);
+            scheduleActionId, ScheduleAction.class,  securityContext);
     if (scheduleAction == null) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "No ScheduleAction with id " + scheduleActionId);
@@ -61,7 +61,7 @@ public class ScheduleActionController implements Plugin {
   public PaginationResponse<ScheduleAction> getAllScheduleActions(
       
       @RequestBody ScheduleActionFilter scheduleActionFilter,
-      @RequestAttribute SecurityContextBase securityContext) {
+      @RequestAttribute SecurityContext securityContext) {
     scheduleActionService.validate(scheduleActionFilter, securityContext);
     return scheduleActionService.getAllScheduleActions(scheduleActionFilter, securityContext);
   }

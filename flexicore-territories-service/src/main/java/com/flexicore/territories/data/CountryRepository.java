@@ -4,7 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.flexicore.model.territories.Country;
 import com.flexicore.model.territories.Country_;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.territories.request.CountryFilter;
 import com.wizzdi.flexicore.boot.base.annotations.plugins.PluginInfo;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -33,13 +33,13 @@ public class CountryRepository implements Plugin {
 	@Autowired
 	private BaseclassRepository baseclassRepository;
 
-	public List<Country> listAllCountries(SecurityContextBase securityContextBase,
+	public List<Country> listAllCountries(SecurityContext SecurityContext,
 			CountryFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Country> q = cb.createQuery(Country.class);
 		Root<Country> r = q.from(Country.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCountryPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addCountryPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(r).where(preds.toArray(Predicate[]::new)).orderBy(cb.asc(r.get(Country_.name)));
 		TypedQuery<Country> query = em.createQuery(q);
 		BasicRepository.addPagination(filtering,query);
@@ -47,13 +47,13 @@ public class CountryRepository implements Plugin {
 
 	}
 
-	public long countAllCountries(SecurityContextBase securityContextBase,
+	public long countAllCountries(SecurityContext SecurityContext,
 			CountryFilter filtering) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Long> q = cb.createQuery(Long.class);
 		Root<Country> r = q.from(Country.class);
 		List<Predicate> preds = new ArrayList<>();
-		addCountryPredicate(filtering,q, cb, r, preds,securityContextBase);
+		addCountryPredicate(filtering,q, cb, r, preds,SecurityContext);
 		q.select(cb.count(r)).where(preds.toArray(Predicate[]::new));
 		TypedQuery<Long> query = em.createQuery(q);
 		return query.getSingleResult();
@@ -61,13 +61,12 @@ public class CountryRepository implements Plugin {
 	}
 
 	private void addCountryPredicate(CountryFilter filtering, CommonAbstractCriteria q,
-									 CriteriaBuilder cb, Root<Country> r, List<Predicate> preds, SecurityContextBase securityContextBase) {
+									 CriteriaBuilder cb, Root<Country> r, List<Predicate> preds, SecurityContext SecurityContext) {
 		if(filtering.getBasicPropertiesFilter()!=null){
 			BasicRepository.addBasicPropertiesFilter(filtering.getBasicPropertiesFilter(),cb,q,r,preds);
 		}
-		if(securityContextBase!=null){
-			Join<Country, Baseclass> join=r.join(Country_.security);
-			baseclassRepository.addBaseclassPredicates(cb,q,join,preds,securityContextBase);
+		if(SecurityContext!=null){
+			baseclassRepository.addBaseclassPredicates(cb,q,r,preds,SecurityContext);
 		}
 		if(filtering.getCountryCodes()!=null&&!filtering.getCountryCodes().isEmpty()){
 			preds.add(r.get(Country_.countryCode).in(filtering.getCountryCodes()));
@@ -75,13 +74,14 @@ public class CountryRepository implements Plugin {
 
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> T getByIdOrNull(String id, Class<T> c, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
+	public <T extends Baseclass> T getByIdOrNull(String id, Class<T> c, SecurityContext securityContext) {
+		return baseclassRepository.getByIdOrNull(id, c, securityContext);
 	}
 
-	public <D extends Basic, E extends Baseclass, T extends D> List<T> listByIds(Class<T> c, Set<String> ids, SingularAttribute<D, E> baseclassAttribute, SecurityContextBase securityContext) {
-		return baseclassRepository.listByIds(c, ids, baseclassAttribute, securityContext);
+	public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
+		return baseclassRepository.listByIds(c, ids, securityContext);
 	}
+
 
 	public <D extends Basic, T extends D> List<T> findByIds(Class<T> c, Set<String> ids, SingularAttribute<D, String> idAttribute) {
 		return baseclassRepository.findByIds(c, ids, idAttribute);

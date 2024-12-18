@@ -1,7 +1,7 @@
 package com.wizzdi.messaging.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.flexicore.model.SecuredBasic;
+import com.flexicore.model.Baseclass;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Chat extends SecuredBasic {
+public class Chat extends Baseclass {
 
 	@ManyToOne(targetEntity = ChatUser.class)
 	private ChatUser owner;

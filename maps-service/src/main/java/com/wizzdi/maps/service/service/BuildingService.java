@@ -2,7 +2,7 @@ package com.wizzdi.maps.service.service;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
-import com.flexicore.security.SecurityContextBase;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.flexicore.security.service.BaseclassService;
@@ -42,7 +42,7 @@ public class BuildingService implements Plugin {
    * @return created Building
    */
   public Building createBuilding(
-      BuildingCreate buildingCreate, SecurityContextBase securityContext) {
+      BuildingCreate buildingCreate, SecurityContext securityContext) {
     List<Object> toMerge=new ArrayList<>();
     Building building = createBuildingNoMerge(buildingCreate, securityContext,toMerge);
     this.repository.massMerge(toMerge);
@@ -55,7 +55,7 @@ public class BuildingService implements Plugin {
    * @return created Building unmerged
    */
   public Building createBuildingNoMerge(
-      BuildingCreate buildingCreate, SecurityContextBase securityContext,List<Object> toMerge) {
+      BuildingCreate buildingCreate, SecurityContext securityContext,List<Object> toMerge) {
     Building building = new Building();
     building.setId(UUID.randomUUID().toString());
     MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setRelatedType(Building.class.getCanonicalName()).setRelatedId(building.getId()).setExternalId(buildingCreate.getExternalId()).setName(buildingCreate.getExternalId()), securityContext);
@@ -98,7 +98,7 @@ public class BuildingService implements Plugin {
    * @return building
    */
   public Building updateBuilding(
-      BuildingUpdate buildingUpdate, SecurityContextBase securityContext) {
+      BuildingUpdate buildingUpdate, SecurityContext securityContext) {
     Building building = buildingUpdate.getBuilding();
     if (updateBuildingNoMerge(building, buildingUpdate)) {
       this.repository.merge(building);
@@ -112,7 +112,7 @@ public class BuildingService implements Plugin {
    * @return PaginationResponse containing paging information for Building
    */
   public PaginationResponse<Building> getAllBuildings(
-      BuildingFilter buildingFilter, SecurityContextBase securityContext) {
+      BuildingFilter buildingFilter, SecurityContext securityContext) {
     List<Building> list = listAllBuildings(buildingFilter, securityContext);
     long count = this.repository.countAllBuildings(buildingFilter, securityContext);
     return new PaginationResponse<>(list, buildingFilter.getPageSize(), count);
@@ -124,17 +124,17 @@ public class BuildingService implements Plugin {
    * @return List of Building
    */
   public List<Building> listAllBuildings(
-      BuildingFilter buildingFilter, SecurityContextBase securityContext) {
+      BuildingFilter buildingFilter, SecurityContext securityContext) {
     return this.repository.listAllBuildings(buildingFilter, securityContext);
   }
 
   public <T extends Baseclass> List<T> listByIds(
-      Class<T> c, Set<String> ids, SecurityContextBase securityContext) {
+      Class<T> c, Set<String> ids, SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, securityContext);
   }
 
   public <T extends Baseclass> T getByIdOrNull(
-      String id, Class<T> c, SecurityContextBase securityContext) {
+      String id, Class<T> c, SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, securityContext);
   }
 
@@ -142,7 +142,7 @@ public class BuildingService implements Plugin {
       String id,
       Class<T> c,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.getByIdOrNull(id, c, baseclassAttribute, securityContext);
   }
 
@@ -150,7 +150,7 @@ public class BuildingService implements Plugin {
       Class<T> c,
       Set<String> ids,
       SingularAttribute<D, E> baseclassAttribute,
-      SecurityContextBase securityContext) {
+      SecurityContext securityContext) {
     return this.repository.listByIds(c, ids, baseclassAttribute, securityContext);
   }
 
@@ -175,7 +175,7 @@ public class BuildingService implements Plugin {
     this.repository.massMerge(toMerge);
   }
 
-  public Building getOrCreateByExternalId(String buildingId, SecurityContextBase securityContext) {
+  public Building getOrCreateByExternalId(String buildingId, SecurityContext securityContext) {
     String externalId = "%s_%s".formatted(securityContext.getTenantToCreateIn().getId(), buildingId);
     return listAllBuildings(new BuildingFilter().setExternalId(Collections.singleton(externalId)),null).stream().findFirst().orElseGet(()->createBuilding(new BuildingCreate().setExternalId(externalId).setName(buildingId),securityContext));
   }
