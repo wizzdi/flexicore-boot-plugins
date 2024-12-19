@@ -65,7 +65,6 @@ public class UiFieldService implements Plugin {
     private PresetService presetService;
     @Autowired
     @Qualifier("presetClazz")
-    @Lazy
     private Clazz presetClazz;
     @Autowired
     @Lazy

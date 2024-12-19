@@ -20,7 +20,6 @@ public class ClazzProvider implements Plugin {
 
     @Qualifier("gridPresetClazz")
     @Bean
-    @Lazy
     public Clazz gridPresetClazz(ClazzService clazzService){
         return clazzService.getClazz(GridPreset.class).orElseThrow(()->new RuntimeException("cannot find clazz gird preset"));
     }
@@ -28,7 +27,6 @@ public class ClazzProvider implements Plugin {
 
     @Qualifier("presetClazz")
     @Bean
-    @Lazy
     public Clazz presetClazz(ClazzService clazzService){
         return clazzService.getClazz(Preset.class).orElseThrow(()->new RuntimeException("cannot find clazz preset"));
     }

@@ -62,7 +62,6 @@ public class GridPresetService implements Plugin {
 	@Lazy
 	private SecurityContext adminSecurityContext;
 	@Autowired
-	@Lazy
 	@Qualifier("gridPresetClazz")
 	private Clazz gridPresetClazz;
 
