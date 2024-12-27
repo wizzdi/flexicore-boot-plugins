@@ -34,7 +34,7 @@ public class StatusHistoryGroupedService implements Plugin {
         Map<String,List<StatusHistory>> byStatus=lastEventsForMappedPOI.values().stream().collect(Collectors.groupingBy(f->f.getMapIcon().getId()));
         List<StatusHistoryGroupedEntry> entryList=new ArrayList<>();
         for ( List<StatusHistory> list : byStatus.values()) {
-            MapIcon mapIcon=list.get(0).getMapIcon();
+            MapIcon mapIcon=list.getFirst().getMapIcon();
             entryList.add(new StatusHistoryGroupedEntry().setMapIcon(mapIcon).setCount(list.size()));
         }
 

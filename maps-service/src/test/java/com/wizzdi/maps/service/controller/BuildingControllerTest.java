@@ -67,8 +67,7 @@ public class BuildingControllerTest {
 
   }
 
-  @Autowired
-  private MappedPOI mappedPOI;
+
   private Building testBuilding;
   @Autowired
   private TestRestTemplate restTemplate;
@@ -79,7 +78,6 @@ public class BuildingControllerTest {
   public void testBuildingCreate() {
     BuildingCreate request = new BuildingCreate().setName(UUID.randomUUID().toString());
 
-    request.setMappedPOIId(this.mappedPOI.getId());
 
     request.setExternalId("test-string");
 
@@ -111,11 +109,7 @@ public class BuildingControllerTest {
   public void assertBuilding(BuildingCreate request, Building testBuilding) {
     Assertions.assertNotNull(testBuilding);
 
-    if (request.getMappedPOIId() != null) {
-
-      Assertions.assertNotNull(testBuilding.getMappedPOI());
-      Assertions.assertEquals(request.getMappedPOIId(), testBuilding.getMappedPOI().getId());
-    }
+    Assertions.assertNotNull(testBuilding.getMappedPOI());
 
     if (request.getExternalId() != null) {
       Assertions.assertEquals(request.getExternalId(), testBuilding.getExternalId());

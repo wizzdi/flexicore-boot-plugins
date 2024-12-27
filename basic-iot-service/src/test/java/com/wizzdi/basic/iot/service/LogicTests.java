@@ -109,11 +109,11 @@ public class LogicTests {
     @Test
     @Order(1)
     public void testRegister() {
-        RegisterGatewayReceived test = (RegisterGatewayReceived) basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID)).setSentAt(OffsetDateTime.now());
+        RegisterGatewayReceived test = basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID)).setSentAt(OffsetDateTime.now());
         PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(GATEWAY_ID))));
         Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(GATEWAY_ID)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
-        Assertions.assertEquals(gateway.getRemoteId(), GATEWAY_ID);
+        Assertions.assertEquals(GATEWAY_ID, gateway.getRemoteId());
         validateMappedPOI(gateway.getMappedPOI());
         Assertions.assertEquals(gatewayMapIcon.getId(), gateway.getMappedPOI().getMapIcon().getId());
 
@@ -148,7 +148,7 @@ public class LogicTests {
         Device device = deviceService.listAllDevices(adminSecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(DEVICE_ID))).stream().findFirst().orElse(null);
         Assertions.assertNotNull(device);
         Assertions.assertEquals(deviceType.getId(), device.getDeviceType().getId());
-        Assertions.assertEquals(device.getRemoteId(), DEVICE_ID);
+        Assertions.assertEquals(DEVICE_ID, device.getRemoteId());
         Assertions.assertEquals(30, device.getDeviceProperties().get("dim"));
         Assertions.assertNotNull(device.getLastConnectivityChange());
         Assertions.assertEquals(Connectivity.ON, device.getLastConnectivityChange().getConnectivity()); // statechange is counted as keepalive

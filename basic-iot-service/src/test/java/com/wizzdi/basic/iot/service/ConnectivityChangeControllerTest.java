@@ -2,10 +2,14 @@ package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.client.BasicIOTClient;
 import com.wizzdi.basic.iot.model.ConnectivityChange;
+import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.app.App;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeCreate;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeFilter;
 import com.wizzdi.basic.iot.service.request.ConnectivityChangeUpdate;
+import com.wizzdi.basic.iot.service.request.GatewayCreate;
+import com.wizzdi.basic.iot.service.service.RemoteService;
+import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import org.apache.commons.io.FileUtils;
 import org.bouncycastle.crypto.util.PrivateKeyInfoFactory;
@@ -64,6 +68,8 @@ public class ConnectivityChangeControllerTest {
 
     }
 
+    @Autowired
+    private SecurityContext securityContext;
 
 
     @DynamicPropertySource
@@ -82,6 +88,9 @@ public class ConnectivityChangeControllerTest {
     private ConnectivityChange connectivityChange;
     @Autowired
     private TestRestTemplate restTemplate;
+    @Autowired
+    private RemoteService remoteService;
+    private Remote remote;
 
     @BeforeAll
     public void init() {
@@ -91,6 +100,7 @@ public class ConnectivityChangeControllerTest {
                             .add("authenticationKey", "fake");
                     return execution.execute(request, body);
                 }));
+        remote=remoteService.createRemote(new GatewayCreate().setRemoteId(UUID.randomUUID().toString()),securityContext);
 
     }
 
@@ -99,6 +109,7 @@ public class ConnectivityChangeControllerTest {
     public void testConnectivityChangeCreate() {
         String name = UUID.randomUUID().toString();
         ConnectivityChangeCreate request = new ConnectivityChangeCreate()
+                .setRemoteId(remote.getId())
                 .setName(name);
         ResponseEntity<ConnectivityChange> connectivityChangeResponse = this.restTemplate.postForEntity("/plugins/ConnectivityChange/createConnectivityChange", request, ConnectivityChange.class);
         Assertions.assertEquals(200, connectivityChangeResponse.getStatusCodeValue());

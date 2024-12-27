@@ -167,7 +167,7 @@ public class MoveGatewayTest {
     private NewUserResult createUserInTenant(String tenantName) {
         SecurityTenant newTenant = securityTenantService.createTenant(new SecurityTenantCreate().setName(tenantName), adminSecurityContext);
         SecurityUser securityUser = securityUserService.createSecurityUser(new SecurityUserCreate().setTenant(newTenant), adminSecurityContext);
-        tenantToUserService.createTenantToUserNoMerge(new TenantToUserCreate().setTenant(newTenant).setUser(securityUser).setDefaultTenant(true),adminSecurityContext);
+        tenantToUserService.createTenantToUser(new TenantToUserCreate().setTenant(newTenant).setUser(securityUser).setDefaultTenant(true),adminSecurityContext);
         tenantToBaseclassService.createTenantToBaseclass(new TenantToBaseclassCreate().setTenant(newTenant).setClazz(securityWildcard).setOperation(allOps).setAccess(Access.allow),adminSecurityContext);
         return new NewUserResult(securityUser,newTenant);
     }

@@ -4,6 +4,7 @@ package com.wizzdi.maps.service.controller;
 
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.Building;
+import com.wizzdi.maps.model.BuildingFloor;
 import com.wizzdi.maps.model.Room;
 import com.wizzdi.maps.service.App;
 import com.wizzdi.maps.service.request.RoomCreate;
@@ -49,6 +50,8 @@ public class RoomControllerTest {
   @Autowired private TestRestTemplate restTemplate;
 
   @Autowired private Building building;
+  @Autowired
+  private BuildingFloor buildingFloor;
 
    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
 
@@ -93,6 +96,7 @@ public class RoomControllerTest {
     request.setExternalId("test-string");
 
     request.setY(10D);
+    request.setBuildingFloorId(buildingFloor.getId());
 
     ResponseEntity<Room> response =
         this.restTemplate.postForEntity("/Room/createRoom", request, Room.class);

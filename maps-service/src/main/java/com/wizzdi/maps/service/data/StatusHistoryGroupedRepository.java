@@ -43,7 +43,7 @@ public class StatusHistoryGroupedRepository implements Plugin {
     OffsetDateTime statusAtDate = statusHistoryGroupedRequest.getStatusAtDate();
     Query nativeQuery = em.createNativeQuery(
             "select h.* from StatusHistory as h inner join (" +
-            "select max(s.dateAtStatus) as maxDateAtStatus,s.mappedPOI_id from StatusHistory as s join MappedPOI as m on m.id=s.mappedPOI_id join Baseclass as b on b.id=m.security_id where s.dateAtStatus <= ?1 and b.tenant_id in ("+listPlaceHolder+") group by s.mappedPOI_id " +
+            "select max(s.dateAtStatus) as maxDateAtStatus,s.mappedPOI_id from StatusHistory as s join MappedPOI as m on m.id=s.mappedPOI_id  where s.dateAtStatus <= ?1 and m.tenant_id in ("+listPlaceHolder+") group by s.mappedPOI_id " +
             ") groupedStatus on h.dateAtStatus=groupedStatus.maxDateAtStatus and h.mappedPOI_id=groupedStatus.mappedPOI_id",StatusHistory.class);
     nativeQuery.setParameter(1, statusAtDate);
     for (int i = 0; i < collect.size(); i++) {

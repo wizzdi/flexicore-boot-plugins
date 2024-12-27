@@ -94,10 +94,16 @@ public class AppConfig {
         }
         return map;
     }
+    @Bean
+    public BuildingFloor buildingFloor(Building building, BuildingFloorService buildingFloorService){
+        return buildingFloorService.createBuildingFloor(new BuildingFloorCreate().setBuilding(building).setName("floor1"),securityContext);
+    }
 
     @Bean
-    public Room room() {
-        RoomCreate roomCreate = new RoomCreate();
+    public Room room(BuildingFloor buildingFloor) {
+        RoomCreate roomCreate = new RoomCreate()
+                .setBuildingFloor(buildingFloor)
+                .setName("Room1");
         return roomService.createRoom(roomCreate, securityContext);
     }
 
