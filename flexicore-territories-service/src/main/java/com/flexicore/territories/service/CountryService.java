@@ -124,7 +124,7 @@ public class CountryService implements Plugin {
 		return country;
 	}
 
-	private boolean updateCountryNoMerge(Country country,
+	public boolean updateCountryNoMerge(Country country,
 										 CountryCreate creationContainer) {
 		boolean update = basicService.updateBasicNoMerge(
 				creationContainer, country);

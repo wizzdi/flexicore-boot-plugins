@@ -148,6 +148,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
+                                        <Plugin-Dependencies>flexicore-encryption-service@&gt;=${revision}</Plugin-Dependencies>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
