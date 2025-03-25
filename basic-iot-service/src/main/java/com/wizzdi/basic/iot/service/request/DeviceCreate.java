@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Gateway;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ public class DeviceCreate extends RemoteCreate {
     private String deviceTypeId;
     @JsonIgnore
     private DeviceType deviceType;
+    private OffsetDateTime verifiedAt;
 
 
     public String getGatewayId() {
@@ -55,5 +57,12 @@ public class DeviceCreate extends RemoteCreate {
         return (T) this;
     }
 
+    public OffsetDateTime getVerifiedAt() {
+        return verifiedAt;
+    }
 
+    public <T extends DeviceCreate> T setVerifiedAt(OffsetDateTime verifiedAt) {
+        this.verifiedAt = verifiedAt;
+        return (T) this;
+    }
 }

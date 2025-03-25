@@ -1,7 +1,10 @@
 package com.wizzdi.basic.iot.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+
+import java.time.OffsetDateTime;
 
 @Entity
 public class Device extends Remote {
@@ -11,6 +14,9 @@ public class Device extends Remote {
 
     @ManyToOne(targetEntity = DeviceType.class)
     private DeviceType deviceType;
+
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime verifiedAt;
 
 
 
@@ -35,4 +41,12 @@ public class Device extends Remote {
         return (T) this;
     }
 
+    public OffsetDateTime getVerifiedAt() {
+        return verifiedAt;
+    }
+
+    public <T extends Device> T setVerifiedAt(OffsetDateTime verifiedAt) {
+        this.verifiedAt = verifiedAt;
+        return (T) this;
+    }
 }

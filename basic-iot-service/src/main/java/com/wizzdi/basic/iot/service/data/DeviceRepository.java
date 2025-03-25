@@ -89,6 +89,9 @@ public class DeviceRepository implements Plugin {
                     cb.not(cb.equal(mappedPOIJoin.get(MappedPOI_.mapIcon),deviceTypeJoin.get(DeviceType_.defaultMapIcon)))
             ));
         }
+        if(filtering.getVerified()!=null){
+            preds.add(filtering.getVerified()?r.get(Device_.verifiedAt).isNotNull():r.get(Device_.verifiedAt).isNull());
+        }
 
 
 

@@ -23,6 +23,7 @@ public class DeviceFilter extends RemoteFilter {
     private DeviceTypeFilter deviceTypeFilter;
     @JsonIgnore
     private boolean withoutDefaultIcon;
+    private Boolean verified;
 
 
     public Set<String> getGatewayIds() {
@@ -79,6 +80,15 @@ public class DeviceFilter extends RemoteFilter {
 
     public <T extends DeviceFilter> T setWithoutDefaultIcon(boolean withoutDefaultIcon) {
         this.withoutDefaultIcon = withoutDefaultIcon;
+        return (T) this;
+    }
+
+    public Boolean getVerified() {
+        return verified;
+    }
+
+    public <T extends DeviceFilter> T setVerified(Boolean verified) {
+        this.verified = verified;
         return (T) this;
     }
 }

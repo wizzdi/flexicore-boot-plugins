@@ -140,6 +140,10 @@ public class DeviceService implements Plugin {
             device.setGateway(deviceCreate.getGateway());
             update = true;
         }
+        if(deviceCreate.getVerifiedAt()!=null&&!deviceCreate.getVerifiedAt().equals(device.getVerifiedAt())){
+            device.setVerifiedAt(deviceCreate.getVerifiedAt());
+            update=true;
+        }
 
 
         return new RemoteUpdateResponse(update, remoteUpdateResponse.remoteUpdatedEvent());
