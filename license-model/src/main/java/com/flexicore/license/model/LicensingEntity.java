@@ -41,7 +41,7 @@ public class  LicensingEntity extends Baseclass {
 	@JsonIgnore
 	public Clazz getClazz(){
 		List<String> list = Optional.ofNullable(getCanonicalName()).map(f -> f.split("\\.")).stream().flatMap(Arrays::stream).toList();
-		return list.isEmpty()?null:new Clazz(list.getLast());
+		return list.isEmpty()?null: Clazz.ofName(list.getLast());
 	}
 
 	public void setCanonicalName(String canonicalName) {

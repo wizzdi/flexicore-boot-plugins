@@ -48,6 +48,6 @@ public class CategoryToClazz extends Baseclass {
 
 
 	public Clazz getClazz() {
-		return new Clazz(type);
+		return Clazz.ofName(type);
 	}
 }
