@@ -2,8 +2,12 @@ package com.wizzdi.basic.iot.service;
 
 import com.wizzdi.basic.iot.service.utils.KeyUtils;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testcontainers.shaded.org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -18,6 +22,7 @@ import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 public class KeyTest {
 
     public static final String toSign = "067c2435-32b6-459f-bcb9-bcc7143ba0b6";
+    private static final Logger log = LoggerFactory.getLogger(KeyTest.class);
     private String signed;
 
     @Order(1)
@@ -65,6 +70,48 @@ public class KeyTest {
         boolean verify = signature.verify(bytes);
         Assertions.assertTrue(verify);
 
+    }
+
+    @Order(4)
+    @Test
+    public void generate() throws InvalidKeySpecException, IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+
+        java.security.Security.addProvider(
+                new org.bouncycastle.jce.provider.BouncyCastleProvider()
+        );
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+        java.security.KeyPair key = keyGen.generateKeyPair();
+        PrivateKey privateKey = key.getPrivate();
+        PublicKey publicKey = key.getPublic();
+        // 3. Convert Public Key to PEM format
+        String publicKeyPem = convertToPem(publicKey);
+        System.out.println("\n----- PUBLIC KEY (PEM) -----");
+        System.out.println(publicKeyPem);
+        System.out.println("----- END PUBLIC KEY (PEM) -----");
+
+        // 4. Convert Private Key to PEM format
+        String privateKeyPem = convertToPem(privateKey);
+        System.out.println("\n----- PRIVATE KEY (PEM) -----");
+        System.out.println(privateKeyPem);
+        System.out.println("----- END PRIVATE KEY (PEM) -----");
+
+    }
+
+    /**
+     * Converts a Key object (PublicKey or PrivateKey) to PEM format string.
+     *
+     * @param key The Key object to convert.
+     * @return The PEM formatted string representation of the key.
+     * @throws IOException If an error occurs during writing.
+     */
+    public static String convertToPem(Object key) throws IOException {
+        StringWriter stringWriter = new StringWriter();
+        // Use try-with-resources to ensure the writer is closed
+        try (JcaPEMWriter pemWriter = new JcaPEMWriter(stringWriter)) {
+            pemWriter.writeObject(key);
+        } // pemWriter.close() is called automatically here
+        return stringWriter.toString();
     }
 
 

@@ -138,6 +138,7 @@ public class UIComponentService implements Plugin {
         UIComponent uiComponent=new UIComponent();
         uiComponent.setId(UUID.randomUUID().toString());
         uiComponent.setExternalId(uiComponentRegistrationContainer.getExternalId());
+        uiComponent.setName(uiComponentRegistrationContainer.getName());
         uiComponent.setDescription(uiComponentRegistrationContainer.getDescription());
         BaseclassService.createSecurityObjectNoMerge(uiComponent,securityContext);
         return uiComponent;
