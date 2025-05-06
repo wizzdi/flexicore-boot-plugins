@@ -22,7 +22,6 @@ import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 public class KeyTest {
 
     public static final String toSign = "067c2435-32b6-459f-bcb9-bcc7143ba0b6";
-    private static final Logger log = LoggerFactory.getLogger(KeyTest.class);
     private String signed;
 
     @Order(1)
