@@ -468,7 +468,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
         if(!remote.isLockLocation()
                 &&latitude!=null&&longitude!=null
-                &&getDistanceFromCurrentLocation(mappedPOI,longitude,latitude)>locationDistanceThreshold){
+                &&(mappedPOI==null||getDistanceFromCurrentLocation(mappedPOI,longitude,latitude)>locationDistanceThreshold)){
             mappedPOICreate
                     .setLon(longitude)
                     .setLat(latitude);
