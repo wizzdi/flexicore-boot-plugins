@@ -103,7 +103,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Override
     public void onIOTMessage(IOTMessage iotMessage) {
         if(iotMessage instanceof KeepAlive){
-            logger.debug("received message " + iotMessage);
+            logger.debug("received message  " + iotMessage);
 
         }
         else{
@@ -427,6 +427,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
     }
     private MessageHandleContext stateChanged(StateChanged stateChanged, Gateway gateway, SecurityContextBase gatewaySecurityContext) {
+        logger.debug("Have started stateChanged on gateway {}, deviceId is {} , device type {}",
+                gateway.getRemoteId(),Optional.ofNullable(stateChanged).map(StateChanged::getDeviceId).orElse("device id not found"),Optional.ofNullable(stateChanged).map(StateChanged::getDeviceType).orElse("device type not found"));
         String newVersion=null;
         Remote remote=null;
         Map<String, Object> values = stateChanged.getValues();
@@ -439,6 +441,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         keepAlive.add(gateway);
         MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         if(deviceId !=null){
+            logger.debug("device id is {}",deviceId);
             GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
             newVersion=getOrCreateDeviceResponse.newVersion();
             remote=getOrCreateDeviceResponse.device();
@@ -446,6 +449,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             keepAlive.add(remote);
         }
         else{
+            logger.debug("device id is null");
             newVersion= version !=null&&!version.equals(gateway.getVersion())? version :null;
             RemoteUpdateResponse remoteUpdateResponse = gatewayService.updateGatewayNoMerge(gateway, new GatewayCreate().setDeviceProperties(values).setVersion(version));
             if(remoteUpdateResponse.updated()){
@@ -513,7 +517,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private double getDistanceFromCurrentLocation(MappedPOI mappedPOI, double longitude, double latitude) {
-        if(mappedPOI.getLat()==null || mappedPOI.getLon()==null){
+        logger.debug("getDistanceFromCurrentLocation  mappedPoi is null {}",mappedPOI==null);
+        if((mappedPOI == null) || (mappedPOI.getLat() == null) || (mappedPOI.getLon() == null)){
             return Double.POSITIVE_INFINITY;
         }
         return DistanceUtils.haversineDistance(mappedPOI.getLat(),mappedPOI.getLon(),latitude,longitude);
