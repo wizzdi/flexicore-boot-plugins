@@ -23,7 +23,7 @@ import java.util.Collections;
 @Component
 public class PublicKeyService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(PublicKeyService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
     public static final String CACHE_NAME = "publicKeyCache";
     private final GatewayService gatewayService;
 

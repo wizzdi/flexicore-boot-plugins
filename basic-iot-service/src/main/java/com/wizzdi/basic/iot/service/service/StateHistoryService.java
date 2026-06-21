@@ -35,7 +35,7 @@ import java.util.UUID;
 
 public class StateHistoryService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(StateHistoryService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private StateHistoryRepository repository;

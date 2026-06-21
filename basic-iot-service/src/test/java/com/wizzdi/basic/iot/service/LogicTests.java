@@ -78,7 +78,7 @@ public class LogicTests {
 
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(LogicTests.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
 
     private static final String GATEWAY_ID = "test_gateway";
     public static final String DEVICE_ID = "test";

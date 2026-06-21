@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
 @OperationsInside
 public class DownloadFirmwareController implements Plugin {
 
-    private static final Logger logger = LoggerFactory.getLogger(DownloadFirmwareController.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private DownloadFirmwareService downloadFirmwareService;

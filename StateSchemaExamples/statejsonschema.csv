@@ -1,0 +1,434 @@
+statejsonschema
+"{
+    ""$schema"": ""http://json-schema.org/draft-04/schema#"",
+    ""type"": ""object"",
+    ""properties"": {
+        ""AccelerometerImpact"": {
+            ""type"": ""boolean"",
+            ""readOnly"": true
+        },
+        ""AccelerometerFullScale"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                2,
+                4,
+                8,
+                16
+            ],
+            ""description"": ""possible sample value range of the accelerometer. [ n*(-10^3) , n*10^3 ] where n=2,4,8,16""
+        },
+        ""AccelerometerTreshold"": {
+            ""type"": ""integer"",
+            ""minimum"": 2000,
+            ""maximum"": 16000,
+            ""description"": ""threshold for \""AccelerometerImpact\"" alert from device. (units mG)""
+        },
+        ""RSSI"": {
+            ""type"": ""integer"",
+            ""minimum"": -120,
+            ""maximum"": 0,
+            ""readOnly"": true
+        },
+        ""Net_Type"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ],
+            ""readOnly"": true
+        },
+        ""Oper_Code"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 4294967295,
+            ""readOnly"": true
+        },
+        ""SIM_ID"": {
+            ""type"": ""string"",
+            ""readOnly"": true,
+            ""maxLength"": 20
+        },
+        ""Host_URL"": {
+            ""type"": ""string"",
+            ""description"": ""sets url for mqtt server"",
+            ""maxLength"": 255
+        },
+        ""APN"": {
+            ""type"": ""string"",
+            ""description"": ""APN of the network provider"",
+            ""maxLength"": 100
+        },
+        ""APR"": {
+            ""type"": ""string"",
+            ""description"": ""APR of the network provider"",
+            ""maxLength"": 100
+        },
+        ""ConnTime"": {
+            ""type"": ""string"",
+            ""readOnly"": true,
+            ""maxLength"": 64
+        },
+        ""FWversion"": {
+            ""type"": ""string"",
+            ""readOnly"": true,
+            ""maxLength"": 255
+        },
+        ""LocalTime"": {
+            ""type"": ""string"",
+            ""readOnly"": true,
+            ""maxLength"": 64
+        },
+        ""CurrFault"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""DimFault"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""DALILEDFailure"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""DALIStatus"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""BytesSent"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 18446744073709551615,
+            ""readOnly"": true
+        },
+        ""BytesRcvd"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 18446744073709551615,
+            ""readOnly"": true
+        },
+        ""DALIDevType"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""DALILightType"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""Net_Pri"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ],
+            ""description"": ""network type search order. 0:CAT_M1->CAT_NB1->GSM, 1:CAT_NB1->CAT_M1->GSM, 2:GSM->CAT_M1->CAT_NB1, 3:GSM->CAT_NB1->CAT_M1, 4:CAT_M1->GSM->CAT_NB1, 5:CAT_NB1->GSM->CAT_M1, 6:CAT_M1->CAT_M1->GSM, 7:CAT_M1->CAT_M1->CAT_M1,""
+        },
+        ""Pref_Oper_Code"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 4294967295,
+            ""description"": ""sets the preferred operator code for network registration""
+        },
+        ""ConnTimeOut"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65525,
+            ""description"": ""connection to server retry time out in secs""
+        },
+        ""ConnPeriod"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65525,
+            ""description"": ""server reconnection time minutes""
+        },
+        ""TimeSync"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""description"": ""period in hours for modem time sync""
+        },
+        ""BLE_Pass"": {
+            ""type"": ""string"",
+            ""description"": ""changes BLE password"",
+            ""maxLength"": 6
+        },
+        ""DimCurrProtect"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1
+            ],
+            ""description"": ""current protector. 0- disable, 1- enable""
+        },
+        ""DimOnOff"": {
+            ""type"": ""boolean"",
+            ""description"": ""turn on/off light""
+        },
+        ""DimLevel"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 100,
+            ""description"": ""light dim level""
+        },
+        ""DimMaxLevel"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""description"": ""maximum allowed level of dimming""
+        },
+        ""DimMinLevel"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""description"": ""minimum allowed level of dimming""
+        },
+        ""DimMode"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1,
+                2
+            ],
+            ""description"": ""0- manual control, 1- auto control (light sensor), 2- periodic control (set timing via \""DimCurve\"")""
+        },
+        ""KeepAlivePeriod"": {
+            ""type"": ""integer"",
+            ""minimum"": 1,
+            ""maximum"": 4294967295,
+            ""description"": ""keepAlive message period in secs""
+        },
+        ""DimTimeOut"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 1440,
+            ""description"": ""if during \""DimMode\""=1 or \""DimMode\""=2, if a \""DimLevel\"" is received, the device will change dimming level for \""DimTimeOut\"" seconds""
+        },
+        ""DimSlope"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""description"": ""dimming change rate. represents a number of seconds to go from 0% to 100%""
+        },
+        ""DimCurve"": {
+            ""type"": ""array"",
+            ""items"": {
+                ""type"": ""array"",
+                ""items"": [
+                    {
+                        ""type"": ""integer"",
+                        ""minimum"": 0,
+                        ""maximum"": 1440,
+                        ""description"": ""Offset from a midnight, minutes""
+                    },
+                    {
+                        ""type"": ""integer"",
+                        ""minimum"": 0,
+                        ""maximum"": 100,
+                        ""description"": ""Dimmer level, percents""
+                    }
+                ],
+                ""maxItems"": 2,
+                ""minItems"": 2
+            },
+            ""maxItems"": 5,
+            ""description"": ""Dimmer schedule for a day""
+        },
+        ""DimTargetLevel"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true
+        },
+        ""SystemFailureLevel"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255
+        },
+        ""Voltage"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65525,
+            ""readOnly"": true
+        },
+        ""Current"": {
+            ""type"": ""number"",
+            ""minimum"": 0,
+            ""maximum"": 2147483647,
+            ""readOnly"": true
+        },
+        ""ActiveEnergy"": {
+            ""type"": ""number"",
+            ""minimum"": 0,
+            ""maximum"": 2147483647,
+            ""readOnly"": true
+        },
+        ""ActivePower"": {
+            ""type"": ""number"",
+            ""minimum"": 0,
+            ""maximum"": 2147483647,
+            ""readOnly"": true
+        },
+        ""Latitude"": {
+            ""type"": ""number"",
+            ""minimum"": -90,
+            ""maximum"": 90,
+            ""readOnly"": true
+        },
+        ""Longitude"": {
+            ""type"": ""number"",
+            ""minimum"": -180,
+            ""maximum"": 180,
+            ""readOnly"": true
+        },
+        ""PhotoResistorThreshold"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 3000
+        },
+        ""GnssSatAmount"": {
+            ""type"": ""integer"",
+            ""minimum"": 1,
+            ""maximum"": 255,
+            ""description"": ""indicating a number of satellites. Default value=7""
+        },
+        ""GnssTimeout"": {
+            ""type"": ""integer"",
+            ""minimum"": 1,
+            ""maximum"": 65535,
+            ""description"": ""indicating time in seconds. Default value=90""
+        },
+        ""DimInterface"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1
+            ],
+            ""description"": ""Dimmer control interface. 0 - 0-10V; 1 - DALI2""
+        },
+        ""DefaultDim"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 100,
+            ""description"": ""Dimmer default level on startup""
+        },
+        ""DimCurveType"": {
+            ""type"": ""integer"",
+            ""enum"": [
+                0,
+                1
+            ],
+            ""description"": ""Dimmer curve type. 0 - logarithmic, 1 - linear""
+        },
+        ""CurrCurve"": {
+            ""type"": ""array"",
+            ""items"": {
+                ""type"": ""array"",
+                ""items"": [
+                    {
+                        ""type"": ""integer"",
+                        ""minimum"": 0,
+                        ""maximum"": 100,
+                        ""description"": ""Dimmer percents""
+                    },
+                    {
+                        ""type"": ""integer"",
+                        ""minimum"": 0,
+                        ""maximum"": 65535,
+                        ""description"": ""LED current mA""
+                    }
+                ],
+                ""maxItems"": 2,
+                ""minItems"": 2
+            },
+            ""maxItems"": 10,
+            ""description"": ""Dimmer current curve for current fault detection""
+        },
+        ""CurrDelta"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""description"": ""Current delta for current fault detection""
+        },
+        ""LightUth"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""description"": ""Upper threshold for automatic control. Photo sensor current, uA""
+        },
+        ""LightLth"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""description"": ""Lower threshold for automatic control. Photo sensor current, uA""
+        },
+        ""LEDmA"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 4294967295,
+            ""readOnly"": true,
+            ""description"": ""LED current from current sensor, mA""
+        },
+        ""LightInt"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 4294967295,
+            ""readOnly"": true,
+            ""description"": ""Light intensity. Photo sensor current, uA""
+        },
+        ""DimStatus"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 255,
+            ""readOnly"": true,
+            ""description"": ""Dimmer status that was read from DALI control gear. Bitmap in accordance to standard""
+        },
+        ""SchemaVersion"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""readOnly"": true,
+            ""description"": ""Schema version the device is supposed to work with""
+        },
+        ""ElectricalValuesPeriod"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""description"": ""Period for reporting electrical values, minutes""
+        },
+        ""BytesReportPeriod"": {
+            ""type"": ""integer"",
+            ""minimum"": 0,
+            ""maximum"": 65535,
+            ""description"": ""Period for reporting modem send/received bytes, minutes""
+        },
+        ""BGFWversion"": {
+            ""type"": ""string"",
+            ""readOnly"": true,
+            ""maxLength"": 64
+        }
+    }
+}
+"

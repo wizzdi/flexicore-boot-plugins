@@ -23,7 +23,7 @@ import java.time.OffsetDateTime;
 @Extension
 public class StateHistoryCreator implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(StateHistoryCreator.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private SecurityContextProvider securityContextProvider;

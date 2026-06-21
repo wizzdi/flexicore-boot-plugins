@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 public class RemoteService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(RemoteService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private RemoteRepository repository;

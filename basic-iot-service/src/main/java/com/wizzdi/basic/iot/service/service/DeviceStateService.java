@@ -29,7 +29,7 @@ import java.util.concurrent.*;
 
 public class DeviceStateService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(DeviceStateService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
     private static final ExecutorService executorService= Executors.newVirtualThreadPerTaskExecutor();
 
     @Autowired

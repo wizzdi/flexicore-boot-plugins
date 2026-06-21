@@ -28,7 +28,7 @@ import static com.wizzdi.basic.iot.client.BasicIOTClient.SIGNATURE_ALGORITHM;
 @Component
 public class DownloadFirmwareService implements Plugin {
 
-    private static final Logger logger = LoggerFactory.getLogger(DownloadFirmwareService.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
     @Autowired
     private FileResourceService fileResourceService;
     @Autowired

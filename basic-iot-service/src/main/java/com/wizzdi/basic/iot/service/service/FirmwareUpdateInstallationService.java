@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public class FirmwareUpdateInstallationService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(FirmwareUpdateInstallationService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private FirmwareUpdateInstallationRepository repository;

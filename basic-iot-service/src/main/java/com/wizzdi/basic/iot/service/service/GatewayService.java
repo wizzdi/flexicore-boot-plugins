@@ -49,7 +49,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 public class GatewayService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(GatewayService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
     @Autowired
     private GatewayRepository repository;
 

@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 @Component
 @Extension
 public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
-    private static final Logger logger = LoggerFactory.getLogger(BasicIOTLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private SecurityContext adminSecurityContext;
@@ -101,6 +101,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private boolean badMessageResponse;
     @Value("${basic.iot.mqtt.keepAlive.bounce:#{3*60*1000}}")
     private long keepAliveBounceThreshold;
+
+    @Value("${basic.iot.keyPath:server-signing-key.pem}")
+    private String keyPath;
 
     @Value("${basic.iot.map.locationDistanceThresholdMeters:#{200}}")
     private int locationDistanceThreshold;
@@ -339,6 +342,20 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         }
         logger.debug("done fixing invalid status {} ",System.currentTimeMillis()-started);
     }
+    public String getServerPublicKey() {
+        try {
+            java.io.File keyFile = new java.io.File(keyPath);
+            String pubKeyPath = keyFile.getAbsolutePath().replaceFirst("\\.[^.]+$|", "") + ".pub.pem";
+            java.io.File pubKeyFile = new java.io.File(pubKeyPath);
+            if (pubKeyFile.exists()) {
+                return java.nio.file.Files.readString(pubKeyFile.toPath(), java.nio.charset.Charset.defaultCharset());
+            }
+        } catch (Exception e) {
+            logger.error("failed reading server public key", e);
+        }
+        return null;
+    }
+
     public long fixIcons(SecurityContext securityContext) {
         long started=System.currentTimeMillis();
         fixInvalidStatus();

@@ -33,6 +33,7 @@ public class BasicIOTController implements Plugin {
     private BasicIOTLogic basicIOTLogic;
 
 
+
     @Operation(summary = "Run fixing connectivity off with default icon fix")
     @GetMapping("/fixIcons")
     public long fixIcons(

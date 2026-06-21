@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class SchemaActionService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(SchemaActionService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private SchemaActionRepository repository;

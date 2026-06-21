@@ -57,20 +57,18 @@ public class BasicIOTClient {
     private final String id;
     private PublicKeyProvider publicKeyProvider;
     private final boolean client;
-    private final boolean disableVerification;
     private final Consumer<IOTMessage> outgoingMessageCallback;
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers) {
-        this(id, key, objectMapper, subscribers, false, false,null);
+        this(id, key, objectMapper, subscribers, false, null);
     }
 
 
-    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,boolean disableVerification,Consumer<IOTMessage> outgoingMessageCallback) {
+    public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,Consumer<IOTMessage> outgoingMessageCallback) {
         this.objectMapper = objectMapper;
         this.subscribers = subscribers;
         this.id = id;
         this.client = client;
-        this.disableVerification=disableVerification;
         this.outgoingMessageCallback=outgoingMessageCallback;
         try {
             signature = Signature.getInstance(SIGNATURE_ALGORITHM);
@@ -133,9 +131,6 @@ public class BasicIOTClient {
     }
 
     public boolean verifyMessage(IOTMessage iotMessage) {
-        if(disableVerification){
-            return true;
-        }
         if(!iotMessage.isRequireAuthentication()){
             return true;
         }

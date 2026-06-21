@@ -23,7 +23,7 @@ import java.util.Collections;
 @Component
 public class KeepAliveBounceService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(KeepAliveBounceService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
     public static final String CACHE_NAME = "keepAliveBounceCache";
 
     @Cacheable(cacheNames = CACHE_NAME,key = "#remoteId",cacheManager = "keepAliveBounceCacheManager")

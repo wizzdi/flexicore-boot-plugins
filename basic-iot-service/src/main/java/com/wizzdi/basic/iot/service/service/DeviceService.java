@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class DeviceService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(DeviceService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private DeviceRepository repository;

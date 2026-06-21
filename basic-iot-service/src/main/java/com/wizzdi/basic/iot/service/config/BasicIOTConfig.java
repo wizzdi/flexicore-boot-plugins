@@ -42,14 +42,27 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
+import java.security.SecureRandom;
 
 @Extension
 @Configuration
@@ -59,7 +72,7 @@ import java.util.concurrent.TimeUnit;
 @EnableAsync(proxyTargetClass = true)
 public class BasicIOTConfig implements Plugin {
 
-    private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
 
     @Value("${basic.iot.id:iot-server}")
     private String iotId;
@@ -77,13 +90,19 @@ public class BasicIOTConfig implements Plugin {
     private String keystorePassword;
     @Value("${basic.iot.mqtt.keyStoreType:#{null}}")
     private String keyStoreType;
+    @Value("${basic.iot.mqtt.trustStore:#{null}}")
+    private String trustStore;
+    @Value("${basic.iot.mqtt.trustStorePassword:#{null}}")
+    private String trustStorePassword;
+    @Value("${basic.iot.mqtt.trustStoreType:#{null}}")
+    private String trustStoreType;
     @Value("${basic.iot.mqtt.defaultRetained:false}")
     private boolean defaultRetained;
-    @Value("${basic.iot.mqtt.disableVerification:false}")
-    private boolean disableVerification;
 
-    @Value("${basic.iot.mqtt.url:ssl://localhost:8883}")
+    @Value("${basic.iot.mqtt.url:#{null}}")
     private String[] mqttURLs;
+    @Value("${basic.iot.start.delay:60}")
+    private int startDelay;
     @Autowired
     @Lazy
     private PublicKeyService publicKeyService;
@@ -109,9 +128,10 @@ public class BasicIOTConfig implements Plugin {
     public MqttPahoClientFactory mqttServerFactory() {
         logger.info("mqttServerFactory");
 
-        if (mqttURLs == null || mqttURLs.length == 0) {
+        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
+        if (!isMqttConfigured()) {
             logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
-            return null;
+            return factory;
         }
         if (keystore != null) {
             System.setProperty("javax.net.ssl.keyStore", keystore);
@@ -125,8 +145,34 @@ public class BasicIOTConfig implements Plugin {
             System.setProperty("javax.net.ssl.keyStoreType", keyStoreType);
 
         }
-        DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
+        if (trustStore != null) {
+            System.setProperty("javax.net.ssl.trustStore", trustStore);
+
+        }
+        if (trustStorePassword != null) {
+            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+
+        }
+        if (trustStoreType != null) {
+            System.setProperty("javax.net.ssl.trustStoreType", trustStoreType);
+
+        }
         MqttConnectOptions options = new MqttConnectOptions();
+        if (trustStore != null) {
+             try {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                KeyStore ks = KeyStore.getInstance(trustStoreType != null ? trustStoreType : KeyStore.getDefaultType());
+                try (InputStream is = new java.io.FileInputStream(trustStore)) {
+                    ks.load(is, trustStorePassword != null ? trustStorePassword.toCharArray() : null);
+                }
+                tmf.init(ks);
+                sslContext.init(null, tmf.getTrustManagers(), new SecureRandom());
+                options.setSocketFactory(sslContext.getSocketFactory());
+            } catch (Exception e) {
+                logger.error("failed to initialize mqtt ssl with truststore", e);
+            }
+        }
         if (username != null) {
             options.setUserName(username);
         }
@@ -169,19 +215,55 @@ public class BasicIOTConfig implements Plugin {
 
 
     @Bean
-    public PrivateKey privateKey() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+    public PrivateKey privateKey() {
 
-        return KeyUtils.readPrivateKey(keyPath);
+        try {
+            return KeyUtils.readPrivateKey(keyPath);
+        }
+        catch (Exception e) {
+            logger.error("failed to read private key from {}, generating temporary key so server can start", keyPath, e);
+            return generateTemporaryPrivateKey();
+        }
+    }
+
+    private PrivateKey generateTemporaryPrivateKey() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            return keyPairGenerator.generateKeyPair().getPrivate();
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("failed to generate temporary private key", e);
+        }
     }
 
 
 
 
     @Bean
-    public PublicKeyProvider publicKeyProvider() {
+    public PublicKeyProvider publicKeyProvider(PrivateKey privateKey) {
         logger.info("publicKeyProvider");
+        PublicKey serverPublicKey = getServerPublicKey(privateKey);
 
-        return f ->  publicKeyService.getPublicKeyForGateway(f);
+        return f -> {
+            if (iotId.equals(f) && serverPublicKey != null) {
+                return new PublicKeyResponse(serverPublicKey, true);
+            }
+            return publicKeyService.getPublicKeyForGateway(f);
+        };
+    }
+
+    private PublicKey getServerPublicKey(PrivateKey privateKey) {
+        if (privateKey instanceof RSAPrivateCrtKey priv) {
+            try {
+                RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(priv.getModulus(), priv.getPublicExponent());
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+                return keyFactory.generatePublic(publicKeySpec);
+            } catch (Exception e) {
+                logger.error("failed to derive public key from private key", e);
+            }
+        }
+        return null;
     }
 
 
@@ -192,16 +274,12 @@ public class BasicIOTConfig implements Plugin {
     public BasicIOTClient basicIOTClient(PrivateKey privateKey, PublicKeyProvider publicKeyProvider, ObjectProvider<IOTMessageSubscriber> iotMessageSubscribers) throws IOException, InterruptedException {
         logger.info("basicIOTClient");
 
-        if (mqttURLs == null || mqttURLs.length == 0) {
-            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
-            return null;
-        }
         ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().toList(),false,disableVerification,f->incOutgoingMessage(f.getClass().getSimpleName()))
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().toList(),false,false,f->incOutgoingMessage(f.getClass().getSimpleName()))
                 .setPublicKeyProvider(publicKeyProvider);
     }
 
@@ -243,17 +321,12 @@ public class BasicIOTConfig implements Plugin {
     public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow, Semaphore virtualThreadsLogicSemaphore, MeterRegistry meterRegistry) {
         logger.info("serverInputIntegrationFlow");
 
-        if (mqttURLs == null || mqttURLs.length == 0) {
+        if (!isMqttConfigured() || mqttServerFactory == null) {
             logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
-            return null;
+            return new ServerIntegrationFlowHolder(null, new BasicIOTConnection(null, mqttOutboundFlow, null));
         }
         logger.info("mqttPahoMessageDrivenChannelAdapterServer");
-
-        if (mqttURLs == null || mqttURLs.length == 0) {
-            logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
-            return null;
-        }
-        MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT);
+        MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter = new MqttPahoMessageDrivenChannelAdapter(iotId+"-in", mqttServerFactory, BasicIOTClient.MAIN_TOPIC_PATH_OUT, "mqtt-test");
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
 
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter)
@@ -304,7 +377,14 @@ public class BasicIOTConfig implements Plugin {
 
                 })
                 .get();
-        BasicIOTConnection basicIOTConnection = basicIOTClient.open(standardIntegrationFlow, mqttOutboundFlow, mqttPahoMessageDrivenChannelAdapter);
+        BasicIOTConnection basicIOTConnection;
+        try {
+            basicIOTConnection = basicIOTClient.open(standardIntegrationFlow, mqttOutboundFlow, mqttPahoMessageDrivenChannelAdapter);
+        }
+        catch (Exception e) {
+            logger.error("mqtt server will not start because opening the MQTT connection failed", e);
+            basicIOTConnection = new BasicIOTConnection(standardIntegrationFlow, mqttOutboundFlow, mqttPahoMessageDrivenChannelAdapter);
+        }
 
         return new ServerIntegrationFlowHolder(standardIntegrationFlow,basicIOTConnection);
     }
@@ -313,17 +393,18 @@ public class BasicIOTConfig implements Plugin {
     @Bean
     @Qualifier("mqttInbound")
     public IntegrationFlow mqttInbound(ServerIntegrationFlowHolder serverIntegrationFlowHolder){
-        return serverIntegrationFlowHolder.getIntegrationFlow();
+        IntegrationFlow integrationFlow = serverIntegrationFlowHolder.getIntegrationFlow();
+        return integrationFlow != null ? integrationFlow : f -> f.nullChannel();
     }
 
 
     @Bean
-    @Qualifier("mqttOutbounndFlow")
+    @Qualifier("mqttOutboundFlow")
     public IntegrationFlow mqttOutboundFlow(MqttPahoClientFactory mqttServerFactory) {
         logger.info("serverOutputIntegrationFlow");
-        if (mqttURLs == null || mqttURLs.length == 0) {
+        if (!isMqttConfigured() || mqttServerFactory == null) {
             logger.warn("mqtt server will not start as basic.iot.mqtt.url is empty");
-            return null;
+            return f -> f.nullChannel();
         }
 
         MqttPahoMessageHandler someMqttClient = new MqttPahoMessageHandler(iotId+"-out", mqttServerFactory);
@@ -339,6 +420,18 @@ public class BasicIOTConfig implements Plugin {
 
         return serverIntegrationFlowHolder.getBasicIOTConnection();
 
+    }
+
+    private boolean isMqttConfigured() {
+        if (mqttURLs == null || mqttURLs.length == 0) {
+            return false;
+        }
+        for (String mqttURL : mqttURLs) {
+            if (mqttURL != null && !mqttURL.isBlank()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

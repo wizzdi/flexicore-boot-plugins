@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 public class StateSchemaService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(StateSchemaService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
 
     @Autowired
     private StateSchemaRepository repository;

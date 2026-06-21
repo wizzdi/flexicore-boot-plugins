@@ -39,7 +39,7 @@ import java.util.*;
 
 public class DeviceTypeService implements Plugin {
 
-    private static final Logger logger= LoggerFactory.getLogger(DeviceTypeService.class);
+    private static final Logger logger= LoggerFactory.getLogger("basic-iot");
     public static final String UNKNOWN_STATUS_SUFFIX = "UNKNOWN";
 
     @Autowired
