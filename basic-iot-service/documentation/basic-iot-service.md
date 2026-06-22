@@ -477,6 +477,10 @@ The Basic IoT Service requires specific configuration in `application.properties
 | `basic.iot.mqtt.caCertificatePath` | MQTT broker CA certificate path. Optional. Defaults to `cacert.pem` under `basic.iot.mqtt.certsBaseDir`. | `/home/flexicore/mqttcerts/cacert.pem` |
 | `basic.iot.mqtt.clientCertificatePath` | MQTT client certificate path. Optional. Defaults to `<basic.iot.id>.crt` under `basic.iot.mqtt.certsBaseDir`. | `/home/flexicore/mqttcerts/playground.crt` |
 | `basic.iot.mqtt.clientKeyPath` | MQTT client private key path (PKCS#8). Optional. Defaults to `<basic.iot.id>.key` under `basic.iot.mqtt.certsBaseDir`. | `/home/flexicore/mqttcerts/playground.key` |
+| `basic.iot.mqtt.clientCertificateBase64` | Base64 or PEM-encoded MQTT client certificate for mutual TLS. Takes precedence over truststore-only TLS when used together with the private key and CA properties. | - |
+| `basic.iot.mqtt.clientPrivateKeyBase64` | Base64 or PEM-encoded MQTT client private key for mutual TLS. The key must be PKCS#8. | - |
+| `basic.iot.mqtt.caCertificateBase64` | Base64 or PEM-encoded MQTT broker CA certificate for mutual TLS. | - |
+| `basic.iot.mqtt.privateKeyAlgorithm` | Private key algorithm used for the MQTT client key. | `RSA` |
 | `basic.iot.start.delay` | Seconds to delay the initialization of the MQTT client factory. Used to ensure other critical system components are ready and to prevent immediate startup failure if some configurations are lazily loaded. | `30` |
 
 ### Resilient Startup

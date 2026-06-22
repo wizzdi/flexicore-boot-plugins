@@ -36,13 +36,16 @@ import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
-import org.springframework.messaging.Message;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
@@ -50,17 +53,19 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.InvalidKeySpecException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 import java.security.SecureRandom;
 
@@ -96,6 +101,22 @@ public class BasicIOTConfig implements Plugin {
     private String trustStorePassword;
     @Value("${basic.iot.mqtt.trustStoreType:#{null}}")
     private String trustStoreType;
+    @Value("${basic.iot.mqtt.clientCertificateBase64:#{null}}")
+    private String clientCertificateBase64;
+    @Value("${basic.iot.mqtt.clientPrivateKeyBase64:#{null}}")
+    private String clientPrivateKeyBase64;
+    @Value("${basic.iot.mqtt.caCertificateBase64:#{null}}")
+    private String caCertificateBase64;
+    @Value("${basic.iot.mqtt.privateKeyAlgorithm:RSA}")
+    private String mqttPrivateKeyAlgorithm;
+    @Value("${basic.iot.mqtt.certsBaseDir:#{null}}")
+    private String mqttCertsBaseDir;
+    @Value("${basic.iot.mqtt.caCertificatePath:#{null}}")
+    private String mqttCaCertificatePath;
+    @Value("${basic.iot.mqtt.clientCertificatePath:#{null}}")
+    private String mqttClientCertificatePath;
+    @Value("${basic.iot.mqtt.clientKeyPath:#{null}}")
+    private String mqttClientKeyPath;
     @Value("${basic.iot.mqtt.defaultRetained:false}")
     private boolean defaultRetained;
 
@@ -158,8 +179,20 @@ public class BasicIOTConfig implements Plugin {
 
         }
         MqttConnectOptions options = new MqttConnectOptions();
-        if (trustStore != null) {
-             try {
+        if (isBase64MutualTlsConfigured()) {
+            try {
+                options.setSocketFactory(buildMutualTlsContext(clientCertificateBase64, clientPrivateKeyBase64, caCertificateBase64, mqttPrivateKeyAlgorithm).getSocketFactory());
+            } catch (Exception e) {
+                logger.error("failed to initialize mqtt mutual tls from base64 certificates", e);
+            }
+        } else if (isFileMutualTlsConfigured()) {
+            try {
+                options.setSocketFactory(buildMutualTlsContextFromFiles(getMqttCaCertificatePath(), getMqttClientCertificatePath(), getMqttClientKeyPath(), mqttPrivateKeyAlgorithm).getSocketFactory());
+            } catch (Exception e) {
+                logger.error("failed to initialize mqtt mutual tls from certificate files", e);
+            }
+        } else if (trustStore != null) {
+            try {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 KeyStore ks = KeyStore.getInstance(trustStoreType != null ? trustStoreType : KeyStore.getDefaultType());
@@ -187,6 +220,100 @@ public class BasicIOTConfig implements Plugin {
         options.setMaxInflight(maxInFlight);
         factory.setConnectionOptions(options);
         return factory;
+    }
+
+    private boolean isBase64MutualTlsConfigured() {
+        return hasText(clientCertificateBase64) && hasText(clientPrivateKeyBase64) && hasText(caCertificateBase64);
+    }
+
+    private boolean isFileMutualTlsConfigured() {
+        return hasText(mqttCertsBaseDir) || hasText(mqttCaCertificatePath) || hasText(mqttClientCertificatePath) || hasText(mqttClientKeyPath);
+    }
+
+    private SSLContext buildMutualTlsContextFromFiles(String caCertificatePath,
+                                                      String clientCertificatePath,
+                                                      String clientKeyPath,
+                                                      String privateKeyAlgorithm) throws Exception {
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate caCert;
+        try (InputStream is = Files.newInputStream(Paths.get(caCertificatePath))) {
+            caCert = (X509Certificate) certificateFactory.generateCertificate(is);
+        }
+        X509Certificate clientCert;
+        try (InputStream is = Files.newInputStream(Paths.get(clientCertificatePath))) {
+            clientCert = (X509Certificate) certificateFactory.generateCertificate(is);
+        }
+
+        byte[] keyBytes = Files.readAllBytes(Paths.get(clientKeyPath));
+        String keyString = normalizeCertificateValue(new String(keyBytes));
+        PrivateKey privateKey = KeyFactory.getInstance(hasText(privateKeyAlgorithm) ? privateKeyAlgorithm : "RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(keyString)));
+
+        return buildMutualTlsContext(clientCert, privateKey, caCert);
+    }
+
+    private SSLContext buildMutualTlsContext(String base64ClientCertificate,
+                                            String base64ClientPrivateKey,
+                                            String base64CaCertificate,
+                                            String privateKeyAlgorithm) throws Exception {
+        byte[] clientCertDer = Base64.getDecoder().decode(normalizeCertificateValue(base64ClientCertificate));
+        byte[] clientKeyDer = Base64.getDecoder().decode(normalizeCertificateValue(base64ClientPrivateKey));
+        byte[] caCertDer = Base64.getDecoder().decode(normalizeCertificateValue(base64CaCertificate));
+
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate clientCert = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(clientCertDer));
+        X509Certificate caCert = (X509Certificate) certificateFactory.generateCertificate(new ByteArrayInputStream(caCertDer));
+
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(clientKeyDer);
+        PrivateKey privateKey = KeyFactory.getInstance(hasText(privateKeyAlgorithm) ? privateKeyAlgorithm : "RSA").generatePrivate(keySpec);
+
+        return buildMutualTlsContext(clientCert, privateKey, caCert);
+    }
+
+    private SSLContext buildMutualTlsContext(X509Certificate clientCert, PrivateKey privateKey, X509Certificate caCert) throws Exception {
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keyStore.load(null, null);
+        keyStore.setKeyEntry("client", privateKey, new char[0], new Certificate[]{clientCert});
+
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+        trustStore.load(null, null);
+        trustStore.setCertificateEntry("ca", caCert);
+
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, new char[0]);
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(trustStore);
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
+        return sslContext;
+    }
+
+    private String getMqttCaCertificatePath() {
+        return hasText(mqttCaCertificatePath) ? mqttCaCertificatePath : getMqttCertPath("cacert.pem");
+    }
+
+    private String getMqttClientCertificatePath() {
+        return hasText(mqttClientCertificatePath) ? mqttClientCertificatePath : getMqttCertPath(iotId + ".crt");
+    }
+
+    private String getMqttClientKeyPath() {
+        return hasText(mqttClientKeyPath) ? mqttClientKeyPath : getMqttCertPath(iotId + ".key");
+    }
+
+    private String getMqttCertPath(String fileName) {
+        return Path.of(mqttCertsBaseDir, fileName).toString();
+    }
+
+    private String normalizeCertificateValue(String value) {
+        return value == null ? "" : value.replace("-----BEGIN CERTIFICATE-----", "")
+                .replace("-----END CERTIFICATE-----", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s+", "");
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Bean
@@ -279,7 +406,7 @@ public class BasicIOTConfig implements Plugin {
                 .registerModule(new JavaTimeModule())
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().toList(),false,false,f->incOutgoingMessage(f.getClass().getSimpleName()))
+        return new BasicIOTClient(iotId, privateKey, objectMapper, iotMessageSubscribers.stream().toList(), false, f -> incOutgoingMessage(f.getClass().getSimpleName()))
                 .setPublicKeyProvider(publicKeyProvider);
     }
 
