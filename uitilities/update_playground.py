@@ -10,6 +10,9 @@ Behavior:
   - Excludes sources/original/shade/gradle/migration/javadoc/test jars.
   - Connects over SSH/SFTP using Paramiko.
   - Backs up existing remote plugins/entities into /home/avishay/backups.
+  - Before any upload, reads remote /home/flexicore/plugins and /home/flexicore/entities.
+  - Transfers a local JAR only when a remote JAR with the same main artifact name
+    already exists in the corresponding target folder, regardless of version.
   - Uploads JARs to /tmp first.
   - Installs JARs into the correct remote folder using sudo.
   - Removes older remote JARs with the same artifactId but a different version.
@@ -31,7 +34,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 import paramiko
 
 
-SCRIPT_VERSION = "remote-dry-run-v2"
+SCRIPT_VERSION = "remote-existing-artifact-only-v3"
 
 
 EXCLUDED_JAR_KEYWORDS = (
@@ -290,6 +293,92 @@ def list_remote_jars(
     return [line.strip() for line in stdout_data.splitlines() if line.strip()]
 
 
+def remote_artifact_ids(remote_filenames: Iterable[str]) -> set[str]:
+    """
+    Convert remote JAR filenames into main artifact names, ignoring versions.
+
+    Example:
+      basic-iot-service-9.0.1.jar -> basic-iot-service
+      basic-iot-service-9.0.2.jar -> basic-iot-service
+    """
+    artifact_ids: set[str] = set()
+
+    for remote_filename in remote_filenames:
+        artifact_id, _version = parse_artifact_version(remote_filename)
+        if artifact_id:
+            artifact_ids.add(artifact_id)
+
+    return artifact_ids
+
+
+def filter_candidates_existing_on_remote(
+    candidates: List[JarCandidate],
+    remote_jars_by_dir: Dict[str, List[str]],
+) -> Tuple[List[JarCandidate], List[JarCandidate]]:
+    """
+    Keep only local candidates whose main artifact name already exists remotely
+    in the same target folder.
+
+    This intentionally ignores the version number. For example, if the remote
+    folder contains alert-service-9.0.1.jar and the local build has
+    alert-service-9.0.2.jar, the local JAR is eligible.
+
+    If no remote JAR with artifact_id='alert-service' exists in the matching
+    remote folder, the local JAR is skipped and not transferred.
+    """
+    remote_artifact_ids_by_dir = {
+        remote_dir: remote_artifact_ids(remote_filenames)
+        for remote_dir, remote_filenames in remote_jars_by_dir.items()
+    }
+
+    eligible: List[JarCandidate] = []
+    skipped_missing_remote: List[JarCandidate] = []
+
+    for candidate in candidates:
+        existing_artifact_ids = remote_artifact_ids_by_dir.get(candidate.remote_dir, set())
+
+        if candidate.artifact_id in existing_artifact_ids:
+            eligible.append(candidate)
+        else:
+            skipped_missing_remote.append(candidate)
+
+    return eligible, skipped_missing_remote
+
+
+def print_remote_filter_summary(
+    candidates: List[JarCandidate],
+    skipped_missing_remote: List[JarCandidate],
+    remote_jars_by_dir: Dict[str, List[str]],
+) -> None:
+    print("")
+    print("Remote target inventory:")
+    for remote_dir in sorted(remote_jars_by_dir):
+        print(f"  {remote_dir}: {len(remote_jars_by_dir[remote_dir])} JAR(s)")
+
+    if skipped_missing_remote:
+        print("")
+        print(
+            "Skipping local JAR(s) whose main artifact name was not found "
+            "in the matching remote target folder:"
+        )
+        for candidate in skipped_missing_remote:
+            print(
+                f"  [skip-missing-remote] {candidate.filename} -> {candidate.remote_dir} "
+                f"(artifact={candidate.artifact_id}, version={candidate.version or 'unknown'})"
+            )
+
+    print("")
+    if candidates:
+        print(f"Eligible for transfer after remote-name filter: {len(candidates)} JAR(s)")
+        for candidate in candidates:
+            print(
+                f"  [eligible] {candidate.filename} -> {candidate.remote_dir} "
+                f"(artifact={candidate.artifact_id}, version={candidate.version or 'unknown'})"
+            )
+    else:
+        print("No local JARs are eligible for transfer after remote-name filter.")
+
+
 def find_remote_same_artifact_different_version(
     remote_filenames: Iterable[str],
     local_candidate: JarCandidate,
@@ -444,7 +533,7 @@ def main() -> int:
     parser.add_argument("--remote-backup-root", default="/home/avishay/backups", help="Remote backup root")
     parser.add_argument("--remote-stage-root", default="/tmp", help="Remote temp/stage root")
     parser.add_argument("--owner", default="flexicore:flexicore", help="Remote owner for installed JARs. Use empty string to skip chown.")
-    parser.add_argument("--dry-run", action="store_true", help="Only scan and print what would be deployed")
+    parser.add_argument("--dry-run", action="store_true", help="Connect, scan remote names, and print what would be deployed without changing remote files")
 
     args = parser.parse_args()
 
@@ -488,6 +577,8 @@ def main() -> int:
     installed = 0
     skipped_same_checksum = 0
     removed_old = 0
+    skipped_missing_remote = 0
+    stage_created = False
 
     try:
         print(f"Connecting to SSH: {args.username}@{args.host}:{args.port}")
@@ -500,11 +591,48 @@ def main() -> int:
         )
         print("SSH connection established.")
 
+        print("Reading remote plugin/entity JAR names before deployment...")
+        remote_jars_by_dir = {
+            args.remote_plugins_dir: list_remote_jars(
+                ssh,
+                args.remote_plugins_dir,
+                sudo_password,
+            ),
+            args.remote_entities_dir: list_remote_jars(
+                ssh,
+                args.remote_entities_dir,
+                sudo_password,
+            ),
+        }
+
+        candidates, skipped_missing_remote_candidates = filter_candidates_existing_on_remote(
+            candidates,
+            remote_jars_by_dir,
+        )
+        skipped_missing_remote = len(skipped_missing_remote_candidates)
+
+        print_remote_filter_summary(
+            candidates,
+            skipped_missing_remote_candidates,
+            remote_jars_by_dir,
+        )
+
+        if not candidates:
+            print("")
+            print("Nothing to transfer: no collected local JAR matched an existing remote main artifact name.")
+            return 1
+
+        if args.dry_run:
+            print("")
+            print("Dry run requested; no backup, upload, install, cleanup, or remote file changes were performed.")
+            return 0
+
         sftp = ssh.open_sftp()
         print("SFTP session established.")
 
         print(f"Creating remote stage directory: {stage_dir}")
         mkdir_sftp_safe(sftp, stage_dir)
+        stage_created = True
 
         print("Creating remote backup before deployment...")
         backup_dir = create_remote_backup(
@@ -577,13 +705,14 @@ def main() -> int:
         print(f"Backup:                  {backup_dir}")
         print(f"Uploaded to stage:       {uploaded}")
         print(f"Installed/replaced:      {installed}")
+        print(f"Skipped missing remote:  {skipped_missing_remote}")
         print(f"Skipped same checksum:   {skipped_same_checksum}")
         print(f"Removed old versions:    {removed_old}")
 
         return 0
 
     finally:
-        if ssh is not None:
+        if ssh is not None and "stage_created" in locals() and stage_created:
             try:
                 cleanup_stage_dir(ssh, stage_dir, sudo_password if "sudo_password" in locals() else "")
             except Exception as exc:
