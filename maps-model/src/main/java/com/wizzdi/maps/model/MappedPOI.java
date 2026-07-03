@@ -48,6 +48,10 @@ public class MappedPOI extends Baseclass {
     @OneToMany(targetEntity = MapGroupToMappedPOI.class, mappedBy = "mappedPOI")
     private List<MapGroupToMappedPOI> mapGroupToMappedPOIS = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(targetEntity = MappedPOIToLayer.class, mappedBy = "mappedPOI")
+    private List<MappedPOIToLayer> mappedPOIToLayers = new ArrayList<>();
+
     private boolean keepLocationHistory;
     private boolean keepStatusHistory;
 
@@ -399,6 +403,17 @@ public class MappedPOI extends Baseclass {
 
     public <T extends MappedPOI> T setMapGroupToMappedPOIS(List<MapGroupToMappedPOI> mapGroupToMappedPOIS) {
         this.mapGroupToMappedPOIS = mapGroupToMappedPOIS;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    @OneToMany(targetEntity = MappedPOIToLayer.class, mappedBy = "mappedPOI")
+    public List<MappedPOIToLayer> getMappedPOIToLayers() {
+        return mappedPOIToLayers;
+    }
+
+    public <T extends MappedPOI> T setMappedPOIToLayers(List<MappedPOIToLayer> mappedPOIToLayers) {
+        this.mappedPOIToLayers = mappedPOIToLayers;
         return (T) this;
     }
 

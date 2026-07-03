@@ -36,6 +36,10 @@ import java.util.Set;
         @IdValid(
                 targetField = "layers",
                 field = "layerIds",
+                fieldType = com.wizzdi.maps.model.Layer.class),
+        @IdValid(
+                targetField = "requiredLayers",
+                field = "requiredLayerIds",
                 fieldType = com.wizzdi.maps.model.Layer.class)
 })
 public class MappedPOIFilter extends PaginationFilter {
@@ -93,6 +97,10 @@ public class MappedPOIFilter extends PaginationFilter {
     @TypeRetention(Layer.class)
     private List<Layer> layers;
     private boolean layerExclude;
+    private Set<String> requiredLayerIds=new HashSet<>();
+    @JsonIgnore
+    @TypeRetention(Layer.class)
+    private List<Layer> requiredLayers;
 
     private Boolean withIcon;
 
@@ -136,6 +144,8 @@ public class MappedPOIFilter extends PaginationFilter {
         this.layerExclude=other.layerExclude;
         this.layerIds=other.layerIds;
         this.layers=other.layers;
+        this.requiredLayerIds=other.requiredLayerIds;
+        this.requiredLayers=other.requiredLayers;
         this.withIcon=other.withIcon;
         this.hasLocation=other.hasLocation;
     }
@@ -426,6 +436,26 @@ public class MappedPOIFilter extends PaginationFilter {
 
     public MappedPOIFilter setLayerExclude(boolean layerExclude) {
         this.layerExclude = layerExclude;
+        return this;
+    }
+
+    public Set<String> getRequiredLayerIds() {
+        return requiredLayerIds;
+    }
+
+    public MappedPOIFilter setRequiredLayerIds(Set<String> requiredLayerIds) {
+        this.requiredLayerIds = requiredLayerIds;
+        return this;
+    }
+
+    @JsonIgnore
+    @TypeRetention(Layer.class)
+    public List<Layer> getRequiredLayers() {
+        return requiredLayers;
+    }
+
+    public MappedPOIFilter setRequiredLayers(List<Layer> requiredLayers) {
+        this.requiredLayers = requiredLayers;
         return this;
     }
 

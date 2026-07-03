@@ -19,6 +19,8 @@
                 <class>com.wizzdi.maps.model.MapIcon</class>
             
                 <class>com.wizzdi.maps.model.MappedPOI</class>
+
+                <class>com.wizzdi.maps.model.MappedPOIToLayer</class>
             
                 <class>com.wizzdi.maps.model.Room</class>
             

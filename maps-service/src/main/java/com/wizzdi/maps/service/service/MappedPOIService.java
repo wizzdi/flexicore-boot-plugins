@@ -322,6 +322,14 @@ public class MappedPOIService implements Plugin {
         }
         mappedPOIFilter.setLayers(new ArrayList<>(layerMap.values()));
 
+        Set<String> requiredLayerIds = mappedPOIFilter.getRequiredLayerIds();
+        Map<String, Layer> requiredLayerMap = requiredLayerIds.isEmpty() ? new HashMap<>() : repository.listByIds(Layer.class, requiredLayerIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
+        requiredLayerIds.removeAll(requiredLayerMap.keySet());
+        if (!requiredLayerIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Required Layers with ids " + requiredLayerIds);
+        }
+        mappedPOIFilter.setRequiredLayers(new ArrayList<>(requiredLayerMap.values()));
+
         Set<String> roomIds = mappedPOIFilter.getRoomIds();
         Map<String, Room> room = roomIds.isEmpty() ? new HashMap<>() : repository.listByIds(Room.class, roomIds,securityContext).parallelStream().collect(Collectors.toMap(f -> f.getId(), f -> f));
         roomIds.removeAll(room.keySet());

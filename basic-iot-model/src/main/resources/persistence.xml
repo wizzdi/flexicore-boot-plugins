@@ -7,6 +7,7 @@
         <class>com.wizzdi.basic.iot.model.ConnectivityChange</class>
         <class>com.wizzdi.basic.iot.model.Device</class>
         <class>com.wizzdi.basic.iot.model.DeviceType</class>
+        <class>com.wizzdi.basic.iot.model.DeviceTypeToMapIcon</class>
         <class>com.wizzdi.basic.iot.model.Gateway</class>
         <class>com.wizzdi.basic.iot.model.PendingGateway</class>
         <class>com.wizzdi.basic.iot.model.Remote</class>

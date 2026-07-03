@@ -15,6 +15,9 @@ public class Layer extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = MappedPOI.class,mappedBy = "layer")
     private List<MappedPOI> mappedPOIS=new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(targetEntity = MappedPOIToLayer.class,mappedBy = "layer")
+    private List<MappedPOIToLayer> mappedPOIToLayers=new ArrayList<>();
     private String externalId;
     @ManyToOne(targetEntity = LayerType.class)
     private LayerType layerType;
@@ -35,6 +38,16 @@ public class Layer extends Baseclass {
         this.mappedPOIS = mappedPOIS;
         return this;
     }
+
+    public List<MappedPOIToLayer> getMappedPOIToLayers() {
+        return mappedPOIToLayers;
+    }
+
+    public Layer setMappedPOIToLayers(List<MappedPOIToLayer> mappedPOIToLayers) {
+        this.mappedPOIToLayers = mappedPOIToLayers;
+        return this;
+    }
+
     @ManyToOne(targetEntity = LayerType.class)
     public LayerType getLayerType() {
         return layerType;

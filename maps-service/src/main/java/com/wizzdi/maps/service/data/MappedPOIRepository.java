@@ -110,6 +110,21 @@ public class MappedPOIRepository implements Plugin {
             Predicate in = join.get(Layer_.id).in(ids);
             preds.add(filtering.isLayerExclude()?cb.not(in):in);
         }
+        if (filtering.getRequiredLayers()!=null && !filtering.getRequiredLayers().isEmpty()) {
+            Set<String> ids =
+                    filtering.getRequiredLayers().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());
+            Subquery<Long> subquery = q.subquery(Long.class);
+            Root<MappedPOIToLayer> linkRoot = subquery.from(MappedPOIToLayer.class);
+            Join<MappedPOIToLayer, Layer> layerJoin = linkRoot.join(MappedPOIToLayer_.layer);
+            subquery.select(cb.countDistinct(layerJoin.get(Layer_.id)));
+            subquery.where(
+                    cb.equal(linkRoot.get(MappedPOIToLayer_.mappedPOI), r),
+                    layerJoin.get(Layer_.id).in(ids),
+                    cb.isFalse(linkRoot.get(MappedPOIToLayer_.softDelete)),
+                    cb.isFalse(layerJoin.get(Layer_.softDelete))
+            );
+            preds.add(cb.equal(subquery, Long.valueOf(ids.size())));
+        }
         if (filtering.getRoom() != null && !filtering.getRoom().isEmpty()) {
             Set<String> ids =
                     filtering.getRoom().parallelStream().map(f -> f.getId()).collect(Collectors.toSet());

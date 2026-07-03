@@ -65,6 +65,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private DeviceService deviceService;
     @Autowired
     private DeviceTypeService deviceTypeService;
+    @Autowired
+    private DeviceTypeToMapIconService deviceTypeToMapIconService;
 
     @Autowired
     private StateSchemaService stateSchemaService;
@@ -336,7 +338,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         List<Device> remotesAtInvalidStatus = deviceService.listAllDevices(null, new DeviceFilter().setWithoutDefaultIcon(true).setConnectivity(Collections.singleton(Connectivity.OFF)));
         logger.debug("Have found {}  devices at invalid status",remotesAtInvalidStatus.size());
         for (Device atInvalidStatus : remotesAtInvalidStatus) {
-            MapIcon defaultMapIcon = atInvalidStatus.getDeviceType().getDefaultMapIcon();
+            MapIcon defaultMapIcon = deviceTypeToMapIconService.getDefaultMapIcon(atInvalidStatus.getDeviceType(), remoteService.getRemoteSecurityContext(atInvalidStatus));
             mappedPOIService.updateMappedPOI(new MappedPOIUpdate().setMappedPOI(atInvalidStatus.getMappedPOI()).setMapIcon(defaultMapIcon),null);
             logger.info("fixed invalid status for device "+atInvalidStatus.getRemoteId()+"("+atInvalidStatus.getId()+")");
         }
@@ -385,9 +387,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
                 logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
                 if (remote instanceof Device device) {
-                    if (device.getMappedPOI() != null && device.getDeviceType() != null && device.getDeviceType().getDefaultMapIcon() != null) {
+                    if (device.getMappedPOI() != null && device.getDeviceType() != null) {
                         MapIcon previousStatus = device.getMappedPOI().getMapIcon();
-                        MapIcon newStatus = device.getDeviceType().getDefaultMapIcon();
+                        MapIcon newStatus = deviceTypeToMapIconService.getDefaultMapIcon(device.getDeviceType(), remoteService.getRemoteSecurityContext(device));
+                        if (newStatus == null) {
+                            continue;
+                        }
                         if (previousStatus != null && !previousStatus.getId().equals(newStatus.getId())) {
                             device.setPreConnectivityLossIcon(previousStatus);
                         }
@@ -620,6 +625,10 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             DeviceType deviceType = device.getDeviceType();
             Class<? extends Device> deviceClass = device.getClass();
 
+            MapIcon configuredMapIcon = deviceTypeToMapIconService.getMapIconForState(deviceType, status, gatewaySecurityContext);
+            if (configuredMapIcon != null) {
+                return configuredMapIcon;
+            }
             return deviceTypeService.getOrCreateMapIcon(status, deviceType.getName(), deviceClass,gatewaySecurityContext);
 
         }
