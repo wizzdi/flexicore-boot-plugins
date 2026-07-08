@@ -104,7 +104,7 @@ public class FirmwareUpdateInstallationControllerTest {
                     return execution.execute(request, body);
                 }));
         PendingGateway remote=pendingGatewayService.createPendingGateway(new PendingGatewayCreate().setGatewayId("fake"),adminSecurityContext);
-        gateway=gatewayService.approveGateways(adminSecurityContext,new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(remote.getGatewayId())))).getList().stream().findFirst().orElseThrow(()->new RuntimeException("could not get approved gateway"));
+        gateway=gatewayService.approveGateways(adminSecurityContext,new ApproveGatewaysRequest().setPendingGatewayIds(Collections.singleton(remote.getId()))).getList().stream().findFirst().orElseThrow(()->new RuntimeException("could not get approved gateway"));
         firmwareUpdate=firmwareUpdateService.createFirmwareUpdate(new FirmwareUpdateCreate().setFileResource(firmwareFile.get()).setVersion("3.0.0"),adminSecurityContext);
 
     }

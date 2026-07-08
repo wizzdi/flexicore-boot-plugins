@@ -69,6 +69,9 @@ public class PendingGatewayRepository implements Plugin {
         if(filtering.getGatewayIds()!=null&&!filtering.getGatewayIds().isEmpty()){
             preds.add(r.get(PendingGateway_.gatewayId).in(filtering.getGatewayIds()));
         }
+        if(filtering.getGatewayConfirmationReceived()!=null){
+            preds.add(cb.equal(r.get(PendingGateway_.gatewayConfirmationReceived), filtering.getGatewayConfirmationReceived()));
+        }
 
 
     }

@@ -40,6 +40,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.lang.management.ManagementFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +64,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -78,6 +80,7 @@ import java.security.SecureRandom;
 public class BasicIOTConfig implements Plugin {
 
     private static final Logger logger = LoggerFactory.getLogger("basic-iot");
+    private static final com.sun.management.OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getPlatformMXBean(com.sun.management.OperatingSystemMXBean.class);
 
     @Value("${basic.iot.id:iot-server}")
     private String iotId;
@@ -119,6 +122,8 @@ public class BasicIOTConfig implements Plugin {
     private String mqttClientKeyPath;
     @Value("${basic.iot.mqtt.defaultRetained:false}")
     private boolean defaultRetained;
+    @Value("${basic.iot.message.processing.logInterval:1000}")
+    private long messageProcessingLogInterval;
 
     @Value("${basic.iot.mqtt.url:#{null}}")
     private String[] mqttURLs;
@@ -414,6 +419,11 @@ public class BasicIOTConfig implements Plugin {
 
     private static final Map<String,Counter> outgoingCounterMap=new ConcurrentHashMap<>();
 
+    private static final AtomicLong processedMessageCount = new AtomicLong();
+    private static final AtomicLong processedMessageTotalTimeNanos = new AtomicLong();
+    private static final AtomicLong processedMessageMinTimeNanos = new AtomicLong(Long.MAX_VALUE);
+    private static final AtomicLong processedMessageMaxTimeNanos = new AtomicLong();
+
 
     private void incOutgoingMessage( String type) {
         Counter counter = outgoingCounterMap.computeIfAbsent(type, e -> Counter.builder("outgoing.message.count")
@@ -430,6 +440,28 @@ public class BasicIOTConfig implements Plugin {
                 .tag("type", e)
                 .register(meterRegistry));
         timer.record(time, TimeUnit.NANOSECONDS);
+    }
+
+    private void recordProcessedMessageTime(String type, long time) {
+        long count = processedMessageCount.incrementAndGet();
+        long total = processedMessageTotalTimeNanos.addAndGet(time);
+        processedMessageMinTimeNanos.accumulateAndGet(time, Math::min);
+        processedMessageMaxTimeNanos.accumulateAndGet(time, Math::max);
+        if (messageProcessingLogInterval > 0 && count % messageProcessingLogInterval == 0) {
+            logger.info("processed {} mqtt messages, latest type {}, latest {} ms, min {} ms, max {} ms, average {} ms, system cpu load {}%",
+                    count,
+                    type,
+                    TimeUnit.NANOSECONDS.toMillis(time),
+                    TimeUnit.NANOSECONDS.toMillis(processedMessageMinTimeNanos.get()),
+                    TimeUnit.NANOSECONDS.toMillis(processedMessageMaxTimeNanos.get()),
+                    TimeUnit.NANOSECONDS.toMillis(total / count),
+                    getSystemCpuLoadPercentage());
+        }
+    }
+
+    private String getSystemCpuLoadPercentage() {
+        double cpuLoad = operatingSystemMXBean != null ? operatingSystemMXBean.getCpuLoad() : -1;
+        return cpuLoad >= 0 ? String.format("%.2f", cpuLoad * 100) : "unknown";
     }
 
     @Bean
@@ -463,6 +495,7 @@ public class BasicIOTConfig implements Plugin {
                    // logger.info("handling mqtt id "+message.getHeaders().getId() +" with id "+message.getPayload());
                     String type="unknown";
                     IOTMessage iotMessage =null;
+                    boolean acquired = false;
                   try {
                       iotMessage = basicIOTClient.parseMessage(message, IOTMessage.class);
                       type = iotMessage != null ? iotMessage.getClass().getSimpleName() : type;
@@ -476,6 +509,7 @@ public class BasicIOTConfig implements Plugin {
                         long waitingStart=System.nanoTime();
 
                         virtualThreadsLogicSemaphore.acquire();
+                        acquired = true;
                         timeMessage(TimerType.WAITING,type, System.nanoTime() - waitingStart);
 
                         long verifyingStart=System.nanoTime();
@@ -497,8 +531,12 @@ public class BasicIOTConfig implements Plugin {
                         logger.error("error handling message",e);
                     }
                     finally {
-                        virtualThreadsLogicSemaphore.release();
-                        timeMessage(TimerType.TOTAL,type, System.nanoTime() - start);
+                        if (acquired) {
+                            virtualThreadsLogicSemaphore.release();
+                        }
+                        long totalTime = System.nanoTime() - start;
+                        timeMessage(TimerType.TOTAL,type, totalTime);
+                        recordProcessedMessageTime(type, totalTime);
 
                     }
 

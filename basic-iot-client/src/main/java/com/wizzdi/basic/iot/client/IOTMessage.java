@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
                 @JsonSubTypes.Type(value = KeepAlive.class,name = "com.wizzdi.basic.iot.client.KeepAlive"),
                 @JsonSubTypes.Type(value = RegisterGateway.class,name = "com.wizzdi.basic.iot.client.RegisterGateway"),
                 @JsonSubTypes.Type(value = RegisterGatewayReceived.class,name = "com.wizzdi.basic.iot.client.RegisterGatewayReceived"),
+                @JsonSubTypes.Type(value = RegisterGatewayConfirmationReceived.class,name = "com.wizzdi.basic.iot.client.RegisterGatewayConfirmationReceived"),
                 @JsonSubTypes.Type(value = StateChanged.class,name = "com.wizzdi.basic.iot.client.StateChanged"),
                 @JsonSubTypes.Type(value = StateChangedReceived.class,name = "com.wizzdi.basic.iot.client.StateChangedReceived"),
                 @JsonSubTypes.Type(value = UpdateStateSchema.class,name = "com.wizzdi.basic.iot.client.UpdateStateSchema"),

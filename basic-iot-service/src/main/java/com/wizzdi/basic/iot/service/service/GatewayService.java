@@ -20,6 +20,8 @@ import com.wizzdi.flexicore.security.service.TenantToUserService;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.service.request.MappedPOICreate;
+import com.wizzdi.maps.service.request.MappedPOIFilter;
+import com.wizzdi.maps.service.request.MappedPOIUpdate;
 import com.wizzdi.maps.service.service.MappedPOIService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -104,13 +106,37 @@ public class GatewayService implements Plugin {
                                   SecurityContext securityContext) {
         remoteService.validateFiltering(gatewayFilter, securityContext);
     }
-    public void validateFiltering(ApproveGatewaysRequest gatewayFilter,
+    public void validateFiltering(ApproveGatewaysRequest approveGatewaysRequest,
                                   SecurityContext securityContext) {
-        if(gatewayFilter.getPendingGatewayFilter()==null){
-            throw new ResponseStatusException(BAD_REQUEST,"pendingGatewayFilter must be provided");
+        Set<String> pendingGatewayIds = approveGatewaysRequest.getPendingGatewayIds();
+        if (pendingGatewayIds == null || pendingGatewayIds.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "pendingGatewayIds must be provided");
         }
-        gatewayFilter.getPendingGatewayFilter().setRegistered(false);
-        pendingGatewayService.validateFiltering(gatewayFilter.getPendingGatewayFilter(), securityContext);
+        Map<String, PendingGateway> pendingGatewayMap = listByIds(PendingGateway.class, pendingGatewayIds, securityContext)
+                .stream()
+                .collect(Collectors.toMap(PendingGateway::getId, f -> f, (a, b) -> a));
+        Set<String> missing = new HashSet<>(pendingGatewayIds);
+        missing.removeAll(pendingGatewayMap.keySet());
+        if (!missing.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "No PendingGateway with ids " + missing);
+        }
+        List<PendingGateway> alreadyRegistered = pendingGatewayMap.values().stream()
+                .filter(f -> f.getRegisteredGateway() != null)
+                .toList();
+        if (!alreadyRegistered.isEmpty()) {
+            throw new ResponseStatusException(BAD_REQUEST, "PendingGateway already registered ids " + alreadyRegistered.stream().map(PendingGateway::getId).toList());
+        }
+        approveGatewaysRequest.setPendingGateways(new ArrayList<>(pendingGatewayMap.values()));
+        String tenantId = approveGatewaysRequest.getTenantId();
+        if (tenantId == null || tenantId.isBlank()) {
+            approveGatewaysRequest.setTargetTenant(securityContext.getTenantToCreateIn());
+            return;
+        }
+        SecurityTenant targetTenant = getByIdOrNull(tenantId, SecurityTenant.class, securityContext);
+        if (targetTenant == null) {
+            throw new ResponseStatusException(BAD_REQUEST, "No SecurityTenant with id " + tenantId);
+        }
+        approveGatewaysRequest.setTargetTenant(targetTenant);
     }
 
     public PaginationResponse<Gateway> getAllGateways(
@@ -200,10 +226,11 @@ public class GatewayService implements Plugin {
     }
 
     public PaginationResponse<Gateway> approveGateways(SecurityContext securityContext, ApproveGatewaysRequest approveGatewaysRequest) {
-        PendingGatewayFilter pendingGatewayFilter = approveGatewaysRequest.getPendingGatewayFilter();
-        pendingGatewayFilter.setRegistered(false);
-        List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(securityContext, pendingGatewayFilter);
-        return approveGateways(securityContext, pendingGateways);
+        SecurityTenant targetTenant = approveGatewaysRequest.getTargetTenant();
+        if (targetTenant != null) {
+            securityContext.setTenantToCreateIn(targetTenant);
+        }
+        return approveGateways(securityContext, approveGatewaysRequest.getPendingGateways());
     }
 
     private PaginationResponse<Gateway> approveGateways(SecurityContext securityContext, List<PendingGateway> pendingGateways) {
@@ -214,7 +241,7 @@ public class GatewayService implements Plugin {
                     .setApprovingUser(securityContext.getUser())
                     .setGatewayUser(gatewaySecurityUser);
             Gateway gateway = createGatewayNoMerge(gatewayCreate, securityContext);
-            MappedPOI mappedPOI = mappedPOIService.createMappedPOINoMerge(new MappedPOICreate().setExternalId(gateway.getRemoteId()).setMapIcon(gatewayMapIcon).setRelatedType(Gateway.class.getCanonicalName()).setRelatedId(gateway.getId()).setName(gateway.getName()), securityContext);
+            MappedPOI mappedPOI = getOrCreateGatewayMappedPOI(pendingGateway, gateway, securityContext);
             gateway.setMappedPOI(mappedPOI);
             repository.massMergePlain(List.of(mappedPOI,gateway));
             response.add(gateway);
@@ -222,6 +249,34 @@ public class GatewayService implements Plugin {
             invalidatePublicKey(gateway);
         }
         return new PaginationResponse<>(response, response.size(), response.size());
+    }
+
+    private MappedPOI getOrCreateGatewayMappedPOI(PendingGateway pendingGateway, Gateway gateway, SecurityContext securityContext) {
+        MappedPOICreate create = new MappedPOICreate()
+                .setExternalId(gateway.getRemoteId())
+                .setMapIcon(gatewayMapIcon)
+                .setRelatedType(Gateway.class.getCanonicalName())
+                .setRelatedId(gateway.getId())
+                .setLat(pendingGateway.getLat())
+                .setLon(pendingGateway.getLon())
+                .setName(gateway.getName());
+        List<MappedPOI> existingPendingPoints = mappedPOIService.listAllMappedPOIs(new MappedPOIFilter()
+                .setRelatedType(Collections.singleton(PendingGateway.class.getCanonicalName()))
+                .setRelatedId(Collections.singleton(pendingGateway.getId())), securityContext);
+        if (!existingPendingPoints.isEmpty()) {
+            MappedPOI mappedPOI = existingPendingPoints.get(0);
+            MappedPOIUpdate update = new MappedPOIUpdate().setMappedPOI(mappedPOI);
+            update.setExternalId(gateway.getRemoteId());
+            update.setMapIcon(gatewayMapIcon);
+            update.setRelatedType(Gateway.class.getCanonicalName());
+            update.setRelatedId(gateway.getId());
+            update.setName(gateway.getName());
+            update.setLat(pendingGateway.getLat());
+            update.setLon(pendingGateway.getLon());
+            mappedPOIService.updateMappedPOINoMerge(update, mappedPOI);
+            return mappedPOI;
+        }
+        return mappedPOIService.createMappedPOINoMerge(create, securityContext);
     }
 
     public SecurityUser createGatewaySecurityUser(SecurityContext securityContext, String gatewayId) {
@@ -247,6 +302,8 @@ public class GatewayService implements Plugin {
                 .setNoSignatureCapabilities(pendingGateway.isNoSignatureCapabilities())
                 .setPublicKey(pendingGateway.getPublicKey())
                 .setRemoteId(pendingGateway.getGatewayId())
+                .setReportedLat(pendingGateway.getLat())
+                .setReportedLon(pendingGateway.getLon())
                 .setName(pendingGateway.getName())
                 .setDescription(pendingGateway.getDescription());
     }

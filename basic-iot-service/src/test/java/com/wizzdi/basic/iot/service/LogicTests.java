@@ -110,7 +110,8 @@ public class LogicTests {
     @Order(1)
     public void testRegister() {
         RegisterGatewayReceived test = basicIOTLogic.executeLogic(new RegisterGateway().setPublicKey("test").setId(UUID.randomUUID().toString()).setGatewayId(GATEWAY_ID)).setSentAt(OffsetDateTime.now());
-        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayFilter(new PendingGatewayFilter().setGatewayIds(Collections.singleton(GATEWAY_ID))));
+        Assertions.assertNotNull(test.getPendingGatewayId());
+        PaginationResponse<Gateway> approveResponse = gatewayService.approveGateways(adminSecurityContext, new ApproveGatewaysRequest().setPendingGatewayIds(Collections.singleton(test.getPendingGatewayId())));
         Gateway gateway = approveResponse.getList().stream().filter(f -> f.getRemoteId().equals(GATEWAY_ID)).findFirst().orElse(null);
         Assertions.assertNotNull(gateway);
         Assertions.assertEquals(GATEWAY_ID, gateway.getRemoteId());

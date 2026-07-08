@@ -130,6 +130,42 @@ public class PendingGatewayService implements Plugin {
             pendingGateway.setNoSignatureCapabilities(pendingGatewayCreate.getNoSignatureCapabilities());
             update=true;
         }
+        if (pendingGatewayCreate.getLat() != null && !pendingGatewayCreate.getLat().equals(pendingGateway.getLat())) {
+            pendingGateway.setLat(pendingGatewayCreate.getLat());
+            update = true;
+        }
+        if (pendingGatewayCreate.getLon() != null && !pendingGatewayCreate.getLon().equals(pendingGateway.getLon())) {
+            pendingGateway.setLon(pendingGatewayCreate.getLon());
+            update = true;
+        }
+        if (pendingGatewayCreate.getLocationAccuracyMeters() != null && !pendingGatewayCreate.getLocationAccuracyMeters().equals(pendingGateway.getLocationAccuracyMeters())) {
+            pendingGateway.setLocationAccuracyMeters(pendingGatewayCreate.getLocationAccuracyMeters());
+            update = true;
+        }
+        if (pendingGatewayCreate.getLocationSource() != null && !pendingGatewayCreate.getLocationSource().equals(pendingGateway.getLocationSource())) {
+            pendingGateway.setLocationSource(pendingGatewayCreate.getLocationSource());
+            update = true;
+        }
+        if (pendingGatewayCreate.getWifiAccessPointsJson() != null && !pendingGatewayCreate.getWifiAccessPointsJson().equals(pendingGateway.getWifiAccessPointsJson())) {
+            pendingGateway.setWifiAccessPointsJson(pendingGatewayCreate.getWifiAccessPointsJson());
+            update = true;
+        }
+        if (pendingGatewayCreate.getGatewayConfirmationReceived() != null && pendingGatewayCreate.getGatewayConfirmationReceived() != pendingGateway.isGatewayConfirmationReceived()) {
+            pendingGateway.setGatewayConfirmationReceived(pendingGatewayCreate.getGatewayConfirmationReceived());
+            update = true;
+        }
+        if (pendingGatewayCreate.getGatewayConfirmationReceivedAt() != null && !pendingGatewayCreate.getGatewayConfirmationReceivedAt().equals(pendingGateway.getGatewayConfirmationReceivedAt())) {
+            pendingGateway.setGatewayConfirmationReceivedAt(pendingGatewayCreate.getGatewayConfirmationReceivedAt());
+            update = true;
+        }
+        if (pendingGatewayCreate.getLastGatewayConfirmationSentAt() != null && !pendingGatewayCreate.getLastGatewayConfirmationSentAt().equals(pendingGateway.getLastGatewayConfirmationSentAt())) {
+            pendingGateway.setLastGatewayConfirmationSentAt(pendingGatewayCreate.getLastGatewayConfirmationSentAt());
+            update = true;
+        }
+        if (pendingGatewayCreate.getGatewayConfirmationAttempts() != null && !pendingGatewayCreate.getGatewayConfirmationAttempts().equals(pendingGateway.getGatewayConfirmationAttempts())) {
+            pendingGateway.setGatewayConfirmationAttempts(pendingGatewayCreate.getGatewayConfirmationAttempts());
+            update = true;
+        }
         return update;
     }
 

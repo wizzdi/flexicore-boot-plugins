@@ -38,7 +38,7 @@ public class BasicIOTClient {
         return MAIN_TOPIC_PATH + "/" + gatewayId + "/" + OUT_SUFFIX;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(BasicIOTClient.class);
+    private static final Logger logger = LoggerFactory.getLogger("basic-iot");
     public static final String MQTT_TOPIC = "mqtt_topic";
     public static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
     public static final String MQTT_RECEIVED_TOPIC = "mqtt_receivedTopic";

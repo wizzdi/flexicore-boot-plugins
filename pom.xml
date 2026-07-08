@@ -59,7 +59,8 @@
         <module>basic-iot-model</module>
         <module>basic-iot-service</module>
         <module>basic-iot-triggers-service</module>
-
+        <module>building-studio-model</module>
+        <module>building-studio-service</module>
         <module>billing-model</module>
         <module>billing-service</module>
         <module>category-model</module>
@@ -210,6 +211,18 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>building-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>building-studio-model</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>building-studio-service</artifactId>
                 <version>${revision}</version>
                 <scope>provided</scope>
             </dependency>

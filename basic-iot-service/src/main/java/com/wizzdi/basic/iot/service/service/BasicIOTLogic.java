@@ -9,6 +9,7 @@ import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.events.RemoteStatusChanged;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.*;
+import com.wizzdi.basic.iot.service.response.GatewayLocationResolution;
 import com.wizzdi.basic.iot.service.response.RemoteUpdateResponse;
 import com.wizzdi.basic.iot.service.utils.DistanceUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -18,11 +19,11 @@ import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
 import com.wizzdi.maps.model.Building;
 import com.wizzdi.maps.model.BuildingFloor;
-import com.wizzdi.maps.model.BuildingFloor_;
 import com.wizzdi.maps.model.MapIcon;
 import com.wizzdi.maps.model.MappedPOI;
 import com.wizzdi.maps.model.Room;
 import com.wizzdi.maps.service.request.MappedPOICreate;
+import com.wizzdi.maps.service.request.MappedPOIFilter;
 import com.wizzdi.maps.service.request.MappedPOIUpdate;
 import com.wizzdi.maps.service.service.BuildingFloorService;
 import com.wizzdi.maps.service.service.BuildingService;
@@ -46,6 +47,8 @@ import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -72,6 +75,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private StateSchemaService stateSchemaService;
     @Autowired
     private PendingGatewayService pendingGatewayService;
+    @Autowired
+    private GoogleGeolocationService googleGeolocationService;
     @Autowired
     private ConnectivityChangeService connectivityChangeService;
     @Autowired
@@ -114,6 +119,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     @Autowired
     @Qualifier("gatewayMapIcon")
     private MapIcon gatewayMapIcon;
+    @Autowired
+    @Qualifier("pendingGatewayMapIcon")
+    private MapIcon pendingGatewayMapIcon;
 
     @Autowired
     private KeepAliveBounceService keepAliveBounceService;
@@ -123,6 +131,8 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private Timer checkConnectivityTimer;
     @Autowired
     private Counter droppedMessagesCounter;
+
+    private final ConcurrentMap<String, Object> registerGatewayLocks = new ConcurrentHashMap<>();
 
 
     @Override
@@ -687,8 +697,168 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
 
     private RegisterGatewayReceived registerGateway(RegisterGateway registerGateway) {
-        PendingGateway pendingGateway = pendingGatewayService.createPendingGateway(new PendingGatewayCreate().setGatewayId(registerGateway.getGatewayId()).setPublicKey(registerGateway.getPublicKey()).setNoSignatureCapabilities(registerGateway.getNoSignatureCapabilities()).setName(registerGateway.getGatewayId()), adminSecurityContext);
-        return new RegisterGatewayReceived().setRegisterGatewayId(registerGateway.getId());
+        String gatewayId = registerGateway.getGatewayId();
+        if (gatewayId == null || gatewayId.isBlank()) {
+            logger.warn("received RegisterGateway without gatewayId, messageId={}", registerGateway.getId());
+            return new RegisterGatewayReceived()
+                    .setRegisterGatewayId(registerGateway.getId())
+                    .setRegistrationStatus("invalid")
+                    .setRegistrationMessage("gatewayId is required");
+        }
+        gatewayId = gatewayId.trim();
+        Object lock = registerGatewayLocks.computeIfAbsent(gatewayId, ignored -> new Object());
+        synchronized (lock) {
+            Optional<Gateway> existingGateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(gatewayId))).stream().findFirst();
+            if (existingGateway.isPresent()) {
+                Gateway gateway = existingGateway.get();
+                logger.info("gateway {} already registered as {}", gatewayId, gateway.getId());
+                return new RegisterGatewayReceived()
+                        .setRegisterGatewayId(registerGateway.getId())
+                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_REGISTERED)
+                        .setRegisteredGatewayRemoteId(gatewayId)
+                        .setRegisteredGatewayId(gateway.getId())
+                        .setRegistrationMessage("gateway already registered");
+            }
+
+            List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(null, new PendingGatewayFilter().setGatewayIds(Collections.singleton(gatewayId)));
+            Optional<PendingGateway> activePendingGateway = pendingGateways.stream()
+                    .filter(f -> f.getRegisteredGateway() == null)
+                    .findFirst();
+            if (activePendingGateway.isPresent()) {
+                PendingGateway pendingGateway = activePendingGateway.get();
+                RegistrationLocation registrationLocation = resolveRegistrationLocation(registerGateway);
+                updatePendingGatewayRegistrationLocation(pendingGateway, registrationLocation);
+                upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon());
+                logger.info("gateway {} already pending as {}", gatewayId, pendingGateway.getId());
+                return new RegisterGatewayReceived()
+                        .setRegisterGatewayId(registerGateway.getId())
+                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_PENDING)
+                        .setRegisteredGatewayRemoteId(gatewayId)
+                        .setPendingGatewayId(pendingGateway.getId())
+                        .setRegistrationMessage("gateway registration is already pending");
+            }
+
+            Optional<PendingGateway> registeredPendingGateway = pendingGateways.stream()
+                    .filter(f -> f.getRegisteredGateway() != null)
+                    .findFirst();
+            if (registeredPendingGateway.isPresent()) {
+                PendingGateway pendingGateway = registeredPendingGateway.get();
+                Gateway gateway = pendingGateway.getRegisteredGateway();
+                logger.info("gateway {} has already registered pending record {} with gateway {}", gatewayId, pendingGateway.getId(), gateway != null ? gateway.getId() : null);
+                return new RegisterGatewayReceived()
+                        .setRegisterGatewayId(registerGateway.getId())
+                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_REGISTERED)
+                        .setRegisteredGatewayRemoteId(gatewayId)
+                        .setPendingGatewayId(pendingGateway.getId())
+                        .setRegisteredGatewayId(gateway != null ? gateway.getId() : null)
+                        .setRegistrationMessage("gateway already registered from an existing pending registration");
+            }
+
+            RegistrationLocation registrationLocation = resolveRegistrationLocation(registerGateway);
+            PendingGateway pendingGateway = pendingGatewayService.createPendingGateway(new PendingGatewayCreate()
+                    .setGatewayId(gatewayId)
+                    .setPublicKey(registerGateway.getPublicKey())
+                    .setNoSignatureCapabilities(registerGateway.getNoSignatureCapabilities())
+                    .setLat(registrationLocation.lat())
+                    .setLon(registrationLocation.lon())
+                    .setLocationAccuracyMeters(registrationLocation.accuracyMeters())
+                    .setLocationSource(registrationLocation.source())
+                    .setWifiAccessPointsJson(registrationLocation.wifiAccessPointsJson())
+                    .setName(gatewayId), adminSecurityContext);
+            upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon());
+            logger.info("registered new pending gateway {} for {}", pendingGateway.getId(), gatewayId);
+            return new RegisterGatewayReceived()
+                    .setRegisterGatewayId(registerGateway.getId())
+                    .setRegistrationStatus(RegisterGatewayReceived.STATUS_REGISTERED)
+                    .setRegisteredGatewayRemoteId(gatewayId)
+                    .setPendingGatewayId(pendingGateway.getId())
+                    .setRegistrationMessage("gateway registration created");
+        }
+    }
+
+    private RegistrationLocation resolveRegistrationLocation(RegisterGateway registerGateway) {
+        String wifiAccessPointsJson = googleGeolocationService.toWifiAccessPointsJson(registerGateway.getWifiAccessPoints());
+        Optional<GatewayLocationResolution> wifiLocation = googleGeolocationService.resolveWifiLocation(registerGateway.getWifiAccessPoints());
+        if (wifiLocation.isPresent()) {
+            GatewayLocationResolution resolution = wifiLocation.get();
+            return new RegistrationLocation(
+                    resolution.getLat(),
+                    resolution.getLon(),
+                    resolution.getAccuracyMeters(),
+                    resolution.getSource(),
+                    wifiAccessPointsJson
+            );
+        }
+        Double lat = registerGateway.getLat();
+        Double lon = registerGateway.getLon();
+        String source = lat != null && lon != null ? GoogleGeolocationService.LOCATION_SOURCE_GATEWAY_REPORTED : null;
+        return new RegistrationLocation(lat, lon, null, source, wifiAccessPointsJson);
+    }
+
+    private void updatePendingGatewayRegistrationLocation(PendingGateway pendingGateway, RegistrationLocation registrationLocation) {
+        if (registrationLocation == null || (registrationLocation.lat() == null
+                && registrationLocation.lon() == null
+                && registrationLocation.accuracyMeters() == null
+                && registrationLocation.source() == null
+                && registrationLocation.wifiAccessPointsJson() == null)) {
+            return;
+        }
+        PendingGatewayUpdate update = new PendingGatewayUpdate().setPendingGateway(pendingGateway);
+        if (registrationLocation.lat() != null) {
+            update.setLat(registrationLocation.lat());
+        }
+        if (registrationLocation.lon() != null) {
+            update.setLon(registrationLocation.lon());
+        }
+        if (registrationLocation.accuracyMeters() != null) {
+            update.setLocationAccuracyMeters(registrationLocation.accuracyMeters());
+        }
+        if (registrationLocation.source() != null) {
+            update.setLocationSource(registrationLocation.source());
+        }
+        if (registrationLocation.wifiAccessPointsJson() != null) {
+            update.setWifiAccessPointsJson(registrationLocation.wifiAccessPointsJson());
+        }
+        pendingGatewayService.updatePendingGateway(update, adminSecurityContext);
+    }
+
+    private record RegistrationLocation(Double lat, Double lon, Double accuracyMeters, String source, String wifiAccessPointsJson) {
+    }
+
+    private void upsertPendingGatewayMappedPOI(PendingGateway pendingGateway, Double lat, Double lon) {
+        if (pendingGateway == null || lat == null || lon == null) {
+            return;
+        }
+        try {
+            MappedPOICreate create = new MappedPOICreate()
+                    .setExternalId(pendingGateway.getGatewayId())
+                    .setMapIcon(pendingGatewayMapIcon)
+                    .setRelatedType(PendingGateway.class.getCanonicalName())
+                    .setRelatedId(pendingGateway.getId())
+                    .setLat(lat)
+                    .setLon(lon)
+                    .setName(pendingGateway.getName());
+            List<MappedPOI> existing = mappedPOIService.listAllMappedPOIs(new MappedPOIFilter()
+                    .setRelatedType(Collections.singleton(PendingGateway.class.getCanonicalName()))
+                    .setRelatedId(Collections.singleton(pendingGateway.getId())), adminSecurityContext);
+            if (existing.isEmpty()) {
+                mappedPOIService.createMappedPOI(create, adminSecurityContext);
+                return;
+            }
+            for (MappedPOI mappedPOI : existing) {
+                MappedPOIUpdate update = new MappedPOIUpdate().setMappedPOI(mappedPOI);
+                update.setExternalId(pendingGateway.getGatewayId());
+                update.setName(pendingGateway.getName());
+                update.setMapIcon(pendingGatewayMapIcon);
+                update.setRelatedType(PendingGateway.class.getCanonicalName());
+                update.setRelatedId(pendingGateway.getId());
+                update.setLat(lat);
+                update.setLon(lon);
+                mappedPOIService.updateMappedPOI(update, adminSecurityContext);
+            }
+        } catch (Exception e) {
+            logger.warn("failed creating/updating pending gateway map point for {}", pendingGateway.getGatewayId(), e);
+        }
     }
 
     private MessageHandleContext updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContext gatewaySecurityContext) {

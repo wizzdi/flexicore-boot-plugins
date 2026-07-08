@@ -11,6 +11,7 @@ public class PendingGatewayFilter extends PaginationFilter {
     private BasicPropertiesFilter basicPropertiesFilter;
     private Set<String> gatewayIds =new HashSet<>();
     private Boolean registered;
+    private Boolean gatewayConfirmationReceived;
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -37,6 +38,15 @@ public class PendingGatewayFilter extends PaginationFilter {
 
     public <T extends PendingGatewayFilter> T setRegistered(Boolean registered) {
         this.registered = registered;
+        return (T) this;
+    }
+
+    public Boolean getGatewayConfirmationReceived() {
+        return gatewayConfirmationReceived;
+    }
+
+    public <T extends PendingGatewayFilter> T setGatewayConfirmationReceived(Boolean gatewayConfirmationReceived) {
+        this.gatewayConfirmationReceived = gatewayConfirmationReceived;
         return (T) this;
     }
 }
