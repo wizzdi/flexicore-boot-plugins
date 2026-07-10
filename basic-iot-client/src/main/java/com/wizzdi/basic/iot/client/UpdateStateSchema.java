@@ -6,11 +6,16 @@ import java.util.List;
 public class UpdateStateSchema extends IOTMessage{
 
     private String deviceType;
+    private String deviceTypeExternalId;
     private String jsonSchema;
     private int version;
 
     private String deviceId;
     private List<SchemaAction> schemaActions=new ArrayList<>();
+
+    public String getDeviceTypeExternalId() { return deviceTypeExternalId; }
+
+    public <T extends UpdateStateSchema> T setDeviceTypeExternalId(String deviceTypeExternalId) { this.deviceTypeExternalId = deviceTypeExternalId; return (T) this; }
 
     public String getDeviceType() {
         return deviceType;

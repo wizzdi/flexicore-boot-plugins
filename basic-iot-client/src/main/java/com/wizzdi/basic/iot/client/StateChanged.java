@@ -11,6 +11,7 @@ public class StateChanged extends IOTMessage{
     private String deviceId;
     private Map<String,Object> otherProperties =new HashMap<>();
     private String deviceType;
+    private String deviceTypeExternalId;
     @JsonAlias({"FWversion"})
     private String version;
     @JsonAlias({"Longitude","lon","Lon"})
@@ -33,6 +34,7 @@ public class StateChanged extends IOTMessage{
         this.deviceId = other.deviceId;
         this.otherProperties = other.otherProperties;
         this.deviceType = other.deviceType;
+        this.deviceTypeExternalId = other.deviceTypeExternalId;
         this.version = other.version;
         this.longitude = other.longitude;
         this.latitude = other.latitude;
@@ -65,6 +67,10 @@ public class StateChanged extends IOTMessage{
         otherProperties.put(key,value);
         return (T) this;
     }
+
+    public String getDeviceTypeExternalId() { return deviceTypeExternalId; }
+
+    public <T extends StateChanged> T setDeviceTypeExternalId(String deviceTypeExternalId) { this.deviceTypeExternalId = deviceTypeExternalId; return (T) this; }
 
     public String getDeviceType() {
         return deviceType;

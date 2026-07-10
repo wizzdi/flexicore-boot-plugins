@@ -125,6 +125,10 @@ public class DeviceTypeService implements Plugin {
     public boolean updateDeviceTypeNoMerge(DeviceType deviceType,
                                         DeviceTypeCreate deviceTypeCreate) {
         boolean updated = basicService.updateBasicNoMerge(deviceTypeCreate, deviceType);
+        if (deviceTypeCreate.getExternalId() != null && !Objects.equals(deviceTypeCreate.getExternalId(), deviceType.getExternalId())) {
+            deviceType.setExternalId(deviceTypeCreate.getExternalId());
+            updated = true;
+        }
         if(deviceTypeCreate.getDefaultMapIcon()!=null&&(deviceType.getDefaultMapIcon()==null||!deviceTypeCreate.getDefaultMapIcon().getId().equals(deviceType.getDefaultMapIcon().getId()))){
             deviceType.setDefaultMapIcon(deviceTypeCreate.getDefaultMapIcon());
             updated=true;
@@ -153,6 +157,9 @@ public class DeviceTypeService implements Plugin {
         if(mapIcon==null&&defaultMapIconId!=null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no map icon with id "+defaultMapIconId);
         }
+        if (mapIcon == null && defaultMapIconId == null && deviceTypeCreate.getExternalId() != null) {
+            mapIcon = mapIconService.listAllMapIcons(new MapIconFilter().setExternalId(Collections.singleton(deviceTypeCreate.getExternalId())), securityContext).stream().findFirst().orElse(null);
+        }
         deviceTypeCreate.setDefaultMapIcon(mapIcon);
     }
 
@@ -170,21 +177,42 @@ public class DeviceTypeService implements Plugin {
         return new MapIconCreate().setExternalId(externalId).setRelatedType(relatedType).setName(name);
     }
 
-    public DeviceType getOrCreateDeviceType(String deviceTypeName,SecurityContext securityContext) {
-        return getOrCreateDeviceType(deviceTypeName, false, securityContext);
+    public DeviceType getOrCreateDeviceType(String deviceTypeName, SecurityContext securityContext) {
+        return getOrCreateDeviceType(deviceTypeName, normalizeExternalId(deviceTypeName), false, securityContext);
     }
 
+    public DeviceType getOrCreateDeviceType(String deviceTypeName, String externalId, SecurityContext securityContext) {
+        return getOrCreateDeviceType(deviceTypeName, externalId, false, securityContext);
+    }
 
     public DeviceType getOrCreateDeviceType(String deviceTypeName, boolean checkMapIcon, SecurityContext securityContext) {
-        DeviceType deviceType = listAllDeviceTypes(null, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream().filter(f->f.getTenant().getId().equals(securityContext.getTenantToCreateIn().getId())).findFirst().orElse(null);
-        if(deviceType!=null){
-            logger.info("created device type "+deviceTypeName);
+        return getOrCreateDeviceType(deviceTypeName, normalizeExternalId(deviceTypeName), checkMapIcon, securityContext);
+    }
+
+    public DeviceType getOrCreateDeviceType(String deviceTypeName, String externalId, boolean checkMapIcon, SecurityContext securityContext) {
+        String normalizedExternalId = externalId == null || externalId.isBlank() ? normalizeExternalId(deviceTypeName) : externalId;
+        DeviceTypeFilter filter = new DeviceTypeFilter().setExternalIds(Collections.singleton(normalizedExternalId));
+        DeviceType deviceType = listAllDeviceTypes(null, filter).stream()
+                .filter(f -> f.getTenant().getId().equals(securityContext.getTenantToCreateIn().getId()))
+                .findFirst().orElse(null);
+        if (deviceType == null) {
+            deviceType = listAllDeviceTypes(null, new DeviceTypeFilter().setBasicPropertiesFilter(new BasicPropertiesFilter().setNames(Collections.singleton(deviceTypeName)))).stream()
+                    .filter(f -> f.getTenant().getId().equals(securityContext.getTenantToCreateIn().getId()))
+                    .findFirst().orElse(null);
+        }
+        if (deviceType != null) {
             return deviceType;
         }
-        MapIconCreate mapIconCreate = getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn());
-        MapIcon unknown = Optional.of(checkMapIcon).filter(f->f).map(f->mapIconService.getOrCreateMapIcon(mapIconCreate,securityContext)).orElseGet(()->mapIconService.createMapIcon(mapIconCreate, securityContext));
-        deviceType = createDeviceType(new DeviceTypeCreate().setDefaultMapIcon(unknown).setName(deviceTypeName), securityContext);
-        return deviceType;
+        MapIcon matching = mapIconService.listAllMapIcons(new MapIconFilter().setExternalId(Collections.singleton(normalizedExternalId)), securityContext).stream().findFirst().orElse(null);
+        if (matching == null) {
+            MapIconCreate mapIconCreate = getMapIconCreate(UNKNOWN_STATUS_SUFFIX, deviceTypeName, Device.class, securityContext.getTenantToCreateIn());
+            matching = Optional.of(checkMapIcon).filter(f -> f).map(f -> mapIconService.getOrCreateMapIcon(mapIconCreate, securityContext)).orElseGet(() -> mapIconService.createMapIcon(mapIconCreate, securityContext));
+        }
+        return createDeviceType(new DeviceTypeCreate().setExternalId(normalizedExternalId).setDefaultMapIcon(matching).setName(deviceTypeName), securityContext);
+    }
+
+    public static String normalizeExternalId(String name) {
+        return name == null ? null : name.trim().replaceAll("\\s+", "_");
     }
 
 

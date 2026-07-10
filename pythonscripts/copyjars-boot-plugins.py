@@ -19,6 +19,12 @@ EXCLUDED_JAR_KEYWORDS = [
     "original",
 ]
 
+# Explicit artifacts that should be deployed to the plugins directory even
+# though their artifact name does not contain "service".
+PLUGIN_ARTIFACT_EXCEPTIONS = {
+    "dynamic-invoker-export-utils",
+}
+
 REMOTE_PLUGINS_DIR = "/home/flexicore/plugins"
 REMOTE_ENTITIES_DIR = "/home/flexicore/entities"
 REMOTE_TMP_DIR = "/tmp"
@@ -26,16 +32,26 @@ REMOTE_TMP_DIR = "/tmp"
 
 def calculate_checksum(file_path):
     sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        while chunk := f.read(8192):
+
+    with open(file_path, "rb") as file_handle:
+        while chunk := file_handle.read(8192):
             sha256.update(chunk)
+
     return sha256.hexdigest()
 
 
-def run_remote_command(ssh, command, sudo_password=None, use_sudo=False, print_command=True):
+def run_remote_command(
+        ssh,
+        command,
+        sudo_password=None,
+        use_sudo=False,
+        print_command=True,
+):
     if use_sudo:
         if sudo_password is None:
-            raise ValueError("sudo_password is required when use_sudo=True")
+            raise ValueError(
+                "sudo_password is required when use_sudo=True"
+            )
 
         # Run the command through sudo safely.
         # The command itself is passed to sh -c as one quoted argument.
@@ -47,8 +63,8 @@ def run_remote_command(ssh, command, sudo_password=None, use_sudo=False, print_c
         formatted_command = command
 
     if print_command:
-        shown = command if use_sudo else formatted_command
-        print(f"Executing remote command: {shown}")
+        shown_command = command if use_sudo else formatted_command
+        print(f"Executing remote command: {shown_command}")
 
     stdin, stdout, stderr = ssh.exec_command(formatted_command)
 
@@ -75,11 +91,17 @@ def list_remote_jars(ssh, remote_dir, sudo_password):
 
     if exit_code != 0:
         print(f"Failed to list remote jars in {remote_dir}")
+
         if stderr_data:
             print(stderr_data)
+
         return []
 
-    return [line.strip() for line in stdout_data.splitlines() if line.strip()]
+    return [
+        line.strip()
+        for line in stdout_data.splitlines()
+        if line.strip()
+    ]
 
 
 def get_remote_checksum(ssh, remote_path, sudo_password):
@@ -105,28 +127,47 @@ def get_remote_checksum(ssh, remote_path, sudo_password):
 
 
 def is_valid_jar(filename):
-    lower = filename.lower()
+    lower_filename = filename.lower()
 
-    if not lower.endswith(".jar"):
+    if not lower_filename.endswith(".jar"):
         return False
 
-    return not any(keyword in lower for keyword in EXCLUDED_JAR_KEYWORDS)
+    return not any(
+        keyword in lower_filename
+        for keyword in EXCLUDED_JAR_KEYWORDS
+    )
 
 
 def artifact_key(filename):
     """
-    Returns the jar artifact name without the version.
+    Return the JAR artifact name without the version.
 
     Examples:
-      maps-service-6.0.5.jar              -> maps-service
-      maps-service-6.0.5-PARKING.jar      -> maps-service
-      basic-iot-model-1.0.0-SNAPSHOT.jar  -> basic-iot-model
-      maps-service.jar                    -> maps-service
+      maps-service-6.0.5.jar
+        -> maps-service
+
+      maps-service-6.0.5-PARKING.jar
+        -> maps-service
+
+      basic-iot-model-1.0.0-SNAPSHOT.jar
+        -> basic-iot-model
+
+      dynamic-invoker-export-utils-9.0.4.jar
+        -> dynamic-invoker-export-utils
+
+      maps-service.jar
+        -> maps-service
     """
-    name = filename[:-4] if filename.lower().endswith(".jar") else filename
+    if filename.lower().endswith(".jar"):
+        name = filename[:-4]
+    else:
+        name = filename
 
     match = re.match(
-        r"^(?P<artifact>.+)-(?P<version>\d+(?:\.\d+)*(?:[-._A-Za-z0-9]+)*)$",
+        (
+            r"^(?P<artifact>.+)-"
+            r"(?P<version>\d+(?:\.\d+)*(?:[-._A-Za-z0-9]+)*)$"
+        ),
         name,
     )
 
@@ -138,12 +179,17 @@ def artifact_key(filename):
 
 def jar_target_kind(filename):
     """
-    Only service and model jars are deployable.
+    Determine the remote destination for a JAR.
 
     Returns:
-      "plugins"  for service jars
-      "entities" for model jars
-      None       for anything else
+      "plugins"
+          For service JARs and explicitly configured plugin exceptions.
+
+      "entities"
+          For model JARs.
+
+      None
+          For all unsupported JARs.
     """
     key = artifact_key(filename).lower()
     parts = key.split("-")
@@ -154,15 +200,18 @@ def jar_target_kind(filename):
     if "service" in parts:
         return "plugins"
 
+    if key in PLUGIN_ARTIFACT_EXCEPTIONS:
+        return "plugins"
+
     return None
 
 
 def build_remote_index(remote_jars):
     index = defaultdict(list)
 
-    for jar in remote_jars:
-        key = artifact_key(jar)
-        index[key].append(jar)
+    for jar_filename in remote_jars:
+        key = artifact_key(jar_filename)
+        index[key].append(jar_filename)
 
     return index
 
@@ -171,7 +220,9 @@ def find_local_candidate_jars(local_base_path):
     candidates = []
 
     for root, dirs, files in os.walk(local_base_path):
-        if "target" not in root.split(os.sep):
+        path_parts = root.split(os.sep)
+
+        if "target" not in path_parts:
             continue
 
         for filename in files:
@@ -179,8 +230,12 @@ def find_local_candidate_jars(local_base_path):
                 continue
 
             target_kind = jar_target_kind(filename)
+
             if target_kind is None:
-                print(f"Skipping non service/model jar: {filename}")
+                print(
+                    f"Skipping non service/model/exception jar: "
+                    f"{filename}"
+                )
                 continue
 
             local_path = os.path.join(root, filename)
@@ -201,11 +256,20 @@ def find_local_candidate_jars(local_base_path):
 def sftp_transfer(sftp, local_path, remote_path):
     print(f"Copying {local_path}")
     print(f"  -> {remote_path}")
+
     sftp.put(local_path, remote_path)
 
 
-def move_tmp_to_final(ssh, remote_tmp_path, remote_dir, sudo_password):
-    command = f"mv {shlex.quote(remote_tmp_path)} {shlex.quote(remote_dir)}/"
+def move_tmp_to_final(
+        ssh,
+        remote_tmp_path,
+        remote_dir,
+        sudo_password,
+):
+    command = (
+        f"mv {shlex.quote(remote_tmp_path)} "
+        f"{shlex.quote(remote_dir)}/"
+    )
 
     exit_code, stdout_data, stderr_data = run_remote_command(
         ssh,
@@ -217,18 +281,28 @@ def move_tmp_to_final(ssh, remote_tmp_path, remote_dir, sudo_password):
 
     if exit_code != 0:
         print("Failed moving jar into final destination.")
+
         if stdout_data:
             print(stdout_data)
+
         if stderr_data:
             print(stderr_data)
+
         return False
 
     return True
 
 
-def delete_old_versions(ssh, remote_dir, artifact, keep_filename, sudo_password):
+def delete_old_versions(
+        ssh,
+        remote_dir,
+        artifact,
+        keep_filename,
+        sudo_password,
+):
     """
-    Delete jars with the same versionless artifact name, but keep the newly copied jar.
+    Delete JARs having the same versionless artifact name while retaining
+    the newly copied JAR.
     """
     pattern_versioned = f"{artifact}-*.jar"
     pattern_unversioned = f"{artifact}.jar"
@@ -236,8 +310,10 @@ def delete_old_versions(ssh, remote_dir, artifact, keep_filename, sudo_password)
     command = (
         f"find {shlex.quote(remote_dir)} "
         f"-maxdepth 1 -type f "
-        f"\\( -name {shlex.quote(pattern_versioned)} "
-        f"-o -name {shlex.quote(pattern_unversioned)} \\) "
+        f"\\( "
+        f"-name {shlex.quote(pattern_versioned)} "
+        f"-o -name {shlex.quote(pattern_unversioned)} "
+        f"\\) "
         f"! -name {shlex.quote(keep_filename)} "
         f"-exec rm -f {{}} +"
     )
@@ -251,11 +327,17 @@ def delete_old_versions(ssh, remote_dir, artifact, keep_filename, sudo_password)
     )
 
     if exit_code != 0:
-        print(f"Failed deleting old versions for artifact {artifact}.")
+        print(
+            f"Failed deleting old versions for artifact "
+            f"{artifact}."
+        )
+
         if stdout_data:
             print(stdout_data)
+
         if stderr_data:
             print(stderr_data)
+
         return False
 
     return True
@@ -288,8 +370,9 @@ def deploy_candidate(
 
     if not matching_remote_jars:
         print(
-            f"Skipping {filename}: no matching artifact already exists on target "
-            f"in {remote_dir}. Artifact key: {artifact}"
+            f"Skipping {filename}: no matching artifact already exists "
+            f"on target in {remote_dir}. "
+            f"Artifact key: {artifact}"
         )
         return False
 
@@ -297,12 +380,19 @@ def deploy_candidate(
     print(f"Candidate: {filename}")
     print(f"Artifact key: {artifact}")
     print(f"Target dir: {remote_dir}")
-    print(f"Remote matches: {', '.join(matching_remote_jars)}")
+    print(
+        f"Remote matches: "
+        f"{', '.join(matching_remote_jars)}"
+    )
 
     local_checksum = calculate_checksum(local_path)
-    remote_final_path = posixpath.join(remote_dir, filename)
+    remote_final_path = posixpath.join(
+        remote_dir,
+        filename,
+    )
 
-    # If the exact same filename exists remotely and checksum is identical, skip.
+    # If the exact same filename exists remotely and its checksum is
+    # identical, there is nothing to deploy.
     if filename in matching_remote_jars:
         remote_checksum = get_remote_checksum(
             ssh,
@@ -311,19 +401,44 @@ def deploy_candidate(
         )
 
         if remote_checksum == local_checksum:
-            print(f"Skipping {filename}: same filename and same checksum already deployed.")
+            print(
+                f"Skipping {filename}: same filename and same "
+                f"checksum already deployed."
+            )
             return False
 
-        print(f"{filename} exists remotely but checksum differs. It will be replaced.")
+        print(
+            f"{filename} exists remotely but checksum differs. "
+            f"It will be replaced."
+        )
     else:
-        print(f"New version/name detected for {artifact}. It will replace old remote version(s).")
+        print(
+            f"New version/name detected for {artifact}. "
+            f"It will replace old remote version(s)."
+        )
 
-    remote_tmp_path = posixpath.join(REMOTE_TMP_DIR, filename)
+    remote_tmp_path = posixpath.join(
+        REMOTE_TMP_DIR,
+        filename,
+    )
 
     try:
-        sftp_transfer(sftp, local_path, remote_tmp_path)
-    except PermissionError as e:
-        print(f"Permission error while copying {filename} to {remote_tmp_path}: {e}")
+        sftp_transfer(
+            sftp,
+            local_path,
+            remote_tmp_path,
+        )
+    except PermissionError as error:
+        print(
+            f"Permission error while copying {filename} "
+            f"to {remote_tmp_path}: {error}"
+        )
+        return False
+    except OSError as error:
+        print(
+            f"SFTP error while copying {filename} "
+            f"to {remote_tmp_path}: {error}"
+        )
         return False
 
     moved = move_tmp_to_final(
@@ -334,7 +449,10 @@ def deploy_candidate(
     )
 
     if not moved:
-        print(f"Keeping old remote jars because new jar was not moved successfully: {filename}")
+        print(
+            f"Keeping old remote jars because the new jar was "
+            f"not moved successfully: {filename}"
+        )
         return False
 
     deleted = delete_old_versions(
@@ -346,29 +464,60 @@ def deploy_candidate(
     )
 
     if deleted:
-        print(f"Deployed {filename} and removed old versions for {artifact}.")
+        print(
+            f"Deployed {filename} and removed old versions "
+            f"for {artifact}."
+        )
     else:
-        print(f"Deployed {filename}, but failed to remove old versions for {artifact}.")
+        print(
+            f"Deployed {filename}, but failed to remove old "
+            f"versions for {artifact}."
+        )
 
     return True
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--username", required=True, help="Username for the remote machine")
-    parser.add_argument("--private-key", help="Path to the private key file")
-    parser.add_argument("--target-ip", required=True, help="IP address of the target machine")
-    parser.add_argument("--port", type=int, default=22, help="SSH port to connect to")
+
+    parser.add_argument(
+        "--username",
+        required=True,
+        help="Username for the remote machine",
+    )
+
+    parser.add_argument(
+        "--private-key",
+        help="Path to the private key file",
+    )
+
+    parser.add_argument(
+        "--target-ip",
+        required=True,
+        help="IP address of the target machine",
+    )
+
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=22,
+        help="SSH port to connect to",
+    )
+
     parser.add_argument(
         "--local-base",
         default=os.getcwd(),
-        help="Local flexicore-boot-plugins folder. Defaults to current directory.",
+        help=(
+            "Local flexicore-boot-plugins folder. "
+            "Defaults to the current directory."
+        ),
     )
 
     args = parser.parse_args()
 
     password_or_passphrase = getpass.getpass(
-        "Enter password/passphrase. This is also used for sudo: "
+        "Enter password/passphrase. "
+        "This is also used for sudo: "
     )
 
     local_base_path = os.path.abspath(args.local_base)
@@ -376,100 +525,138 @@ def main():
     print(f"Local base path: {local_base_path}")
     print(f"Remote plugins dir: {REMOTE_PLUGINS_DIR}")
     print(f"Remote entities dir: {REMOTE_ENTITIES_DIR}")
-    print(f"Connecting to SSH: {args.target_ip}:{args.port} as {args.username}")
+    print(
+        f"Connecting to SSH: "
+        f"{args.target_ip}:{args.port} "
+        f"as {args.username}"
+    )
 
     ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    if args.private_key:
-        ssh.connect(
-            args.target_ip,
-            port=args.port,
-            username=args.username,
-            key_filename=args.private_key,
-            passphrase=password_or_passphrase,
-        )
-    else:
-        ssh.connect(
-            args.target_ip,
-            port=args.port,
-            username=args.username,
-            password=password_or_passphrase,
-        )
-
-    print("SSH connection established.")
-
-    sftp = ssh.open_sftp()
-    print("SFTP session started.")
+    ssh.set_missing_host_key_policy(
+        paramiko.AutoAddPolicy()
+    )
 
     try:
-        print()
-        print("Reading remote plugin jars first...")
-        remote_plugin_jars = list_remote_jars(
-            ssh,
-            REMOTE_PLUGINS_DIR,
-            sudo_password=password_or_passphrase,
-        )
+        if args.private_key:
+            ssh.connect(
+                args.target_ip,
+                port=args.port,
+                username=args.username,
+                key_filename=args.private_key,
+                passphrase=password_or_passphrase,
+            )
+        else:
+            ssh.connect(
+                args.target_ip,
+                port=args.port,
+                username=args.username,
+                password=password_or_passphrase,
+            )
 
-        print("Reading remote entity/model jars first...")
-        remote_entity_jars = list_remote_jars(
-            ssh,
-            REMOTE_ENTITIES_DIR,
-            sudo_password=password_or_passphrase,
-        )
+        print("SSH connection established.")
 
-        remote_plugins_index = build_remote_index(remote_plugin_jars)
-        remote_entities_index = build_remote_index(remote_entity_jars)
+        sftp = ssh.open_sftp()
+        print("SFTP session started.")
 
-        print()
-        print(f"Remote plugin artifacts found: {len(remote_plugins_index)}")
-        print(f"Remote entity artifacts found: {len(remote_entities_index)}")
+        try:
+            print()
+            print("Reading remote plugin jars first...")
 
-        print()
-        print("Scanning local target folders for service/model jars...")
-        candidates = find_local_candidate_jars(local_base_path)
-
-        if not candidates:
-            print("No local service/model jars found under target folders.")
-            return 0
-
-        print(f"Local service/model candidates found: {len(candidates)}")
-
-        deployed_count = 0
-        skipped_count = 0
-
-        for candidate in candidates:
-            deployed = deploy_candidate(
+            remote_plugin_jars = list_remote_jars(
                 ssh,
-                sftp,
-                candidate,
-                remote_plugins_index,
-                remote_entities_index,
+                REMOTE_PLUGINS_DIR,
                 sudo_password=password_or_passphrase,
             )
 
-            if deployed:
-                deployed_count += 1
+            print("Reading remote entity/model jars first...")
 
-                # Update index locally so repeated modules do not act on stale remote state.
-                if candidate["target_kind"] == "plugins":
-                    remote_plugins_index[candidate["key"]] = [candidate["filename"]]
+            remote_entity_jars = list_remote_jars(
+                ssh,
+                REMOTE_ENTITIES_DIR,
+                sudo_password=password_or_passphrase,
+            )
+
+            remote_plugins_index = build_remote_index(
+                remote_plugin_jars
+            )
+
+            remote_entities_index = build_remote_index(
+                remote_entity_jars
+            )
+
+            print()
+            print(
+                f"Remote plugin artifacts found: "
+                f"{len(remote_plugins_index)}"
+            )
+            print(
+                f"Remote entity artifacts found: "
+                f"{len(remote_entities_index)}"
+            )
+
+            print()
+            print(
+                "Scanning local target folders for "
+                "service/model/exception jars..."
+            )
+
+            candidates = find_local_candidate_jars(
+                local_base_path
+            )
+
+            if not candidates:
+                print(
+                    "No local service/model/exception jars "
+                    "found under target folders."
+                )
+                return 0
+
+            print(
+                f"Local deployment candidates found: "
+                f"{len(candidates)}"
+            )
+
+            deployed_count = 0
+            skipped_count = 0
+
+            for candidate in candidates:
+                deployed = deploy_candidate(
+                    ssh,
+                    sftp,
+                    candidate,
+                    remote_plugins_index,
+                    remote_entities_index,
+                    sudo_password=password_or_passphrase,
+                )
+
+                if deployed:
+                    deployed_count += 1
+
+                    # Update the local index so repeated modules do not
+                    # act on stale remote state.
+                    if candidate["target_kind"] == "plugins":
+                        remote_plugins_index[
+                            candidate["key"]
+                        ] = [candidate["filename"]]
+                    else:
+                        remote_entities_index[
+                            candidate["key"]
+                        ] = [candidate["filename"]]
                 else:
-                    remote_entities_index[candidate["key"]] = [candidate["filename"]]
-            else:
-                skipped_count += 1
+                    skipped_count += 1
 
-        print()
-        print("Deployment completed.")
-        print(f"Deployed jars: {deployed_count}")
-        print(f"Skipped jars: {skipped_count}")
+            print()
+            print("Deployment completed.")
+            print(f"Deployed jars: {deployed_count}")
+            print(f"Skipped jars: {skipped_count}")
 
-        return 0
+            return 0
+
+        finally:
+            print("Closing SFTP session.")
+            sftp.close()
 
     finally:
-        print("Closing SFTP session.")
-        sftp.close()
-
         print("Closing SSH connection.")
         ssh.close()
 

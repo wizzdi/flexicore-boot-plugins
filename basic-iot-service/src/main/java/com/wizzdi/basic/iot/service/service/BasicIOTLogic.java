@@ -496,7 +496,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         keepAlive.add(gateway);
         MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         if(deviceId !=null){
-            GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId);
+            GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, values, version, deviceId, deviceTypeId, stateChanged.getDeviceTypeExternalId());
             newVersion=getOrCreateDeviceResponse.newVersion();
             remote=getOrCreateDeviceResponse.device();
             messageHandleContext=MessageHandleContext.merged(messageHandleContext,getOrCreateDeviceResponse.messageHandleContext());
@@ -647,7 +647,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
 
 
-    private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContext gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId) {
+    private GetOrCreateDeviceResponse getGetOrCreateDevice(Gateway gateway, SecurityContext gatewaySecurityContext, Map<String, Object> state, String version, String deviceId, String deviceTypeId, String deviceTypeExternalId) {
         MessageHandleContext messageHandleContext=new MessageHandleContext(new ArrayList<>(),new ArrayList<>(),null);
         String newVersion;
         DeviceCreate deviceCreate = new DeviceCreate()
@@ -659,7 +659,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
         Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
         if (device == null) {
-            DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, gatewaySecurityContext);
+            DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, deviceTypeExternalId, gatewaySecurityContext);
             deviceCreate
                     .setDeviceType(deviceType)
                     .setRemoteId(deviceId);
@@ -862,7 +862,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private MessageHandleContext updateStateSchema(UpdateStateSchema updateStateSchema, Gateway gateway, SecurityContext gatewaySecurityContext) {
-        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, updateStateSchema.getDeviceId(), updateStateSchema.getDeviceType());
+        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, updateStateSchema.getDeviceId(), updateStateSchema.getDeviceType(), updateStateSchema.getDeviceTypeExternalId());
         Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
         MessageHandleContext messageHandleContext=getOrCreateDeviceResponse.messageHandleContext();
@@ -887,7 +887,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private MessageHandleContext setStateSchema(SetStateSchema setStateSchema, Gateway gateway, SecurityContext gatewaySecurityContext) {
-        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType());
+        GetOrCreateDeviceResponse getOrCreateDeviceResponse = getGetOrCreateDevice(gateway, gatewaySecurityContext, null, null, setStateSchema.getDeviceId(), setStateSchema.getDeviceType(), null);
         Device device=getOrCreateDeviceResponse.device();
         DeviceType deviceType=device.getDeviceType();
         MessageHandleContext messageHandleContext=getOrCreateDeviceResponse.messageHandleContext();

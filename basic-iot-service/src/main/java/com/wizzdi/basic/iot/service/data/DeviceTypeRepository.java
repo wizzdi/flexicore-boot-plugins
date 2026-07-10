@@ -61,8 +61,12 @@ public class DeviceTypeRepository implements Plugin {
     public <T extends DeviceType> void addDeviceTypePredicates(DeviceTypeFilter filtering,
                                                            CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
-
-
+        if (filtering.getDeviceTypeIds() != null && !filtering.getDeviceTypeIds().isEmpty()) {
+            preds.add(r.get(DeviceType_.id).in(filtering.getDeviceTypeIds()));
+        }
+        if (filtering.getExternalIds() != null && !filtering.getExternalIds().isEmpty()) {
+            preds.add(r.get(DeviceType_.externalId).in(filtering.getExternalIds()));
+        }
 
     }
 

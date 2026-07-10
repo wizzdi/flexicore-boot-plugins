@@ -10,6 +10,7 @@ public class DeviceTypeFilter extends PaginationFilter {
 
     private BasicPropertiesFilter basicPropertiesFilter;
     private Set<String> deviceTypeIds =new HashSet<>();
+    private Set<String> externalIds = new HashSet<>();
 
 
     public BasicPropertiesFilter getBasicPropertiesFilter() {
@@ -30,5 +31,9 @@ public class DeviceTypeFilter extends PaginationFilter {
         return (T) this;
     }
 
+    public Set<String> getExternalIds() { return externalIds; }
+
+    public <T extends DeviceTypeFilter> T setExternalIds(Set<String> externalIds) { this.externalIds = externalIds; return (T) this; }
 
 }
+

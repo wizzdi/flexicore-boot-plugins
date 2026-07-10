@@ -6,11 +6,16 @@ import com.wizzdi.maps.model.MapIcon;
 
 public class DeviceTypeCreate extends BasicCreate {
 
+    private String externalId;
     private String defaultMapIconId;
     @JsonIgnore
     private MapIcon defaultMapIcon;
 
     private Boolean keepStateHistory;
+
+    public String getExternalId() { return externalId; }
+
+    public <T extends DeviceTypeCreate> T setExternalId(String externalId) { this.externalId = externalId; return (T) this; }
 
     public String getDefaultMapIconId() {
         return defaultMapIconId;

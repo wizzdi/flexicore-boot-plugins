@@ -14,9 +14,12 @@ import java.util.List;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "device_type_idx",columnList = "name")
+        @Index(name = "device_type_idx",columnList = "name"),
+        @Index(name = "device_type_external_id_idx",columnList = "externalId")
 })
 public class DeviceType extends Baseclass {
+
+    private String externalId;
 
     @ManyToOne(targetEntity = MapIcon.class)
     private MapIcon defaultMapIcon;
@@ -25,6 +28,15 @@ public class DeviceType extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = DeviceTypeToMapIcon.class, mappedBy = "deviceType")
     private List<DeviceTypeToMapIcon> deviceTypeToMapIcons = new ArrayList<>();
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends DeviceType> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
+    }
 
     @ManyToOne(targetEntity = MapIcon.class)
     public MapIcon getDefaultMapIcon() {
