@@ -3,9 +3,11 @@ package com.wizzdi.basic.iot.service.triggers.listeners;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.events.RemoteStatusChanged;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
+import com.wizzdi.basic.iot.service.events.SeverityChangedEvent;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteCreatedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteStatusChangedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteUpdatedTrigger;
+import com.wizzdi.basic.iot.service.triggers.events.SeverityChangedTrigger;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import org.pf4j.Extension;
@@ -28,6 +30,15 @@ public class BasicIOTEventsToTriggerListeners implements Plugin {
     public void remoteStatusChangedToTrigger(RemoteStatusChanged remoteStatusChanged){
         Remote remote = remoteStatusChanged.remote();
         eventPublisher.publishEvent(new RemoteStatusChangedTrigger(remote,remoteStatusChanged.newStatus(),remoteStatusChanged.currentStatus(), List.of(remote.getTenant())));
+    }
+
+    @EventListener
+    public void severityChangedToTrigger(SeverityChangedEvent event) {
+        eventPublisher.publishEvent(new SeverityChangedTrigger(
+                event.device(), event.previousSeverityName(), event.previousSeverityValue(),
+                event.severityName(), event.severityValue(), event.ruleId(),
+                event.humanInterventionRequired(), event.mitigationInstructions(),
+                event.escalationKey(), event.occurredAt(), List.of(event.device().getTenant())));
     }
 
     @EventListener

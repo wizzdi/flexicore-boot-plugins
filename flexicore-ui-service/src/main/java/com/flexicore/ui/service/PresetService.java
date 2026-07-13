@@ -9,6 +9,7 @@ import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.PresetRepository;
 import com.flexicore.ui.model.Preset;
+import com.flexicore.ui.model.UiStyle;
 import com.flexicore.ui.request.PresetCreate;
 import com.flexicore.ui.request.PresetFiltering;
 import com.flexicore.ui.request.PresetUpdate;
@@ -17,6 +18,8 @@ import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -43,6 +46,9 @@ public class PresetService implements Plugin {
     @Autowired
     private BasicService basicService;
 
+    @Autowired
+    private UiStyleService uiStyleService;
+
 
     public Preset updatePreset(PresetUpdate updatePreset,
                                SecurityContext securityContext) {
@@ -58,6 +64,14 @@ public class PresetService implements Plugin {
         if (createPreset.getExternalId() != null && (preset.getExternalId() == null || !createPreset.getExternalId().equals(preset.getExternalId()))) {
             preset.setExternalId(createPreset.getExternalId());
 
+            update = true;
+        }
+        if (createPreset.isTitleSet() && !java.util.Objects.equals(createPreset.getTitle(), preset.getTitle())) {
+            preset.setTitle(createPreset.getTitle());
+            update = true;
+        }
+        if (createPreset.isUiStyleIdSet() && !sameBaseclass(createPreset.getUiStyle(), preset.getUiStyle())) {
+            preset.setUiStyle(createPreset.getUiStyle());
             update = true;
         }
         Map<String, Object> map = DynamicPropertiesUtils.updateDynamic(createPreset.any(), preset.any());
@@ -102,6 +116,34 @@ public class PresetService implements Plugin {
 
     public void validate(PresetCreate presetCreate, SecurityContext securityContext) {
         basicService.validate(presetCreate, securityContext);
+        if (!presetCreate.isUiStyleIdSet()) {
+            return;
+        }
+        String styleId = trimToNull(presetCreate.getUiStyleId());
+        if (styleId == null) {
+            presetCreate.setUiStyle(null);
+            return;
+        }
+        UiStyle uiStyle = uiStyleService.getByIdOrNull(styleId, UiStyle.class, securityContext);
+        if (uiStyle == null || uiStyle.isSoftDelete()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No accessible UI style with id " + styleId);
+        }
+        presetCreate.setUiStyle(uiStyle);
+    }
+
+    private boolean sameBaseclass(Baseclass first, Baseclass second) {
+        if (first == second) {
+            return true;
+        }
+        if (first == null || second == null) {
+            return false;
+        }
+        return java.util.Objects.equals(first.getId(), second.getId());
+    }
+
+    private String trimToNull(String value) {
+        return value != null && !value.isBlank() ? value.trim() : null;
     }
 
     public void validate(PresetFiltering presetFiltering, SecurityContext securityContext) {

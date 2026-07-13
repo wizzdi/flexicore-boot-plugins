@@ -9,9 +9,19 @@ public class TableColumn extends UiField {
 	public TableColumn() {
 	}
 
+	private String fieldPath;
 	private boolean sortable;
 	private boolean filterable;
 	private double defaultColumnWidth;
+
+	public String getFieldPath() {
+		return fieldPath;
+	}
+
+	public <T extends TableColumn> T setFieldPath(String fieldPath) {
+		this.fieldPath = fieldPath;
+		return (T) this;
+	}
 
 	public boolean isSortable() {
 		return sortable;

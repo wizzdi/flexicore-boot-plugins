@@ -7,6 +7,7 @@ import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.flexicore.model.Baseclass;
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.data.TableColumnRepository;
+import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.model.TableColumn;
 import com.flexicore.ui.request.TableColumnCreate;
 import com.flexicore.ui.request.TableColumnFiltering;
@@ -15,6 +16,7 @@ import com.flexicore.ui.request.TableColumnUpdate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Objects;
 
 import com.wizzdi.flexicore.security.service.BaseclassService;
 import org.slf4j.Logger;
@@ -23,6 +25,8 @@ import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.metamodel.SingularAttribute;
 
@@ -33,25 +37,52 @@ public class TableColumnService implements Plugin {
 
 	private static final Logger logger=LoggerFactory.getLogger(TableColumnService.class);
 
-	
+
 	@Autowired
 	private TableColumnRepository tableColumnRepository;
 
-	
+
 	@Autowired
 	private UiFieldService uiFieldService;
 
-	public TableColumn TableColumnUpdate(TableColumnUpdate TableColumnUpdate,
+	@Autowired
+	private GridPresetService gridPresetService;
+
+	public TableColumn TableColumnUpdate(TableColumnUpdate tableColumnUpdate,
 			SecurityContext securityContext) {
-		if (TableColumnUpdateNoMerge(TableColumnUpdate, TableColumnUpdate.getTableColumn())) {
-			tableColumnRepository.merge(TableColumnUpdate.getTableColumn());
+		TableColumn tableColumn = tableColumnUpdate.getTableColumn();
+		GridPreset gridPreset = tableColumn.getPreset();
+		if (tableColumnUpdate.getPresetId() != null) {
+			gridPreset = gridPresetService.getByIdOrNull(
+					tableColumnUpdate.getPresetId(), GridPreset.class, securityContext);
+			if (gridPreset == null) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+						"no GridPreset with id " + tableColumnUpdate.getPresetId());
+			}
+			tableColumnUpdate.setPreset(gridPreset);
 		}
-		return TableColumnUpdate.getTableColumn();
+
+		String effectiveFieldPath = tableColumnUpdate.getFieldPath() != null
+				? tableColumnUpdate.getFieldPath() : tableColumn.getFieldPath();
+		String validatedFieldPath = gridPresetService.validateColumnFieldPath(gridPreset, effectiveFieldPath);
+		if (tableColumnUpdate.getFieldPath() != null) {
+			tableColumnUpdate.setFieldPath(validatedFieldPath);
+		}
+
+		if (TableColumnUpdateNoMerge(tableColumnUpdate, tableColumn)) {
+			tableColumnRepository.merge(tableColumn);
+		}
+		return tableColumn;
 	}
 
 	public boolean TableColumnUpdateNoMerge(
 			TableColumnCreate tableColumnCreate, TableColumn tableColumn) {
 		boolean update = uiFieldService.updateUiFieldNoMerge(tableColumnCreate, tableColumn);
+
+		if (tableColumnCreate.getFieldPath() != null && !Objects.equals(tableColumnCreate.getFieldPath(), tableColumn.getFieldPath())) {
+			update = true;
+			tableColumn.setFieldPath(tableColumnCreate.getFieldPath());
+		}
 
 		if (tableColumnCreate.getSortable() != null && tableColumnCreate.getSortable() != tableColumn.isSortable()) {
 			update = true;
@@ -114,6 +145,7 @@ public class TableColumnService implements Plugin {
 
 	public TableColumnCreate getTableColumnCreate(TableColumn tableColumn) {
 		return new TableColumnCreate()
+				.setFieldPath(tableColumn.getFieldPath())
 				.setFilterable(tableColumn.isFilterable())
 				.setSortable(tableColumn.isSortable())
 				.setDefaultColumnWidth(tableColumn.getDefaultColumnWidth())
@@ -167,5 +199,10 @@ public class TableColumnService implements Plugin {
 
 	public void validateCreate(TableColumnCreate createTableColumn, SecurityContext securityContext) {
 		uiFieldService.validateCreate(createTableColumn,securityContext);
+		if (!(createTableColumn.getPreset() instanceof GridPreset gridPreset)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "TableColumn preset must be a GridPreset");
+		}
+		createTableColumn.setFieldPath(
+				gridPresetService.validateColumnFieldPath(gridPreset, createTableColumn.getFieldPath()));
 	}
 }

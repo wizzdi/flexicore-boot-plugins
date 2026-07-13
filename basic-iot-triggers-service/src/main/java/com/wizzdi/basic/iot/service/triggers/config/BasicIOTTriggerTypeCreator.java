@@ -10,6 +10,7 @@ import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteCreatedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteStatusChangedTrigger;
 import com.wizzdi.basic.iot.service.triggers.events.RemoteUpdatedTrigger;
+import com.wizzdi.basic.iot.service.triggers.events.SeverityChangedTrigger;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import org.pf4j.Extension;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,8 @@ public class BasicIOTTriggerTypeCreator implements Plugin {
     private static final List<TriggerTypeHolder> triggerTypes = List.of(
             new TriggerTypeHolder(RemoteCreatedTrigger.class,"fired when remote is created"),
             new TriggerTypeHolder(RemoteStatusChangedTrigger.class,"fired when remote status is changed"),
-            new TriggerTypeHolder(RemoteUpdatedTrigger.class,"fired when remote state or any other direct property is changed")
+            new TriggerTypeHolder(RemoteUpdatedTrigger.class,"fired when remote state or any other direct property is changed"),
+            new TriggerTypeHolder(SeverityChangedTrigger.class,"fired when a device severity enters, changes or clears; suitable for escalation scenarios")
     );
 
 

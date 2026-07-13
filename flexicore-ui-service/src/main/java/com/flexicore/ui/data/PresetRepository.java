@@ -1,6 +1,7 @@
 package com.flexicore.ui.data;
 
 
+import com.flexicore.ui.model.UiStyle;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -26,7 +27,6 @@ import jakarta.persistence.metamodel.SingularAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Extension
@@ -56,6 +56,9 @@ public class PresetRepository implements Plugin {
         securedBasicRepository.addSecuredBasicPredicates(presetFiltering.getBasicPropertiesFilter(),cb,q,r,preds,SecurityContext);
         if (presetFiltering.getExternalIds() != null && !presetFiltering.getExternalIds().isEmpty()) {
             preds.add(r.get(Preset_.externalId).in(presetFiltering.getExternalIds()));
+        }
+        if (presetFiltering.getUiStyleIds() != null && !presetFiltering.getUiStyleIds().isEmpty()) {
+            preds.add(r.get(Preset_.uiStyle).get(Baseclass_.id).in(presetFiltering.getUiStyleIds()));
         }
         if(presetFiltering.getRelatedBaseclass()!=null&&!presetFiltering.getRelatedBaseclass().isEmpty()){
             preds.add(r.get(Baseclass_.securityId).in(presetFiltering.getRelatedBaseclass()));

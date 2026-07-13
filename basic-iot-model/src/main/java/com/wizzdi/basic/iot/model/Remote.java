@@ -53,6 +53,16 @@ public class Remote extends Baseclass {
     private Double reportedLat;
     private Double reportedLon;
 
+    private String currentSeverityName;
+    private Integer currentSeverityValue;
+    private String currentSeverityRuleId;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime severitySince;
+    private boolean humanInterventionRequired;
+    private String mitigationStatus;
+    @Column(columnDefinition = "text")
+    private String mitigationInstructions;
+
 
 
     @Column(columnDefinition = "jsonb")
@@ -185,6 +195,21 @@ public class Remote extends Baseclass {
         this.reportedLon = reportedLon;
         return (T) this;
     }
+
+    public String getCurrentSeverityName() { return currentSeverityName; }
+    public <T extends Remote> T setCurrentSeverityName(String currentSeverityName) { this.currentSeverityName = currentSeverityName; return (T) this; }
+    public Integer getCurrentSeverityValue() { return currentSeverityValue; }
+    public <T extends Remote> T setCurrentSeverityValue(Integer currentSeverityValue) { this.currentSeverityValue = currentSeverityValue; return (T) this; }
+    public String getCurrentSeverityRuleId() { return currentSeverityRuleId; }
+    public <T extends Remote> T setCurrentSeverityRuleId(String currentSeverityRuleId) { this.currentSeverityRuleId = currentSeverityRuleId; return (T) this; }
+    public OffsetDateTime getSeveritySince() { return severitySince; }
+    public <T extends Remote> T setSeveritySince(OffsetDateTime severitySince) { this.severitySince = severitySince; return (T) this; }
+    public boolean isHumanInterventionRequired() { return humanInterventionRequired; }
+    public <T extends Remote> T setHumanInterventionRequired(boolean humanInterventionRequired) { this.humanInterventionRequired = humanInterventionRequired; return (T) this; }
+    public String getMitigationStatus() { return mitigationStatus; }
+    public <T extends Remote> T setMitigationStatus(String mitigationStatus) { this.mitigationStatus = mitigationStatus; return (T) this; }
+    public String getMitigationInstructions() { return mitigationInstructions; }
+    public <T extends Remote> T setMitigationInstructions(String mitigationInstructions) { this.mitigationInstructions = mitigationInstructions; return (T) this; }
 
     public boolean isKeepConnectivityHistory() {
         return keepConnectivityHistory;

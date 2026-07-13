@@ -12,6 +12,10 @@ public class DeviceTypeCreate extends BasicCreate {
     private MapIcon defaultMapIcon;
 
     private Boolean keepStateHistory;
+    private String severityDefinitions;
+    private String validationSeverityDefinitions;
+    private String fleetHealthDefinitions;
+    private String historyRecordingPolicy;
 
     public String getExternalId() { return externalId; }
 
@@ -44,4 +48,41 @@ public class DeviceTypeCreate extends BasicCreate {
         this.keepStateHistory = keepStateHistory;
         return (T) this;
     }
+
+    public String getSeverityDefinitions() {
+        return severityDefinitions;
+    }
+
+    public <T extends DeviceTypeCreate> T setSeverityDefinitions(String severityDefinitions) {
+        this.severityDefinitions = severityDefinitions;
+        return (T) this;
+    }
+
+    public String getValidationSeverityDefinitions() {
+        return validationSeverityDefinitions;
+    }
+
+    public <T extends DeviceTypeCreate> T setValidationSeverityDefinitions(String validationSeverityDefinitions) {
+        this.validationSeverityDefinitions = validationSeverityDefinitions;
+        return (T) this;
+    }
+
+    public String getFleetHealthDefinitions() {
+        return fleetHealthDefinitions;
+    }
+
+    public <T extends DeviceTypeCreate> T setFleetHealthDefinitions(String fleetHealthDefinitions) {
+        this.fleetHealthDefinitions = fleetHealthDefinitions;
+        return (T) this;
+    }
+
+    public String getHistoryRecordingPolicy() {
+        return historyRecordingPolicy;
+    }
+
+    public <T extends DeviceTypeCreate> T setHistoryRecordingPolicy(String historyRecordingPolicy) {
+        this.historyRecordingPolicy = historyRecordingPolicy;
+        return (T) this;
+    }
 }
+

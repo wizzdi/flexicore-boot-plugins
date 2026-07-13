@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.flexicore.ui.model.GridPreset;
+import com.flexicore.ui.model.GridPreset_;
 import com.flexicore.ui.request.GridPresetFiltering;
 
 import jakarta.persistence.TypedQuery;
@@ -50,8 +51,23 @@ public class GridPresetRepository implements Plugin {
 
     public <T extends GridPreset> void addGridPresetPredicates(List<Predicate> preds,
                                                                CriteriaBuilder cb, CommonAbstractCriteria q, From<?,T> r,
-                                                               GridPresetFiltering gridPresetFiltering,SecurityContext SecurityContext) {
-        presetRepository.addPresetPredicates(preds, cb,q, r, gridPresetFiltering,SecurityContext);
+                                                               GridPresetFiltering gridPresetFiltering,SecurityContext securityContext) {
+        presetRepository.addPresetPredicates(preds, cb,q, r, gridPresetFiltering,securityContext);
+        if (gridPresetFiltering.getDynamicInvokerCanonicalNames() != null && !gridPresetFiltering.getDynamicInvokerCanonicalNames().isEmpty()) {
+            preds.add(r.get(GridPreset_.dynamicInvokerCanonicalName).in(gridPresetFiltering.getDynamicInvokerCanonicalNames()));
+        }
+        if (gridPresetFiltering.getDynamicInvokerMethodNames() != null && !gridPresetFiltering.getDynamicInvokerMethodNames().isEmpty()) {
+            preds.add(r.get(GridPreset_.dynamicInvokerMethodName).in(gridPresetFiltering.getDynamicInvokerMethodNames()));
+        }
+        if (gridPresetFiltering.getCreateOperationMethodNames() != null && !gridPresetFiltering.getCreateOperationMethodNames().isEmpty()) {
+            preds.add(r.get(GridPreset_.createOperationMethodName).in(gridPresetFiltering.getCreateOperationMethodNames()));
+        }
+        if (gridPresetFiltering.getUpdateOperationMethodNames() != null && !gridPresetFiltering.getUpdateOperationMethodNames().isEmpty()) {
+            preds.add(r.get(GridPreset_.updateOperationMethodName).in(gridPresetFiltering.getUpdateOperationMethodNames()));
+        }
+        if (gridPresetFiltering.getGridPresetStyleIds() != null && !gridPresetFiltering.getGridPresetStyleIds().isEmpty()) {
+            preds.add(r.get(GridPreset_.gridPresetStyle).get("id").in(gridPresetFiltering.getGridPresetStyleIds()));
+        }
 
     }
 

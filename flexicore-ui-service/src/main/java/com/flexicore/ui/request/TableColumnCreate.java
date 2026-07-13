@@ -1,11 +1,21 @@
 package com.flexicore.ui.request;
 
 public class TableColumnCreate extends UiFieldCreate {
+	private String fieldPath;
 	private Boolean sortable;
 	private Boolean filterable;
 	private Double defaultColumnWidth;
 
 	public TableColumnCreate() {
+	}
+
+	public String getFieldPath() {
+		return fieldPath;
+	}
+
+	public <T extends TableColumnCreate> T setFieldPath(String fieldPath) {
+		this.fieldPath = fieldPath;
+		return (T) this;
 	}
 
 	public Boolean getSortable() {

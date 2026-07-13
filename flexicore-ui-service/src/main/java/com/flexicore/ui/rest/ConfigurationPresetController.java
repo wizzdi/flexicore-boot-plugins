@@ -67,6 +67,7 @@ public class ConfigurationPresetController implements Plugin {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no ConfigurationPreset with id  " + updateConfigurationPreset.getId());
 		}
 		updateConfigurationPreset.setConfigurationPreset(configurationPresetToClazz);
+		service.validate(updateConfigurationPreset, securityContext);
 		return service.updateConfigurationPreset(updateConfigurationPreset, securityContext);
 
 	}

@@ -5,15 +5,14 @@ import com.flexicore.ui.model.Form;
 import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.request.FormCreate;
 import com.flexicore.ui.request.GridPresetCreate;
+import com.flexicore.ui.rest.TableColumnController;
 import com.flexicore.ui.service.FormService;
 import com.flexicore.ui.service.GridPresetService;
-import com.wizzdi.dynamic.properties.converter.DynamicPropertiesModule;
 import com.wizzdi.dynamic.properties.converter.JsonConverterImplementationHolder;
 import com.wizzdi.flexicore.boot.dynamic.invokers.model.DynamicExecution;
 import com.wizzdi.flexicore.boot.dynamic.invokers.request.DynamicExecutionCreate;
 import com.wizzdi.flexicore.boot.dynamic.invokers.service.DynamicExecutionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,7 +43,11 @@ public class TestEntities {
 
     @Bean
     public GridPreset gridPreset(DynamicExecution dynamicExecution){
-        return gridPresetService.createGridPreset(new GridPresetCreate().setDynamicExecution(dynamicExecution).setJsonNode(Map.of("test","test")).setName("test"),adminSecurityContext);
+        return gridPresetService.createGridPreset(new GridPresetCreate()
+                .setDynamicInvokerCanonicalName(TableColumnController.class.getCanonicalName())
+                .setDynamicInvokerMethodName("getAllTableColumns")
+                .setJsonNode(Map.of("test","test"))
+                .setName("test"), adminSecurityContext);
     }
 
 

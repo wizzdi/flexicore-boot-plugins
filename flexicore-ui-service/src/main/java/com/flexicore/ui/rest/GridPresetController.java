@@ -2,7 +2,6 @@ package com.flexicore.ui.rest;
 
 import com.flexicore.annotations.OperationsInside;
 
-import com.flexicore.ui.model.GridPreset_;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
@@ -16,6 +15,8 @@ import com.flexicore.ui.request.GridPresetCreate;
 import com.flexicore.ui.request.GridPresetUpdate;
 import com.flexicore.ui.model.GridPreset;
 import com.flexicore.ui.request.GridPresetFiltering;
+import com.flexicore.ui.request.GridPresetExecutionRequest;
+import com.wizzdi.flexicore.boot.dynamic.invokers.request.ExecuteInvokersResponse;
 import com.flexicore.ui.service.GridPresetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,11 +42,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class GridPresetController implements Plugin {
 
-	
+
 	@Autowired
 	private GridPresetService service;
 
-	
+
 
 	@Operation(summary = "getAllGridPresets", description = "returns all GridPresets")
 	@PostMapping("getAllGridPresets")
@@ -57,7 +58,7 @@ public class GridPresetController implements Plugin {
 
 	}
 
-	
+
 
 	@Operation(summary = "updateGridPreset", description = "Updates Dashbaord")
 	@PutMapping("updateGridPreset")
@@ -77,7 +78,7 @@ public class GridPresetController implements Plugin {
 
 	}
 
-	
+
 
 	@Operation(summary = "createGridPreset", description = "Creates Grid Preset ")
 	@PostMapping("createGridPreset")
@@ -90,7 +91,13 @@ public class GridPresetController implements Plugin {
 
 	}
 
-	
+	@Operation(summary = "executeGridPreset", description = "Executes a GridPreset with its immutable design filtering and permitted runtime filters")
+	@PostMapping("executeGridPreset")
+	public ExecuteInvokersResponse executeGridPreset(@RequestBody GridPresetExecutionRequest request,
+			@RequestAttribute SecurityContext securityContext) {
+		return service.executeGridPreset(request, securityContext);
+	}
+
 
 	@Operation(summary = "copyGridPreset", description = "Copies Grid Preset")
 	@PostMapping("copyGridPreset")
@@ -98,7 +105,7 @@ public class GridPresetController implements Plugin {
 			 @RequestBody
 			GridPresetCopy gridPresetCopy,
 			@RequestAttribute SecurityContext securityContext) {
-		service.validate(gridPresetCopy, securityContext);
+		service.validateCopy(gridPresetCopy, securityContext);
 		return service.copyGridPreset(gridPresetCopy, securityContext);
 
 	}

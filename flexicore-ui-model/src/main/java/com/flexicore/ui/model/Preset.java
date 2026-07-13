@@ -17,6 +17,11 @@ import java.util.Map;
 public class Preset extends Baseclass {
 
 	private String externalId;
+	private String title;
+
+	@ManyToOne(targetEntity = UiStyle.class)
+	@JsonIgnore
+	private UiStyle uiStyle;
 
 	@Column(columnDefinition = "jsonb")
 	@Convert(converter = JsonConverter.class)
@@ -41,6 +46,36 @@ public class Preset extends Baseclass {
 	public <T extends Preset> T setUiFields(List<UiField> uiFields) {
 		this.uiFields = uiFields;
 		return (T) this;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public <T extends Preset> T setTitle(String title) {
+		this.title = title;
+		return (T) this;
+	}
+
+	@ManyToOne(targetEntity = UiStyle.class)
+	@JsonIgnore
+	public UiStyle getUiStyle() {
+		return uiStyle;
+	}
+
+	public <T extends Preset> T setUiStyle(UiStyle uiStyle) {
+		this.uiStyle = uiStyle;
+		return (T) this;
+	}
+
+	@Transient
+	public String getUiStyleId() {
+		return uiStyle != null ? uiStyle.getId() : null;
+	}
+
+	@Transient
+	public String getUiStyleName() {
+		return uiStyle != null ? uiStyle.getName() : null;
 	}
 
 	public String getExternalId() {

@@ -47,8 +47,14 @@ public class StateHistoryCreator implements Plugin {
 
     private void createStateHistory(Remote remote) {
 
-        if ( !remote.isKeepStateHistory()) {
-            logger.debug("not keeping state history for device " + remote.getName() + " with id " + remote.getId());
+        if (remote instanceof Device device && device.getDeviceType() != null) {
+            String policy = device.getDeviceType().getHistoryRecordingPolicy();
+            if (!"ALL_STATE_CHANGES".equalsIgnoreCase(policy)) {
+                logger.debug("state snapshots are controlled by severity history policy for device " + remote.getId());
+                return;
+            }
+        } else if (!remote.isKeepStateHistory()) {
+            logger.debug("not keeping state history for remote " + remote.getName() + " with id " + remote.getId());
             return;
         }
 

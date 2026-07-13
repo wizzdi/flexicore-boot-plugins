@@ -4,6 +4,7 @@ import com.flexicore.model.Baseclass;
 import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.data.BasicRepository;
 import com.wizzdi.flexicore.security.data.SecuredBasicRepository;
+import com.flexicore.ui.data.PresetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityManager;
@@ -36,6 +37,8 @@ public class DashboardPresetRepository implements Plugin {
     private EntityManager em;
     @Autowired
     private SecuredBasicRepository securedBasicRepository;
+    @Autowired
+    private PresetRepository presetRepository;
 
     public List<DashboardPreset> listAllDashboardPreset(DashboardPresetFilter dashboardPresetFilter,
                                                         SecurityContext securityContext) {
@@ -53,7 +56,7 @@ public class DashboardPresetRepository implements Plugin {
     public <T extends DashboardPreset> void addDashboardPresetPredicates(List<Predicate> preds, CriteriaBuilder cb,
                                                                          CommonAbstractCriteria q, From<?,T> r, DashboardPresetFilter dashboardPresetFilter, SecurityContext securityContext) {
 
-    	securedBasicRepository.addSecuredBasicPredicates(null,cb,q,r,preds,securityContext);
+        presetRepository.addPresetPredicates(preds, cb, q, r, dashboardPresetFilter, securityContext);
         if (dashboardPresetFilter.getGridLayouts() != null && !dashboardPresetFilter.getGridLayouts().isEmpty()) {
             Set<String> ids = dashboardPresetFilter.getGridLayouts().stream().map(f -> f.getId()).collect(Collectors.toSet());
             Join<T, GridLayout> join = r.join(DashboardPreset_.gridLayout);

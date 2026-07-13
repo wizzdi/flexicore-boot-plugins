@@ -76,9 +76,12 @@ public class TableColumnControllerTest {
     @Order(1)
     public void testTableColumnCreate() {
         String name = UUID.randomUUID().toString();
-        TableColumnCreate request = new TableColumnCreate()
-                .setPresetId(gridPreset.getId())
-                .setName(name);
+        TableColumnCreate request = new TableColumnCreate();
+        request.setPresetId(gridPreset.getId());
+        request.setFieldPath("preset.externalId");
+        request.setVisible(true);
+        request.setPriority(10);
+        request.setName(name);
         ResponseEntity<TableColumn> tableColumnResponse = this.restTemplate.postForEntity("/plugins/TableColumns/createTableColumn", request, TableColumn.class);
         Assertions.assertEquals(200, tableColumnResponse.getStatusCodeValue());
         tableColumn = tableColumnResponse.getBody();
@@ -111,6 +114,9 @@ public class TableColumnControllerTest {
         }
         if(request.getPresetId()!=null){
             Assertions.assertEquals(request.getPresetId(), tableColumn.getPreset().getId());
+        }
+        if(request.getFieldPath()!=null){
+            Assertions.assertEquals(request.getFieldPath(), tableColumn.getFieldPath());
         }
     }
 

@@ -104,11 +104,15 @@ public class DashboardPresetService implements Plugin {
 			SecurityContext securityContext) {
 		presetService.validate(createDashboardPreset, securityContext);
 		String presetId=createDashboardPreset.getGridLayoutId();
-		GridLayout gridPreset=presetId!=null?getByIdOrNull(presetId,GridLayout.class,securityContext):null;
-		if(gridPreset==null){
+		GridLayout gridLayout = presetId != null
+				? getByIdOrNull(presetId, GridLayout.class, securityContext)
+				: createDashboardPreset instanceof DashboardPresetUpdate update && update.getDashboardPreset() != null
+				? update.getDashboardPreset().getGridLayout()
+				: null;
+		if(gridLayout==null){
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No GridLayout with id "+presetId);
 		}
-		createDashboardPreset.setGridLayout(gridPreset);
+		createDashboardPreset.setGridLayout(gridLayout);
 	}
 
 	public void validate(DashboardPresetFilter dashboardPresetFilter,

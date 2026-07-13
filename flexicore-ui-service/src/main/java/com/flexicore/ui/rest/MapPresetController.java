@@ -68,6 +68,7 @@ public class MapPresetController implements Plugin {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"no Map Preset with id  " + updateMapPreset.getId());
 		}
 		updateMapPreset.setMapPreset(mapPreset);
+		service.validate(updateMapPreset, securityContext);
 		return service.updateMapPreset(updateMapPreset,
 				securityContext);
 

@@ -1,6 +1,7 @@
 package com.flexicore.ui.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.flexicore.annotations.TypeRetention;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.PaginationFilter;
 
@@ -11,6 +12,8 @@ public class PresetFiltering extends PaginationFilter {
 
     private BasicPropertiesFilter basicPropertiesFilter;
     private Set<String> externalIds;
+    @TypeRetention(String.class)
+    private Set<String> uiStyleIds;
     @JsonIgnore
     private Set<String> relatedBaseclass;
 
@@ -20,6 +23,15 @@ public class PresetFiltering extends PaginationFilter {
 
     public <T extends PresetFiltering> T setExternalIds(Set<String> externalIds) {
         this.externalIds = externalIds;
+        return (T) this;
+    }
+
+    public Set<String> getUiStyleIds() {
+        return uiStyleIds;
+    }
+
+    public <T extends PresetFiltering> T setUiStyleIds(Set<String> uiStyleIds) {
+        this.uiStyleIds = uiStyleIds;
         return (T) this;
     }
 

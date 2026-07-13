@@ -129,6 +129,22 @@ public class DeviceTypeService implements Plugin {
             deviceType.setExternalId(deviceTypeCreate.getExternalId());
             updated = true;
         }
+        if (deviceTypeCreate.getSeverityDefinitions() != null && !Objects.equals(deviceTypeCreate.getSeverityDefinitions(), deviceType.getSeverityDefinitions())) {
+            deviceType.setSeverityDefinitions(deviceTypeCreate.getSeverityDefinitions());
+            updated = true;
+        }
+        if (deviceTypeCreate.getValidationSeverityDefinitions() != null && !Objects.equals(deviceTypeCreate.getValidationSeverityDefinitions(), deviceType.getValidationSeverityDefinitions())) {
+            deviceType.setValidationSeverityDefinitions(deviceTypeCreate.getValidationSeverityDefinitions());
+            updated = true;
+        }
+        if (deviceTypeCreate.getFleetHealthDefinitions() != null && !Objects.equals(deviceTypeCreate.getFleetHealthDefinitions(), deviceType.getFleetHealthDefinitions())) {
+            deviceType.setFleetHealthDefinitions(deviceTypeCreate.getFleetHealthDefinitions());
+            updated = true;
+        }
+        if (deviceTypeCreate.getHistoryRecordingPolicy() != null && !Objects.equals(deviceTypeCreate.getHistoryRecordingPolicy(), deviceType.getHistoryRecordingPolicy())) {
+            deviceType.setHistoryRecordingPolicy(deviceTypeCreate.getHistoryRecordingPolicy());
+            updated = true;
+        }
         if(deviceTypeCreate.getDefaultMapIcon()!=null&&(deviceType.getDefaultMapIcon()==null||!deviceTypeCreate.getDefaultMapIcon().getId().equals(deviceType.getDefaultMapIcon().getId()))){
             deviceType.setDefaultMapIcon(deviceTypeCreate.getDefaultMapIcon());
             updated=true;

@@ -106,6 +106,7 @@ public class FormService implements Plugin {
 	}
 
 	public void validate(FormCreate createForm, SecurityContext securityContext) {
+		presetService.validate(createForm, securityContext);
 		String dynamicExecutionId = createForm.getDynamicExecutionId();
 		DynamicExecution dynamicExecution = dynamicExecutionId == null ? null : dynamicExecutionService.getByIdOrNull(dynamicExecutionId, DynamicExecution.class,securityContext);
 		if (dynamicExecution == null && dynamicExecutionId != null) {
