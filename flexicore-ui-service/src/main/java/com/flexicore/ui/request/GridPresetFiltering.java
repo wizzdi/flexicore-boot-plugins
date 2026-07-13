@@ -1,5 +1,9 @@
 package com.flexicore.ui.request;
 
+import com.flexicore.annotations.TypeRetention;
+
+import java.util.Set;
+
 public class GridPresetFiltering extends PresetFiltering {
 
 	@TypeRetention(String.class)
