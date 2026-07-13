@@ -201,7 +201,8 @@ public class DeviceSeverityEvaluationService implements Plugin {
                 .setCurrentSeverityValue(value)
                 .setCurrentSeverityRuleId(ruleId)
                 .setHumanInterventionRequired(humanRequired)
-                .setMitigationInstructions(instructions);
+                .setMitigationInstructions(instructions)
+                .setHealthCalculatedAt(now);
         if (changed) {
             device.setSeveritySince(now)
                     .setMitigationStatus(humanRequired ? "REQUIRED" : "NOT_REQUIRED");

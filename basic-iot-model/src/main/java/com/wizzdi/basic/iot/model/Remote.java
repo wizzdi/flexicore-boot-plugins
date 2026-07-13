@@ -58,6 +58,8 @@ public class Remote extends Baseclass {
     private String currentSeverityRuleId;
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime severitySince;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime healthCalculatedAt;
     private boolean humanInterventionRequired;
     private String mitigationStatus;
     @Column(columnDefinition = "text")
@@ -204,6 +206,8 @@ public class Remote extends Baseclass {
     public <T extends Remote> T setCurrentSeverityRuleId(String currentSeverityRuleId) { this.currentSeverityRuleId = currentSeverityRuleId; return (T) this; }
     public OffsetDateTime getSeveritySince() { return severitySince; }
     public <T extends Remote> T setSeveritySince(OffsetDateTime severitySince) { this.severitySince = severitySince; return (T) this; }
+    public OffsetDateTime getHealthCalculatedAt() { return healthCalculatedAt; }
+    public <T extends Remote> T setHealthCalculatedAt(OffsetDateTime healthCalculatedAt) { this.healthCalculatedAt = healthCalculatedAt; return (T) this; }
     public boolean isHumanInterventionRequired() { return humanInterventionRequired; }
     public <T extends Remote> T setHumanInterventionRequired(boolean humanInterventionRequired) { this.humanInterventionRequired = humanInterventionRequired; return (T) this; }
     public String getMitigationStatus() { return mitigationStatus; }

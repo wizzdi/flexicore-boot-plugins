@@ -19,6 +19,12 @@
         <class>com.wizzdi.basic.iot.model.StateHistory</class>
         <class>com.wizzdi.basic.iot.model.DeviceSeverityRuntime</class>
         <class>com.wizzdi.basic.iot.model.SeverityHistory</class>
+        <class>com.wizzdi.basic.iot.model.RemoteRoleDefinition</class>
+        <class>com.wizzdi.basic.iot.model.FleetHealthPolicy</class>
+        <class>com.wizzdi.basic.iot.model.FleetHealthRule</class>
+        <class>com.wizzdi.basic.iot.model.FleetHealthRuleCondition</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroup</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupToRemote</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
