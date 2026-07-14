@@ -145,6 +145,14 @@ public class RemoteService implements Plugin {
             remote.setVersion(remoteCreate.getVersion());
             update = true;
         }
+        if (remoteCreate.getHealthProfileId() != null) {
+            String currentId = remote.getHealthProfile() == null ? null : remote.getHealthProfile().getId();
+            String requestedId = remoteCreate.getHealthProfile() == null ? null : remoteCreate.getHealthProfile().getId();
+            if (!Objects.equals(currentId, requestedId)) {
+                remote.setHealthProfile(remoteCreate.getHealthProfile());
+                update = true;
+            }
+        }
         if (remoteCreate.getLastSeen() != null && !remoteCreate.getLastSeen().equals(remote.getLastSeen())) {
             remote.setLastSeen(remoteCreate.getLastSeen());
             update = true;
@@ -228,6 +236,18 @@ public class RemoteService implements Plugin {
     public void validate(RemoteCreate remoteCreate,
                          SecurityContext securityContext) {
         basicService.validate(remoteCreate, securityContext);
+        if (remoteCreate.getHealthProfileId() != null) {
+            String healthProfileId = remoteCreate.getHealthProfileId().trim();
+            RemoteHealthProfile healthProfile = healthProfileId.isEmpty()
+                    ? null
+                    : getByIdOrNull(healthProfileId, RemoteHealthProfile.class, securityContext);
+            if (!healthProfileId.isEmpty() && healthProfile == null) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST,
+                        "No accessible RemoteHealthProfile with id " + healthProfileId);
+            }
+            remoteCreate.setHealthProfile(healthProfile);
+        }
     }
 
     public Gateway getGateway(Remote remote){

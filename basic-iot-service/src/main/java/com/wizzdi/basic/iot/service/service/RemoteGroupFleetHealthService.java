@@ -117,6 +117,9 @@ public class RemoteGroupFleetHealthService implements Plugin {
         group.setCurrentUnknownCount(unknown);
         group.setCurrentOfflineCount(offline);
         group.setCurrentHumanInterventionCount(intervention);
+        group.setEvaluatedFleetHealthPolicyId(policy.getId());
+        group.setFleetHealthEvaluationVersion(policy.getEvaluationVersion());
+        group.setEvaluatedHealthInputVersion(group.getHealthInputVersion());
         group.setHealthCalculatedAt(now);
         repository.merge(group);
 
@@ -148,6 +151,72 @@ public class RemoteGroupFleetHealthService implements Plugin {
                 metrics,
                 now);
     }
+
+
+    @Transactional
+    public RemoteGroupHealthSnapshot evaluateAutomatic(String remoteGroupId) {
+        RemoteGroup group = repository.getByIdOrNull(remoteGroupId, RemoteGroup.class, null);
+        if (group == null || group.isSoftDelete()) {
+            return null;
+        }
+        if (!group.isHealthEnabled() || group.getFleetHealthPolicy() == null) {
+            return clearHealthProjection(group, OffsetDateTime.now());
+        }
+        return evaluate(remoteGroupId, null);
+    }
+
+    private RemoteGroupHealthSnapshot clearHealthProjection(RemoteGroup group, OffsetDateTime now) {
+        String previousSeverityName = group.getCurrentSeverityName();
+        Integer previousSeverityValue = group.getCurrentSeverityValue();
+        boolean changed = previousSeverityName != null
+                || previousSeverityValue != null
+                || group.getCurrentSeverityRuleId() != null
+                || group.isHumanInterventionRequired()
+                || group.getCurrentPopulationCount() != null
+                || group.getEvaluatedFleetHealthPolicyId() != null;
+
+        group.setCurrentSeverityName(null);
+        group.setCurrentSeverityValue(null);
+        group.setCurrentSeverityRuleId(null);
+        group.setHumanInterventionRequired(false);
+        group.setCurrentPopulationCount(null);
+        group.setCurrentUnknownCount(null);
+        group.setCurrentOfflineCount(null);
+        group.setCurrentHumanInterventionCount(null);
+        group.setEvaluatedFleetHealthPolicyId(null);
+        group.setFleetHealthEvaluationVersion(null);
+        group.setEvaluatedHealthInputVersion(group.getHealthInputVersion());
+        group.setHealthCalculatedAt(now);
+        repository.merge(group);
+
+        if (changed) {
+            eventPublisher.publishEvent(new RemoteGroupHealthChangedEvent(
+                    group,
+                    previousSeverityName,
+                    previousSeverityValue,
+                    null,
+                    null,
+                    null,
+                    0,
+                    0,
+                    0,
+                    0,
+                    now));
+        }
+        return new RemoteGroupHealthSnapshot(
+                group.getId(),
+                0,
+                0,
+                0,
+                0,
+                null,
+                null,
+                null,
+                false,
+                Map.of(),
+                now);
+    }
+
 
     private List<Member> resolveMembers(RemoteGroup group, SecurityContext securityContext, OffsetDateTime now) {
         RemoteGroupToRemoteFilter filter = new RemoteGroupToRemoteFilter();

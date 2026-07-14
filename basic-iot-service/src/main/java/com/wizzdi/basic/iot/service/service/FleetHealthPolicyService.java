@@ -11,6 +11,7 @@ import com.wizzdi.basic.iot.model.FleetUnknownPolicy;
 import com.wizzdi.basic.iot.model.HealthComparisonOperator;
 import com.wizzdi.basic.iot.model.RemoteRoleDefinition;
 import com.wizzdi.basic.iot.service.data.FleetHealthPolicyRepository;
+import com.wizzdi.basic.iot.service.events.FleetHealthPolicyChangedEvent;
 import com.wizzdi.basic.iot.service.request.FleetHealthPolicyCreate;
 import com.wizzdi.basic.iot.service.request.FleetHealthPolicyFilter;
 import com.wizzdi.basic.iot.service.request.FleetHealthPolicyUpdate;
@@ -23,11 +24,13 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +49,8 @@ public class FleetHealthPolicyService implements Plugin {
     private FleetHealthPolicyRepository repository;
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public void validate(FleetHealthPolicyCreate create, SecurityContext securityContext) {
         basicService.validate(create, securityContext);
@@ -119,22 +124,28 @@ public class FleetHealthPolicyService implements Plugin {
         FleetHealthPolicy policy = new FleetHealthPolicy();
         policy.setId(UUID.randomUUID().toString());
         updatePolicyNoMerge(policy, create);
+        policy.setEvaluationVersion(1);
         BaseclassService.createSecurityObjectNoMerge(policy, securityContext);
         repository.merge(policy);
         if (create.getRules() != null) {
             syncRules(policy, create.getRules(), securityContext);
         }
+        eventPublisher.publishEvent(new FleetHealthPolicyChangedEvent(policy.getId(), policy.getEvaluationVersion(), OffsetDateTime.now()));
         return populate(policy);
     }
 
     @Transactional
     public FleetHealthPolicy update(FleetHealthPolicyUpdate update, SecurityContext securityContext) {
         FleetHealthPolicy policy = update.getFleetHealthPolicy();
-        if (updatePolicyNoMerge(policy, update)) {
-            repository.merge(policy);
-        }
+        boolean definitionChanged = updatePolicyNoMerge(policy, update);
         if (update.getRules() != null) {
             syncRules(policy, update.getRules(), securityContext);
+            definitionChanged = true;
+        }
+        if (definitionChanged) {
+            policy.setEvaluationVersion(Math.max(1, policy.getEvaluationVersion() + 1));
+            repository.merge(policy);
+            eventPublisher.publishEvent(new FleetHealthPolicyChangedEvent(policy.getId(), policy.getEvaluationVersion(), OffsetDateTime.now()));
         }
         return populate(policy);
     }

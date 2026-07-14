@@ -1,14 +1,11 @@
 package com.wizzdi.basic.iot.service.service;
 
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
-import com.wizzdi.basic.iot.model.Device;
-import com.wizzdi.basic.iot.model.DeviceType;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.StateHistoryCreate;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
-import com.wizzdi.flexicore.security.events.BasicUpdated;
 import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import org.pf4j.Extension;
 import org.slf4j.Logger;
@@ -47,13 +44,7 @@ public class StateHistoryCreator implements Plugin {
 
     private void createStateHistory(Remote remote) {
 
-        if (remote instanceof Device device && device.getDeviceType() != null) {
-            String policy = device.getDeviceType().getHistoryRecordingPolicy();
-            if (!"ALL_STATE_CHANGES".equalsIgnoreCase(policy)) {
-                logger.debug("state snapshots are controlled by severity history policy for device " + remote.getId());
-                return;
-            }
-        } else if (!remote.isKeepStateHistory()) {
+        if (!remote.isKeepStateHistory()) {
             logger.debug("not keeping state history for remote " + remote.getName() + " with id " + remote.getId());
             return;
         }

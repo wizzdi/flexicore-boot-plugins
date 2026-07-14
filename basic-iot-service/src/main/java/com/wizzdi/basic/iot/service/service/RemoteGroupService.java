@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 import com.wizzdi.basic.iot.model.FleetHealthPolicy;
 import com.wizzdi.basic.iot.model.RemoteGroup;
 import com.wizzdi.basic.iot.service.data.RemoteGroupRepository;
+import com.wizzdi.basic.iot.service.events.RemoteGroupDefinitionChangedEvent;
 import com.wizzdi.basic.iot.service.request.RemoteGroupCreate;
 import com.wizzdi.basic.iot.service.request.RemoteGroupFilter;
 import com.wizzdi.basic.iot.service.request.RemoteGroupUpdate;
@@ -13,11 +14,13 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +32,8 @@ public class RemoteGroupService implements Plugin {
     private RemoteGroupRepository repository;
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public void validate(RemoteGroupCreate create, SecurityContext securityContext) {
         basicService.validate(create, securityContext);
@@ -59,17 +64,27 @@ public class RemoteGroupService implements Plugin {
     public RemoteGroup create(RemoteGroupCreate create, SecurityContext securityContext) {
         RemoteGroup group = new RemoteGroup();
         group.setId(UUID.randomUUID().toString());
+        group.setHealthInputVersion(1);
         updateNoMerge(group, create, true);
         BaseclassService.createSecurityObjectNoMerge(group, securityContext);
         repository.merge(group);
+        eventPublisher.publishEvent(new RemoteGroupDefinitionChangedEvent(group.getId(), OffsetDateTime.now()));
         return group;
     }
 
     @Transactional
     public RemoteGroup update(RemoteGroupUpdate update, SecurityContext securityContext) {
         RemoteGroup group = update.getRemoteGroup();
+        String previousPolicyId = group.getFleetHealthPolicy() == null ? null : group.getFleetHealthPolicy().getId();
+        boolean previousHealthEnabled = group.isHealthEnabled();
         if (updateNoMerge(group, update, false)) {
             repository.merge(group);
+        }
+        String currentPolicyId = group.getFleetHealthPolicy() == null ? null : group.getFleetHealthPolicy().getId();
+        if (previousHealthEnabled != group.isHealthEnabled() || !Objects.equals(previousPolicyId, currentPolicyId)) {
+            group.setHealthInputVersion(Math.max(1, group.getHealthInputVersion() + 1));
+            repository.merge(group);
+            eventPublisher.publishEvent(new RemoteGroupDefinitionChangedEvent(group.getId(), OffsetDateTime.now()));
         }
         return group;
     }

@@ -9,8 +9,6 @@ import com.wizzdi.basic.iot.service.request.DeviceTypeCreate;
 import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
 import com.wizzdi.basic.iot.service.request.DeviceTypeUpdate;
 import com.wizzdi.basic.iot.service.service.DeviceTypeService;
-import com.wizzdi.basic.iot.service.service.FleetHealthService;
-import com.wizzdi.basic.iot.service.response.FleetHealthSnapshot;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.boot.dynamic.invokers.annotations.Invoker;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -34,9 +32,6 @@ public class DeviceTypeController implements Plugin, Invoker {
 
     @Autowired
     private DeviceTypeService service;
-    @Autowired
-    private FleetHealthService fleetHealthService;
-
 
     @Operation(summary = "getAllDeviceTypes", description = "Lists all DeviceType")
     
@@ -83,11 +78,6 @@ public class DeviceTypeController implements Plugin, Invoker {
         return service.updateDeviceType(deviceTypeUpdate, securityContext);
     }
 
-    @GetMapping("/{id}/fleetHealth")
-    @Operation(summary = "getFleetHealth", description = "Aggregates the current severity of all accessible devices of this DeviceType")
-    public FleetHealthSnapshot getFleetHealth(@PathVariable String id, @RequestAttribute SecurityContext securityContext) {
-        return fleetHealthService.getSnapshot(id, securityContext);
-    }
 
     @Override
     public Class<?> getHandlingClass() {

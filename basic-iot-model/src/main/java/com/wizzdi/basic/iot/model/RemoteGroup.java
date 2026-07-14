@@ -30,6 +30,10 @@ public class RemoteGroup extends Baseclass {
     private Integer currentUnknownCount;
     private Integer currentOfflineCount;
     private Integer currentHumanInterventionCount;
+    private String evaluatedFleetHealthPolicyId;
+    private Integer fleetHealthEvaluationVersion;
+    private long healthInputVersion = 1;
+    private Long evaluatedHealthInputVersion;
 
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime healthCalculatedAt;
@@ -130,6 +134,42 @@ public class RemoteGroup extends Baseclass {
 
     public <T extends RemoteGroup> T setCurrentHumanInterventionCount(Integer currentHumanInterventionCount) {
         this.currentHumanInterventionCount = currentHumanInterventionCount;
+        return (T) this;
+    }
+
+    public String getEvaluatedFleetHealthPolicyId() {
+        return evaluatedFleetHealthPolicyId;
+    }
+
+    public <T extends RemoteGroup> T setEvaluatedFleetHealthPolicyId(String evaluatedFleetHealthPolicyId) {
+        this.evaluatedFleetHealthPolicyId = evaluatedFleetHealthPolicyId;
+        return (T) this;
+    }
+
+    public Integer getFleetHealthEvaluationVersion() {
+        return fleetHealthEvaluationVersion;
+    }
+
+    public <T extends RemoteGroup> T setFleetHealthEvaluationVersion(Integer fleetHealthEvaluationVersion) {
+        this.fleetHealthEvaluationVersion = fleetHealthEvaluationVersion;
+        return (T) this;
+    }
+
+    public long getHealthInputVersion() {
+        return healthInputVersion;
+    }
+
+    public <T extends RemoteGroup> T setHealthInputVersion(long healthInputVersion) {
+        this.healthInputVersion = healthInputVersion;
+        return (T) this;
+    }
+
+    public Long getEvaluatedHealthInputVersion() {
+        return evaluatedHealthInputVersion;
+    }
+
+    public <T extends RemoteGroup> T setEvaluatedHealthInputVersion(Long evaluatedHealthInputVersion) {
+        this.evaluatedHealthInputVersion = evaluatedHealthInputVersion;
         return (T) this;
     }
 

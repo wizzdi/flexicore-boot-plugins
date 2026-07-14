@@ -6,6 +6,7 @@ import com.wizzdi.basic.iot.model.RemoteGroupMembershipAction;
 import com.wizzdi.basic.iot.model.RemoteGroupToRemote;
 import com.wizzdi.basic.iot.model.RemoteRoleDefinition;
 import com.wizzdi.basic.iot.service.data.RemoteGroupRepository;
+import com.wizzdi.basic.iot.service.events.RemoteGroupMembershipChangedEvent;
 import com.wizzdi.basic.iot.service.request.RemoteGroupToRemoteCreate;
 import com.wizzdi.basic.iot.service.request.RemoteGroupToRemoteFilter;
 import com.wizzdi.basic.iot.service.request.RemoteGroupToRemoteUpdate;
@@ -16,12 +17,16 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,6 +37,8 @@ public class RemoteGroupToRemoteService implements Plugin {
     private RemoteGroupRepository repository;
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public void validate(RemoteGroupToRemoteCreate create, SecurityContext securityContext) {
         basicService.validate(create, securityContext);
@@ -91,14 +98,28 @@ public class RemoteGroupToRemoteService implements Plugin {
         updateNoMerge(membership, create, true);
         BaseclassService.createSecurityObjectNoMerge(membership, securityContext);
         repository.merge(membership);
+        incrementGroupInputVersions(Set.of(membership.getRemoteGroup()));
+        publishMembershipChanged(Set.of(), Set.of(), membership);
         return membership;
     }
 
     @Transactional
     public RemoteGroupToRemote update(RemoteGroupToRemoteUpdate update, SecurityContext securityContext) {
         RemoteGroupToRemote membership = update.getRemoteGroupToRemote();
+        RemoteGroup previousGroup = membership.getRemoteGroup();
+        Set<String> previousGroupIds = previousGroup == null ? Set.of() : Set.of(previousGroup.getId());
+        Set<String> previousRemoteIds = membership.getRemote() == null ? Set.of() : Set.of(membership.getRemote().getId());
         if (updateNoMerge(membership, update, false)) {
             repository.merge(membership);
+            Set<RemoteGroup> affectedGroups = new LinkedHashSet<>();
+            if (previousGroup != null) {
+                affectedGroups.add(previousGroup);
+            }
+            if (membership.getRemoteGroup() != null) {
+                affectedGroups.add(membership.getRemoteGroup());
+            }
+            incrementGroupInputVersions(affectedGroups);
+            publishMembershipChanged(previousGroupIds, previousRemoteIds, membership);
         }
         return membership;
     }
@@ -150,6 +171,33 @@ public class RemoteGroupToRemoteService implements Plugin {
             changed = true;
         }
         return changed;
+    }
+
+    private void incrementGroupInputVersions(Set<RemoteGroup> groups) {
+        for (RemoteGroup group : groups) {
+            if (group == null) {
+                continue;
+            }
+            group.setHealthInputVersion(Math.max(1, group.getHealthInputVersion() + 1));
+            repository.merge(group);
+        }
+    }
+
+    private void publishMembershipChanged(Set<String> previousGroupIds,
+                                          Set<String> previousRemoteIds,
+                                          RemoteGroupToRemote membership) {
+        Set<String> groupIds = new LinkedHashSet<>(previousGroupIds);
+        Set<String> remoteIds = new LinkedHashSet<>(previousRemoteIds);
+        if (membership.getRemoteGroup() != null) {
+            groupIds.add(membership.getRemoteGroup().getId());
+        }
+        if (membership.getRemote() != null) {
+            remoteIds.add(membership.getRemote().getId());
+        }
+        eventPublisher.publishEvent(new RemoteGroupMembershipChangedEvent(
+                Set.copyOf(groupIds),
+                Set.copyOf(remoteIds),
+                OffsetDateTime.now()));
     }
 
     private boolean sameEntity(com.flexicore.model.Baseclass left, com.flexicore.model.Baseclass right) {

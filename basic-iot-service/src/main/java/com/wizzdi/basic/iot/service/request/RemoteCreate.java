@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wizzdi.basic.iot.model.Remote;
+import com.wizzdi.basic.iot.model.RemoteHealthProfile;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.flexicore.security.request.BasicCreate;
 import com.wizzdi.maps.model.MappedPOI;
@@ -18,6 +19,9 @@ public class RemoteCreate extends BasicCreate {
 
     private String remoteId;
     private String version;
+    private String healthProfileId;
+    @JsonIgnore
+    private RemoteHealthProfile healthProfile;
 
     @JsonIgnore
     private StateSchema currentSchema;
@@ -45,6 +49,8 @@ public class RemoteCreate extends BasicCreate {
         this.userAddedProperties = deepCopy(other.getUserAddedProperties());
         this.remoteId = other.getRemoteId();
         this.version = other.getVersion();
+        this.healthProfileId = other.getHealthProfile() == null ? null : other.getHealthProfile().getId();
+        this.healthProfile = other.getHealthProfile();
         this.currentSchema = other.getCurrentSchema();
         this.mappedPOI = other.getMappedPOI();
         this.lockLocation = other.isLockLocation();
@@ -73,6 +79,25 @@ public class RemoteCreate extends BasicCreate {
         return (T) this;
     }
 
+
+    public String getHealthProfileId() {
+        return healthProfileId;
+    }
+
+    public <T extends RemoteCreate> T setHealthProfileId(String healthProfileId) {
+        this.healthProfileId = healthProfileId;
+        return (T) this;
+    }
+
+    @JsonIgnore
+    public RemoteHealthProfile getHealthProfile() {
+        return healthProfile;
+    }
+
+    public <T extends RemoteCreate> T setHealthProfile(RemoteHealthProfile healthProfile) {
+        this.healthProfile = healthProfile;
+        return (T) this;
+    }
 
     public String getVersion() {
         return version;

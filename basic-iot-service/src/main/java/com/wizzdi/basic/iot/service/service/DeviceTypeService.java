@@ -8,10 +8,12 @@ import com.flexicore.model.SecurityTenant;
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.Device;
 import com.wizzdi.basic.iot.model.DeviceType;
+import com.wizzdi.basic.iot.model.RemoteHealthProfile;
 import com.wizzdi.basic.iot.service.data.DeviceTypeRepository;
 import com.wizzdi.basic.iot.service.request.DeviceTypeCreate;
 import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
 import com.wizzdi.basic.iot.service.request.DeviceTypeUpdate;
+import com.wizzdi.basic.iot.service.events.DeviceTypeHealthProfileChangedEvent;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -25,6 +27,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.metamodel.SingularAttribute;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Extension
@@ -47,6 +51,8 @@ public class DeviceTypeService implements Plugin {
 
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     @Autowired
     private MapIconService mapIconService;
 
@@ -109,6 +115,13 @@ public class DeviceTypeService implements Plugin {
                                  SecurityContext securityContext) {
         DeviceType deviceType = createDeviceTypeNoMerge(creationContainer, securityContext);
         repository.merge(deviceType);
+        if (deviceType.getDefaultHealthProfile() != null) {
+            eventPublisher.publishEvent(new DeviceTypeHealthProfileChangedEvent(
+                    deviceType.getId(),
+                    null,
+                    deviceType.getDefaultHealthProfile().getId(),
+                    OffsetDateTime.now()));
+        }
         return deviceType;
     }
 
@@ -129,22 +142,6 @@ public class DeviceTypeService implements Plugin {
             deviceType.setExternalId(deviceTypeCreate.getExternalId());
             updated = true;
         }
-        if (deviceTypeCreate.getSeverityDefinitions() != null && !Objects.equals(deviceTypeCreate.getSeverityDefinitions(), deviceType.getSeverityDefinitions())) {
-            deviceType.setSeverityDefinitions(deviceTypeCreate.getSeverityDefinitions());
-            updated = true;
-        }
-        if (deviceTypeCreate.getValidationSeverityDefinitions() != null && !Objects.equals(deviceTypeCreate.getValidationSeverityDefinitions(), deviceType.getValidationSeverityDefinitions())) {
-            deviceType.setValidationSeverityDefinitions(deviceTypeCreate.getValidationSeverityDefinitions());
-            updated = true;
-        }
-        if (deviceTypeCreate.getFleetHealthDefinitions() != null && !Objects.equals(deviceTypeCreate.getFleetHealthDefinitions(), deviceType.getFleetHealthDefinitions())) {
-            deviceType.setFleetHealthDefinitions(deviceTypeCreate.getFleetHealthDefinitions());
-            updated = true;
-        }
-        if (deviceTypeCreate.getHistoryRecordingPolicy() != null && !Objects.equals(deviceTypeCreate.getHistoryRecordingPolicy(), deviceType.getHistoryRecordingPolicy())) {
-            deviceType.setHistoryRecordingPolicy(deviceTypeCreate.getHistoryRecordingPolicy());
-            updated = true;
-        }
         if(deviceTypeCreate.getDefaultMapIcon()!=null&&(deviceType.getDefaultMapIcon()==null||!deviceTypeCreate.getDefaultMapIcon().getId().equals(deviceType.getDefaultMapIcon().getId()))){
             deviceType.setDefaultMapIcon(deviceTypeCreate.getDefaultMapIcon());
             updated=true;
@@ -153,14 +150,31 @@ public class DeviceTypeService implements Plugin {
             deviceType.setKeepStateHistory(deviceTypeCreate.getKeepStateHistory());
             updated=true;
         }
+        if (deviceTypeCreate.getDefaultHealthProfileId() != null) {
+            String currentId = deviceType.getDefaultHealthProfile() == null ? null : deviceType.getDefaultHealthProfile().getId();
+            String requestedId = deviceTypeCreate.getDefaultHealthProfile() == null ? null : deviceTypeCreate.getDefaultHealthProfile().getId();
+            if (!Objects.equals(currentId, requestedId)) {
+                deviceType.setDefaultHealthProfile(deviceTypeCreate.getDefaultHealthProfile());
+                updated = true;
+            }
+        }
         return updated;
     }
 
     public DeviceType updateDeviceType(DeviceTypeUpdate deviceTypeUpdate,
                                  SecurityContext securityContext) {
         DeviceType deviceType = deviceTypeUpdate.getDeviceType();
+        String previousProfileId = deviceType.getDefaultHealthProfile() == null ? null : deviceType.getDefaultHealthProfile().getId();
         if (updateDeviceTypeNoMerge(deviceType, deviceTypeUpdate)) {
             repository.merge(deviceType);
+        }
+        String currentProfileId = deviceType.getDefaultHealthProfile() == null ? null : deviceType.getDefaultHealthProfile().getId();
+        if (!Objects.equals(previousProfileId, currentProfileId)) {
+            eventPublisher.publishEvent(new DeviceTypeHealthProfileChangedEvent(
+                    deviceType.getId(),
+                    previousProfileId,
+                    currentProfileId,
+                    OffsetDateTime.now()));
         }
         return deviceType;
     }
@@ -177,6 +191,16 @@ public class DeviceTypeService implements Plugin {
             mapIcon = mapIconService.listAllMapIcons(new MapIconFilter().setExternalId(Collections.singleton(deviceTypeCreate.getExternalId())), securityContext).stream().findFirst().orElse(null);
         }
         deviceTypeCreate.setDefaultMapIcon(mapIcon);
+        if (deviceTypeCreate.getDefaultHealthProfileId() != null) {
+            String profileId = deviceTypeCreate.getDefaultHealthProfileId().trim();
+            RemoteHealthProfile profile = profileId.isEmpty()
+                    ? null
+                    : getByIdOrNull(profileId, RemoteHealthProfile.class, securityContext);
+            if (!profileId.isEmpty() && profile == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No accessible RemoteHealthProfile with id " + profileId);
+            }
+            deviceTypeCreate.setDefaultHealthProfile(profile);
+        }
     }
 
     public MapIcon getOrCreateMapIcon(String status, String deviceTypeName, Class<? extends Device> deviceClass,SecurityContext SecurityContext) {

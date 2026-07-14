@@ -20,6 +20,7 @@ public class FleetHealthPolicy extends Baseclass {
     private Integer minimumPopulation;
     private String defaultSeverityName;
     private Integer defaultSeverityValue;
+    private int evaluationVersion = 1;
 
     @Enumerated(EnumType.STRING)
     private FleetUnknownPolicy unknownPolicy = FleetUnknownPolicy.USE_DEFAULT;
@@ -69,6 +70,15 @@ public class FleetHealthPolicy extends Baseclass {
 
     public <T extends FleetHealthPolicy> T setDefaultSeverityValue(Integer defaultSeverityValue) {
         this.defaultSeverityValue = defaultSeverityValue;
+        return (T) this;
+    }
+
+    public int getEvaluationVersion() {
+        return evaluationVersion;
+    }
+
+    public <T extends FleetHealthPolicy> T setEvaluationVersion(int evaluationVersion) {
+        this.evaluationVersion = evaluationVersion;
         return (T) this;
     }
 

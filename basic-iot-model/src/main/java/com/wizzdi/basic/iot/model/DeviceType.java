@@ -25,20 +25,9 @@ public class DeviceType extends Baseclass {
     private MapIcon defaultMapIcon;
     private boolean keepStateHistory;
 
-    /** JSON array of operational severity rules. */
-    @jakarta.persistence.Column(columnDefinition = "text")
-    private String severityDefinitions;
+    @ManyToOne(targetEntity = RemoteHealthProfile.class)
+    private RemoteHealthProfile defaultHealthProfile;
 
-    /** JSON array mapping schema validation exceptions to severities. */
-    @jakarta.persistence.Column(columnDefinition = "text")
-    private String validationSeverityDefinitions;
-
-    /** JSON array of tenant/device-type fleet aggregation rules. */
-    @jakarta.persistence.Column(columnDefinition = "text")
-    private String fleetHealthDefinitions;
-
-    /** NONE, ALL_STATE_CHANGES, SEVERITY_CHANGES or MATCHED_RULES. */
-    private String historyRecordingPolicy;
 
     @JsonIgnore
     @OneToMany(targetEntity = DeviceTypeToMapIcon.class, mappedBy = "deviceType")
@@ -63,39 +52,14 @@ public class DeviceType extends Baseclass {
         return (T) this;
     }
 
-    public String getSeverityDefinitions() {
-        return severityDefinitions;
+
+    @ManyToOne(targetEntity = RemoteHealthProfile.class)
+    public RemoteHealthProfile getDefaultHealthProfile() {
+        return defaultHealthProfile;
     }
 
-    public <T extends DeviceType> T setSeverityDefinitions(String severityDefinitions) {
-        this.severityDefinitions = severityDefinitions;
-        return (T) this;
-    }
-
-    public String getValidationSeverityDefinitions() {
-        return validationSeverityDefinitions;
-    }
-
-    public <T extends DeviceType> T setValidationSeverityDefinitions(String validationSeverityDefinitions) {
-        this.validationSeverityDefinitions = validationSeverityDefinitions;
-        return (T) this;
-    }
-
-    public String getFleetHealthDefinitions() {
-        return fleetHealthDefinitions;
-    }
-
-    public <T extends DeviceType> T setFleetHealthDefinitions(String fleetHealthDefinitions) {
-        this.fleetHealthDefinitions = fleetHealthDefinitions;
-        return (T) this;
-    }
-
-    public String getHistoryRecordingPolicy() {
-        return historyRecordingPolicy;
-    }
-
-    public <T extends DeviceType> T setHistoryRecordingPolicy(String historyRecordingPolicy) {
-        this.historyRecordingPolicy = historyRecordingPolicy;
+    public <T extends DeviceType> T setDefaultHealthProfile(RemoteHealthProfile defaultHealthProfile) {
+        this.defaultHealthProfile = defaultHealthProfile;
         return (T) this;
     }
 

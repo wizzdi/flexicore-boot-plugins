@@ -53,6 +53,9 @@ public class Remote extends Baseclass {
     private Double reportedLat;
     private Double reportedLon;
 
+    @ManyToOne(targetEntity = RemoteHealthProfile.class)
+    private RemoteHealthProfile healthProfile;
+
     private String currentSeverityName;
     private Integer currentSeverityValue;
     private String currentSeverityRuleId;
@@ -61,9 +64,15 @@ public class Remote extends Baseclass {
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime healthCalculatedAt;
     private boolean humanInterventionRequired;
+    @Column(columnDefinition = "text")
+    private String healthSummary;
     private String mitigationStatus;
     @Column(columnDefinition = "text")
     private String mitigationInstructions;
+
+    /** ID and server-managed version of the effective health profile used for the current projection. */
+    private String evaluatedHealthProfileId;
+    private Integer healthEvaluationVersion;
 
 
 
@@ -198,6 +207,10 @@ public class Remote extends Baseclass {
         return (T) this;
     }
 
+    @ManyToOne(targetEntity = RemoteHealthProfile.class)
+    public RemoteHealthProfile getHealthProfile() { return healthProfile; }
+    public <T extends Remote> T setHealthProfile(RemoteHealthProfile healthProfile) { this.healthProfile = healthProfile; return (T) this; }
+
     public String getCurrentSeverityName() { return currentSeverityName; }
     public <T extends Remote> T setCurrentSeverityName(String currentSeverityName) { this.currentSeverityName = currentSeverityName; return (T) this; }
     public Integer getCurrentSeverityValue() { return currentSeverityValue; }
@@ -210,10 +223,16 @@ public class Remote extends Baseclass {
     public <T extends Remote> T setHealthCalculatedAt(OffsetDateTime healthCalculatedAt) { this.healthCalculatedAt = healthCalculatedAt; return (T) this; }
     public boolean isHumanInterventionRequired() { return humanInterventionRequired; }
     public <T extends Remote> T setHumanInterventionRequired(boolean humanInterventionRequired) { this.humanInterventionRequired = humanInterventionRequired; return (T) this; }
+    public String getHealthSummary() { return healthSummary; }
+    public <T extends Remote> T setHealthSummary(String healthSummary) { this.healthSummary = healthSummary; return (T) this; }
     public String getMitigationStatus() { return mitigationStatus; }
     public <T extends Remote> T setMitigationStatus(String mitigationStatus) { this.mitigationStatus = mitigationStatus; return (T) this; }
     public String getMitigationInstructions() { return mitigationInstructions; }
     public <T extends Remote> T setMitigationInstructions(String mitigationInstructions) { this.mitigationInstructions = mitigationInstructions; return (T) this; }
+    public String getEvaluatedHealthProfileId() { return evaluatedHealthProfileId; }
+    public <T extends Remote> T setEvaluatedHealthProfileId(String evaluatedHealthProfileId) { this.evaluatedHealthProfileId = evaluatedHealthProfileId; return (T) this; }
+    public Integer getHealthEvaluationVersion() { return healthEvaluationVersion; }
+    public <T extends Remote> T setHealthEvaluationVersion(Integer healthEvaluationVersion) { this.healthEvaluationVersion = healthEvaluationVersion; return (T) this; }
 
     public boolean isKeepConnectivityHistory() {
         return keepConnectivityHistory;

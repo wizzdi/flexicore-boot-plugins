@@ -61,8 +61,10 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.net.ssl.KeyManagerFactory;
@@ -334,12 +336,27 @@ public class BasicIOTConfig implements Plugin {
         return new QueueChannel();
     }
 
+    @Bean(name = "basicIotVirtualExecutor", destroyMethod = "close")
+    public ExecutorService basicIotVirtualExecutor() {
+        ThreadFactory factory = Thread.ofVirtual()
+                .name("basic-iot-", 0)
+                .factory();
+        return Executors.newThreadPerTaskExecutor(factory);
+    }
+
+    @Bean(name = "mqttInboundVirtualExecutor", destroyMethod = "close")
+    public ExecutorService mqttInboundVirtualExecutor() {
+        ThreadFactory factory = Thread.ofVirtual()
+                .name("mqtt-in-", 0)
+                .factory();
+        return Executors.newThreadPerTaskExecutor(factory);
+    }
+
     @Bean
     @Primary
-    public TaskExecutor taskExecutor() {
-
-        return new TaskExecutorAdapter(Executors.newCachedThreadPool());
-
+    public TaskExecutor taskExecutor(
+            @Qualifier("basicIotVirtualExecutor") ExecutorService basicIotVirtualExecutor) {
+        return new TaskExecutorAdapter(basicIotVirtualExecutor);
     }
 
 
@@ -477,7 +494,13 @@ public class BasicIOTConfig implements Plugin {
     }
 
     @Bean
-    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(BasicIOTClient basicIOTClient, MqttPahoClientFactory mqttServerFactory, @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow, Semaphore virtualThreadsLogicSemaphore, MeterRegistry meterRegistry) {
+    public ServerIntegrationFlowHolder serverInputIntegrationFlowHolder(
+            BasicIOTClient basicIOTClient,
+            MqttPahoClientFactory mqttServerFactory,
+            @Qualifier("mqttOutboundFlow") IntegrationFlow mqttOutboundFlow,
+            @Qualifier("virtualThreadsLogicSemaphore") Semaphore virtualThreadsLogicSemaphore,
+            @Qualifier("mqttInboundVirtualExecutor") ExecutorService mqttInboundVirtualExecutor,
+            MeterRegistry meterRegistry) {
         logger.info("serverInputIntegrationFlow");
 
         if (!isMqttConfigured() || mqttServerFactory == null) {
@@ -489,7 +512,7 @@ public class BasicIOTConfig implements Plugin {
         mqttPahoMessageDrivenChannelAdapter.setQos(1);
 
         StandardIntegrationFlow standardIntegrationFlow = IntegrationFlow.from(mqttPahoMessageDrivenChannelAdapter)
-                .channel(MessageChannels.executor("mqtt-in-executor",new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor())))
+                .channel(MessageChannels.executor("mqtt-in-executor", new TaskExecutorAdapter(mqttInboundVirtualExecutor)))
                 .handle(message->{
                     long start = System.nanoTime();
                    // logger.info("handling mqtt id "+message.getHeaders().getId() +" with id "+message.getPayload());

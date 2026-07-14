@@ -6,6 +6,7 @@ import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
 import com.wizzdi.basic.iot.model.*;
+import com.wizzdi.basic.iot.service.events.RemoteHealthInputChangedEvent;
 import com.wizzdi.basic.iot.service.events.RemoteStatusChanged;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.*;
@@ -236,6 +237,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if( f instanceof RemoteStatusChanged remoteStatusChanged){
             return remoteStatusChanged.remote().getId();
         }
+        if (f instanceof RemoteHealthInputChangedEvent remoteHealthInputChangedEvent) {
+            return "health-input-" + remoteHealthInputChangedEvent.remoteId();
+        }
         return UUID.randomUUID().toString();
     }
 
@@ -302,6 +306,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 RemoteUpdateResponse remoteUpdateResponse = remoteService.updateRemoteNoMerge(remote, new RemoteCreate().setLastSeen(lastSeen));
                 if(remoteUpdateResponse.updated()){
                     messageHandleContext.toMerge.add(remote);
+                    if (remoteUpdateResponse.remoteUpdatedEvent() != null) {
+                        messageHandleContext.events.add(remoteUpdateResponse.remoteUpdatedEvent());
+                    }
                 }
             }
             if(remote.getLastSeen().plus(lastSeenThreshold,ChronoUnit.MILLIS).isAfter(OffsetDateTime.now())){
@@ -318,6 +325,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
                     }
 
+                    messageHandleContext.events().add(RemoteHealthInputChangedEvent.connectivity(remote.getId(), OffsetDateTime.now()));
                     logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is ON");
                     statusChanged.add(remote);
 
@@ -382,6 +390,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             OffsetDateTime threshold = OffsetDateTime.now().minus(lastSeenThreshold, ChronoUnit.MILLIS);
             List<Remote> remotesToUpdate = remoteService.listAllRemotes(null, new RemoteFilter().setConnectivity(Collections.singleton(Connectivity.ON)).setLastSeenTo(threshold));
             List<RemoteStatusChanged> events = new ArrayList<>();
+            List<RemoteHealthInputChangedEvent> healthInputEvents = new ArrayList<>();
             Map<String, Object> toMerge = new HashMap<>();
 
             for (Remote remote : remotesToUpdate) {
@@ -395,6 +404,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     toMerge.put(connectivityChange.getId(), connectivityChange);
                 }
 
+                healthInputEvents.add(RemoteHealthInputChangedEvent.connectivity(remote.getId(), OffsetDateTime.now()));
                 logger.info("remote " + remote.getRemoteId() + "(" + remote.getId() + ") is OFF");
                 if (remote instanceof Device device) {
                     if (device.getMappedPOI() != null && device.getDeviceType() != null) {
@@ -419,7 +429,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             connectivityChangeService.massMerge(new ArrayList<>(toMerge.values()));
             for (RemoteStatusChanged event : events) {
                 eventPublisher.publishEvent(event);
-
+            }
+            for (RemoteHealthInputChangedEvent event : healthInputEvents) {
+                eventPublisher.publishEvent(event);
             }
             logger.debug("done checking connectivity");
         }
