@@ -38,6 +38,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -136,36 +137,71 @@ public class RemoteHealthEvaluationService implements Plugin {
             return clearHealthProjection(remote, profile, now);
         }
         profileService.populate(profile);
-        Map<String, Object> signals = resolveSignals(remote, profile.getMappings(), now);
-        RemoteHealthRule selected = selectRule(profile.getRules(), signals);
+        ResolvedSignals resolved = resolveSignals(remote, profile.getMappings(), profile.getRules(), now);
+        RemoteHealthRule selected = selectRule(profile.getRules(), resolved.values());
+        HealthOutcome defaultOutcome = new HealthOutcome(
+                profile.getDefaultSeverityName(),
+                profile.getDefaultSeverityValue(),
+                null,
+                false,
+                null,
+                null);
+        HealthOutcome candidate = selected == null
+                ? defaultOutcome
+                : new HealthOutcome(
+                        selected.getResultingSeverityName(),
+                        selected.getResultingSeverityValue(),
+                        selected.getId(),
+                        selected.isHumanInterventionRequired(),
+                        selected.getSummary(),
+                        selected.getMitigationInstructions());
 
         String previousName = remote.getCurrentSeverityName();
         Integer previousValue = remote.getCurrentSeverityValue();
         String previousRuleId = remote.getCurrentSeverityRuleId();
         boolean previousIntervention = remote.isHumanInterventionRequired();
 
-        String severityName = selected == null ? profile.getDefaultSeverityName() : selected.getResultingSeverityName();
-        Integer severityValue = selected == null ? profile.getDefaultSeverityValue() : selected.getResultingSeverityValue();
-        String ruleId = selected == null ? null : selected.getId();
-        boolean interventionRequired = selected != null && selected.isHumanInterventionRequired();
-        String summary = selected == null ? null : selected.getSummary();
-        String mitigationInstructions = selected == null ? null : selected.getMitigationInstructions();
+        boolean definitionChanged = !Objects.equals(remote.getEvaluatedHealthProfileId(), profile.getId())
+                || !Objects.equals(remote.getHealthEvaluationVersion(), profile.getEvaluationVersion());
+        if (definitionChanged) {
+            clearPendingTransition(remote);
+        }
 
-        boolean changed = !Objects.equals(previousName, severityName)
-                || !Objects.equals(previousValue, severityValue)
-                || !Objects.equals(previousRuleId, ruleId)
-                || previousIntervention != interventionRequired;
+        HealthOutcome current = hasCurrentProjection(remote)
+                ? new HealthOutcome(
+                        remote.getCurrentSeverityName(),
+                        remote.getCurrentSeverityValue(),
+                        remote.getCurrentSeverityRuleId(),
+                        remote.isHumanInterventionRequired(),
+                        remote.getHealthSummary(),
+                        remote.getMitigationInstructions())
+                : defaultOutcome;
+        RemoteHealthRule currentRule = findRule(profile.getRules(), current.ruleId());
+        TransitionDecision transition = decideTransition(
+                remote,
+                current,
+                candidate,
+                currentRule,
+                selected,
+                now);
+        HealthOutcome applied = transition.applyCandidate() ? candidate : current;
 
-        remote.setCurrentSeverityName(severityName)
-                .setCurrentSeverityValue(severityValue)
-                .setCurrentSeverityRuleId(ruleId)
-                .setHumanInterventionRequired(interventionRequired)
-                .setHealthSummary(summary)
-                .setMitigationStatus(interventionRequired ? "REQUIRED" : "NOT_REQUIRED")
-                .setMitigationInstructions(mitigationInstructions)
+        boolean changed = !Objects.equals(previousName, applied.severityName())
+                || !Objects.equals(previousValue, applied.severityValue())
+                || !Objects.equals(previousRuleId, applied.ruleId())
+                || previousIntervention != applied.interventionRequired();
+
+        remote.setCurrentSeverityName(applied.severityName())
+                .setCurrentSeverityValue(applied.severityValue())
+                .setCurrentSeverityRuleId(applied.ruleId())
+                .setHumanInterventionRequired(applied.interventionRequired())
+                .setHealthSummary(applied.summary())
+                .setMitigationStatus(applied.interventionRequired() ? "REQUIRED" : "NOT_REQUIRED")
+                .setMitigationInstructions(applied.mitigationInstructions())
                 .setEvaluatedHealthProfileId(profile.getId())
                 .setHealthEvaluationVersion(profile.getEvaluationVersion())
-                .setHealthCalculatedAt(now);
+                .setHealthCalculatedAt(now)
+                .setNextHealthEvaluationAt(earliest(transition.nextEvaluationAt(), resolved.nextTimeDrivenEvaluationAt()));
         if (changed) {
             remote.setSeveritySince(now);
         }
@@ -176,28 +212,132 @@ public class RemoteHealthEvaluationService implements Plugin {
                     remote,
                     previousName,
                     previousValue,
-                    severityName,
-                    severityValue,
-                    ruleId,
-                    interventionRequired,
-                    summary,
-                    mitigationInstructions,
+                    applied.severityName(),
+                    applied.severityValue(),
+                    applied.ruleId(),
+                    applied.interventionRequired(),
+                    applied.summary(),
+                    applied.mitigationInstructions(),
                     now));
             if (remote instanceof Device device) {
                 eventPublisher.publishEvent(new SeverityChangedEvent(
                         device,
                         previousName,
                         previousValue,
-                        severityName,
-                        severityValue,
-                        ruleId,
-                        interventionRequired,
-                        mitigationInstructions,
+                        applied.severityName(),
+                        applied.severityValue(),
+                        applied.ruleId(),
+                        applied.interventionRequired(),
+                        applied.mitigationInstructions(),
                         null,
                         now));
             }
         }
-        return snapshot(remote, profile, selected, signals, now);
+        RemoteHealthRule appliedRule = findRule(profile.getRules(), applied.ruleId());
+        return snapshot(remote, profile, appliedRule, resolved.values(), now);
+    }
+
+    private TransitionDecision decideTransition(Remote remote,
+                                                HealthOutcome current,
+                                                HealthOutcome candidate,
+                                                RemoteHealthRule currentRule,
+                                                RemoteHealthRule candidateRule,
+                                                OffsetDateTime now) {
+        if (sameOutcome(current, candidate)) {
+            clearPendingTransition(remote);
+            return new TransitionDecision(true, null);
+        }
+        long stableMillis = requiredStableMillis(current, candidate, currentRule, candidateRule);
+        if (stableMillis <= 0) {
+            clearPendingTransition(remote);
+            return new TransitionDecision(true, null);
+        }
+        if (!pendingMatches(remote, candidate)) {
+            remote.setHealthTransitionPending(true)
+                    .setPendingSeverityName(candidate.severityName())
+                    .setPendingSeverityValue(candidate.severityValue())
+                    .setPendingSeverityRuleId(candidate.ruleId())
+                    .setPendingHumanInterventionRequired(candidate.interventionRequired())
+                    .setHealthTransitionPendingSince(now);
+        }
+        OffsetDateTime pendingSince = remote.getHealthTransitionPendingSince() == null
+                ? now
+                : remote.getHealthTransitionPendingSince();
+        OffsetDateTime deadline = pendingSince.plus(Duration.ofMillis(stableMillis));
+        if (!now.isBefore(deadline)) {
+            clearPendingTransition(remote);
+            return new TransitionDecision(true, null);
+        }
+        return new TransitionDecision(false, deadline);
+    }
+
+    private long requiredStableMillis(HealthOutcome current,
+                                      HealthOutcome candidate,
+                                      RemoteHealthRule currentRule,
+                                      RemoteHealthRule candidateRule) {
+        int currentValue = current.severityValue() == null ? Integer.MIN_VALUE : current.severityValue();
+        int candidateValue = candidate.severityValue() == null ? Integer.MIN_VALUE : candidate.severityValue();
+        boolean recovery = candidateValue < currentValue
+                || current.interventionRequired() && !candidate.interventionRequired();
+        if (recovery) {
+            return currentRule == null || currentRule.getRecoveryStableMillis() == null
+                    ? 0L
+                    : Math.max(0L, currentRule.getRecoveryStableMillis());
+        }
+        return candidateRule == null || candidateRule.getMinimumStableMillis() == null
+                ? 0L
+                : Math.max(0L, candidateRule.getMinimumStableMillis());
+    }
+
+    private boolean pendingMatches(Remote remote, HealthOutcome candidate) {
+        return remote.isHealthTransitionPending()
+                && Objects.equals(remote.getPendingSeverityName(), candidate.severityName())
+                && Objects.equals(remote.getPendingSeverityValue(), candidate.severityValue())
+                && Objects.equals(remote.getPendingSeverityRuleId(), candidate.ruleId())
+                && remote.isPendingHumanInterventionRequired() == candidate.interventionRequired();
+    }
+
+    private boolean sameOutcome(HealthOutcome one, HealthOutcome two) {
+        return Objects.equals(one.severityName(), two.severityName())
+                && Objects.equals(one.severityValue(), two.severityValue())
+                && Objects.equals(one.ruleId(), two.ruleId())
+                && one.interventionRequired() == two.interventionRequired();
+    }
+
+    private boolean hasCurrentProjection(Remote remote) {
+        return remote.getCurrentSeverityName() != null
+                || remote.getCurrentSeverityValue() != null
+                || remote.getCurrentSeverityRuleId() != null
+                || remote.isHumanInterventionRequired();
+    }
+
+    private void clearPendingTransition(Remote remote) {
+        remote.setHealthTransitionPending(false)
+                .setPendingSeverityName(null)
+                .setPendingSeverityValue(null)
+                .setPendingSeverityRuleId(null)
+                .setPendingHumanInterventionRequired(false)
+                .setHealthTransitionPendingSince(null);
+    }
+
+    private RemoteHealthRule findRule(List<RemoteHealthRule> rules, String ruleId) {
+        if (ruleId == null || rules == null) {
+            return null;
+        }
+        return rules.stream()
+                .filter(rule -> Objects.equals(rule.getId(), ruleId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private OffsetDateTime earliest(OffsetDateTime one, OffsetDateTime two) {
+        if (one == null) {
+            return two;
+        }
+        if (two == null) {
+            return one;
+        }
+        return one.isBefore(two) ? one : two;
     }
 
     private RemoteHealthSnapshot clearHealthProjection(Remote remote, RemoteHealthProfile profile, OffsetDateTime now) {
@@ -212,6 +352,7 @@ public class RemoteHealthEvaluationService implements Plugin {
                 || remote.getHealthSummary() != null
                 || remote.getMitigationInstructions() != null;
 
+        clearPendingTransition(remote);
         remote.setCurrentSeverityName(null)
                 .setCurrentSeverityValue(null)
                 .setCurrentSeverityRuleId(null)
@@ -221,7 +362,8 @@ public class RemoteHealthEvaluationService implements Plugin {
                 .setMitigationInstructions(null)
                 .setEvaluatedHealthProfileId(profile == null ? null : profile.getId())
                 .setHealthEvaluationVersion(profile == null ? null : profile.getEvaluationVersion())
-                .setHealthCalculatedAt(now);
+                .setHealthCalculatedAt(now)
+                .setNextHealthEvaluationAt(null);
         if (changed) {
             remote.setSeveritySince(now);
         }
@@ -243,8 +385,12 @@ public class RemoteHealthEvaluationService implements Plugin {
         return snapshot(remote, profile, null, Map.of(), now);
     }
 
-    private Map<String, Object> resolveSignals(Remote remote, List<HealthSignalMapping> mappings, OffsetDateTime now) {
+    private ResolvedSignals resolveSignals(Remote remote,
+                                           List<HealthSignalMapping> mappings,
+                                           List<RemoteHealthRule> rules,
+                                           OffsetDateTime now) {
         Map<String, Object> values = new LinkedHashMap<>();
+        Map<String, AgeSignal> ageSignals = new HashMap<>();
         List<HealthSignalMapping> sorted = new ArrayList<>(mappings == null ? List.of() : mappings);
         sorted.sort(Comparator.comparingInt(HealthSignalMapping::getPriority).reversed());
         for (HealthSignalMapping mapping : sorted) {
@@ -257,10 +403,97 @@ public class RemoteHealthEvaluationService implements Plugin {
             Object raw = resolveRawValue(remote, mapping, now);
             Object transformed = transform(raw, mapping, now);
             if (transformed != null) {
-                values.put(mapping.getHealthSignal().getId(), transformed);
+                String signalId = mapping.getHealthSignal().getId();
+                values.put(signalId, transformed);
+                OffsetDateTime ageOrigin = ageOrigin(remote, mapping, raw);
+                if (ageOrigin != null) {
+                    ageSignals.put(signalId, new AgeSignal(ageOrigin, mapping));
+                }
             }
         }
-        return values;
+        return new ResolvedSignals(values, nextTimeDrivenEvaluation(ageSignals, rules, now));
+    }
+
+    private OffsetDateTime ageOrigin(Remote remote, HealthSignalMapping mapping, Object raw) {
+        if (mapping.getSourceType() == HealthSignalSourceType.REMOTE_LAST_SEEN_AGE_SECONDS) {
+            return remote.getLastSeen();
+        }
+        HealthSignalMappingOperation operation = mapping.getOperation() == null
+                ? HealthSignalMappingOperation.DIRECT
+                : mapping.getOperation();
+        return operation == HealthSignalMappingOperation.TIMESTAMP_AGE_SECONDS
+                ? asOffsetDateTime(raw)
+                : null;
+    }
+
+    private OffsetDateTime nextTimeDrivenEvaluation(Map<String, AgeSignal> ageSignals,
+                                                    List<RemoteHealthRule> rules,
+                                                    OffsetDateTime now) {
+        OffsetDateTime next = null;
+        if (rules == null || ageSignals.isEmpty()) {
+            return null;
+        }
+        for (RemoteHealthRule rule : rules) {
+            if (rule == null || rule.isSoftDelete() || !rule.isEnabled() || rule.getConditions() == null) {
+                continue;
+            }
+            for (RemoteHealthRuleCondition condition : rule.getConditions()) {
+                if (condition == null || condition.isSoftDelete() || condition.getHealthSignal() == null) {
+                    continue;
+                }
+                AgeSignal ageSignal = ageSignals.get(condition.getHealthSignal().getId());
+                if (ageSignal == null) {
+                    continue;
+                }
+                for (long boundarySeconds : conditionBoundaries(condition, ageSignal.mapping())) {
+                    OffsetDateTime candidate = ageSignal.origin().plusSeconds(boundarySeconds);
+                    if (candidate.isAfter(now) && (next == null || candidate.isBefore(next))) {
+                        next = candidate;
+                    }
+                }
+            }
+        }
+        return next;
+    }
+
+    private List<Long> conditionBoundaries(RemoteHealthRuleCondition condition, HealthSignalMapping mapping) {
+        Double first = toRawAgeThreshold(condition.getNumericValue(), mapping);
+        if (first == null || condition.getOperator() == null) {
+            return List.of();
+        }
+        java.util.LinkedHashSet<Long> boundaries = new java.util.LinkedHashSet<>();
+        addThresholdBoundaries(boundaries, first);
+        if (condition.getOperator() == HealthComparisonOperator.BETWEEN) {
+            addThresholdBoundaries(boundaries, toRawAgeThreshold(condition.getSecondNumericValue(), mapping));
+        }
+        return List.copyOf(boundaries);
+    }
+
+    private void addThresholdBoundaries(Set<Long> boundaries, Double threshold) {
+        if (threshold == null || !Double.isFinite(threshold)) {
+            return;
+        }
+        boundaries.add(Math.max(0L, (long) Math.ceil(threshold)));
+        boundaries.add(Math.max(0L, (long) Math.floor(threshold) + 1L));
+    }
+
+    private Double toRawAgeThreshold(Double threshold, HealthSignalMapping mapping) {
+        if (threshold == null) {
+            return null;
+        }
+        HealthSignalMappingOperation operation = mapping.getOperation() == null
+                ? HealthSignalMappingOperation.DIRECT
+                : mapping.getOperation();
+        return switch (operation) {
+            case NUMERIC_SCALE -> {
+                double multiplier = mapping.getMultiplier() == null ? 1D : mapping.getMultiplier();
+                double offset = mapping.getOffset() == null ? 0D : mapping.getOffset();
+                yield multiplier == 0D ? null : (threshold - offset) / multiplier;
+            }
+            case NUMERIC_OFFSET -> threshold - (mapping.getOffset() == null ? 0D : mapping.getOffset());
+            case DIRECT, TIMESTAMP_AGE_SECONDS -> threshold;
+            case ENUM_EQUALS, BOOLEAN_NEGATE -> null;
+        };
     }
 
     private boolean mappingApplies(Remote remote, HealthSignalMapping mapping) {
@@ -518,4 +751,22 @@ public class RemoteHealthEvaluationService implements Plugin {
                 .setCalculatedAt(now)
                 .setSignals(byExternalId);
     }
+    private record HealthOutcome(
+            String severityName,
+            Integer severityValue,
+            String ruleId,
+            boolean interventionRequired,
+            String summary,
+            String mitigationInstructions) {
+    }
+
+    private record TransitionDecision(boolean applyCandidate, OffsetDateTime nextEvaluationAt) {
+    }
+
+
+    private record AgeSignal(OffsetDateTime origin, HealthSignalMapping mapping) {
+    }
+    private record ResolvedSignals(Map<String, Object> values, OffsetDateTime nextTimeDrivenEvaluationAt) {
+    }
+
 }

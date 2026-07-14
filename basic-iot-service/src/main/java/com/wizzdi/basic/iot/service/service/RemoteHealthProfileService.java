@@ -190,6 +190,12 @@ public class RemoteHealthProfileService implements Plugin {
             if (rule.getResultingSeverityValue() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "resultingSeverityValue is required for every rule");
             }
+            if (rule.getMinimumStableMillis() != null && rule.getMinimumStableMillis() < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minimumStableMillis must be non-negative");
+            }
+            if (rule.getRecoveryStableMillis() != null && rule.getRecoveryStableMillis() < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "recoveryStableMillis must be non-negative");
+            }
             if ((rule.getConditions() == null || rule.getConditions().isEmpty()) && rule.getId() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Every new RemoteHealthRule requires at least one condition");
             }
@@ -401,6 +407,8 @@ public class RemoteHealthProfileService implements Plugin {
             rule.setResultingSeverityName(item.getResultingSeverityName());
             rule.setResultingSeverityValue(item.getResultingSeverityValue());
             rule.setHumanInterventionRequired(Boolean.TRUE.equals(item.getHumanInterventionRequired()));
+            rule.setMinimumStableMillis(item.getMinimumStableMillis() == null ? 0L : item.getMinimumStableMillis());
+            rule.setRecoveryStableMillis(item.getRecoveryStableMillis() == null ? 0L : item.getRecoveryStableMillis());
             rule.setSummary(item.getSummary());
             rule.setMitigationInstructions(item.getMitigationInstructions());
             rule.setSoftDelete(false);

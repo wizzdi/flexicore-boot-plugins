@@ -13,6 +13,8 @@ public class FleetHealthRuleCreate extends BasicCreate {
     private String resultingSeverityName;
     private Integer resultingSeverityValue;
     private Boolean humanInterventionRequired;
+    private Long minimumStableMillis;
+    private Long recoveryStableMillis;
     private List<FleetHealthRuleConditionCreate> conditions;
 
     public String getId() { return id; }
@@ -29,6 +31,10 @@ public class FleetHealthRuleCreate extends BasicCreate {
     public <T extends FleetHealthRuleCreate> T setResultingSeverityValue(Integer resultingSeverityValue) { this.resultingSeverityValue = resultingSeverityValue; return (T) this; }
     public Boolean getHumanInterventionRequired() { return humanInterventionRequired; }
     public <T extends FleetHealthRuleCreate> T setHumanInterventionRequired(Boolean humanInterventionRequired) { this.humanInterventionRequired = humanInterventionRequired; return (T) this; }
+    public Long getMinimumStableMillis() { return minimumStableMillis; }
+    public <T extends FleetHealthRuleCreate> T setMinimumStableMillis(Long minimumStableMillis) { this.minimumStableMillis = minimumStableMillis; return (T) this; }
+    public Long getRecoveryStableMillis() { return recoveryStableMillis; }
+    public <T extends FleetHealthRuleCreate> T setRecoveryStableMillis(Long recoveryStableMillis) { this.recoveryStableMillis = recoveryStableMillis; return (T) this; }
     public List<FleetHealthRuleConditionCreate> getConditions() { return conditions; }
     public <T extends FleetHealthRuleCreate> T setConditions(List<FleetHealthRuleConditionCreate> conditions) { this.conditions = conditions; return (T) this; }
 }

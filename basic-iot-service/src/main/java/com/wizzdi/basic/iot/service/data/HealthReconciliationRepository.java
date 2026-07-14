@@ -29,6 +29,7 @@ import jakarta.persistence.criteria.Root;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,6 +144,26 @@ public class HealthReconciliationRepository implements Plugin {
                 cb.notEqual(group.get(RemoteGroup_.fleetHealthEvaluationVersion), policy.get(FleetHealthPolicy_.evaluationVersion)),
                 cb.isNull(group.get(RemoteGroup_.evaluatedHealthInputVersion)),
                 cb.notEqual(group.get(RemoteGroup_.evaluatedHealthInputVersion), group.get(RemoteGroup_.healthInputVersion))));
+        return ids(query, group, predicates, limit);
+    }
+
+    public List<String> listDueRemoteHealthIds(OffsetDateTime dueAt, String afterId, int limit) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<Remote> remote = query.from(Remote.class);
+        List<Predicate> predicates = activeAfter(cb, remote, afterId);
+        predicates.add(cb.isNotNull(remote.get(Remote_.nextHealthEvaluationAt)));
+        predicates.add(cb.lessThanOrEqualTo(remote.get(Remote_.nextHealthEvaluationAt), dueAt));
+        return ids(query, remote, predicates, limit);
+    }
+
+    public List<String> listDueGroupHealthIds(OffsetDateTime dueAt, String afterId, int limit) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<String> query = cb.createQuery(String.class);
+        Root<RemoteGroup> group = query.from(RemoteGroup.class);
+        List<Predicate> predicates = activeAfter(cb, group, afterId);
+        predicates.add(cb.isNotNull(group.get(RemoteGroup_.nextHealthEvaluationAt)));
+        predicates.add(cb.lessThanOrEqualTo(group.get(RemoteGroup_.nextHealthEvaluationAt), dueAt));
         return ids(query, group, predicates, limit);
     }
 

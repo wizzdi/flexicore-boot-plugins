@@ -85,6 +85,12 @@ public class FleetHealthPolicyService implements Plugin {
             if (rule.getResultingSeverityValue() == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Every fleet health rule requires resultingSeverityValue");
             }
+            if (rule.getMinimumStableMillis() != null && rule.getMinimumStableMillis() < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minimumStableMillis must be non-negative");
+            }
+            if (rule.getRecoveryStableMillis() != null && rule.getRecoveryStableMillis() < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "recoveryStableMillis must be non-negative");
+            }
             if (rule.getConditions() == null) {
                 if (rule.getId() == null) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Every new fleet health rule requires at least one condition");
@@ -205,6 +211,8 @@ public class FleetHealthPolicyService implements Plugin {
             rule.setResultingSeverityName(item.getResultingSeverityName());
             rule.setResultingSeverityValue(item.getResultingSeverityValue());
             rule.setHumanInterventionRequired(Boolean.TRUE.equals(item.getHumanInterventionRequired()));
+            rule.setMinimumStableMillis(item.getMinimumStableMillis() == null ? 0L : item.getMinimumStableMillis());
+            rule.setRecoveryStableMillis(item.getRecoveryStableMillis() == null ? 0L : item.getRecoveryStableMillis());
             rule.setSoftDelete(false);
             retained.add(rule.getId());
             toMerge.add(rule);

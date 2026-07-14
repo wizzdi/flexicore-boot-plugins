@@ -64,7 +64,8 @@ public class RemoteGroupFleetHealthService implements Plugin {
         }
         fleetHealthPolicyService.populate(policy);
         OffsetDateTime now = OffsetDateTime.now();
-        List<Member> members = resolveMembers(group, securityContext, now);
+        MemberResolution resolution = resolveMembers(group, securityContext, now);
+        List<Member> members = resolution.members();
 
         int population = members.size();
         int unknown = (int) members.stream().filter(member -> member.remote().getCurrentSeverityValue() == null).count();
@@ -79,40 +80,64 @@ public class RemoteGroupFleetHealthService implements Plugin {
         metrics.put("weightedSeverityAverage", weightedSeverityAverage(members));
 
         FleetHealthRule selected = selectRule(policy, members, now, metrics);
-        String severityName;
-        Integer severityValue;
-        String matchedRuleId;
-        boolean humanInterventionRequired;
-
         boolean belowMinimum = policy.getMinimumPopulation() != null && population < policy.getMinimumPopulation();
+        GroupHealthOutcome defaultOutcome = new GroupHealthOutcome(
+                policy.getDefaultSeverityName(),
+                policy.getDefaultSeverityValue(),
+                null,
+                false);
+        GroupHealthOutcome candidate;
         if (belowMinimum && policy.getUnknownPolicy() == FleetUnknownPolicy.RESULT_UNKNOWN) {
-            severityName = "UNKNOWN";
-            severityValue = null;
-            matchedRuleId = null;
-            humanInterventionRequired = false;
+            candidate = new GroupHealthOutcome("UNKNOWN", null, null, false);
         } else if (selected != null) {
-            severityName = selected.getResultingSeverityName();
-            severityValue = selected.getResultingSeverityValue();
-            matchedRuleId = selected.getId();
-            humanInterventionRequired = selected.isHumanInterventionRequired();
+            candidate = new GroupHealthOutcome(
+                    selected.getResultingSeverityName(),
+                    selected.getResultingSeverityValue(),
+                    selected.getId(),
+                    selected.isHumanInterventionRequired());
         } else {
-            severityName = policy.getDefaultSeverityName();
-            severityValue = policy.getDefaultSeverityValue();
-            matchedRuleId = null;
-            humanInterventionRequired = false;
+            candidate = defaultOutcome;
         }
 
         String previousSeverityName = group.getCurrentSeverityName();
         Integer previousSeverityValue = group.getCurrentSeverityValue();
-        boolean changed = !Objects.equals(previousSeverityName, severityName)
-                || !Objects.equals(previousSeverityValue, severityValue)
-                || !Objects.equals(group.getCurrentSeverityRuleId(), matchedRuleId)
-                || group.isHumanInterventionRequired() != humanInterventionRequired;
+        String previousRuleId = group.getCurrentSeverityRuleId();
+        boolean previousIntervention = group.isHumanInterventionRequired();
 
-        group.setCurrentSeverityName(severityName);
-        group.setCurrentSeverityValue(severityValue);
-        group.setCurrentSeverityRuleId(matchedRuleId);
-        group.setHumanInterventionRequired(humanInterventionRequired);
+        boolean definitionChanged = !Objects.equals(group.getEvaluatedFleetHealthPolicyId(), policy.getId())
+                || !Objects.equals(group.getFleetHealthEvaluationVersion(), policy.getEvaluationVersion())
+                || !Objects.equals(group.getEvaluatedHealthInputVersion(), group.getHealthInputVersion());
+        if (definitionChanged) {
+            clearPendingTransition(group);
+        }
+
+        GroupHealthOutcome current = hasCurrentProjection(group)
+                ? new GroupHealthOutcome(
+                        group.getCurrentSeverityName(),
+                        group.getCurrentSeverityValue(),
+                        group.getCurrentSeverityRuleId(),
+                        group.isHumanInterventionRequired())
+                : selected == null ? candidate : defaultOutcome;
+        FleetHealthRule currentRule = findRule(policy.getRules(), current.ruleId());
+        GroupTransitionDecision transition = decideTransition(
+                group,
+                current,
+                candidate,
+                currentRule,
+                selected,
+                now);
+        GroupHealthOutcome applied = transition.applyCandidate() ? candidate : current;
+
+        boolean changed = !Objects.equals(previousSeverityName, applied.severityName())
+                || !Objects.equals(previousSeverityValue, applied.severityValue())
+                || !Objects.equals(previousRuleId, applied.ruleId())
+                || previousIntervention != applied.interventionRequired();
+
+        OffsetDateTime nextStaleEvaluation = nextStaleEvaluation(policy, members, now);
+        group.setCurrentSeverityName(applied.severityName());
+        group.setCurrentSeverityValue(applied.severityValue());
+        group.setCurrentSeverityRuleId(applied.ruleId());
+        group.setHumanInterventionRequired(applied.interventionRequired());
         group.setCurrentPopulationCount(population);
         group.setCurrentUnknownCount(unknown);
         group.setCurrentOfflineCount(offline);
@@ -121,6 +146,9 @@ public class RemoteGroupFleetHealthService implements Plugin {
         group.setFleetHealthEvaluationVersion(policy.getEvaluationVersion());
         group.setEvaluatedHealthInputVersion(group.getHealthInputVersion());
         group.setHealthCalculatedAt(now);
+        group.setNextHealthEvaluationAt(earliest(
+                transition.nextEvaluationAt(),
+                earliest(nextStaleEvaluation, resolution.nextMembershipChangeAt())));
         repository.merge(group);
 
         if (changed) {
@@ -128,9 +156,9 @@ public class RemoteGroupFleetHealthService implements Plugin {
                     group,
                     previousSeverityName,
                     previousSeverityValue,
-                    severityName,
-                    severityValue,
-                    matchedRuleId,
+                    applied.severityName(),
+                    applied.severityValue(),
+                    applied.ruleId(),
                     population,
                     unknown,
                     offline,
@@ -144,14 +172,13 @@ public class RemoteGroupFleetHealthService implements Plugin {
                 unknown,
                 offline,
                 intervention,
-                severityName,
-                severityValue,
-                matchedRuleId,
-                humanInterventionRequired,
+                applied.severityName(),
+                applied.severityValue(),
+                applied.ruleId(),
+                applied.interventionRequired(),
                 metrics,
                 now);
     }
-
 
     @Transactional
     public RemoteGroupHealthSnapshot evaluateAutomatic(String remoteGroupId) {
@@ -175,6 +202,7 @@ public class RemoteGroupFleetHealthService implements Plugin {
                 || group.getCurrentPopulationCount() != null
                 || group.getEvaluatedFleetHealthPolicyId() != null;
 
+        clearPendingTransition(group);
         group.setCurrentSeverityName(null);
         group.setCurrentSeverityValue(null);
         group.setCurrentSeverityRuleId(null);
@@ -187,6 +215,7 @@ public class RemoteGroupFleetHealthService implements Plugin {
         group.setFleetHealthEvaluationVersion(null);
         group.setEvaluatedHealthInputVersion(group.getHealthInputVersion());
         group.setHealthCalculatedAt(now);
+        group.setNextHealthEvaluationAt(null);
         repository.merge(group);
 
         if (changed) {
@@ -217,28 +246,184 @@ public class RemoteGroupFleetHealthService implements Plugin {
                 now);
     }
 
+    private GroupTransitionDecision decideTransition(RemoteGroup group,
+                                                     GroupHealthOutcome current,
+                                                     GroupHealthOutcome candidate,
+                                                     FleetHealthRule currentRule,
+                                                     FleetHealthRule candidateRule,
+                                                     OffsetDateTime now) {
+        if (sameOutcome(current, candidate)) {
+            clearPendingTransition(group);
+            return new GroupTransitionDecision(true, null);
+        }
+        long stableMillis = requiredStableMillis(current, candidate, currentRule, candidateRule);
+        if (stableMillis <= 0) {
+            clearPendingTransition(group);
+            return new GroupTransitionDecision(true, null);
+        }
+        if (!pendingMatches(group, candidate)) {
+            group.setHealthTransitionPending(true)
+                    .setPendingSeverityName(candidate.severityName())
+                    .setPendingSeverityValue(candidate.severityValue())
+                    .setPendingSeverityRuleId(candidate.ruleId())
+                    .setPendingHumanInterventionRequired(candidate.interventionRequired())
+                    .setHealthTransitionPendingSince(now);
+        }
+        OffsetDateTime pendingSince = group.getHealthTransitionPendingSince() == null
+                ? now
+                : group.getHealthTransitionPendingSince();
+        OffsetDateTime deadline = pendingSince.plus(Duration.ofMillis(stableMillis));
+        if (!now.isBefore(deadline)) {
+            clearPendingTransition(group);
+            return new GroupTransitionDecision(true, null);
+        }
+        return new GroupTransitionDecision(false, deadline);
+    }
 
-    private List<Member> resolveMembers(RemoteGroup group, SecurityContext securityContext, OffsetDateTime now) {
+    private long requiredStableMillis(GroupHealthOutcome current,
+                                      GroupHealthOutcome candidate,
+                                      FleetHealthRule currentRule,
+                                      FleetHealthRule candidateRule) {
+        int currentValue = current.severityValue() == null ? Integer.MIN_VALUE : current.severityValue();
+        int candidateValue = candidate.severityValue() == null ? Integer.MIN_VALUE : candidate.severityValue();
+        boolean recovery = candidateValue < currentValue
+                || current.interventionRequired() && !candidate.interventionRequired();
+        if (recovery) {
+            return currentRule == null || currentRule.getRecoveryStableMillis() == null
+                    ? 0L
+                    : Math.max(0L, currentRule.getRecoveryStableMillis());
+        }
+        return candidateRule == null || candidateRule.getMinimumStableMillis() == null
+                ? 0L
+                : Math.max(0L, candidateRule.getMinimumStableMillis());
+    }
+
+    private boolean pendingMatches(RemoteGroup group, GroupHealthOutcome candidate) {
+        return group.isHealthTransitionPending()
+                && Objects.equals(group.getPendingSeverityName(), candidate.severityName())
+                && Objects.equals(group.getPendingSeverityValue(), candidate.severityValue())
+                && Objects.equals(group.getPendingSeverityRuleId(), candidate.ruleId())
+                && group.isPendingHumanInterventionRequired() == candidate.interventionRequired();
+    }
+
+    private boolean sameOutcome(GroupHealthOutcome one, GroupHealthOutcome two) {
+        return Objects.equals(one.severityName(), two.severityName())
+                && Objects.equals(one.severityValue(), two.severityValue())
+                && Objects.equals(one.ruleId(), two.ruleId())
+                && one.interventionRequired() == two.interventionRequired();
+    }
+
+    private boolean hasCurrentProjection(RemoteGroup group) {
+        return group.getCurrentSeverityName() != null
+                || group.getCurrentSeverityValue() != null
+                || group.getCurrentSeverityRuleId() != null
+                || group.isHumanInterventionRequired();
+    }
+
+    private void clearPendingTransition(RemoteGroup group) {
+        group.setHealthTransitionPending(false)
+                .setPendingSeverityName(null)
+                .setPendingSeverityValue(null)
+                .setPendingSeverityRuleId(null)
+                .setPendingHumanInterventionRequired(false)
+                .setHealthTransitionPendingSince(null);
+    }
+
+    private FleetHealthRule findRule(List<FleetHealthRule> rules, String ruleId) {
+        if (ruleId == null || rules == null) {
+            return null;
+        }
+        return rules.stream()
+                .filter(rule -> Objects.equals(rule.getId(), ruleId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private OffsetDateTime earliest(OffsetDateTime one, OffsetDateTime two) {
+        if (one == null) {
+            return two;
+        }
+        if (two == null) {
+            return one;
+        }
+        return one.isBefore(two) ? one : two;
+    }
+
+    private MemberResolution resolveMembers(RemoteGroup group, SecurityContext securityContext, OffsetDateTime now) {
         RemoteGroupToRemoteFilter filter = new RemoteGroupToRemoteFilter();
         filter.setRemoteGroupIds(Set.of(group.getId()));
-        filter.setActiveAt(now);
         List<RemoteGroupToRemote> memberships = repository.listAllMemberships(securityContext, filter);
-        Set<String> excludedRemoteIds = memberships.stream()
-                .filter(membership -> membership.getMembershipAction() == RemoteGroupMembershipAction.EXCLUDE)
-                .filter(membership -> membership.getRemote() != null)
-                .map(membership -> membership.getRemote().getId())
-                .collect(java.util.stream.Collectors.toSet());
+        OffsetDateTime nextMembershipChange = null;
+        Set<String> excludedRemoteIds = new java.util.HashSet<>();
+        for (RemoteGroupToRemote membership : memberships) {
+            nextMembershipChange = earliest(nextMembershipChange, nextMembershipChange(membership, now));
+            if (isActive(membership, now)
+                    && membership.getMembershipAction() == RemoteGroupMembershipAction.EXCLUDE
+                    && membership.getRemote() != null) {
+                excludedRemoteIds.add(membership.getRemote().getId());
+            }
+        }
         Map<String, Member> included = new LinkedHashMap<>();
         for (RemoteGroupToRemote membership : memberships) {
             Remote remote = membership.getRemote();
-            if (remote == null || remote.isSoftDelete() || excludedRemoteIds.contains(remote.getId())) {
+            if (!isActive(membership, now)
+                    || remote == null
+                    || remote.isSoftDelete()
+                    || excludedRemoteIds.contains(remote.getId())) {
                 continue;
             }
             if (membership.getMembershipAction() != RemoteGroupMembershipAction.EXCLUDE) {
                 included.put(remote.getId(), new Member(remote, membership));
             }
         }
-        return new ArrayList<>(included.values());
+        return new MemberResolution(new ArrayList<>(included.values()), nextMembershipChange);
+    }
+
+    private boolean isActive(RemoteGroupToRemote membership, OffsetDateTime now) {
+        return (membership.getActiveFrom() == null || !membership.getActiveFrom().isAfter(now))
+                && (membership.getActiveUntil() == null || membership.getActiveUntil().isAfter(now));
+    }
+
+    private OffsetDateTime nextMembershipChange(RemoteGroupToRemote membership, OffsetDateTime now) {
+        OffsetDateTime next = null;
+        if (membership.getActiveFrom() != null && membership.getActiveFrom().isAfter(now)) {
+            next = membership.getActiveFrom();
+        }
+        if (membership.getActiveUntil() != null && membership.getActiveUntil().isAfter(now)) {
+            next = earliest(next, membership.getActiveUntil());
+        }
+        return next;
+    }
+
+    private OffsetDateTime nextStaleEvaluation(FleetHealthPolicy policy, List<Member> members, OffsetDateTime now) {
+        OffsetDateTime next = null;
+        if (policy.getRules() == null) {
+            return null;
+        }
+        for (FleetHealthRule rule : policy.getRules()) {
+            if (rule == null || rule.isSoftDelete() || !rule.isEnabled() || rule.getConditions() == null) {
+                continue;
+            }
+            for (FleetHealthRuleCondition condition : rule.getConditions()) {
+                if (condition == null || condition.isSoftDelete()
+                        || condition.getStaleAfterSeconds() == null
+                        || condition.getStaleAfterSeconds() < 0
+                        || condition.getMetricType() != FleetHealthMetricType.STALE_COUNT
+                        && condition.getMetricType() != FleetHealthMetricType.STALE_PERCENT) {
+                    continue;
+                }
+                for (Member member : eligibleMembers(condition, members)) {
+                    if (member.remote().getLastSeen() == null) {
+                        continue;
+                    }
+                    OffsetDateTime candidate = member.remote().getLastSeen().plusSeconds(condition.getStaleAfterSeconds());
+                    if (candidate.isAfter(now)) {
+                        next = earliest(next, candidate);
+                    }
+                }
+            }
+        }
+        return next;
     }
 
     private FleetHealthRule selectRule(FleetHealthPolicy policy, List<Member> members, OffsetDateTime now, Map<String, Double> metrics) {
@@ -364,5 +549,18 @@ public class RemoteGroupFleetHealthService implements Plugin {
     }
 
     private record Member(Remote remote, RemoteGroupToRemote membership) {
+    }
+
+    private record MemberResolution(List<Member> members, OffsetDateTime nextMembershipChangeAt) {
+    }
+
+    private record GroupHealthOutcome(
+            String severityName,
+            Integer severityValue,
+            String ruleId,
+            boolean interventionRequired) {
+    }
+
+    private record GroupTransitionDecision(boolean applyCandidate, OffsetDateTime nextEvaluationAt) {
     }
 }

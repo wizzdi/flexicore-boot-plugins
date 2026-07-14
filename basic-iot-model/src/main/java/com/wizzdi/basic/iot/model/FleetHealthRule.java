@@ -30,6 +30,8 @@ public class FleetHealthRule extends Baseclass {
     private String resultingSeverityName;
     private Integer resultingSeverityValue;
     private boolean humanInterventionRequired;
+    private Long minimumStableMillis = 0L;
+    private Long recoveryStableMillis = 0L;
 
     @Transient
     private List<FleetHealthRuleCondition> conditions = new ArrayList<>();
@@ -94,6 +96,24 @@ public class FleetHealthRule extends Baseclass {
 
     public <T extends FleetHealthRule> T setHumanInterventionRequired(boolean humanInterventionRequired) {
         this.humanInterventionRequired = humanInterventionRequired;
+        return (T) this;
+    }
+
+    public Long getMinimumStableMillis() {
+        return minimumStableMillis;
+    }
+
+    public <T extends FleetHealthRule> T setMinimumStableMillis(Long minimumStableMillis) {
+        this.minimumStableMillis = minimumStableMillis;
+        return (T) this;
+    }
+
+    public Long getRecoveryStableMillis() {
+        return recoveryStableMillis;
+    }
+
+    public <T extends FleetHealthRule> T setRecoveryStableMillis(Long recoveryStableMillis) {
+        this.recoveryStableMillis = recoveryStableMillis;
         return (T) this;
     }
 

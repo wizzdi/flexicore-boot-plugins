@@ -12,7 +12,8 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(indexes = {
         @Index(name = "remote_group_external_id_idx", columnList = "externalId"),
-        @Index(name = "remote_group_policy_idx", columnList = "fleetHealthPolicy_id")
+        @Index(name = "remote_group_policy_idx", columnList = "fleetHealthPolicy_id"),
+        @Index(name = "remote_group_health_deadline_idx", columnList = "nextHealthEvaluationAt")
 })
 public class RemoteGroup extends Baseclass {
 
@@ -34,6 +35,16 @@ public class RemoteGroup extends Baseclass {
     private Integer fleetHealthEvaluationVersion;
     private long healthInputVersion = 1;
     private Long evaluatedHealthInputVersion;
+
+    private boolean healthTransitionPending;
+    private String pendingSeverityName;
+    private Integer pendingSeverityValue;
+    private String pendingSeverityRuleId;
+    private boolean pendingHumanInterventionRequired;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime healthTransitionPendingSince;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime nextHealthEvaluationAt;
 
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime healthCalculatedAt;
@@ -170,6 +181,69 @@ public class RemoteGroup extends Baseclass {
 
     public <T extends RemoteGroup> T setEvaluatedHealthInputVersion(Long evaluatedHealthInputVersion) {
         this.evaluatedHealthInputVersion = evaluatedHealthInputVersion;
+        return (T) this;
+    }
+
+    public boolean isHealthTransitionPending() {
+        return healthTransitionPending;
+    }
+
+    public <T extends RemoteGroup> T setHealthTransitionPending(boolean healthTransitionPending) {
+        this.healthTransitionPending = healthTransitionPending;
+        return (T) this;
+    }
+
+    public String getPendingSeverityName() {
+        return pendingSeverityName;
+    }
+
+    public <T extends RemoteGroup> T setPendingSeverityName(String pendingSeverityName) {
+        this.pendingSeverityName = pendingSeverityName;
+        return (T) this;
+    }
+
+    public Integer getPendingSeverityValue() {
+        return pendingSeverityValue;
+    }
+
+    public <T extends RemoteGroup> T setPendingSeverityValue(Integer pendingSeverityValue) {
+        this.pendingSeverityValue = pendingSeverityValue;
+        return (T) this;
+    }
+
+    public String getPendingSeverityRuleId() {
+        return pendingSeverityRuleId;
+    }
+
+    public <T extends RemoteGroup> T setPendingSeverityRuleId(String pendingSeverityRuleId) {
+        this.pendingSeverityRuleId = pendingSeverityRuleId;
+        return (T) this;
+    }
+
+    public boolean isPendingHumanInterventionRequired() {
+        return pendingHumanInterventionRequired;
+    }
+
+    public <T extends RemoteGroup> T setPendingHumanInterventionRequired(boolean pendingHumanInterventionRequired) {
+        this.pendingHumanInterventionRequired = pendingHumanInterventionRequired;
+        return (T) this;
+    }
+
+    public OffsetDateTime getHealthTransitionPendingSince() {
+        return healthTransitionPendingSince;
+    }
+
+    public <T extends RemoteGroup> T setHealthTransitionPendingSince(OffsetDateTime healthTransitionPendingSince) {
+        this.healthTransitionPendingSince = healthTransitionPendingSince;
+        return (T) this;
+    }
+
+    public OffsetDateTime getNextHealthEvaluationAt() {
+        return nextHealthEvaluationAt;
+    }
+
+    public <T extends RemoteGroup> T setNextHealthEvaluationAt(OffsetDateTime nextHealthEvaluationAt) {
+        this.nextHealthEvaluationAt = nextHealthEvaluationAt;
         return (T) this;
     }
 

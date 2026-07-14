@@ -13,7 +13,8 @@ import java.util.Map;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "remote_idx",columnList = "remoteId,lastSeen,gateway_id,dtype")
+        @Index(name = "remote_idx",columnList = "remoteId,lastSeen,gateway_id,dtype"),
+        @Index(name = "remote_health_deadline_idx", columnList = "nextHealthEvaluationAt")
 })
 public class Remote extends Baseclass {
 
@@ -74,6 +75,15 @@ public class Remote extends Baseclass {
     private String evaluatedHealthProfileId;
     private Integer healthEvaluationVersion;
 
+    private boolean healthTransitionPending;
+    private String pendingSeverityName;
+    private Integer pendingSeverityValue;
+    private String pendingSeverityRuleId;
+    private boolean pendingHumanInterventionRequired;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime healthTransitionPendingSince;
+    @Column(columnDefinition = "timestamp with time zone")
+    private OffsetDateTime nextHealthEvaluationAt;
 
 
     @Column(columnDefinition = "jsonb")
@@ -249,6 +259,69 @@ public class Remote extends Baseclass {
 
     public <T extends Remote> T setKeepStateHistory(boolean keepStateHistory) {
         this.keepStateHistory = keepStateHistory;
+        return (T) this;
+    }
+
+    public boolean isHealthTransitionPending() {
+        return healthTransitionPending;
+    }
+
+    public <T extends Remote> T setHealthTransitionPending(boolean healthTransitionPending) {
+        this.healthTransitionPending = healthTransitionPending;
+        return (T) this;
+    }
+
+    public String getPendingSeverityName() {
+        return pendingSeverityName;
+    }
+
+    public <T extends Remote> T setPendingSeverityName(String pendingSeverityName) {
+        this.pendingSeverityName = pendingSeverityName;
+        return (T) this;
+    }
+
+    public Integer getPendingSeverityValue() {
+        return pendingSeverityValue;
+    }
+
+    public <T extends Remote> T setPendingSeverityValue(Integer pendingSeverityValue) {
+        this.pendingSeverityValue = pendingSeverityValue;
+        return (T) this;
+    }
+
+    public String getPendingSeverityRuleId() {
+        return pendingSeverityRuleId;
+    }
+
+    public <T extends Remote> T setPendingSeverityRuleId(String pendingSeverityRuleId) {
+        this.pendingSeverityRuleId = pendingSeverityRuleId;
+        return (T) this;
+    }
+
+    public boolean isPendingHumanInterventionRequired() {
+        return pendingHumanInterventionRequired;
+    }
+
+    public <T extends Remote> T setPendingHumanInterventionRequired(boolean pendingHumanInterventionRequired) {
+        this.pendingHumanInterventionRequired = pendingHumanInterventionRequired;
+        return (T) this;
+    }
+
+    public OffsetDateTime getHealthTransitionPendingSince() {
+        return healthTransitionPendingSince;
+    }
+
+    public <T extends Remote> T setHealthTransitionPendingSince(OffsetDateTime healthTransitionPendingSince) {
+        this.healthTransitionPendingSince = healthTransitionPendingSince;
+        return (T) this;
+    }
+
+    public OffsetDateTime getNextHealthEvaluationAt() {
+        return nextHealthEvaluationAt;
+    }
+
+    public <T extends Remote> T setNextHealthEvaluationAt(OffsetDateTime nextHealthEvaluationAt) {
+        this.nextHealthEvaluationAt = nextHealthEvaluationAt;
         return (T) this;
     }
 

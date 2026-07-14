@@ -13,6 +13,8 @@ public class RemoteHealthRuleCreate extends BasicCreate {
     private String resultingSeverityName;
     private Integer resultingSeverityValue;
     private Boolean humanInterventionRequired;
+    private Long minimumStableMillis;
+    private Long recoveryStableMillis;
     private String summary;
     private String mitigationInstructions;
     private List<RemoteHealthRuleConditionCreate> conditions;
@@ -31,6 +33,10 @@ public class RemoteHealthRuleCreate extends BasicCreate {
     public <T extends RemoteHealthRuleCreate> T setResultingSeverityValue(Integer resultingSeverityValue) { this.resultingSeverityValue = resultingSeverityValue; return (T) this; }
     public Boolean getHumanInterventionRequired() { return humanInterventionRequired; }
     public <T extends RemoteHealthRuleCreate> T setHumanInterventionRequired(Boolean humanInterventionRequired) { this.humanInterventionRequired = humanInterventionRequired; return (T) this; }
+    public Long getMinimumStableMillis() { return minimumStableMillis; }
+    public <T extends RemoteHealthRuleCreate> T setMinimumStableMillis(Long minimumStableMillis) { this.minimumStableMillis = minimumStableMillis; return (T) this; }
+    public Long getRecoveryStableMillis() { return recoveryStableMillis; }
+    public <T extends RemoteHealthRuleCreate> T setRecoveryStableMillis(Long recoveryStableMillis) { this.recoveryStableMillis = recoveryStableMillis; return (T) this; }
     public String getSummary() { return summary; }
     public <T extends RemoteHealthRuleCreate> T setSummary(String summary) { this.summary = summary; return (T) this; }
     public String getMitigationInstructions() { return mitigationInstructions; }
