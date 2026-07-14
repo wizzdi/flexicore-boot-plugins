@@ -6,6 +6,7 @@ public class RegisterGateway extends IOTMessage{
 
     private String publicKey;
     private Boolean noSignatureCapabilities;
+    private String tenantExternalId;
     private Double lat;
     private Double lon;
     private List<WifiAccessPointInfo> wifiAccessPoints;
@@ -25,6 +26,16 @@ public class RegisterGateway extends IOTMessage{
 
     public <T extends RegisterGateway> T setNoSignatureCapabilities(Boolean noSignatureCapabilities) {
         this.noSignatureCapabilities = noSignatureCapabilities;
+        return (T) this;
+    }
+
+
+    public String getTenantExternalId() {
+        return tenantExternalId;
+    }
+
+    public <T extends RegisterGateway> T setTenantExternalId(String tenantExternalId) {
+        this.tenantExternalId = tenantExternalId;
         return (T) this;
     }
 

@@ -6,6 +6,9 @@ public class RegisterGatewayReceived extends IOTMessage {
     public static final String STATUS_ALREADY_PENDING = "alreadyPending";
     public static final String STATUS_ALREADY_REGISTERED = "alreadyRegistered";
     public static final String STATUS_CONFIRMED = "confirmed";
+    public static final String STATUS_TENANT_NOT_FOUND = "tenantNotFound";
+    public static final String STATUS_TENANT_MISMATCH = "tenantMismatch";
+    public static final String STATUS_INVALID = "invalid";
 
     private String registerGatewayId;
     private String registrationStatus;
@@ -13,6 +16,8 @@ public class RegisterGatewayReceived extends IOTMessage {
     private String pendingGatewayId;
     private String registeredGatewayId;
     private String registrationMessage;
+    private String tenantId;
+    private String tenantExternalId;
 
     public String getRegisterGatewayId() {
         return registerGatewayId;
@@ -65,6 +70,25 @@ public class RegisterGatewayReceived extends IOTMessage {
 
     public <T extends RegisterGatewayReceived> T setRegistrationMessage(String registrationMessage) {
         this.registrationMessage = registrationMessage;
+        return (T) this;
+    }
+
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public <T extends RegisterGatewayReceived> T setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+        return (T) this;
+    }
+
+    public String getTenantExternalId() {
+        return tenantExternalId;
+    }
+
+    public <T extends RegisterGatewayReceived> T setTenantExternalId(String tenantExternalId) {
+        this.tenantExternalId = tenantExternalId;
         return (T) this;
     }
 

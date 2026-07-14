@@ -129,7 +129,18 @@ public class GatewayService implements Plugin {
         approveGatewaysRequest.setPendingGateways(new ArrayList<>(pendingGatewayMap.values()));
         String tenantId = approveGatewaysRequest.getTenantId();
         if (tenantId == null || tenantId.isBlank()) {
-            approveGatewaysRequest.setTargetTenant(securityContext.getTenantToCreateIn());
+            Set<SecurityTenant> pendingTenants = pendingGatewayMap.values().stream()
+                    .map(PendingGateway::getTenant)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(SecurityTenant::getId))));
+            if (pendingTenants.isEmpty()) {
+                throw new ResponseStatusException(BAD_REQUEST, "PendingGateway records do not have a tenant");
+            }
+            if (pendingTenants.size() > 1) {
+                throw new ResponseStatusException(BAD_REQUEST,
+                        "PendingGateway records belong to multiple tenants; provide tenantId explicitly");
+            }
+            approveGatewaysRequest.setTargetTenant(pendingTenants.iterator().next());
             return;
         }
         SecurityTenant targetTenant = getByIdOrNull(tenantId, SecurityTenant.class, securityContext);

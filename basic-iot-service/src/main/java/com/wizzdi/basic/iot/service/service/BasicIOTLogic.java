@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.flexicore.model.Basic;
+import com.flexicore.model.SecurityTenant;
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.client.*;
 import com.wizzdi.basic.iot.client.SchemaAction;
@@ -16,8 +17,11 @@ import com.wizzdi.basic.iot.service.utils.DistanceUtils;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.events.BasicCreated;
 import com.wizzdi.flexicore.security.events.BasicUpdated;
+import com.wizzdi.flexicore.security.interfaces.SecurityContextProvider;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.request.DateFilter;
+import com.wizzdi.flexicore.security.request.SecurityTenantFilter;
+import com.wizzdi.flexicore.security.service.SecurityTenantService;
 import com.wizzdi.maps.model.Building;
 import com.wizzdi.maps.model.BuildingFloor;
 import com.wizzdi.maps.model.MapIcon;
@@ -76,6 +80,12 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private StateSchemaService stateSchemaService;
     @Autowired
     private PendingGatewayService pendingGatewayService;
+    @Autowired
+    private SecurityTenantService securityTenantService;
+    @Autowired
+    private SecurityContextProvider securityContextProvider;
+    @Autowired
+    private StateSchemaHealthMetadataService stateSchemaHealthMetadataService;
     @Autowired
     private GoogleGeolocationService googleGeolocationService;
     @Autowired
@@ -709,45 +719,79 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
 
     private RegisterGatewayReceived registerGateway(RegisterGateway registerGateway) {
-        String gatewayId = registerGateway.getGatewayId();
-        if (gatewayId == null || gatewayId.isBlank()) {
+        String gatewayId = normalize(registerGateway.getGatewayId());
+        String tenantExternalId = normalize(registerGateway.getTenantExternalId());
+        if (gatewayId == null) {
             logger.warn("received RegisterGateway without gatewayId, messageId={}", registerGateway.getId());
-            return new RegisterGatewayReceived()
-                    .setRegisterGatewayId(registerGateway.getId())
-                    .setRegistrationStatus("invalid")
-                    .setRegistrationMessage("gatewayId is required");
+            return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_INVALID, null, null,
+                    null, "gatewayId is required");
         }
-        gatewayId = gatewayId.trim();
+        if (tenantExternalId == null) {
+            logger.warn("received RegisterGateway {} without tenantExternalId, messageId={}", gatewayId, registerGateway.getId());
+            return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_INVALID, null, null,
+                    null, "tenantExternalId is required");
+        }
+
+        List<SecurityTenant> matchingTenants = securityTenantService.listAllTenants(
+                new SecurityTenantFilter().setExternalIds(Collections.singleton(tenantExternalId)),
+                adminSecurityContext);
+        if (matchingTenants.isEmpty()) {
+            logger.warn("could not resolve tenant externalId={} for gateway {}", tenantExternalId, gatewayId);
+            return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_TENANT_NOT_FOUND, null, null,
+                    null, "no tenant found with externalId " + tenantExternalId);
+        }
+        if (matchingTenants.size() > 1) {
+            logger.error("multiple tenants resolved for externalId={} while registering gateway {}", tenantExternalId, gatewayId);
+            return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_INVALID, null, null,
+                    null, "tenant externalId is not unique: " + tenantExternalId);
+        }
+        SecurityTenant targetTenant = matchingTenants.get(0);
+        SecurityContext targetSecurityContext = securityContextProvider.getSecurityContext(adminSecurityContext.getUser());
+        targetSecurityContext.setTenantToCreateIn(targetTenant);
+
         Object lock = registerGatewayLocks.computeIfAbsent(gatewayId, ignored -> new Object());
         synchronized (lock) {
-            Optional<Gateway> existingGateway = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(gatewayId))).stream().findFirst();
+            Optional<Gateway> existingGateway = gatewayService.listAllGateways(null,
+                    new GatewayFilter().setRemoteIds(Collections.singleton(gatewayId))).stream().findFirst();
             if (existingGateway.isPresent()) {
                 Gateway gateway = existingGateway.get();
-                logger.info("gateway {} already registered as {}", gatewayId, gateway.getId());
-                return new RegisterGatewayReceived()
-                        .setRegisterGatewayId(registerGateway.getId())
-                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_REGISTERED)
-                        .setRegisteredGatewayRemoteId(gatewayId)
-                        .setRegisteredGatewayId(gateway.getId())
-                        .setRegistrationMessage("gateway already registered");
+                if (!sameTenant(gateway.getTenant(), targetTenant)) {
+                    logger.warn("gateway {} is already registered in tenant {} but requested tenant {}", gatewayId,
+                            externalIdOrId(gateway.getTenant()), tenantExternalId);
+                    return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_TENANT_MISMATCH,
+                            targetTenant, null, gateway,
+                            "gateway is already registered in tenant " + externalIdOrId(gateway.getTenant()));
+                }
+                logger.info("gateway {} already registered as {} in tenant {}", gatewayId, gateway.getId(), tenantExternalId);
+                return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_ALREADY_REGISTERED,
+                        targetTenant, null, gateway, "gateway already registered");
             }
 
-            List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(null, new PendingGatewayFilter().setGatewayIds(Collections.singleton(gatewayId)));
+            List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(null,
+                    new PendingGatewayFilter().setGatewayIds(Collections.singleton(gatewayId)));
+            Optional<PendingGateway> wrongTenantPending = pendingGateways.stream()
+                    .filter(f -> !sameTenant(f.getTenant(), targetTenant))
+                    .findFirst();
+            if (wrongTenantPending.isPresent()) {
+                PendingGateway pendingGateway = wrongTenantPending.get();
+                logger.warn("gateway {} is already pending in tenant {} but requested tenant {}", gatewayId,
+                        externalIdOrId(pendingGateway.getTenant()), tenantExternalId);
+                return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_TENANT_MISMATCH,
+                        targetTenant, pendingGateway, pendingGateway.getRegisteredGateway(),
+                        "gateway is already pending in tenant " + externalIdOrId(pendingGateway.getTenant()));
+            }
+
             Optional<PendingGateway> activePendingGateway = pendingGateways.stream()
                     .filter(f -> f.getRegisteredGateway() == null)
                     .findFirst();
             if (activePendingGateway.isPresent()) {
                 PendingGateway pendingGateway = activePendingGateway.get();
                 RegistrationLocation registrationLocation = resolveRegistrationLocation(registerGateway);
-                updatePendingGatewayRegistrationLocation(pendingGateway, registrationLocation);
-                upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon());
-                logger.info("gateway {} already pending as {}", gatewayId, pendingGateway.getId());
-                return new RegisterGatewayReceived()
-                        .setRegisterGatewayId(registerGateway.getId())
-                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_PENDING)
-                        .setRegisteredGatewayRemoteId(gatewayId)
-                        .setPendingGatewayId(pendingGateway.getId())
-                        .setRegistrationMessage("gateway registration is already pending");
+                updatePendingGatewayRegistrationLocation(pendingGateway, registrationLocation, targetSecurityContext);
+                upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon(), targetSecurityContext);
+                logger.info("gateway {} already pending as {} in tenant {}", gatewayId, pendingGateway.getId(), tenantExternalId);
+                return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_ALREADY_PENDING,
+                        targetTenant, pendingGateway, null, "gateway registration is already pending");
             }
 
             Optional<PendingGateway> registeredPendingGateway = pendingGateways.stream()
@@ -756,14 +800,11 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             if (registeredPendingGateway.isPresent()) {
                 PendingGateway pendingGateway = registeredPendingGateway.get();
                 Gateway gateway = pendingGateway.getRegisteredGateway();
-                logger.info("gateway {} has already registered pending record {} with gateway {}", gatewayId, pendingGateway.getId(), gateway != null ? gateway.getId() : null);
-                return new RegisterGatewayReceived()
-                        .setRegisterGatewayId(registerGateway.getId())
-                        .setRegistrationStatus(RegisterGatewayReceived.STATUS_ALREADY_REGISTERED)
-                        .setRegisteredGatewayRemoteId(gatewayId)
-                        .setPendingGatewayId(pendingGateway.getId())
-                        .setRegisteredGatewayId(gateway != null ? gateway.getId() : null)
-                        .setRegistrationMessage("gateway already registered from an existing pending registration");
+                logger.info("gateway {} has already registered pending record {} with gateway {} in tenant {}", gatewayId,
+                        pendingGateway.getId(), gateway != null ? gateway.getId() : null, tenantExternalId);
+                return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_ALREADY_REGISTERED,
+                        targetTenant, pendingGateway, gateway,
+                        "gateway already registered from an existing pending registration");
             }
 
             RegistrationLocation registrationLocation = resolveRegistrationLocation(registerGateway);
@@ -776,16 +817,45 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     .setLocationAccuracyMeters(registrationLocation.accuracyMeters())
                     .setLocationSource(registrationLocation.source())
                     .setWifiAccessPointsJson(registrationLocation.wifiAccessPointsJson())
-                    .setName(gatewayId), adminSecurityContext);
-            upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon());
-            logger.info("registered new pending gateway {} for {}", pendingGateway.getId(), gatewayId);
-            return new RegisterGatewayReceived()
-                    .setRegisterGatewayId(registerGateway.getId())
-                    .setRegistrationStatus(RegisterGatewayReceived.STATUS_REGISTERED)
-                    .setRegisteredGatewayRemoteId(gatewayId)
-                    .setPendingGatewayId(pendingGateway.getId())
-                    .setRegistrationMessage("gateway registration created");
+                    .setName(gatewayId), targetSecurityContext);
+            upsertPendingGatewayMappedPOI(pendingGateway, registrationLocation.lat(), registrationLocation.lon(), targetSecurityContext);
+            logger.info("registered new pending gateway {} for {} in tenant {}", pendingGateway.getId(), gatewayId, tenantExternalId);
+            return registrationResponse(registerGateway, RegisterGatewayReceived.STATUS_REGISTERED,
+                    targetTenant, pendingGateway, null, "gateway registration created");
         }
+    }
+
+    private RegisterGatewayReceived registrationResponse(RegisterGateway request,
+                                                         String status,
+                                                         SecurityTenant tenant,
+                                                         PendingGateway pendingGateway,
+                                                         Gateway gateway,
+                                                         String message) {
+        return new RegisterGatewayReceived()
+                .setRegisterGatewayId(request.getId())
+                .setRegistrationStatus(status)
+                .setRegisteredGatewayRemoteId(normalize(request.getGatewayId()))
+                .setTenantId(tenant == null ? null : tenant.getId())
+                .setTenantExternalId(tenant == null ? normalize(request.getTenantExternalId()) : tenant.getExternalId())
+                .setPendingGatewayId(pendingGateway == null ? null : pendingGateway.getId())
+                .setRegisteredGatewayId(gateway == null ? null : gateway.getId())
+                .setRegistrationMessage(message);
+    }
+
+    private boolean sameTenant(SecurityTenant first, SecurityTenant second) {
+        return first != null && second != null && Objects.equals(first.getId(), second.getId());
+    }
+
+    private String externalIdOrId(SecurityTenant tenant) {
+        if (tenant == null) {
+            return null;
+        }
+        String externalId = normalize(tenant.getExternalId());
+        return externalId == null ? tenant.getId() : externalId;
+    }
+
+    private String normalize(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private RegistrationLocation resolveRegistrationLocation(RegisterGateway registerGateway) {
@@ -807,7 +877,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         return new RegistrationLocation(lat, lon, null, source, wifiAccessPointsJson);
     }
 
-    private void updatePendingGatewayRegistrationLocation(PendingGateway pendingGateway, RegistrationLocation registrationLocation) {
+    private void updatePendingGatewayRegistrationLocation(PendingGateway pendingGateway, RegistrationLocation registrationLocation, SecurityContext securityContext) {
         if (registrationLocation == null || (registrationLocation.lat() == null
                 && registrationLocation.lon() == null
                 && registrationLocation.accuracyMeters() == null
@@ -831,13 +901,13 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         if (registrationLocation.wifiAccessPointsJson() != null) {
             update.setWifiAccessPointsJson(registrationLocation.wifiAccessPointsJson());
         }
-        pendingGatewayService.updatePendingGateway(update, adminSecurityContext);
+        pendingGatewayService.updatePendingGateway(update, securityContext);
     }
 
     private record RegistrationLocation(Double lat, Double lon, Double accuracyMeters, String source, String wifiAccessPointsJson) {
     }
 
-    private void upsertPendingGatewayMappedPOI(PendingGateway pendingGateway, Double lat, Double lon) {
+    private void upsertPendingGatewayMappedPOI(PendingGateway pendingGateway, Double lat, Double lon, SecurityContext securityContext) {
         if (pendingGateway == null || lat == null || lon == null) {
             return;
         }
@@ -852,9 +922,9 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                     .setName(pendingGateway.getName());
             List<MappedPOI> existing = mappedPOIService.listAllMappedPOIs(new MappedPOIFilter()
                     .setRelatedType(Collections.singleton(PendingGateway.class.getCanonicalName()))
-                    .setRelatedId(Collections.singleton(pendingGateway.getId())), adminSecurityContext);
+                    .setRelatedId(Collections.singleton(pendingGateway.getId())), securityContext);
             if (existing.isEmpty()) {
-                mappedPOIService.createMappedPOI(create, adminSecurityContext);
+                mappedPOIService.createMappedPOI(create, securityContext);
                 return;
             }
             for (MappedPOI mappedPOI : existing) {
@@ -866,7 +936,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 update.setRelatedId(pendingGateway.getId());
                 update.setLat(lat);
                 update.setLon(lon);
-                mappedPOIService.updateMappedPOI(update, adminSecurityContext);
+                mappedPOIService.updateMappedPOI(update, securityContext);
             }
         } catch (Exception e) {
             logger.warn("failed creating/updating pending gateway map point for {}", pendingGateway.getGatewayId(), e);
@@ -879,6 +949,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         DeviceType deviceType=device.getDeviceType();
         MessageHandleContext messageHandleContext=getOrCreateDeviceResponse.messageHandleContext();
         StateSchema stateSchema=getOrCreateStateSchema(deviceType,updateStateSchema.getVersion(),updateStateSchema.getJsonSchema(),gatewaySecurityContext);
+        stateSchemaHealthMetadataService.synchronize(stateSchema, deviceType, updateStateSchema.getJsonSchema(), gatewaySecurityContext);
         RemoteUpdateResponse remoteUpdateResponse = deviceService.updateDeviceNoMerge(device, new DeviceCreate().setCurrentSchema(stateSchema));
         if(remoteUpdateResponse.updated()){
             messageHandleContext.toMerge.add(device);
