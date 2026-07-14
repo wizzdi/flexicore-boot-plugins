@@ -6,6 +6,7 @@ import com.flexicore.model.Basic;
 import com.wizzdi.flexicore.security.configuration.SecurityContext;
 import com.wizzdi.basic.iot.model.*;
 import com.wizzdi.basic.iot.service.data.DeviceRepository;
+import com.wizzdi.basic.iot.service.events.DeviceGroupMembershipChangedEvent;
 import com.wizzdi.basic.iot.service.events.RemoteUpdatedEvent;
 import com.wizzdi.basic.iot.service.request.DeviceCreate;
 import com.wizzdi.basic.iot.service.request.DeviceFilter;
@@ -18,6 +19,7 @@ import org.pf4j.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,8 @@ public class DeviceService implements Plugin {
 
     @Autowired
     private DeviceTypeService deviceTypeService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
@@ -152,9 +156,16 @@ public class DeviceService implements Plugin {
     public Device updateDevice(DeviceUpdate deviceUpdate,
                                SecurityContext securityContext) {
         Device device = deviceUpdate.getDevice();
+        String previousDeviceTypeId = device.getDeviceType() == null ? null : device.getDeviceType().getId();
+        boolean previousSoftDelete = device.isSoftDelete();
         RemoteUpdateResponse remoteUpdateResponse = updateDeviceNoMerge(device, deviceUpdate);
         if (remoteUpdateResponse.updated()) {
             repository.merge(device,remoteUpdateResponse.remoteUpdatedEvent());
+        }
+        String currentDeviceTypeId = device.getDeviceType() == null ? null : device.getDeviceType().getId();
+        if (!Objects.equals(previousDeviceTypeId, currentDeviceTypeId)
+                || previousSoftDelete != device.isSoftDelete()) {
+            eventPublisher.publishEvent(new DeviceGroupMembershipChangedEvent(device.getId(), java.time.OffsetDateTime.now()));
         }
         return device;
     }

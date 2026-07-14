@@ -9,6 +9,7 @@ public class RemoteHealthProfileCreate extends BasicCreate {
     private Boolean enabled;
     private String defaultSeverityName;
     private Integer defaultSeverityValue;
+    private Integer actionRequiredFromSeverityValue;
     private List<HealthSignalMappingCreate> mappings;
     private List<RemoteHealthRuleCreate> rules;
 
@@ -20,6 +21,8 @@ public class RemoteHealthProfileCreate extends BasicCreate {
     public <T extends RemoteHealthProfileCreate> T setDefaultSeverityName(String defaultSeverityName) { this.defaultSeverityName = defaultSeverityName; return (T) this; }
     public Integer getDefaultSeverityValue() { return defaultSeverityValue; }
     public <T extends RemoteHealthProfileCreate> T setDefaultSeverityValue(Integer defaultSeverityValue) { this.defaultSeverityValue = defaultSeverityValue; return (T) this; }
+    public Integer getActionRequiredFromSeverityValue() { return actionRequiredFromSeverityValue; }
+    public <T extends RemoteHealthProfileCreate> T setActionRequiredFromSeverityValue(Integer actionRequiredFromSeverityValue) { this.actionRequiredFromSeverityValue = actionRequiredFromSeverityValue; return (T) this; }
     public List<HealthSignalMappingCreate> getMappings() { return mappings; }
     public <T extends RemoteHealthProfileCreate> T setMappings(List<HealthSignalMappingCreate> mappings) { this.mappings = mappings; return (T) this; }
     public List<RemoteHealthRuleCreate> getRules() { return rules; }

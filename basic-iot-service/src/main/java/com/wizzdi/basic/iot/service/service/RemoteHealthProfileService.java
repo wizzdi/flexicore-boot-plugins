@@ -56,6 +56,8 @@ public class RemoteHealthProfileService implements Plugin {
     private BasicService basicService;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private DerivedEntitySecurityService derivedEntitySecurityService;
 
     public void validateFiltering(RemoteHealthProfileFilter filter, SecurityContext securityContext) {
         basicService.validate(filter, securityContext);
@@ -74,6 +76,9 @@ public class RemoteHealthProfileService implements Plugin {
         }
         if (!updating && (create.getExternalId() == null || create.getExternalId().isBlank())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "externalId is required");
+        }
+        if (create.getActionRequiredFromSeverityValue() != null && create.getActionRequiredFromSeverityValue() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "actionRequiredFromSeverityValue must be non-negative");
         }
         validateMappings(create.getMappings(), securityContext);
         validateRules(create.getRules(), securityContext);
@@ -329,6 +334,11 @@ public class RemoteHealthProfileService implements Plugin {
             profile.setDefaultSeverityValue(create.getDefaultSeverityValue());
             changed = true;
         }
+        if (create.getActionRequiredFromSeverityValue() != null
+                && !Objects.equals(profile.getActionRequiredFromSeverityValue(), create.getActionRequiredFromSeverityValue())) {
+            profile.setActionRequiredFromSeverityValue(create.getActionRequiredFromSeverityValue());
+            changed = true;
+        }
         return changed;
     }
 
@@ -354,10 +364,11 @@ public class RemoteHealthProfileService implements Plugin {
                 mapping.setId(UUID.randomUUID().toString());
                 mapping.setRemoteHealthProfile(profile);
                 basicService.updateBasicNoMerge(item, mapping);
-                BaseclassService.createSecurityObjectNoMerge(mapping, securityContext);
+                BaseclassService.createSecurityObjectNoMerge(mapping, derivedEntitySecurityService.creationContext(securityContext, profile));
             } else {
                 basicService.updateBasicNoMerge(item, mapping);
             }
+            derivedEntitySecurityService.setTenantFrom(mapping, profile);
             mapping.setHealthSignal(signal);
             mapping.setSourceType(item.getSourceType());
             mapping.setStateProperty(property);
@@ -397,10 +408,11 @@ public class RemoteHealthProfileService implements Plugin {
                 rule.setId(UUID.randomUUID().toString());
                 rule.setRemoteHealthProfile(profile);
                 basicService.updateBasicNoMerge(item, rule);
-                BaseclassService.createSecurityObjectNoMerge(rule, securityContext);
+                BaseclassService.createSecurityObjectNoMerge(rule, derivedEntitySecurityService.creationContext(securityContext, profile));
             } else {
                 basicService.updateBasicNoMerge(item, rule);
             }
+            derivedEntitySecurityService.setTenantFrom(rule, profile);
             rule.setPriority(item.getPriority() == null ? 0 : item.getPriority());
             rule.setEnabled(item.getEnabled() == null || item.getEnabled());
             rule.setConditionJoinType(item.getConditionJoinType() == null ? ConditionJoinType.ALL : item.getConditionJoinType());
@@ -446,10 +458,11 @@ public class RemoteHealthProfileService implements Plugin {
                 condition.setId(UUID.randomUUID().toString());
                 condition.setRemoteHealthRule(rule);
                 basicService.updateBasicNoMerge(item, condition);
-                BaseclassService.createSecurityObjectNoMerge(condition, securityContext);
+                BaseclassService.createSecurityObjectNoMerge(condition, derivedEntitySecurityService.creationContext(securityContext, rule));
             } else {
                 basicService.updateBasicNoMerge(item, condition);
             }
+            derivedEntitySecurityService.setTenantFrom(condition, rule);
             condition.setHealthSignal(signal);
             condition.setOperator(item.getOperator());
             condition.setNumericValue(item.getNumericValue());
@@ -471,6 +484,19 @@ public class RemoteHealthProfileService implements Plugin {
                 toMerge.add(old);
             }
         }
+    }
+
+    @Transactional
+    public RemoteHealthProfile incrementDefinitionVersion(String profileId) {
+        RemoteHealthProfile profile = repository.getByIdOrNull(profileId, RemoteHealthProfile.class, null);
+        if (profile == null || profile.isSoftDelete()) {
+            return null;
+        }
+        profile.setEvaluationVersion(Math.max(1, profile.getEvaluationVersion() + 1));
+        repository.merge(profile);
+        eventPublisher.publishEvent(new RemoteHealthProfileChangedEvent(
+                profile.getId(), profile.getEvaluationVersion(), OffsetDateTime.now()));
+        return profile;
     }
 
     public RemoteHealthProfile populate(RemoteHealthProfile profile) {

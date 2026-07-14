@@ -48,6 +48,12 @@ public class RemoteGroupFleetHealthService implements Plugin {
     private FleetHealthPolicyService fleetHealthPolicyService;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private RemoteGroupHealthAccumulatorService accumulatorService;
+    @Autowired
+    private HealthHistoryService healthHistoryService;
+    @Autowired
+    private HealthIncidentService healthIncidentService;
 
     @Transactional
     public RemoteGroupHealthSnapshot evaluate(String remoteGroupId, SecurityContext securityContext) {
@@ -66,20 +72,31 @@ public class RemoteGroupFleetHealthService implements Plugin {
         OffsetDateTime now = OffsetDateTime.now();
         MemberResolution resolution = resolveMembers(group, securityContext, now);
         List<Member> members = resolution.members();
+        RemoteGroupHealthAccumulatorService.GroupAccumulatorSnapshot accumulatorSnapshot = accumulatorService.ensureCurrent(group, now);
+        com.wizzdi.basic.iot.model.RemoteGroupHealthAccumulator allAccumulator = accumulatorSnapshot.allMembers();
 
-        int population = members.size();
-        int unknown = (int) members.stream().filter(member -> member.remote().getCurrentSeverityValue() == null).count();
-        int offline = (int) members.stream().filter(this::isOffline).count();
-        int intervention = (int) members.stream().filter(member -> member.remote().isHumanInterventionRequired()).count();
+        int population = allAccumulator == null ? members.size() : Math.toIntExact(allAccumulator.getTotalMembers());
+        int unknown = allAccumulator == null
+                ? (int) members.stream().filter(member -> member.remote().getCurrentSeverityValue() == null).count()
+                : Math.toIntExact(allAccumulator.getTotalMembers() - allAccumulator.getKnownSeverityMembers());
+        int offline = allAccumulator == null
+                ? (int) members.stream().filter(this::isOffline).count()
+                : Math.toIntExact(allAccumulator.getOfflineMembers());
+        int intervention = allAccumulator == null
+                ? (int) members.stream().filter(member -> member.remote().isHumanInterventionRequired()).count()
+                : Math.toIntExact(allAccumulator.getHumanInterventionMembers());
+        double weightedSeverityAverage = allAccumulator == null || allAccumulator.getTotalWeight() <= 0
+                ? weightedSeverityAverage(members)
+                : allAccumulator.getWeightedSeveritySum() / allAccumulator.getTotalWeight();
 
         Map<String, Double> metrics = new LinkedHashMap<>();
         metrics.put("population", (double) population);
         metrics.put("unknownSeverity", (double) unknown);
         metrics.put("offline", (double) offline);
         metrics.put("humanIntervention", (double) intervention);
-        metrics.put("weightedSeverityAverage", weightedSeverityAverage(members));
+        metrics.put("weightedSeverityAverage", weightedSeverityAverage);
 
-        FleetHealthRule selected = selectRule(policy, members, now, metrics);
+        FleetHealthRule selected = selectRule(policy, members, now, metrics, accumulatorSnapshot);
         boolean belowMinimum = policy.getMinimumPopulation() != null && population < policy.getMinimumPopulation();
         GroupHealthOutcome defaultOutcome = new GroupHealthOutcome(
                 policy.getDefaultSeverityName(),
@@ -148,10 +165,19 @@ public class RemoteGroupFleetHealthService implements Plugin {
         group.setHealthCalculatedAt(now);
         group.setNextHealthEvaluationAt(earliest(
                 transition.nextEvaluationAt(),
-                earliest(nextStaleEvaluation, resolution.nextMembershipChangeAt())));
+                earliest(nextStaleEvaluation, earliest(
+                        resolution.nextMembershipChangeAt(), accumulatorSnapshot.nextMembershipChangeAt()))));
         repository.merge(group);
 
+        FleetHealthRule appliedRule = findRule(policy.getRules(), applied.ruleId());
         if (changed) {
+            healthHistoryService.recordGroupTransition(
+                    group, policy, appliedRule, population, unknown, offline, intervention,
+                    weightedSeverityAverage, metrics, now);
+            healthIncidentService.handleGroupTransition(
+                    group, policy, previousSeverityName, previousSeverityValue,
+                    applied.severityName(), applied.severityValue(), applied.ruleId(),
+                    group.getDescription(), now);
             eventPublisher.publishEvent(new RemoteGroupHealthChangedEvent(
                     group,
                     previousSeverityName,
@@ -219,6 +245,11 @@ public class RemoteGroupFleetHealthService implements Plugin {
         repository.merge(group);
 
         if (changed) {
+            healthHistoryService.recordGroupTransition(
+                    group, group.getFleetHealthPolicy(), null, 0, 0, 0, 0, 0, Map.of(), now);
+            healthIncidentService.handleGroupTransition(
+                    group, group.getFleetHealthPolicy(), previousSeverityName, previousSeverityValue,
+                    null, null, null, group.getDescription(), now);
             eventPublisher.publishEvent(new RemoteGroupHealthChangedEvent(
                     group,
                     previousSeverityName,
@@ -426,7 +457,7 @@ public class RemoteGroupFleetHealthService implements Plugin {
         return next;
     }
 
-    private FleetHealthRule selectRule(FleetHealthPolicy policy, List<Member> members, OffsetDateTime now, Map<String, Double> metrics) {
+    private FleetHealthRule selectRule(FleetHealthPolicy policy, List<Member> members, OffsetDateTime now, Map<String, Double> metrics, RemoteGroupHealthAccumulatorService.GroupAccumulatorSnapshot accumulatorSnapshot) {
         if (!policy.isEnabled()) {
             return null;
         }
@@ -434,19 +465,21 @@ public class RemoteGroupFleetHealthService implements Plugin {
                 .filter(rule -> !rule.isSoftDelete() && rule.isEnabled())
                 .sorted(Comparator.comparingInt(FleetHealthRule::getPriority).reversed()
                         .thenComparing(rule -> Optional.ofNullable(rule.getResultingSeverityValue()).orElse(Integer.MIN_VALUE), Comparator.reverseOrder()))
-                .filter(rule -> ruleMatches(rule, members, now, metrics))
+                .filter(rule -> ruleMatches(rule, members, now, metrics, accumulatorSnapshot))
                 .findFirst()
                 .orElse(null);
     }
 
-    private boolean ruleMatches(FleetHealthRule rule, List<Member> members, OffsetDateTime now, Map<String, Double> metrics) {
+    private boolean ruleMatches(FleetHealthRule rule, List<Member> members, OffsetDateTime now, Map<String, Double> metrics, RemoteGroupHealthAccumulatorService.GroupAccumulatorSnapshot accumulatorSnapshot) {
         List<FleetHealthRuleCondition> conditions = rule.getConditions();
         if (conditions == null || conditions.isEmpty()) {
             return false;
         }
         boolean any = rule.getConditionJoinType() == ConditionJoinType.ANY;
         for (FleetHealthRuleCondition condition : conditions) {
-            double value = metricValue(condition, members, now);
+            double value = accumulatorSnapshot == null
+                    ? metricValue(condition, members, now)
+                    : accumulatorService.metricValue(accumulatorSnapshot, condition, now);
             metrics.put("condition:" + condition.getId(), value);
             boolean matches = compare(value, condition.getOperator(), condition.getThreshold(), condition.getSecondThreshold());
             if (any && matches) {

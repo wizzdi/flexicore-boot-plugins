@@ -213,8 +213,12 @@ public class RemoteService implements Plugin {
         if(remote instanceof Device){
             return getRemoteSecurityContext(((Device) remote).getGateway());
         }
-        if(remote instanceof Gateway){
-            return securityContextProvider.getSecurityContext(((Gateway) remote).getGatewayUser());
+        if(remote instanceof Gateway gateway){
+            SecurityContext securityContext = securityContextProvider.getSecurityContext(gateway.getGatewayUser());
+            if (securityContext != null && gateway.getTenant() != null) {
+                securityContext.setTenantToCreateIn(gateway.getTenant());
+            }
+            return securityContext;
         }
         return null;
     }

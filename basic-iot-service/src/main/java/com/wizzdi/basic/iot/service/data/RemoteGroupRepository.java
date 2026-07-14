@@ -2,6 +2,7 @@ package com.wizzdi.basic.iot.service.data;
 
 import com.flexicore.model.Baseclass;
 import com.flexicore.model.Baseclass_;
+import com.wizzdi.basic.iot.model.DeviceType_;
 import com.wizzdi.basic.iot.model.FleetHealthPolicy_;
 import com.wizzdi.basic.iot.model.RemoteGroup;
 import com.wizzdi.basic.iot.model.RemoteGroupToRemote;
@@ -77,6 +78,15 @@ public class RemoteGroupRepository implements Plugin {
         if (filter.getHealthEnabled() != null) {
             predicates.add(cb.equal(r.get(RemoteGroup_.healthEnabled), filter.getHealthEnabled()));
         }
+        if (filter.getPopulationTypes() != null && !filter.getPopulationTypes().isEmpty()) {
+            predicates.add(r.get(RemoteGroup_.populationType).in(filter.getPopulationTypes()));
+        }
+        if (filter.getSourceDeviceTypeIds() != null && !filter.getSourceDeviceTypeIds().isEmpty()) {
+            predicates.add(r.get(RemoteGroup_.sourceDeviceType).get(DeviceType_.id).in(filter.getSourceDeviceTypeIds()));
+        }
+        if (filter.getSystemManaged() != null) {
+            predicates.add(cb.equal(r.get(RemoteGroup_.systemManaged), filter.getSystemManaged()));
+        }
     }
 
     public List<RemoteGroupToRemote> listMemberships(SecurityContext securityContext, RemoteGroupToRemoteFilter filter) {
@@ -127,6 +137,9 @@ public class RemoteGroupRepository implements Plugin {
         }
         if (filter.getMembershipActions() != null && !filter.getMembershipActions().isEmpty()) {
             predicates.add(r.get(RemoteGroupToRemote_.membershipAction).in(filter.getMembershipActions()));
+        }
+        if (filter.getMembershipSources() != null && !filter.getMembershipSources().isEmpty()) {
+            predicates.add(r.get(RemoteGroupToRemote_.membershipSource).in(filter.getMembershipSources()));
         }
         OffsetDateTime activeAt = filter.getActiveAt();
         if (activeAt != null) {

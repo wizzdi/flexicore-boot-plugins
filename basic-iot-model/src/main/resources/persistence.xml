@@ -29,6 +29,24 @@
         <class>com.wizzdi.basic.iot.model.HealthSignalMapping</class>
         <class>com.wizzdi.basic.iot.model.RemoteHealthRule</class>
         <class>com.wizzdi.basic.iot.model.RemoteHealthRuleCondition</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupHealthAccumulator</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupSeverityBucket</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupMemberHealthState</class>
+        <class>com.wizzdi.basic.iot.model.RemoteHealthHistory</class>
+        <class>com.wizzdi.basic.iot.model.RemoteHealthSignalEvidence</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupHealthHistory</class>
+        <class>com.wizzdi.basic.iot.model.RemoteGroupHealthMetricHistory</class>
+        <class>com.wizzdi.basic.iot.model.HealthIncident</class>
+        <class>com.wizzdi.basic.iot.model.HealthIncidentAction</class>
+        <class>com.wizzdi.basic.iot.model.HealthNotificationPolicy</class>
+        <class>com.wizzdi.basic.iot.model.HealthNotificationChannelPreference</class>
+        <class>com.wizzdi.basic.iot.model.HealthNotificationOutbox</class>
+        <class>com.wizzdi.basic.iot.model.HealthNotificationDelivery</class>
+        <class>com.wizzdi.basic.iot.model.SendGridHealthNotificationConfiguration</class>
+        <class>com.wizzdi.basic.iot.model.SendGridHealthNotificationTemplate</class>
+        <class>com.wizzdi.basic.iot.model.WhatsAppCloudHealthNotificationConfiguration</class>
+        <class>com.wizzdi.basic.iot.model.WhatsAppHealthNotificationTemplate</class>
+        <class>com.wizzdi.basic.iot.model.WhatsAppHealthNotificationTemplateParameter</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

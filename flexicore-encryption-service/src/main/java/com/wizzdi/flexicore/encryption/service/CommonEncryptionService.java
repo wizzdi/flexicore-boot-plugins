@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.security.GeneralSecurityException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
 
 
 @Component
@@ -108,22 +112,55 @@ public class CommonEncryptionService implements Plugin, InitializingBean {
 		HybridConfig.register();
 		AeadConfig.register();
 		File keysetFile = new File(tinkKeySetPath);
+		File keysetDirectory = keysetFile.getAbsoluteFile().getParentFile();
 		if (!keysetFile.exists()) {
-			if(!keysetFile.getParentFile().exists()){
-				keysetFile.getParentFile().mkdirs();
+			if(keysetDirectory != null && !keysetDirectory.exists()){
+				keysetDirectory.mkdirs();
+			}
+			if (keysetDirectory != null) {
+				restrictDirectoryPermissions(keysetDirectory.toPath());
 			}
 			// 1. Generate the private key material.
 			keysetHandle = KeysetHandle.generateNew(EciesAeadHkdfPrivateKeyManager.eciesP256HkdfHmacSha256Aes128GcmTemplate());
 			try(FileOutputStream fileOutputStream=new FileOutputStream(keysetFile)){
 				CleartextKeysetHandle.write(keysetHandle, JsonKeysetWriter.withOutputStream(fileOutputStream));
 			}
+			restrictFilePermissions(keysetFile.toPath());
 		} else {
+			if (keysetDirectory != null) {
+				restrictDirectoryPermissions(keysetDirectory.toPath());
+			}
+			restrictFilePermissions(keysetFile.toPath());
 			try(FileInputStream fileInputStream=new FileInputStream(keysetFile)){
 				keysetHandle = CleartextKeysetHandle.read(JsonKeysetReader.withInputStream(fileInputStream));
 			}
 		}
 
 
+	}
+
+
+	private void restrictDirectoryPermissions(Path path) {
+		setPosixPermissions(path, Set.of(
+				PosixFilePermission.OWNER_READ,
+				PosixFilePermission.OWNER_WRITE,
+				PosixFilePermission.OWNER_EXECUTE));
+	}
+
+	private void restrictFilePermissions(Path path) {
+		setPosixPermissions(path, Set.of(
+				PosixFilePermission.OWNER_READ,
+				PosixFilePermission.OWNER_WRITE));
+	}
+
+	private void setPosixPermissions(Path path, Set<PosixFilePermission> permissions) {
+		try {
+			Files.setPosixFilePermissions(path, permissions);
+		} catch (UnsupportedOperationException e) {
+			logger.debug("POSIX permissions are not supported for {}", path);
+		} catch (IOException e) {
+			logger.warn("Failed restricting permissions for {}", path, e);
+		}
 	}
 
 	public class HybridEncryptImpl implements EncryptingKey {

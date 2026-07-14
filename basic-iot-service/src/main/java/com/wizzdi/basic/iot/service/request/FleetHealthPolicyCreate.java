@@ -11,6 +11,7 @@ public class FleetHealthPolicyCreate extends BasicCreate {
     private Integer minimumPopulation;
     private String defaultSeverityName;
     private Integer defaultSeverityValue;
+    private Integer actionRequiredFromSeverityValue;
     private FleetUnknownPolicy unknownPolicy;
     private List<FleetHealthRuleCreate> rules;
 
@@ -24,6 +25,8 @@ public class FleetHealthPolicyCreate extends BasicCreate {
     public <T extends FleetHealthPolicyCreate> T setDefaultSeverityName(String defaultSeverityName) { this.defaultSeverityName = defaultSeverityName; return (T) this; }
     public Integer getDefaultSeverityValue() { return defaultSeverityValue; }
     public <T extends FleetHealthPolicyCreate> T setDefaultSeverityValue(Integer defaultSeverityValue) { this.defaultSeverityValue = defaultSeverityValue; return (T) this; }
+    public Integer getActionRequiredFromSeverityValue() { return actionRequiredFromSeverityValue; }
+    public <T extends FleetHealthPolicyCreate> T setActionRequiredFromSeverityValue(Integer actionRequiredFromSeverityValue) { this.actionRequiredFromSeverityValue = actionRequiredFromSeverityValue; return (T) this; }
     public FleetUnknownPolicy getUnknownPolicy() { return unknownPolicy; }
     public <T extends FleetHealthPolicyCreate> T setUnknownPolicy(FleetUnknownPolicy unknownPolicy) { this.unknownPolicy = unknownPolicy; return (T) this; }
     public List<FleetHealthRuleCreate> getRules() { return rules; }

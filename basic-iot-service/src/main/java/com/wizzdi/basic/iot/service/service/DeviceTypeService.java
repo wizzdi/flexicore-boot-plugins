@@ -14,6 +14,7 @@ import com.wizzdi.basic.iot.service.request.DeviceTypeCreate;
 import com.wizzdi.basic.iot.service.request.DeviceTypeFilter;
 import com.wizzdi.basic.iot.service.request.DeviceTypeUpdate;
 import com.wizzdi.basic.iot.service.events.DeviceTypeHealthProfileChangedEvent;
+import com.wizzdi.basic.iot.service.events.DeviceTypeGroupDefinitionChangedEvent;
 import com.wizzdi.flexicore.boot.base.interfaces.Plugin;
 import com.wizzdi.flexicore.security.request.BasicPropertiesFilter;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
@@ -115,6 +116,7 @@ public class DeviceTypeService implements Plugin {
                                  SecurityContext securityContext) {
         DeviceType deviceType = createDeviceTypeNoMerge(creationContainer, securityContext);
         repository.merge(deviceType);
+        eventPublisher.publishEvent(new DeviceTypeGroupDefinitionChangedEvent(deviceType.getId(), OffsetDateTime.now()));
         if (deviceType.getDefaultHealthProfile() != null) {
             eventPublisher.publishEvent(new DeviceTypeHealthProfileChangedEvent(
                     deviceType.getId(),
@@ -165,8 +167,10 @@ public class DeviceTypeService implements Plugin {
                                  SecurityContext securityContext) {
         DeviceType deviceType = deviceTypeUpdate.getDeviceType();
         String previousProfileId = deviceType.getDefaultHealthProfile() == null ? null : deviceType.getDefaultHealthProfile().getId();
-        if (updateDeviceTypeNoMerge(deviceType, deviceTypeUpdate)) {
+        boolean updated = updateDeviceTypeNoMerge(deviceType, deviceTypeUpdate);
+        if (updated) {
             repository.merge(deviceType);
+            eventPublisher.publishEvent(new DeviceTypeGroupDefinitionChangedEvent(deviceType.getId(), OffsetDateTime.now()));
         }
         String currentProfileId = deviceType.getDefaultHealthProfile() == null ? null : deviceType.getDefaultHealthProfile().getId();
         if (!Objects.equals(previousProfileId, currentProfileId)) {

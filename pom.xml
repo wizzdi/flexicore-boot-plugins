@@ -58,6 +58,8 @@
         <module>basic-iot-client</module>
         <module>basic-iot-model</module>
         <module>basic-iot-service</module>
+        <module>health-notification-sendgrid-service</module>
+        <module>health-notification-whatsapp-service</module>
         <module>basic-iot-triggers-service</module>
         <module>building-studio-model</module>
         <module>building-studio-service</module>
@@ -181,6 +183,18 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>basic-iot-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>health-notification-sendgrid-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>health-notification-whatsapp-service</artifactId>
                 <version>${revision}</version>
                 <scope>provided</scope>
             </dependency>

@@ -51,11 +51,18 @@ public class FleetHealthPolicyService implements Plugin {
     private BasicService basicService;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private DerivedEntitySecurityService derivedEntitySecurityService;
 
     public void validate(FleetHealthPolicyCreate create, SecurityContext securityContext) {
         basicService.validate(create, securityContext);
         if (create.getMinimumPopulation() != null && create.getMinimumPopulation() < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minimumPopulation cannot be negative");
+        }
+        if (create.getActionRequiredFromSeverityValue() != null
+                && create.getActionRequiredFromSeverityValue() < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "actionRequiredFromSeverityValue must be non-negative");
         }
         validateRules(create.getRules());
     }
@@ -178,6 +185,11 @@ public class FleetHealthPolicyService implements Plugin {
             policy.setDefaultSeverityValue(create.getDefaultSeverityValue());
             changed = true;
         }
+        if (create.getActionRequiredFromSeverityValue() != null
+                && !Objects.equals(create.getActionRequiredFromSeverityValue(), policy.getActionRequiredFromSeverityValue())) {
+            policy.setActionRequiredFromSeverityValue(create.getActionRequiredFromSeverityValue());
+            changed = true;
+        }
         if (create.getUnknownPolicy() != null && create.getUnknownPolicy() != policy.getUnknownPolicy()) {
             policy.setUnknownPolicy(create.getUnknownPolicy());
             changed = true;
@@ -201,10 +213,11 @@ public class FleetHealthPolicyService implements Plugin {
                 rule.setId(UUID.randomUUID().toString());
                 rule.setFleetHealthPolicy(policy);
                 basicService.updateBasicNoMerge(item, rule);
-                BaseclassService.createSecurityObjectNoMerge(rule, securityContext);
+                BaseclassService.createSecurityObjectNoMerge(rule, derivedEntitySecurityService.creationContext(securityContext, policy));
             } else {
                 basicService.updateBasicNoMerge(item, rule);
             }
+            derivedEntitySecurityService.setTenantFrom(rule, policy);
             rule.setPriority(item.getPriority() == null ? 0 : item.getPriority());
             rule.setEnabled(item.getEnabled() == null || item.getEnabled());
             rule.setConditionJoinType(item.getConditionJoinType() == null ? ConditionJoinType.ALL : item.getConditionJoinType());
@@ -252,10 +265,11 @@ public class FleetHealthPolicyService implements Plugin {
                 condition.setId(UUID.randomUUID().toString());
                 condition.setFleetHealthRule(rule);
                 basicService.updateBasicNoMerge(item, condition);
-                BaseclassService.createSecurityObjectNoMerge(condition, securityContext);
+                BaseclassService.createSecurityObjectNoMerge(condition, derivedEntitySecurityService.creationContext(securityContext, rule));
             } else {
                 basicService.updateBasicNoMerge(item, condition);
             }
+            derivedEntitySecurityService.setTenantFrom(condition, rule);
             condition.setMetricType(item.getMetricType());
             condition.setOperator(item.getOperator());
             condition.setThreshold(item.getThreshold());

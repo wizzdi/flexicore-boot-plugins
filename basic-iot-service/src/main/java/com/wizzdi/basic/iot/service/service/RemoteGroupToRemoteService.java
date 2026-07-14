@@ -3,6 +3,7 @@ package com.wizzdi.basic.iot.service.service;
 import com.wizzdi.basic.iot.model.Remote;
 import com.wizzdi.basic.iot.model.RemoteGroup;
 import com.wizzdi.basic.iot.model.RemoteGroupMembershipAction;
+import com.wizzdi.basic.iot.model.RemoteGroupMembershipSource;
 import com.wizzdi.basic.iot.model.RemoteGroupToRemote;
 import com.wizzdi.basic.iot.model.RemoteRoleDefinition;
 import com.wizzdi.basic.iot.service.data.RemoteGroupRepository;
@@ -39,6 +40,8 @@ public class RemoteGroupToRemoteService implements Plugin {
     private BasicService basicService;
     @Autowired
     private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private DerivedEntitySecurityService derivedEntitySecurityService;
 
     public void validate(RemoteGroupToRemoteCreate create, SecurityContext securityContext) {
         basicService.validate(create, securityContext);
@@ -84,6 +87,10 @@ public class RemoteGroupToRemoteService implements Plugin {
         if (membership == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No accessible RemoteGroupToRemote with id " + update.getId());
         }
+        if (membership.getMembershipSource() == RemoteGroupMembershipSource.DEVICE_TYPE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "DeviceType-managed memberships cannot be updated directly; create a MANUAL EXCLUDE override instead");
+        }
         update.setRemoteGroupToRemote(membership);
     }
 
@@ -96,7 +103,9 @@ public class RemoteGroupToRemoteService implements Plugin {
         RemoteGroupToRemote membership = new RemoteGroupToRemote();
         membership.setId(UUID.randomUUID().toString());
         updateNoMerge(membership, create, true);
-        BaseclassService.createSecurityObjectNoMerge(membership, securityContext);
+        membership.setMembershipSource(RemoteGroupMembershipSource.MANUAL);
+        BaseclassService.createSecurityObjectNoMerge(membership, derivedEntitySecurityService.creationContext(securityContext, membership.getRemote()));
+        derivedEntitySecurityService.setTenantFromRemote(membership, membership.getRemote());
         repository.merge(membership);
         incrementGroupInputVersions(Set.of(membership.getRemoteGroup()));
         publishMembershipChanged(Set.of(), Set.of(), membership);
@@ -135,10 +144,14 @@ public class RemoteGroupToRemoteService implements Plugin {
         }
         if (create.getRemoteId() != null && !sameEntity(membership.getRemote(), create.getRemote())) {
             membership.setRemote(create.getRemote());
+            derivedEntitySecurityService.setTenantFromRemote(membership, create.getRemote());
             changed = true;
         } else if (creating && create.getRemote() != null) {
             membership.setRemote(create.getRemote());
             changed = true;
+        }
+        if (membership.getRemote() != null) {
+            derivedEntitySecurityService.setTenantFromRemote(membership, membership.getRemote());
         }
         if (create.getRoleId() != null) {
             RemoteRoleDefinition requested = create.getRoleId().isBlank() ? null : create.getRole();

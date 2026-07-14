@@ -20,6 +20,7 @@ public class FleetHealthPolicy extends Baseclass {
     private Integer minimumPopulation;
     private String defaultSeverityName;
     private Integer defaultSeverityValue;
+    private Integer actionRequiredFromSeverityValue;
     private int evaluationVersion = 1;
 
     @Enumerated(EnumType.STRING)
@@ -70,6 +71,15 @@ public class FleetHealthPolicy extends Baseclass {
 
     public <T extends FleetHealthPolicy> T setDefaultSeverityValue(Integer defaultSeverityValue) {
         this.defaultSeverityValue = defaultSeverityValue;
+        return (T) this;
+    }
+
+    public Integer getActionRequiredFromSeverityValue() {
+        return actionRequiredFromSeverityValue;
+    }
+
+    public <T extends FleetHealthPolicy> T setActionRequiredFromSeverityValue(Integer actionRequiredFromSeverityValue) {
+        this.actionRequiredFromSeverityValue = actionRequiredFromSeverityValue;
         return (T) this;
     }
 

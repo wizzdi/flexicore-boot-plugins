@@ -17,6 +17,7 @@ public class RemoteHealthProfile extends Baseclass {
     private boolean enabled = true;
     private String defaultSeverityName;
     private Integer defaultSeverityValue;
+    private Integer actionRequiredFromSeverityValue;
     private int evaluationVersion = 1;
 
     @Transient
@@ -58,6 +59,15 @@ public class RemoteHealthProfile extends Baseclass {
 
     public <T extends RemoteHealthProfile> T setDefaultSeverityValue(Integer defaultSeverityValue) {
         this.defaultSeverityValue = defaultSeverityValue;
+        return (T) this;
+    }
+
+    public Integer getActionRequiredFromSeverityValue() {
+        return actionRequiredFromSeverityValue;
+    }
+
+    public <T extends RemoteHealthProfile> T setActionRequiredFromSeverityValue(Integer actionRequiredFromSeverityValue) {
+        this.actionRequiredFromSeverityValue = actionRequiredFromSeverityValue;
         return (T) this;
     }
 

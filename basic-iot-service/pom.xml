@@ -141,7 +141,12 @@
             <artifactId>basic-iot-model</artifactId>
             <scope>provided</scope>
         </dependency>
-    
+        <dependency>
+            <groupId>com.wizzdi</groupId>
+            <artifactId>flexicore-encryption-service</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-jaxrs2-jakarta</artifactId>
@@ -211,7 +216,7 @@
                                     <manifestEntries>
                                         <Plugin-Id>${project.artifactId}</Plugin-Id>
                                         <Plugin-Version>${project.version}</Plugin-Version>
-                                        <Plugin-Dependencies>maps-service@&gt;=${revision},flexicore-territories-service@&gt;=${revision}</Plugin-Dependencies>
+                                        <Plugin-Dependencies>maps-service@&gt;=${revision},flexicore-territories-service@&gt;=${revision},flexicore-encryption-service@&gt;=${revision}</Plugin-Dependencies>
 
                                     </manifestEntries>
                                 </transformer>

@@ -58,6 +58,10 @@ public class RemoteHealthEvaluationService implements Plugin {
     private ApplicationEventPublisher eventPublisher;
     @Autowired
     private RemoteService remoteService;
+    @Autowired
+    private HealthHistoryService healthHistoryService;
+    @Autowired
+    private HealthIncidentService healthIncidentService;
 
     public void validate(EvaluateRemoteHealthRequest request, SecurityContext securityContext) {
         if (request.getRemoteId() == null || request.getRemoteId().isBlank()) {
@@ -160,6 +164,9 @@ public class RemoteHealthEvaluationService implements Plugin {
         Integer previousValue = remote.getCurrentSeverityValue();
         String previousRuleId = remote.getCurrentSeverityRuleId();
         boolean previousIntervention = remote.isHumanInterventionRequired();
+        String previousSummary = remote.getHealthSummary();
+        String previousMitigationStatus = remote.getMitigationStatus();
+        String previousMitigationInstructions = remote.getMitigationInstructions();
 
         boolean definitionChanged = !Objects.equals(remote.getEvaluatedHealthProfileId(), profile.getId())
                 || !Objects.equals(remote.getHealthEvaluationVersion(), profile.getEvaluationVersion());
@@ -186,17 +193,21 @@ public class RemoteHealthEvaluationService implements Plugin {
                 now);
         HealthOutcome applied = transition.applyCandidate() ? candidate : current;
 
+        String appliedMitigationStatus = applied.interventionRequired() ? "REQUIRED" : "NOT_REQUIRED";
         boolean changed = !Objects.equals(previousName, applied.severityName())
                 || !Objects.equals(previousValue, applied.severityValue())
                 || !Objects.equals(previousRuleId, applied.ruleId())
-                || previousIntervention != applied.interventionRequired();
+                || previousIntervention != applied.interventionRequired()
+                || !Objects.equals(previousSummary, applied.summary())
+                || !Objects.equals(previousMitigationStatus, appliedMitigationStatus)
+                || !Objects.equals(previousMitigationInstructions, applied.mitigationInstructions());
 
         remote.setCurrentSeverityName(applied.severityName())
                 .setCurrentSeverityValue(applied.severityValue())
                 .setCurrentSeverityRuleId(applied.ruleId())
                 .setHumanInterventionRequired(applied.interventionRequired())
                 .setHealthSummary(applied.summary())
-                .setMitigationStatus(applied.interventionRequired() ? "REQUIRED" : "NOT_REQUIRED")
+                .setMitigationStatus(appliedMitigationStatus)
                 .setMitigationInstructions(applied.mitigationInstructions())
                 .setEvaluatedHealthProfileId(profile.getId())
                 .setHealthEvaluationVersion(profile.getEvaluationVersion())
@@ -207,7 +218,14 @@ public class RemoteHealthEvaluationService implements Plugin {
         }
         em.merge(remote);
 
+        RemoteHealthRule appliedRule = findRule(profile.getRules(), applied.ruleId());
         if (changed) {
+            healthHistoryService.recordRemoteTransition(
+                    remote, profile, appliedRule, resolved.values(), now);
+            healthIncidentService.handleRemoteTransition(
+                    remote, profile, previousName, previousValue,
+                    applied.severityName(), applied.severityValue(), applied.ruleId(),
+                    applied.summary(), applied.mitigationInstructions(), now);
             eventPublisher.publishEvent(new RemoteHealthChangedEvent(
                     remote,
                     previousName,
@@ -233,7 +251,6 @@ public class RemoteHealthEvaluationService implements Plugin {
                         now));
             }
         }
-        RemoteHealthRule appliedRule = findRule(profile.getRules(), applied.ruleId());
         return snapshot(remote, profile, appliedRule, resolved.values(), now);
     }
 
@@ -370,6 +387,10 @@ public class RemoteHealthEvaluationService implements Plugin {
         em.merge(remote);
 
         if (changed) {
+            healthHistoryService.recordRemoteTransition(remote, profile, null, Map.of(), now);
+            healthIncidentService.handleRemoteTransition(
+                    remote, profile, previousName, previousValue,
+                    null, null, null, null, null, now);
             eventPublisher.publishEvent(new RemoteHealthChangedEvent(
                     remote,
                     previousName,

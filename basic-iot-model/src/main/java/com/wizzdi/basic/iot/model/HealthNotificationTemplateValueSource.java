@@ -1,0 +1,22 @@
+package com.wizzdi.basic.iot.model;
+
+public enum HealthNotificationTemplateValueSource {
+    LITERAL,
+    SUBJECT,
+    BODY,
+    DELIVERY_MODE,
+    ITEM_COUNT,
+    SUMMARY_LINES,
+    FIRST_ITEM_TITLE,
+    FIRST_ITEM_MESSAGE,
+    FIRST_ITEM_SEVERITY_NAME,
+    FIRST_ITEM_SEVERITY_VALUE,
+    FIRST_ITEM_OCCURRED_AT,
+    FIRST_ITEM_EVENT_TYPE,
+    FIRST_ITEM_REMOTE_ID,
+    FIRST_ITEM_REMOTE_GROUP_ID,
+    FIRST_ITEM_INCIDENT_ID,
+    USER_ID,
+    DESTINATION,
+    TENANT_ID
+}

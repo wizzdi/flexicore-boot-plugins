@@ -15,6 +15,7 @@ import java.time.OffsetDateTime;
 @Table(indexes = {
         @Index(name = "remote_group_to_remote_group_idx", columnList = "remoteGroup_id,softDelete"),
         @Index(name = "remote_group_to_remote_remote_idx", columnList = "remote_id,softDelete"),
+        @Index(name = "remote_group_to_remote_source_idx", columnList = "membershipSource,softDelete"),
         @Index(name = "remote_group_to_remote_active_idx", columnList = "activeFrom,activeUntil")
 })
 public class RemoteGroupToRemote extends Baseclass {
@@ -30,6 +31,10 @@ public class RemoteGroupToRemote extends Baseclass {
 
     @Enumerated(EnumType.STRING)
     private RemoteGroupMembershipAction membershipAction = RemoteGroupMembershipAction.INCLUDE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RemoteGroupMembershipSource membershipSource = RemoteGroupMembershipSource.MANUAL;
 
     private boolean requiredMember;
     private Double weight = 1D;
@@ -73,6 +78,15 @@ public class RemoteGroupToRemote extends Baseclass {
 
     public <T extends RemoteGroupToRemote> T setMembershipAction(RemoteGroupMembershipAction membershipAction) {
         this.membershipAction = membershipAction;
+        return (T) this;
+    }
+
+    public RemoteGroupMembershipSource getMembershipSource() {
+        return membershipSource;
+    }
+
+    public <T extends RemoteGroupToRemote> T setMembershipSource(RemoteGroupMembershipSource membershipSource) {
+        this.membershipSource = membershipSource;
         return (T) this;
     }
 

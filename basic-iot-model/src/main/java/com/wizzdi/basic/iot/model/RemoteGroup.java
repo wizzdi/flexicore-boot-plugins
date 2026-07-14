@@ -4,7 +4,10 @@ import com.flexicore.model.Baseclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 
 import java.time.OffsetDateTime;
@@ -13,11 +16,23 @@ import java.time.OffsetDateTime;
 @Table(indexes = {
         @Index(name = "remote_group_external_id_idx", columnList = "externalId"),
         @Index(name = "remote_group_policy_idx", columnList = "fleetHealthPolicy_id"),
+        @Index(name = "remote_group_population_idx", columnList = "populationType,sourceDeviceType_id,softDelete"),
         @Index(name = "remote_group_health_deadline_idx", columnList = "nextHealthEvaluationAt")
 })
 public class RemoteGroup extends Baseclass {
 
     private String externalId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RemoteGroupPopulationType populationType = RemoteGroupPopulationType.STATIC;
+
+    @ManyToOne(targetEntity = DeviceType.class)
+    @JoinColumn(name = "sourceDeviceType_id", unique = true)
+    private DeviceType sourceDeviceType;
+
+    @Column(nullable = false)
+    private boolean systemManaged;
 
     @ManyToOne(targetEntity = FleetHealthPolicy.class)
     private FleetHealthPolicy fleetHealthPolicy;
@@ -55,6 +70,33 @@ public class RemoteGroup extends Baseclass {
 
     public <T extends RemoteGroup> T setExternalId(String externalId) {
         this.externalId = externalId;
+        return (T) this;
+    }
+
+    public RemoteGroupPopulationType getPopulationType() {
+        return populationType;
+    }
+
+    public <T extends RemoteGroup> T setPopulationType(RemoteGroupPopulationType populationType) {
+        this.populationType = populationType;
+        return (T) this;
+    }
+
+    public DeviceType getSourceDeviceType() {
+        return sourceDeviceType;
+    }
+
+    public <T extends RemoteGroup> T setSourceDeviceType(DeviceType sourceDeviceType) {
+        this.sourceDeviceType = sourceDeviceType;
+        return (T) this;
+    }
+
+    public boolean isSystemManaged() {
+        return systemManaged;
+    }
+
+    public <T extends RemoteGroup> T setSystemManaged(boolean systemManaged) {
+        this.systemManaged = systemManaged;
         return (T) this;
     }
 

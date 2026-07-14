@@ -1,6 +1,7 @@
 package com.wizzdi.basic.iot.service.service;
 
 import com.wizzdi.basic.iot.model.HealthSignalDefinition;
+import com.wizzdi.basic.iot.service.events.HealthSignalDefinitionChangedEvent;
 import com.wizzdi.basic.iot.service.data.HealthSignalDefinitionRepository;
 import com.wizzdi.basic.iot.service.request.HealthSignalDefinitionCreate;
 import com.wizzdi.basic.iot.service.request.HealthSignalDefinitionFilter;
@@ -12,10 +13,12 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -27,6 +30,8 @@ public class HealthSignalDefinitionService implements Plugin {
     private HealthSignalDefinitionRepository repository;
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public void validateFiltering(HealthSignalDefinitionFilter filter, SecurityContext securityContext) {
         basicService.validate(filter, securityContext);
@@ -62,13 +67,16 @@ public class HealthSignalDefinitionService implements Plugin {
         updateNoMerge(entity, create);
         BaseclassService.createSecurityObjectNoMerge(entity, securityContext);
         repository.merge(entity);
+        eventPublisher.publishEvent(new HealthSignalDefinitionChangedEvent(entity.getId(), OffsetDateTime.now()));
         return entity;
     }
 
     public HealthSignalDefinition update(HealthSignalDefinitionUpdate update, SecurityContext securityContext) {
         HealthSignalDefinition entity = update.getHealthSignalDefinition();
-        if (updateNoMerge(entity, update)) {
+        boolean changed = updateNoMerge(entity, update);
+        if (changed) {
             repository.merge(entity);
+            eventPublisher.publishEvent(new HealthSignalDefinitionChangedEvent(entity.getId(), OffsetDateTime.now()));
         }
         return entity;
     }

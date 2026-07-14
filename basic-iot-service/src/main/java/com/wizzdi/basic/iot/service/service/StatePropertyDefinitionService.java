@@ -1,6 +1,7 @@
 package com.wizzdi.basic.iot.service.service;
 
 import com.wizzdi.basic.iot.model.StatePropertyDefinition;
+import com.wizzdi.basic.iot.service.events.StatePropertyDefinitionChangedEvent;
 import com.wizzdi.basic.iot.model.StateSchema;
 import com.wizzdi.basic.iot.service.data.StatePropertyDefinitionRepository;
 import com.wizzdi.basic.iot.service.request.StatePropertyDefinitionCreate;
@@ -13,10 +14,12 @@ import com.wizzdi.flexicore.security.service.BaseclassService;
 import com.wizzdi.flexicore.security.service.BasicService;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,6 +31,8 @@ public class StatePropertyDefinitionService implements Plugin {
     private StatePropertyDefinitionRepository repository;
     @Autowired
     private BasicService basicService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     public void validateFiltering(StatePropertyDefinitionFilter filter, SecurityContext securityContext) {
         basicService.validate(filter, securityContext);
@@ -72,13 +77,16 @@ public class StatePropertyDefinitionService implements Plugin {
         updateNoMerge(entity, create);
         BaseclassService.createSecurityObjectNoMerge(entity, securityContext);
         repository.merge(entity);
+        eventPublisher.publishEvent(new StatePropertyDefinitionChangedEvent(entity.getId(), OffsetDateTime.now()));
         return entity;
     }
 
     public StatePropertyDefinition update(StatePropertyDefinitionUpdate update, SecurityContext securityContext) {
         StatePropertyDefinition entity = update.getStatePropertyDefinition();
-        if (updateNoMerge(entity, update)) {
+        boolean changed = updateNoMerge(entity, update);
+        if (changed) {
             repository.merge(entity);
+            eventPublisher.publishEvent(new StatePropertyDefinitionChangedEvent(entity.getId(), OffsetDateTime.now()));
         }
         return entity;
     }
