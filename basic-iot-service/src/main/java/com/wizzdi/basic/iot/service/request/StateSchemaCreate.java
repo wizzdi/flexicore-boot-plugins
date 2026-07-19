@@ -6,12 +6,22 @@ import com.wizzdi.flexicore.security.request.BasicCreate;
 
 public class StateSchemaCreate extends BasicCreate {
 
+    private String externalId;
     private Integer version;
     private String stateSchemaJson;
     private String deviceTypeId;
     @JsonIgnore
     private DeviceType deviceType;
     private Boolean userAddedSchema;
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends StateSchemaCreate> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
+    }
 
     public Integer getVersion() {
         return version;

@@ -309,14 +309,16 @@ public class GatewayService implements Plugin {
     }
 
     private GatewayCreate getGatwayCreate(PendingGateway pendingGateway) {
-        return new GatewayCreate()
-                .setNoSignatureCapabilities(pendingGateway.isNoSignatureCapabilities())
-                .setPublicKey(pendingGateway.getPublicKey())
-                .setRemoteId(pendingGateway.getGatewayId())
-                .setReportedLat(pendingGateway.getLat())
-                .setReportedLon(pendingGateway.getLon())
-                .setName(pendingGateway.getName())
-                .setDescription(pendingGateway.getDescription());
+        GatewayCreate gatewayCreate = new GatewayCreate();
+        gatewayCreate.setExternalId(pendingGateway.getExternalId() == null ? pendingGateway.getGatewayId() : pendingGateway.getExternalId());
+        gatewayCreate.setNoSignatureCapabilities(pendingGateway.isNoSignatureCapabilities());
+        gatewayCreate.setPublicKey(pendingGateway.getPublicKey());
+        gatewayCreate.setRemoteId(pendingGateway.getGatewayId());
+        gatewayCreate.setReportedLat(pendingGateway.getLat());
+        gatewayCreate.setReportedLon(pendingGateway.getLon());
+        gatewayCreate.setName(pendingGateway.getName());
+        gatewayCreate.setDescription(pendingGateway.getDescription());
+        return gatewayCreate;
     }
 
     public void validate(ImportGatewaysRequest importGatewaysRequest, SecurityContext securityContext) {
@@ -344,10 +346,10 @@ public class GatewayService implements Plugin {
                 String gatewayId = record.get("gatewayId");
                 String publicKey = record.get("publicKey");
                 boolean noSignatureCapabilities = noSignatureCapabilitiesHeader && Boolean.parseBoolean(record.get("noSignatureCapabilities"));
-                pendingGatewayCreates.put(gatewayId,new PendingGatewayCreate().setPublicKey(publicKey).setGatewayId(gatewayId).setNoSignatureCapabilities(noSignatureCapabilities));
+                pendingGatewayCreates.put(gatewayId,new PendingGatewayCreate().setExternalId(gatewayId).setPublicKey(publicKey).setGatewayId(gatewayId).setNoSignatureCapabilities(noSignatureCapabilities));
 
             }
-            Map<String,Gateway> existing=pendingGatewayCreates.isEmpty()?new HashMap<>():listAllGateways(securityContext,new GatewayFilter().setRemoteIds(pendingGatewayCreates.keySet())).stream().collect(Collectors.toMap(f->f.getRemoteId(),f->f,(a,b)->a));
+            Map<String,Gateway> existing=pendingGatewayCreates.isEmpty()?new HashMap<>():listAllGateways(securityContext,new GatewayFilter().setExternalIds(pendingGatewayCreates.keySet())).stream().collect(Collectors.toMap(f->f.getExternalId(),f->f,(a,b)->a));
             List<PendingGateway> pendingGateways = pendingGatewayCreates.values().stream().filter(f->!existing.containsKey(f.getGatewayId())).map(f -> pendingGatewayService.createPendingGateway(f, securityContext)).collect(Collectors.toList());
             PaginationResponse<Gateway> gatewayPaginationResponse = approveGateways(securityContext, pendingGateways);
 

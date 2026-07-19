@@ -1,5 +1,10 @@
 package com.wizzdi.maps.service.request;
 
+/**
+ * A map envelope described by two longitude/latitude corner points.
+ *
+ * <p>When all four values are supplied, mapped POIs are filtered with PostGIS.
+ */
 public class LocationArea {
 
     private Double lonStart;

@@ -37,6 +37,9 @@ public class ConnectivityChangeService implements Plugin {
     @Autowired
     private BasicService basicService;
 
+    @Autowired
+    private DerivedEntitySecurityService derivedEntitySecurityService;
+
     public <T extends Baseclass> List<T> listByIds(Class<T> c, Set<String> ids, SecurityContext securityContext) {
         return repository.listByIds(c, ids, securityContext);
     }
@@ -112,7 +115,7 @@ public class ConnectivityChangeService implements Plugin {
 
         updateConnectivityChangeNoMerge(connectivityChange, creationContainer);
         if(connectivityChange.getRemote()!=null){
-            connectivityChange.setSecurityId(connectivityChange.getRemote().getSecurityId());
+            derivedEntitySecurityService.inheritFromRemote(connectivityChange, connectivityChange.getRemote());
         }
         else{
             throw new RuntimeException("cannot create ConnectivityChange without remote");

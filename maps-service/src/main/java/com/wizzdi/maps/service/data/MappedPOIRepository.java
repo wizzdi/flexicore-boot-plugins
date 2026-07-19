@@ -171,13 +171,13 @@ public class MappedPOIRepository implements Plugin {
         }
         LocationArea locationArea = filtering.getLocationArea();
         if (locationArea != null) {
-            if (locationArea.getLatStart() != null && locationArea.getLatEnd() != null) {
+            if (hasTwoPoints(locationArea)) {
+                preds.add(createLocationAreaPredicate(locationArea, cb, r));
+            } else if (locationArea.getLatStart() != null && locationArea.getLatEnd() != null) {
                 preds.add(cb.between(r.get(MappedPOI_.lat), locationArea.getLatStart(), locationArea.getLatEnd()));
-            }
-            if (locationArea.getLonStart() != null && locationArea.getLonEnd() != null) {
+            } else if (locationArea.getLonStart() != null && locationArea.getLonEnd() != null) {
                 preds.add(cb.between(r.get(MappedPOI_.lon), locationArea.getLonStart(), locationArea.getLonEnd()));
             }
-
         }
         if(filtering.getHasLocation()!=null&&filtering.getHasLocation()){
             preds.add(cb.isNotNull(r.get(MappedPOI_.lat)));
@@ -206,6 +206,46 @@ public class MappedPOIRepository implements Plugin {
         if(filtering.getPredicateAdder()!=null){
             filtering.getPredicateAdder().addPredicates(filtering,cb,q,r,preds,securityContext);
         }
+    }
+
+    private boolean hasTwoPoints(LocationArea locationArea) {
+        return locationArea.getLonStart() != null
+                && locationArea.getLatStart() != null
+                && locationArea.getLonEnd() != null
+                && locationArea.getLatEnd() != null;
+    }
+
+    private <T extends MappedPOI> Predicate createLocationAreaPredicate(
+            LocationArea locationArea, CriteriaBuilder cb, From<?, T> mappedPOI) {
+        double minLon = Math.min(locationArea.getLonStart(), locationArea.getLonEnd());
+        double maxLon = Math.max(locationArea.getLonStart(), locationArea.getLonEnd());
+        double minLat = Math.min(locationArea.getLatStart(), locationArea.getLatEnd());
+        double maxLat = Math.max(locationArea.getLatStart(), locationArea.getLatEnd());
+
+        Expression<Object> mappedPOIPoint = cb.function(
+                "ST_SetSRID",
+                Object.class,
+                cb.function(
+                        "ST_MakePoint",
+                        Object.class,
+                        mappedPOI.get(MappedPOI_.lon),
+                        mappedPOI.get(MappedPOI_.lat)),
+                cb.literal(4326));
+        Expression<Object> locationEnvelope = cb.function(
+                "ST_MakeEnvelope",
+                Object.class,
+                cb.literal(minLon),
+                cb.literal(minLat),
+                cb.literal(maxLon),
+                cb.literal(maxLat),
+                cb.literal(4326));
+
+        // ST_Covers preserves the inclusive boundary behavior of the previous BETWEEN predicates.
+        return cb.and(
+                cb.isNotNull(mappedPOI.get(MappedPOI_.lon)),
+                cb.isNotNull(mappedPOI.get(MappedPOI_.lat)),
+                cb.isTrue(cb.function(
+                        "ST_Covers", Boolean.class, locationEnvelope, mappedPOIPoint)));
     }
 
     /**
@@ -285,10 +325,18 @@ public class MappedPOIRepository implements Plugin {
 
     @Transactional
     public void createMappedPOIIdx() {
+        em.createNativeQuery("CREATE EXTENSION IF NOT EXISTS postgis").executeUpdate();
         em.createNativeQuery("""
                 CREATE UNIQUE INDEX IF NOT EXISTS mapped_poi_unique_idx 
                 ON MappedPOI (relatedId,relatedType) 
                 WHERE softdelete = false
+                """).executeUpdate();
+        em.createNativeQuery("""
+                CREATE INDEX IF NOT EXISTS mapped_poi_location_gist_idx
+                ON MappedPOI USING GIST (
+                    ST_SetSRID(ST_MakePoint(lon, lat), 4326)
+                )
+                WHERE lon IS NOT NULL AND lat IS NOT NULL
                 """).executeUpdate();
     }
 }

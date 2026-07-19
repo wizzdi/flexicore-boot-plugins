@@ -50,7 +50,8 @@ public class GeoHashControllerTest {
   private SecurityContext adminSecurityContext;
 
   private Set<String> ids=new HashSet<>();
-   private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+   private final static PostgreSQLContainer postgresqlContainer =
+       new com.wizzdi.maps.service.PostGISContainer()
 
           .withDatabaseName("flexicore-test")
           .withUsername("flexicore")

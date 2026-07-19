@@ -114,6 +114,14 @@ public class PendingGatewayService implements Plugin {
     public boolean updatePendingGatewayNoMerge(PendingGateway pendingGateway,
                                         PendingGatewayCreate pendingGatewayCreate) {
         boolean update = basicService.updateBasicNoMerge(pendingGatewayCreate, pendingGateway);
+        String requestedExternalId = normalizeExternalId(pendingGatewayCreate.getExternalId());
+        if (requestedExternalId == null && pendingGateway.getExternalId() == null) {
+            requestedExternalId = normalizeExternalId(pendingGatewayCreate.getGatewayId());
+        }
+        if (requestedExternalId != null && !requestedExternalId.equals(pendingGateway.getExternalId())) {
+            pendingGateway.setExternalId(requestedExternalId);
+            update = true;
+        }
         if (pendingGatewayCreate.getGatewayId() != null && !pendingGatewayCreate.getGatewayId().equals(pendingGateway.getGatewayId())) {
             pendingGateway.setGatewayId(pendingGatewayCreate.getGatewayId());
             update = true;
@@ -167,6 +175,14 @@ public class PendingGatewayService implements Plugin {
             update = true;
         }
         return update;
+    }
+
+    private String normalizeExternalId(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 
     public PendingGateway updatePendingGateway(PendingGatewayUpdate pendingGatewayUpdate,

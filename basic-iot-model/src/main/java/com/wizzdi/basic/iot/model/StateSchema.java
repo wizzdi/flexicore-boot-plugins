@@ -9,10 +9,12 @@ import java.util.List;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "state_schema_idx",columnList = "deviceType_id,version,name")
+        @Index(name = "state_schema_idx",columnList = "deviceType_id,version,name"),
+        @Index(name = "state_schema_external_id_idx", columnList = "externalId", unique = true)
 })
 public class StateSchema extends Baseclass {
 
+    private String externalId;
     private int version;
     private boolean userAddedSchema;
     @Lob
@@ -23,6 +25,15 @@ public class StateSchema extends Baseclass {
     @JsonIgnore
     @OneToMany(targetEntity = Remote.class)
     private List<Remote> remotes=new ArrayList<>();
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends StateSchema> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
+    }
 
     public int getVersion() {
         return version;

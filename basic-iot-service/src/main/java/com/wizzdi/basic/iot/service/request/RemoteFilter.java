@@ -16,6 +16,7 @@ import java.util.Set;
 public class RemoteFilter extends PaginationFilter {
 
     private BasicPropertiesFilter basicPropertiesFilter;
+    private Set<String> externalIds;
     private Set<String> remoteIds;
     private Set<Connectivity> connectivity;
     private Set<String> notIds;
@@ -40,6 +41,15 @@ public class RemoteFilter extends PaginationFilter {
 
     public <T extends RemoteFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
         this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
+
+    public Set<String> getExternalIds() {
+        return externalIds;
+    }
+
+    public <T extends RemoteFilter> T setExternalIds(Set<String> externalIds) {
+        this.externalIds = externalIds;
         return (T) this;
     }
 

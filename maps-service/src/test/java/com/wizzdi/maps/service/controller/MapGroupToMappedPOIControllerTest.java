@@ -53,7 +53,8 @@ public class MapGroupToMappedPOIControllerTest {
 
   @Autowired private MappedPOI mappedPOI;
 
-   private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+    private final static PostgreSQLContainer postgresqlContainer =
+            new com.wizzdi.maps.service.PostGISContainer()
 
           .withDatabaseName("flexicore-test")
           .withUsername("flexicore")

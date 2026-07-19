@@ -43,6 +43,8 @@ public class StateHistoryService implements Plugin {
     @Autowired
     private BasicService basicService;
     @Autowired
+    private DerivedEntitySecurityService derivedEntitySecurityService;
+    @Autowired
     private ConnectivityChangeService connectivityChangeService;
     @Autowired
     @Lazy
@@ -123,7 +125,7 @@ public class StateHistoryService implements Plugin {
 
         updateStateHistoryNoMerge(stateHistory, creationContainer);
         if(stateHistory.getRemote()!=null){
-            stateHistory.setSecurityId(stateHistory.getRemote().getSecurityId());
+            derivedEntitySecurityService.inheritFromRemote(stateHistory, stateHistory.getRemote());
         }
         else{
             throw new RuntimeException("cannot create state history without remote");

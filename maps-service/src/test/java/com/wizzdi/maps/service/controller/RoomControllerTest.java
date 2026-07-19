@@ -53,7 +53,8 @@ public class RoomControllerTest {
   @Autowired
   private BuildingFloor buildingFloor;
 
-   private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+   private final static PostgreSQLContainer postgresqlContainer =
+       new com.wizzdi.maps.service.PostGISContainer()
 
           .withDatabaseName("flexicore-test")
           .withUsername("flexicore")

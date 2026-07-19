@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(indexes = {
         @Index(name = "device_type_idx",columnList = "name"),
-        @Index(name = "device_type_external_id_idx",columnList = "externalId")
+        @Index(name = "device_type_external_id_idx",columnList = "externalId", unique = true)
 })
 public class DeviceType extends Baseclass {
 

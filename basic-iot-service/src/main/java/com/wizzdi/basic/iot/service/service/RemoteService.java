@@ -129,6 +129,14 @@ public class RemoteService implements Plugin {
         RemoteCreate previousState=getPreviousState(remote);
         boolean update = basicService.updateBasicNoMerge(remoteCreate, remote);
         boolean stateUpdated=false;
+        String requestedExternalId = normalizeExternalId(remoteCreate.getExternalId());
+        if (requestedExternalId == null && remote.getExternalId() == null) {
+            requestedExternalId = normalizeExternalId(remoteCreate.getRemoteId());
+        }
+        if (requestedExternalId != null && !requestedExternalId.equals(remote.getExternalId())) {
+            remote.setExternalId(requestedExternalId);
+            update = true;
+        }
         if (remoteCreate.getRemoteId() != null && !remoteCreate.getRemoteId().equals(remote.getRemoteId())) {
             remote.setRemoteId(remoteCreate.getRemoteId());
             update = true;
@@ -165,6 +173,11 @@ public class RemoteService implements Plugin {
             remote.setKeepStateHistory(remoteCreate.getKeepStateHistory());
             update = true;
         }
+        if (remoteCreate.getKeepConnectivityHistory() != null
+                && !remoteCreate.getKeepConnectivityHistory().equals(remote.isKeepConnectivityHistory())) {
+            remote.setKeepConnectivityHistory(remoteCreate.getKeepConnectivityHistory());
+            update = true;
+        }
         if (remoteCreate.getLockName() != null && !remoteCreate.getLockName().equals(remote.isLockName())) {
             remote.setLockName(remoteCreate.getLockName());
             update = true;
@@ -193,6 +206,14 @@ public class RemoteService implements Plugin {
         }
 
         return new RemoteUpdateResponse(update,update?new RemoteUpdatedEvent(remote,previousState,stateUpdated):null);
+    }
+
+    private String normalizeExternalId(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 
     private RemoteCreate getPreviousState(Remote remote) {

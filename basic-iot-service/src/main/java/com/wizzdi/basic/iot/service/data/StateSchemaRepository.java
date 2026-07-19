@@ -63,6 +63,9 @@ public class StateSchemaRepository implements Plugin {
     public <T extends StateSchema> void addStateSchemaPredicates(StateSchemaFilter filtering,
                                                            CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+        if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
+            preds.add(r.get("externalId").in(filtering.getExternalIds()));
+        }
         if(filtering.getDeviceTypes()!=null&&!filtering.getDeviceTypes().isEmpty()){
             Set<String> ids=filtering.getDeviceTypes().stream().map(f->f.getId()).collect(Collectors.toSet());
             Join<T, DeviceType> join=r.join(StateSchema_.deviceType);

@@ -7,10 +7,12 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "pending_gateway_idx",columnList = "gatewayId,registeredGateway_id")
+        @Index(name = "pending_gateway_idx",columnList = "gatewayId,registeredGateway_id"),
+        @Index(name = "pending_gateway_external_id_idx", columnList = "externalId", unique = true)
 })
 public class PendingGateway extends Baseclass {
 
+    private String externalId;
     @Lob
     private String gatewayId;
     @Lob
@@ -28,6 +30,15 @@ public class PendingGateway extends Baseclass {
     private OffsetDateTime gatewayConfirmationReceivedAt;
     private OffsetDateTime lastGatewayConfirmationSentAt;
     private Integer gatewayConfirmationAttempts;
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends PendingGateway> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
+    }
 
     public String getGatewayId() {
         return gatewayId;

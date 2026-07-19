@@ -9,6 +9,7 @@ import java.util.Set;
 public class PendingGatewayFilter extends PaginationFilter {
 
     private BasicPropertiesFilter basicPropertiesFilter;
+    private Set<String> externalIds =new HashSet<>();
     private Set<String> gatewayIds =new HashSet<>();
     private Boolean registered;
     private Boolean gatewayConfirmationReceived;
@@ -20,6 +21,15 @@ public class PendingGatewayFilter extends PaginationFilter {
 
     public <T extends PendingGatewayFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
         this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
+
+    public Set<String> getExternalIds() {
+        return externalIds;
+    }
+
+    public <T extends PendingGatewayFilter> T setExternalIds(Set<String> externalIds) {
+        this.externalIds = externalIds;
         return (T) this;
     }
 

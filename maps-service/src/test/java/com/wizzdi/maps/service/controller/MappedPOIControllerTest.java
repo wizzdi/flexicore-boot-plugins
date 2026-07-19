@@ -5,6 +5,7 @@ package com.wizzdi.maps.service.controller;
 import com.wizzdi.flexicore.security.response.PaginationResponse;
 import com.wizzdi.maps.model.*;
 import com.wizzdi.maps.service.App;
+import com.wizzdi.maps.service.request.LocationArea;
 import com.wizzdi.maps.service.request.MappedPOICreate;
 import com.wizzdi.maps.service.request.MappedPOIFilter;
 import com.wizzdi.maps.service.request.MappedPOIUpdate;
@@ -52,7 +53,8 @@ public class MappedPOIControllerTest {
   @Autowired private MapIcon mapIcon;
   @Autowired private LayerType layerType1;
   @Autowired private Layer layer1;
-    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+    private final static PostgreSQLContainer postgresqlContainer =
+            new com.wizzdi.maps.service.PostGISContainer()
 
           .withDatabaseName("flexicore-test")
           .withUsername("flexicore")
@@ -207,5 +209,66 @@ public class MappedPOIControllerTest {
     Assertions.assertTrue(response.getStatusCode().is2xxSuccessful() );
     testMappedPOI = response.getBody();
     assertMappedPOI(request, testMappedPOI);
+  }
+
+  @Test
+  @Order(4)
+  public void testLocationAreaUsesGisAndTracksLocationUpdates() {
+    assertLocationAreaContains(
+            new LocationArea()
+                    .setLonStart(9D)
+                    .setLatStart(9D)
+                    .setLonEnd(11D)
+                    .setLatEnd(11D),
+            true);
+
+    MappedPOIUpdate updateRequest =
+            new MappedPOIUpdate()
+                    .setId(testMappedPOI.getId())
+                    .setLon(20D)
+                    .setLat(20D);
+    ResponseEntity<MappedPOI> updateResponse =
+            this.restTemplate.exchange(
+                    "/MappedPOI/updateMappedPOI",
+                    HttpMethod.PUT,
+                    new HttpEntity<>(updateRequest),
+                    MappedPOI.class);
+    Assertions.assertTrue(updateResponse.getStatusCode().is2xxSuccessful());
+    testMappedPOI = updateResponse.getBody();
+
+    assertLocationAreaContains(
+            new LocationArea()
+                    .setLonStart(9D)
+                    .setLatStart(9D)
+                    .setLonEnd(11D)
+                    .setLatEnd(11D),
+            false);
+    // Reverse the corners to verify that either pair ordering describes the same envelope.
+    assertLocationAreaContains(
+            new LocationArea()
+                    .setLonStart(21D)
+                    .setLatStart(21D)
+                    .setLonEnd(19D)
+                    .setLatEnd(19D),
+            true);
+  }
+
+  private void assertLocationAreaContains(LocationArea locationArea, boolean expected) {
+    MappedPOIFilter request = new MappedPOIFilter().setLocationArea(locationArea);
+    ParameterizedTypeReference<PaginationResponse<MappedPOI>> responseType =
+            new ParameterizedTypeReference<>() {};
+    ResponseEntity<PaginationResponse<MappedPOI>> response =
+            this.restTemplate.exchange(
+                    "/MappedPOI/getAllMappedPOIs",
+                    HttpMethod.POST,
+                    new HttpEntity<>(request),
+                    responseType);
+
+    Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
+    Assertions.assertNotNull(response.getBody());
+    Assertions.assertEquals(
+            expected,
+            response.getBody().getList().stream()
+                    .anyMatch(mappedPOI -> mappedPOI.getId().equals(testMappedPOI.getId())));
   }
 }

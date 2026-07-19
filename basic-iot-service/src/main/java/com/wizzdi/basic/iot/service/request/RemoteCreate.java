@@ -17,6 +17,7 @@ public class RemoteCreate extends BasicCreate {
     private Map<String, Object> deviceProperties = new HashMap<>();
     private Map<String, Object> userAddedProperties = new HashMap<>();
 
+    private String externalId;
     private String remoteId;
     private String version;
     private String healthProfileId;
@@ -33,6 +34,7 @@ public class RemoteCreate extends BasicCreate {
     private OffsetDateTime lastSeen;
 
     private Boolean keepStateHistory;
+    private Boolean keepConnectivityHistory;
 
     private Double reportedLat;
     private Double reportedLon;
@@ -47,6 +49,7 @@ public class RemoteCreate extends BasicCreate {
         setSoftDelete(other.isSoftDelete());
         this.deviceProperties = deepCopy(other.getDeviceProperties());
         this.userAddedProperties = deepCopy(other.getUserAddedProperties());
+        this.externalId = other.getExternalId();
         this.remoteId = other.getRemoteId();
         this.version = other.getVersion();
         this.healthProfileId = other.getHealthProfile() == null ? null : other.getHealthProfile().getId();
@@ -57,8 +60,18 @@ public class RemoteCreate extends BasicCreate {
         this.lockName = other.isLockName();
         this.lastSeen = other.getLastSeen();
         this.keepStateHistory = other.isKeepStateHistory();
+        this.keepConnectivityHistory = other.isKeepConnectivityHistory();
         this.reportedLat = other.getReportedLat();
         this.reportedLon = other.getReportedLon();
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends RemoteCreate> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
     }
 
     public String getRemoteId() {
@@ -174,6 +187,15 @@ public class RemoteCreate extends BasicCreate {
         return (T) this;
     }
 
+    public Boolean getKeepConnectivityHistory() {
+        return keepConnectivityHistory;
+    }
+
+    public <T extends RemoteCreate> T setKeepConnectivityHistory(Boolean keepConnectivityHistory) {
+        this.keepConnectivityHistory = keepConnectivityHistory;
+        return (T) this;
+    }
+
     public Double getReportedLat() {
         return reportedLat;
     }
@@ -215,6 +237,7 @@ public class RemoteCreate extends BasicCreate {
         return "RemoteCreate{" +
                 "deviceProperties=" + deviceProperties +
                 ", userAddedProperties=" + userAddedProperties +
+                ", externalId='" + externalId + '\'' +
                 ", remoteId='" + remoteId + '\'' +
                 ", version='" + version + '\'' +
                 ", currentSchema=" + currentSchema +
@@ -223,6 +246,7 @@ public class RemoteCreate extends BasicCreate {
                 ", lockName=" + lockName +
                 ", lastSeen=" + lastSeen +
                 ", keepStateHistory=" + keepStateHistory +
+                ", keepConnectivityHistory=" + keepConnectivityHistory +
                 ", reportedLat=" + reportedLat +
                 ", reportedLon=" + reportedLon +
                 '}';

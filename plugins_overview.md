@@ -9,6 +9,7 @@
 | basic-iot-client | None |
 | basic-iot-model | maps-model |
 | basic-iot-service | basic-iot-client, basic-iot-model, flexicore-territories-model, flexicore-territories-service, maps-model, maps-service |
+| basic-iot-tester-service | basic-iot-client, basic-iot-model, basic-iot-service |
 | basic-iot-triggers-service | basic-iot-model, basic-iot-service, flexicore-territories-model, flexicore-territories-service, maps-model, maps-service, rules-model, rules-service |
 | billing-model | flexicore-territories-model, organization-model, pricing-model |
 | billing-service | billing-model, flexicore-territories-model, organization-model, organization-service, pricing-model, pricing-service |
@@ -69,6 +70,9 @@ Basic IoT Model
 
 ### basic-iot-service
 Basic IoT Service
+
+### basic-iot-tester-service
+Basic IoT end-to-end tester. Publishes production MQTT registration, schema, keepalive, and state messages back to the cloud; validates approval, health, history, incidents, groups, user actions, connectivity, and notifications; writes JSON and Markdown reports.
 
 ### basic-iot-triggers-service
 Basic IoT Triggers Service
@@ -213,6 +217,9 @@ graph TD
     basic-iot-service --> flexicore-territories-service
     basic-iot-service --> maps-model
     basic-iot-service --> maps-service
+    basic-iot-tester-service --> basic-iot-client
+    basic-iot-tester-service --> basic-iot-model
+    basic-iot-tester-service --> basic-iot-service
     basic-iot-triggers-service --> basic-iot-model
     basic-iot-triggers-service --> basic-iot-service
     basic-iot-triggers-service --> flexicore-territories-model

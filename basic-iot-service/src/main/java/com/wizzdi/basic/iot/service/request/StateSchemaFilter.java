@@ -12,6 +12,7 @@ import java.util.Set;
 public class StateSchemaFilter extends PaginationFilter {
 
     private BasicPropertiesFilter basicPropertiesFilter;
+    private Set<String> externalIds =new HashSet<>();
     private Set<String> deviceTypeIds =new HashSet<>();
     @JsonIgnore
     private List<DeviceType> deviceTypes;
@@ -26,6 +27,15 @@ public class StateSchemaFilter extends PaginationFilter {
 
     public <T extends StateSchemaFilter> T setBasicPropertiesFilter(BasicPropertiesFilter basicPropertiesFilter) {
         this.basicPropertiesFilter = basicPropertiesFilter;
+        return (T) this;
+    }
+
+    public Set<String> getExternalIds() {
+        return externalIds;
+    }
+
+    public <T extends StateSchemaFilter> T setExternalIds(Set<String> externalIds) {
+        this.externalIds = externalIds;
         return (T) this;
     }
 

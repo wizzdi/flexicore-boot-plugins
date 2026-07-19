@@ -63,6 +63,29 @@ public class RemoteHealthEvaluationService implements Plugin {
     @Autowired
     private HealthIncidentService healthIncidentService;
 
+    /**
+     * Health evaluations are dispatched asynchronously and receive a detached Remote instance.
+     * Reload and refresh the managed entity before updating the health projection so stale
+     * relationships, such as lastConnectivityChange, cannot be merged back as null.
+     */
+    private Remote refreshManagedRemote(Remote remote) {
+        if (remote == null || remote.getId() == null) {
+            return remote;
+        }
+        Remote managed = em.find(Remote.class, remote.getId());
+        if (managed == null) {
+            return remote;
+        }
+        em.refresh(managed);
+        return managed;
+    }
+
+    private void persistHealthProjection(Remote remote) {
+        if (!em.contains(remote)) {
+            em.merge(remote);
+        }
+    }
+
     public void validate(EvaluateRemoteHealthRequest request, SecurityContext securityContext) {
         if (request.getRemoteId() == null || request.getRemoteId().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "remoteId is required");
@@ -136,6 +159,7 @@ public class RemoteHealthEvaluationService implements Plugin {
 
     @Transactional
     public RemoteHealthSnapshot evaluate(Remote remote, OffsetDateTime now) {
+        remote = refreshManagedRemote(remote);
         RemoteHealthProfile profile = getEffectiveProfile(remote);
         if (profile == null || !profile.isEnabled()) {
             return clearHealthProjection(remote, profile, now);
@@ -216,7 +240,7 @@ public class RemoteHealthEvaluationService implements Plugin {
         if (changed) {
             remote.setSeveritySince(now);
         }
-        em.merge(remote);
+        persistHealthProjection(remote);
 
         RemoteHealthRule appliedRule = findRule(profile.getRules(), applied.ruleId());
         if (changed) {
@@ -384,7 +408,7 @@ public class RemoteHealthEvaluationService implements Plugin {
         if (changed) {
             remote.setSeveritySince(now);
         }
-        em.merge(remote);
+        persistHealthProjection(remote);
 
         if (changed) {
             healthHistoryService.recordRemoteTransition(remote, profile, null, Map.of(), now);

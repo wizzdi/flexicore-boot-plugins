@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class StatusHistoryTest {
-    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+    private final static PostgreSQLContainer postgresqlContainer = new PostGISContainer()
 
             .withDatabaseName("flexicore-test")
             .withUsername("flexicore")

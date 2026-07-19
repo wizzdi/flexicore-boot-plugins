@@ -34,7 +34,7 @@ public class PublicKeyService implements Plugin {
 
     @Cacheable(cacheNames = CACHE_NAME,key = "#remoteId",cacheManager = "publicKeyCacheManager")
     public PublicKeyResponse getPublicKeyForGateway(String remoteId) {
-        return gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(remoteId))).stream().findFirst()
+        return gatewayService.listAllGateways(null, new GatewayFilter().setExternalIds(Collections.singleton(remoteId))).stream().findFirst()
                 .map(e -> getPublicKeyResponse(e)).orElse(null);
     }
     @CacheEvict(cacheNames = CACHE_NAME,key = "#remoteId",cacheManager = "publicKeyCacheManager")

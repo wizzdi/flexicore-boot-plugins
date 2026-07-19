@@ -14,6 +14,7 @@ import java.util.Map;
 @Entity
 @Table(indexes = {
         @Index(name = "remote_idx",columnList = "remoteId,lastSeen,gateway_id,dtype"),
+        @Index(name = "remote_external_id_idx", columnList = "externalId", unique = true),
         @Index(name = "remote_health_deadline_idx", columnList = "nextHealthEvaluationAt")
 })
 public class Remote extends Baseclass {
@@ -24,6 +25,7 @@ public class Remote extends Baseclass {
     @Column(columnDefinition = "timestamp with time zone")
     private OffsetDateTime lastSeen;
 
+    private String externalId;
     private String remoteId;
     private String version;
     @ManyToOne(targetEntity = MappedPOI.class)
@@ -117,6 +119,15 @@ public class Remote extends Baseclass {
 
     public <T extends Remote> T setLastConnectivityChange(ConnectivityChange lastConnectivityChange) {
         this.lastConnectivityChange = lastConnectivityChange;
+        return (T) this;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends Remote> T setExternalId(String externalId) {
+        this.externalId = externalId;
         return (T) this;
     }
 

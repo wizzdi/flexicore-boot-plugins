@@ -19,6 +19,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -48,7 +49,7 @@ public class BasicIOTClient {
 
     private IntegrationFlow inbound;
     private final ObjectMapper objectMapper;
-    private final Iterable<IOTMessageSubscriber> subscribers;
+    private final CopyOnWriteArrayList<IOTMessageSubscriber> subscribers;
     private IntegrationFlow outbound;
     private MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter;
     private final Queue<IOTMessageSubscriber> requestResponseMessageHandlers = new LinkedBlockingQueue<>();
@@ -66,7 +67,8 @@ public class BasicIOTClient {
 
     public BasicIOTClient(String id, PrivateKey key, ObjectMapper objectMapper, Iterable<IOTMessageSubscriber> subscribers, boolean client,Consumer<IOTMessage> outgoingMessageCallback) {
         this.objectMapper = objectMapper;
-        this.subscribers = subscribers;
+        this.subscribers = new CopyOnWriteArrayList<>();
+        subscribers.forEach(this.subscribers::addIfAbsent);
         this.id = id;
         this.client = client;
         this.outgoingMessageCallback=outgoingMessageCallback;
@@ -88,6 +90,27 @@ public class BasicIOTClient {
     public <T extends BasicIOTClient> T setPublicKeyProvider(PublicKeyProvider publicKeyProvider) {
         this.publicKeyProvider = publicKeyProvider;
         return (T) this;
+    }
+
+    /**
+     * Registers a subscriber after this client has already been constructed.
+     * This is required for PF4J plugins that are loaded after the Basic IoT service.
+     *
+     * @return true when the subscriber was added, false when it was already registered
+     */
+    public boolean addSubscriber(IOTMessageSubscriber subscriber) {
+        return subscribers.addIfAbsent(Objects.requireNonNull(subscriber, "subscriber"));
+    }
+
+    /**
+     * Removes a previously registered runtime subscriber.
+     */
+    public boolean removeSubscriber(IOTMessageSubscriber subscriber) {
+        return subscriber != null && subscribers.remove(subscriber);
+    }
+
+    public int getSubscriberCount() {
+        return subscribers.size();
     }
 
     public BasicIOTConnection open(IntegrationFlow inbound, IntegrationFlow outbound, MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter) {

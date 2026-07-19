@@ -555,3 +555,13 @@ If you prefer to generate keys manually:
 - `GatewayService`: Handles gateway-specific security and proxy logic.
 - `RemoteService`: Common logic for all `Remote` entities, including property management.
 - `FirmwareUpdateService`: Manages the distribution and tracking of firmware packages.
+
+
+## MQTT provisioning identity
+
+MQTT provisioning treats `externalId` as the sole creation identity. Gateway protocol IDs are stored as both
+`Gateway.externalId` and `Gateway.remoteId`; device IDs are stored as both `Device.externalId` and
+`Device.remoteId`. `remoteId` remains the MQTT protocol address, but it is not used to decide whether a new
+Gateway or Device must be created. Pending gateways, gateways, devices, device types, state schemas and map
+icons created by this flow are resolved only by deterministic external IDs. Display names are never fallback
+identity keys. A supplied `deviceTypeExternalId` is mandatory when MQTT creates a new device.

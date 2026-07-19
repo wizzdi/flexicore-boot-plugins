@@ -122,6 +122,18 @@ public class StateSchemaService implements Plugin {
     public boolean updateStateSchemaNoMerge(StateSchema stateSchema,
                                         StateSchemaCreate stateSchemaCreate) {
         boolean updated = basicService.updateBasicNoMerge(stateSchemaCreate, stateSchema);
+        String requestedExternalId = normalizeExternalId(stateSchemaCreate.getExternalId());
+        if (requestedExternalId == null && stateSchema.getExternalId() == null
+                && stateSchemaCreate.getDeviceType() != null && stateSchemaCreate.getVersion() != null) {
+            String deviceTypeExternalId = normalizeExternalId(stateSchemaCreate.getDeviceType().getExternalId());
+            if (deviceTypeExternalId != null) {
+                requestedExternalId = deviceTypeExternalId + ".schema." + stateSchemaCreate.getVersion();
+            }
+        }
+        if (requestedExternalId != null && !requestedExternalId.equals(stateSchema.getExternalId())) {
+            stateSchema.setExternalId(requestedExternalId);
+            updated = true;
+        }
         if(stateSchemaCreate.getStateSchemaJson()!=null&&!stateSchemaCreate.getStateSchemaJson().equals(stateSchema.getStateJsonSchema())){
             stateSchema.setStateJsonSchema(stateSchemaCreate.getStateSchemaJson());
             updated=true;
@@ -141,6 +153,14 @@ public class StateSchemaService implements Plugin {
         }
 
         return updated;
+    }
+
+    private String normalizeExternalId(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 
     public StateSchema updateStateSchema(StateSchemaUpdate stateSchemaUpdate,

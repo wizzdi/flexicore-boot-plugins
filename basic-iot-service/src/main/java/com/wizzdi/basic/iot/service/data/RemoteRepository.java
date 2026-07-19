@@ -82,6 +82,9 @@ public class RemoteRepository implements Plugin {
                                                            CriteriaBuilder cb, CriteriaQuery<?> q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
 
+        if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
+            preds.add(r.get("externalId").in(filtering.getExternalIds()));
+        }
         if(filtering.getRemoteIds()!=null&&!filtering.getRemoteIds().isEmpty()){
             preds.add(r.get(Remote_.remoteId).in(filtering.getRemoteIds()));
         }

@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // deactivate the default behaviour
 public class MapFilterComponentTest {
 
-    private final static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:15")
+    private final static PostgreSQLContainer postgresqlContainer = new PostGISContainer()
 
             .withDatabaseName("flexicore-test")
             .withUsername("flexicore")

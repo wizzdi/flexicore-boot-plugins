@@ -62,6 +62,9 @@ public class PendingGatewayRepository implements Plugin {
     public <T extends PendingGateway> void addPendingGatewayPredicates(PendingGatewayFilter filtering,
                                                            CriteriaBuilder cb, CommonAbstractCriteria q, From<?, T> r, List<Predicate> preds, SecurityContext securityContext) {
         securedBasicRepository.addSecuredBasicPredicates(filtering.getBasicPropertiesFilter(), cb, q, r, preds, securityContext);
+        if(filtering.getExternalIds()!=null&&!filtering.getExternalIds().isEmpty()){
+            preds.add(r.get("externalId").in(filtering.getExternalIds()));
+        }
         if(filtering.getRegistered()!=null){
             Path<Gateway> gatewayPath = r.get(PendingGateway_.registeredGateway);
             preds.add(filtering.getRegistered()?gatewayPath.isNotNull():gatewayPath.isNull());

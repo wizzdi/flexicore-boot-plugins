@@ -46,8 +46,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -194,7 +196,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             keepAliveBounceService.setLastBounce(keepAlive.getGatewayId(),System.currentTimeMillis());
 
         }
-        Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setRemoteIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
+        Optional<Gateway> gatewayOptional = gatewayService.listAllGateways(null, new GatewayFilter().setExternalIds(Collections.singleton(iotMessage.getGatewayId()))).stream().findFirst();
         if (gatewayOptional.isEmpty()) {
             logger.warn("could not get gateway {}", iotMessage.getGatewayId());
         }
@@ -261,7 +263,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     private MessageHandleContext onKeepAlive(KeepAlive keepAlive, Gateway gateway, SecurityContext gatewaySecurityContext) {
         MessageHandleContext messageHandleContext = new MessageHandleContext(new ArrayList<>(), new ArrayList<>(), null);
         List<Remote> remotesWithKeepAlive = new ArrayList<>(List.of(gateway));
-        List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(keepAlive.getDeviceIds()));
+        List<Device> devices = keepAlive.getDeviceIds().isEmpty() ? new ArrayList<>() : deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setExternalIds(keepAlive.getDeviceIds()));
         remotesWithKeepAlive.addAll(devices);
         UpdateKeepAliveResponse updateKeepAliveResponse = updateKeepAlive(keepAlive.getSentAt(), gatewaySecurityContext, remotesWithKeepAlive);
         List<Remote> remotesThatChangedState=updateKeepAliveResponse.statusChanged();
@@ -661,7 +663,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             if (configuredMapIcon != null) {
                 return configuredMapIcon;
             }
-            return deviceTypeService.getOrCreateMapIcon(status, deviceType.getName(), deviceClass,gatewaySecurityContext);
+            return deviceTypeService.getOrCreateMapIcon(status, deviceType.getExternalId(), deviceType.getName(), deviceClass,gatewaySecurityContext);
 
         }
         return null;
@@ -676,12 +678,24 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
                 .setGateway(gateway)
                 .setDeviceProperties(state)
                 .setVersion(version)
+                .setExternalId(deviceId)
                 .setName(deviceId);
 
 
-        Device device = deviceService.listAllDevices(gatewaySecurityContext, new DeviceFilter().setRemoteIds(Collections.singleton(deviceId))).stream().findFirst().orElse(null);
+        List<Device> matchingDevices = deviceService.listAllDevices(gatewaySecurityContext,
+                new DeviceFilter().setExternalIds(Collections.singleton(deviceId)));
+        if (matchingDevices.size() > 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "multiple Device records found for externalId " + deviceId);
+        }
+        Device device = matchingDevices.stream().findFirst().orElse(null);
         if (device == null) {
-            DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, deviceTypeExternalId, gatewaySecurityContext);
+            String normalizedDeviceTypeExternalId = normalize(deviceTypeExternalId);
+            if (normalizedDeviceTypeExternalId == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "deviceTypeExternalId is required when creating device " + deviceId);
+            }
+            DeviceType deviceType = deviceTypeService.getOrCreateDeviceType(deviceTypeId, normalizedDeviceTypeExternalId, gatewaySecurityContext);
             deviceCreate
                     .setDeviceType(deviceType)
                     .setRemoteId(deviceId);
@@ -752,7 +766,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
         Object lock = registerGatewayLocks.computeIfAbsent(gatewayId, ignored -> new Object());
         synchronized (lock) {
             Optional<Gateway> existingGateway = gatewayService.listAllGateways(null,
-                    new GatewayFilter().setRemoteIds(Collections.singleton(gatewayId))).stream().findFirst();
+                    new GatewayFilter().setExternalIds(Collections.singleton(gatewayId))).stream().findFirst();
             if (existingGateway.isPresent()) {
                 Gateway gateway = existingGateway.get();
                 if (!sameTenant(gateway.getTenant(), targetTenant)) {
@@ -768,7 +782,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
             }
 
             List<PendingGateway> pendingGateways = pendingGatewayService.listAllPendingGateways(null,
-                    new PendingGatewayFilter().setGatewayIds(Collections.singleton(gatewayId)));
+                    new PendingGatewayFilter().setExternalIds(Collections.singleton(gatewayId)));
             Optional<PendingGateway> wrongTenantPending = pendingGateways.stream()
                     .filter(f -> !sameTenant(f.getTenant(), targetTenant))
                     .findFirst();
@@ -809,6 +823,7 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
 
             RegistrationLocation registrationLocation = resolveRegistrationLocation(registerGateway);
             PendingGateway pendingGateway = pendingGatewayService.createPendingGateway(new PendingGatewayCreate()
+                    .setExternalId(gatewayId)
                     .setGatewayId(gatewayId)
                     .setPublicKey(registerGateway.getPublicKey())
                     .setNoSignatureCapabilities(registerGateway.getNoSignatureCapabilities())
@@ -988,8 +1003,25 @@ public class BasicIOTLogic implements Plugin, IOTMessageSubscriber {
     }
 
     private StateSchema getOrCreateStateSchema(DeviceType deviceType, int version, String jsonSchema, SecurityContext gatewaySecurityContext) {
-        StateSchema stateSchema=stateSchemaService.listAllStateSchemas(null,new StateSchemaFilter().setUserAddedSchema(false).setVersion(version).setDeviceTypes(Collections.singletonList(deviceType))).stream().findFirst().orElse(null);
-        StateSchemaCreate stateSchemaCreate=new StateSchemaCreate().setDeviceType(deviceType).setVersion(version).setStateSchemaJson(jsonSchema).setName(deviceType.getName()+" Schema V"+version);
+        String deviceTypeExternalId = normalize(deviceType.getExternalId());
+        if (deviceTypeExternalId == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "DeviceType externalId is required before creating a StateSchema");
+        }
+        String stateSchemaExternalId = deviceTypeExternalId + ".schema." + version;
+        List<StateSchema> matchingSchemas = stateSchemaService.listAllStateSchemas(null,
+                new StateSchemaFilter().setExternalIds(Collections.singleton(stateSchemaExternalId)));
+        if (matchingSchemas.size() > 1) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "multiple StateSchema records found for externalId " + stateSchemaExternalId);
+        }
+        StateSchema stateSchema=matchingSchemas.stream().findFirst().orElse(null);
+        StateSchemaCreate stateSchemaCreate=new StateSchemaCreate()
+                .setDeviceType(deviceType)
+                .setVersion(version)
+                .setStateSchemaJson(jsonSchema)
+                .setExternalId(stateSchemaExternalId)
+                .setName(deviceType.getName()+" Schema V"+version);
         if(stateSchema==null){
             stateSchema=stateSchemaService.createStateSchema(stateSchemaCreate,gatewaySecurityContext);
         }

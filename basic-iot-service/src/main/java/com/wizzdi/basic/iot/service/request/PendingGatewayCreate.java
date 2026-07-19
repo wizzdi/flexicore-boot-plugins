@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 
 public class PendingGatewayCreate extends BasicCreate {
 
+    private String externalId;
     private String gatewayId;
     private String publicKey;
     private String registeredGatewayId;
@@ -23,6 +24,15 @@ public class PendingGatewayCreate extends BasicCreate {
     private OffsetDateTime gatewayConfirmationReceivedAt;
     private OffsetDateTime lastGatewayConfirmationSentAt;
     private Integer gatewayConfirmationAttempts;
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public <T extends PendingGatewayCreate> T setExternalId(String externalId) {
+        this.externalId = externalId;
+        return (T) this;
+    }
 
     public String getGatewayId() {
         return gatewayId;

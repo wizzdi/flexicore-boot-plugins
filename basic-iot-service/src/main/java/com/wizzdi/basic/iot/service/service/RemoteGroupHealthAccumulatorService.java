@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -129,13 +130,16 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
 
             Map<String, Map<Integer, RemoteGroupSeverityBucket>> bucketsByAccumulator = new HashMap<>();
             for (RemoteGroupHealthAccumulator accumulator : accumulators.values()) {
-                Map<Integer, RemoteGroupSeverityBucket> buckets = repository.listBuckets(accumulator.getId()).stream()
-                        .collect(Collectors.toMap(RemoteGroupSeverityBucket::getSeverityValue, bucket -> bucket));
-                for (RemoteGroupSeverityBucket bucket : buckets.values()) {
+                BucketLoad bucketLoad = loadBuckets(accumulator.getId());
+                for (RemoteGroupSeverityBucket duplicate : bucketLoad.duplicates()) {
+                    duplicate.setSoftDelete(true);
+                    toMerge.add(duplicate);
+                }
+                for (RemoteGroupSeverityBucket bucket : bucketLoad.buckets().values()) {
                     bucket.setMemberCount(0).setTotalWeight(0).setSoftDelete(false);
                     toMerge.add(bucket);
                 }
-                bucketsByAccumulator.put(accumulator.getId(), buckets);
+                bucketsByAccumulator.put(accumulator.getId(), bucketLoad.buckets());
             }
 
             for (RemoteGroupMemberHealthState state : activeStates) {
@@ -186,8 +190,12 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
             Map<String, Map<Integer, RemoteGroupSeverityBucket>> bucketsByAccumulator = new HashMap<>();
             List<Object> toMerge = new ArrayList<>();
             for (RemoteGroupHealthAccumulator accumulator : accumulators.values()) {
-                bucketsByAccumulator.put(accumulator.getId(), repository.listBuckets(accumulator.getId()).stream()
-                        .collect(Collectors.toMap(RemoteGroupSeverityBucket::getSeverityValue, bucket -> bucket)));
+                BucketLoad bucketLoad = loadBuckets(accumulator.getId());
+                if (!bucketLoad.duplicates().isEmpty()) {
+                    reconcile(states.get(0).getRemoteGroup(), now);
+                    return;
+                }
+                bucketsByAccumulator.put(accumulator.getId(), bucketLoad.buckets());
             }
             for (RemoteGroupMemberHealthState state : states) {
                 if (!state.isActive() || state.getRemote() == null || state.getRemoteGroupToRemote() == null) {
@@ -283,8 +291,11 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
         Map<DimensionKey, RemoteGroupHealthAccumulator> accumulators = loadAccumulatorMap(group.getId());
         Map<String, Map<Integer, RemoteGroupSeverityBucket>> buckets = new HashMap<>();
         for (RemoteGroupHealthAccumulator accumulator : accumulators.values()) {
-            buckets.put(accumulator.getId(), repository.listBuckets(accumulator.getId()).stream()
-                    .collect(Collectors.toMap(RemoteGroupSeverityBucket::getSeverityValue, bucket -> bucket)));
+            BucketLoad bucketLoad = loadBuckets(accumulator.getId());
+            if (!bucketLoad.duplicates().isEmpty()) {
+                return reconcile(group, now);
+            }
+            buckets.put(accumulator.getId(), bucketLoad.buckets());
         }
         List<RemoteGroupMemberHealthState> states = repository.listActiveMemberStates(group.getId(), null, false);
         List<RemoteGroupToRemote> memberships = states.stream()
@@ -444,7 +455,7 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
                 accumulator.getId(), ignored -> new HashMap<>());
         RemoteGroupSeverityBucket bucket = buckets.computeIfAbsent(state.getSeverityValue(), ignored -> {
             RemoteGroupSeverityBucket created = new RemoteGroupSeverityBucket();
-            created.setId(UUID.randomUUID().toString());
+            created.setId(deterministicBucketId(accumulator.getId(), state.getSeverityValue()));
             created.setName("severity-" + state.getSeverityValue());
             created.setAccumulator(accumulator);
             derivedEntitySecurityService.inheritFromGroup(created, accumulator.getRemoteGroup());
@@ -479,6 +490,47 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
                 updateBucket(accumulator, afterState, 1, bucketsByAccumulator, toMerge);
             }
         }
+    }
+
+
+    private BucketLoad loadBuckets(String accumulatorId) {
+        Map<Integer, RemoteGroupSeverityBucket> buckets = new LinkedHashMap<>();
+        List<RemoteGroupSeverityBucket> duplicates = new ArrayList<>();
+        for (RemoteGroupSeverityBucket bucket : repository.listBuckets(accumulatorId)) {
+            Integer severityValue = bucket.getSeverityValue();
+            if (severityValue == null) {
+                duplicates.add(bucket);
+                continue;
+            }
+            RemoteGroupSeverityBucket existing = buckets.get(severityValue);
+            if (existing == null) {
+                buckets.put(severityValue, bucket);
+                continue;
+            }
+            RemoteGroupSeverityBucket canonical = canonicalBucket(existing, bucket);
+            RemoteGroupSeverityBucket duplicate = canonical == existing ? bucket : existing;
+            buckets.put(severityValue, canonical);
+            duplicates.add(duplicate);
+        }
+        return new BucketLoad(buckets, duplicates);
+    }
+
+    private RemoteGroupSeverityBucket canonicalBucket(RemoteGroupSeverityBucket one,
+                                                      RemoteGroupSeverityBucket two) {
+        String oneId = one.getId();
+        String twoId = two.getId();
+        if (oneId == null) {
+            return two;
+        }
+        if (twoId == null) {
+            return one;
+        }
+        return oneId.compareTo(twoId) <= 0 ? one : two;
+    }
+
+    private String deterministicBucketId(String accumulatorId, Integer severityValue) {
+        String key = "remote-group-severity-bucket:" + accumulatorId + ":" + severityValue;
+        return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8)).toString();
     }
 
     private boolean isActive(RemoteGroupToRemote membership, OffsetDateTime now) {
@@ -520,6 +572,10 @@ public class RemoteGroupHealthAccumulatorService implements Plugin {
     }
 
     public record DimensionKey(String roleId, boolean requiredOnly) {
+    }
+
+    private record BucketLoad(Map<Integer, RemoteGroupSeverityBucket> buckets,
+                              List<RemoteGroupSeverityBucket> duplicates) {
     }
 
     public record GroupAccumulatorSnapshot(
