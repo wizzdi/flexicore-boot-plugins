@@ -1496,9 +1496,10 @@ public class IotTesterService implements Plugin, IOTMessageSubscriber<IOTMessage
         verifyTenantCollection(context, "GRP-003A",
                 "Remote-group membership is owned by the requested tenant", List.of(membership));
 
-        RemoteGroupHealthSnapshot snapshot = remoteGroupFleetHealthService.evaluate(context.remoteGroup.getId(), context.securityContext);
-        verify(context.report, "GRP-004", "Fleet aggregation detects one critical member", "severity 80, population 1",
-                () -> snapshot,
+        waitFor(context, "GRP-004",
+                "Event-driven fleet aggregation detects one critical member",
+                "severity 80, population 1",
+                () -> remoteGroupFleetHealthService.evaluate(context.remoteGroup.getId(), context.securityContext),
                 value -> value != null && value.populationCount() == 1
                         && Objects.equals(value.severityValue(), 80) && value.humanInterventionRequired(),
                 value -> value == null ? "null" : "severity=" + value.severityValue() + ", population=" + value.populationCount());

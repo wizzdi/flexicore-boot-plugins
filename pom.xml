@@ -59,6 +59,7 @@
         <module>basic-iot-model</module>
         <module>basic-iot-service</module>
         <module>basic-iot-tester-service</module>
+        <module>tenant-data-administration-service</module>
         <module>health-notification-sendgrid-service</module>
         <module>health-notification-whatsapp-service</module>
         <module>basic-iot-triggers-service</module>
@@ -190,6 +191,12 @@
             <dependency>
                 <groupId>com.wizzdi</groupId>
                 <artifactId>basic-iot-tester-service</artifactId>
+                <version>${revision}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.wizzdi</groupId>
+                <artifactId>tenant-data-administration-service</artifactId>
                 <version>${revision}</version>
                 <scope>provided</scope>
             </dependency>
